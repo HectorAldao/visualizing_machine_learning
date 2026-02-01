@@ -1,4 +1,5 @@
 extends Node
+
 var dtree: DTreeLogical
 var canvas: Control
 var next_node_id: int = 0
@@ -7,10 +8,12 @@ var next_node_id: int = 0
 func initialize(p_tree: DTreeLogical, p_canvas: Control) -> void:
 	dtree = p_tree
 	canvas = p_canvas
+
 	# Initialize next_node_id based on existing nodes
 	for id in dtree.nodes_dict.keys():
 		if id >= next_node_id:
 			next_node_id = id + 1
+
 	_connect_all_node_signals()
 	_update_canvas()
 
@@ -52,17 +55,20 @@ func _add_child_node(parent_id: int) -> void:
 	var new_id = next_node_id
 	next_node_id += 1
 	
+	# The new node is created
 	var dnode = preload("res://scenes/objects/dtree/dnode/dnode.tscn").instantiate()
 	dnode.id = new_id
 	dnode.parent_id = parent_id
 	dnode.depth = parent_dnode.depth + 1
 
+	# Is added to the three
 	dtree.nodes_dict[new_id] = dnode
-
-	parent_dnode.sons_id.append(new_id)
-
 	dtree.nodes_container.add_child(dnode)
 
+	# Is added to the list of childs of its parent
+	parent_dnode.sons_id.append(new_id)
+
+	# And is connected
 	_connect_signal_for_node(new_id)
 
 
