@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://bvm44kn2u2552"]
+
+[ext_resource type="Script" uid="uid://df5gxvxcrspyx" path="res://scenes/objects/dtree/conection/conection.gd" id="1_h1wmp"]
+
+[node name="Conexion" type="Line2D"]
+default_color = Color(0, 0, 0, 1)
+script = ExtResource("1_h1wmp")
