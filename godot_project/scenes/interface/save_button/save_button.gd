@@ -1,11 +1,11 @@
-extends Control
+extends Button
 
 func _ready() -> void:
-	$Button.pressed.connect(_on_button_pressed)
+	pressed.connect(_on_button_pressed)
 
 
 func _on_button_pressed() -> void:
-	_save_tree($"../ScrollContainer/ArbolCanvas/Arbol", "user://tree.json")
+	_save_tree($"../ScrollContainer/DTreeCanvas/DTree", "user://tree.json")
 
 
 func _save_tree(arbol: Variant, file_path: String = "user://tree.json") -> void:

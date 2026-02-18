@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://5h4ba5ys8aml"]
+
+[ext_resource type="Script" uid="uid://cdgu4m1kfdibr" path="res://scenes/controllers/controller_dtree/controller_dtree.gd" id="1_5qcpj"]
+
+[node name="ControllerDtree" type="Node" unique_id=387693380]
+script = ExtResource("1_5qcpj")
+panel_algorithm_dtree_scene = "res://scenes/interface/panel_algorithm_dtree/panel_algorithm_dtree.tscn"
+dnode_scene = "uid://b54b7e4e3ojl8"

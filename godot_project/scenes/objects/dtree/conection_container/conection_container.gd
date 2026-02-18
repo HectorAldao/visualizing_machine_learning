@@ -1,4 +1,4 @@
-extends Node2D
+extends Control
 
 func _draw():
 	# Clear all existing connections first
@@ -20,5 +20,9 @@ func _draw_edge(parent_id: int, child_id: int):
 
 	conection.from_node = parent_node
 	conection.to_node = child_node
+	
+	# Asignar el texto de la conexión basado en el branch_value del nodo hijo
+	if child_node.branch_value != null:
+		conection.text = str(child_node.branch_value)
 
 	add_child(conection)

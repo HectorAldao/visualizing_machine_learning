@@ -1,25 +1,66 @@
-extends Node2D
 class_name DTreeLogical
+extends Control
 
-# Take the allready instantiated containters
-@onready var nodes_container : Node2D = $ContenedorNodos
-@onready var edges_container : Node2D = $ContenedorConexiones
 
+@export_file("*.tscn") var dnode_scene: String  # "res://scenes/objects/dtree/dnode/dnode.tscn"
+
+
+const V_SPACING: float = 150.0
+const H_SPACING: float = 120.0
+
+
+# Display related variables
 var nodes_dict = {}
 var root_id = null
-
-const V_SPACING := 150.0
-const H_SPACING := 120.0
+var _current_inorder_index = 0
 
 
+# ML related variables
+var mode: String = "manual"  # Mode: "manual" or "automatic"
 
-func _ready():
-	_create_root()
-	relayout_tree()
+
+@onready var nodes_container : Control = $NodeContainer
+@onready var edges_container : Control = $ConectionContainer
+
+
+
+func set_mode(p_mode: String) -> void:
+	mode = p_mode
+	
+	if mode == "manual":
+		_create_root()
+		relayout_tree()
+
+
+func update_canvas_size_and_center() -> void:
+	var tree_rect: Rect2 = get_tree_bounds()
+	
+	var needed := tree_rect.size
+	
+	# Get parent size, handling both Control and SubViewport parents
+	var parent_size := Vector2.ZERO
+	var parent = get_parent()
+	if parent is Control:
+		parent_size = parent.size
+	elif parent is SubViewport:
+		parent_size = parent.size
+	
+	var final_size := Vector2(
+		max(needed.x, parent_size.x),
+		max(needed.y, parent_size.y)
+	)
+	
+	# Set the attribute of the node Control
+	custom_minimum_size = final_size
+	
+	# Center the tree inside the canvas
+	var canvas_center := final_size * 0.5
+	var tree_center := tree_rect.position + tree_rect.size * 0.5
+	position = canvas_center - tree_center
 
 
 func _create_root():
-	var dnode : DNode = preload("res://scenes/objects/dtree/dnode/dnode.tscn").instantiate()
+	var dnode : DNode = load(dnode_scene).instantiate()
 	dnode.id = 0
 	dnode.depth = 0
 	dnode.inorder_index = 0.0
@@ -31,7 +72,15 @@ func _create_root():
 
 
 
+func relayout_tree():
+	_current_inorder_index = 0
+	_assign_inorder_indices(root_id)
+	_apply_positions()
+	_redraw_edges()
+
+
 func _apply_positions():
+	print("_apply_positions called")
 	var min_x = INF
 	var max_x = -INF
 
@@ -50,16 +99,6 @@ func _apply_positions():
 	for dnode in nodes_dict.values():
 		dnode.position.x -= center_x
 
-var _current_inorder_index = 0
-
-func relayout_tree():
-	if root_id == null:
-		return
-
-	_current_inorder_index = 0
-	_assign_inorder_indices(root_id)
-	_apply_positions()
-	_redraw_edges()
 
 func _assign_inorder_indices(id: int) -> void:
 	if id == null:
@@ -111,8 +150,8 @@ func get_tree_bounds() -> Rect2:
 
 	var margin := 100.0  # margen alrededor del árbol
 	var pos  := Vector2(min_x - margin, min_y - margin)
-	var size := Vector2(
+	var tree_size := Vector2(
 		(max_x - min_x) + margin * 2.0,
 		(max_y - min_y) + margin * 2.0
 	)
-	return Rect2(pos, size)
+	return Rect2(pos, tree_size)

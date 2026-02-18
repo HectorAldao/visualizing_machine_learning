@@ -1,33 +1,10 @@
-[gd_scene load_steps=3 format=3 uid="uid://0y5oidrn5nxd"]
+[gd_scene format=3 uid="uid://0y5oidrn5nxd"]
 
 [ext_resource type="Script" uid="uid://c50sv8cwp5vxt" path="res://scenes/interface/load_button/load_button.gd" id="1_ll7xa"]
-[ext_resource type="LabelSettings" uid="uid://nvad55w00sah" path="res://scenes/interface/load_button/load_button_text.tres" id="3_jx1kn"]
 
-[node name="LoadButton" type="Control"]
-layout_mode = 3
-anchor_right = 0.22200002
-anchor_bottom = 0.19900002
-offset_right = 0.25598145
-offset_bottom = 0.04798889
-grow_horizontal = 2
-grow_vertical = 2
+[node name="LoadButton" type="Button" unique_id=527153130]
+offset_right = 152.0
+offset_bottom = 40.0
+text = "Cargar Arbol"
 script = ExtResource("1_ll7xa")
-
-[node name="Button" type="Button" parent="."]
-layout_mode = 0
-offset_left = -125.0
-offset_top = -61.0
-offset_right = 125.0
-offset_bottom = 61.0
-
-[node name="Label" type="Label" parent="."]
-layout_mode = 0
-offset_left = -122.0
-offset_top = -58.0
-offset_right = 121.0
-offset_bottom = 58.0
-text = "Load
-tree"
-label_settings = ExtResource("3_jx1kn")
-horizontal_alignment = 1
-vertical_alignment = 1
+dtree_scene = "uid://dy3l4lsa0srpr"

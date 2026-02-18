@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://j220721ca3np"]
+[gd_scene format=3 uid="uid://j220721ca3np"]
 
 [ext_resource type="Script" uid="uid://cfirevud3ti3f" path="res://scenes/menus/main_menu.gd" id="1_8gy84"]
 
-[node name="MainMenu" type="Control"]
+[node name="MainMenu" type="Control" unique_id=807388]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -10,20 +10,19 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_8gy84")
+dtree_view_scene = "uid://dr3bg1sj3y1nu"
 
-[node name="DTreeButton" type="Button" parent="."]
+[node name="DTreeButton" type="Button" parent="." unique_id=514394525]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -90.5
+offset_left = -90.0
 offset_top = -37.0
-offset_right = 90.5
+offset_right = 91.0
 offset_bottom = 37.0
 grow_horizontal = 2
 grow_vertical = 2
 text = "Decision Tree"
-
-[connection signal="pressed" from="DTreeButton" to="." method="_on_d_tree_button_pressed"]

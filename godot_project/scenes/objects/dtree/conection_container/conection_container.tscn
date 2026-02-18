@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://ci7giiq21giw1"]
+
+[ext_resource type="Script" uid="uid://diov2wi3fel3h" path="res://scenes/objects/dtree/conection_container/conection_container.gd" id="1_sbgig"]
+
+[node name="ConectionContainer" type="Control" unique_id=1025502829]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_sbgig")

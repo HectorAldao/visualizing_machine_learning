@@ -1,32 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://bbvvlbyvwjc5"]
+[gd_scene format=3 uid="uid://bbvvlbyvwjc5"]
 
 [ext_resource type="Script" uid="uid://dgln3o2k880nv" path="res://scenes/interface/save_button/save_button.gd" id="1_slsja"]
-[ext_resource type="LabelSettings" uid="uid://nvad55w00sah" path="res://scenes/interface/load_button/load_button_text.tres" id="2_vlcxy"]
 
-[node name="SaveButton" type="Control"]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="SaveButton" type="Button" unique_id=1475524492]
+offset_right = 171.0
+offset_bottom = 40.0
+text = "Guardar Arbol"
 script = ExtResource("1_slsja")
-
-[node name="Button" type="Button" parent="."]
-layout_mode = 0
-offset_left = -125.0
-offset_top = -60.0
-offset_right = 124.0
-offset_bottom = 60.0
-
-[node name="Label" type="Label" parent="."]
-layout_mode = 0
-offset_left = -123.0
-offset_top = -60.0
-offset_right = 123.0
-offset_bottom = 60.0
-text = "Save
-tree"
-label_settings = ExtResource("2_vlcxy")
-horizontal_alignment = 1
-vertical_alignment = 1

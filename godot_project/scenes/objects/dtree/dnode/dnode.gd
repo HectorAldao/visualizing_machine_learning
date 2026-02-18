@@ -1,43 +1,36 @@
-extends Node2D
 class_name DNode
+extends Button
 
 
-var id
-var parent_id
+# Logic related variables
+var id: int
+var parent_id: int
 var sons_id: Array[int] = []
-var depth = 0
+var depth: int = 0
 var inorder_index: float = 0.0
 
-
-var can_remove := true
-
+var can_remove := true  # For the root node
 
 
-@onready var area_2d := $Area2D
-@onready var sprite := $Sprite2D
+# ML related variables
+var attribute: String = ""  # Attribute to split on (if not leaf)
+var label: String = ""      # Class label (if leaf)
+var is_leaf: bool = false   # Whether this is a leaf node
+var branch_value = null     # The value this node represents from parent's split
 
- 
 
+
+# Signals
 signal change_child_requested(type_of_change: String)
-
+ 
 
 
 func _ready():
-	area_2d.input_pickable = true
-	area_2d.connect("mouse_entered", _on_mouse_entered)
-	area_2d.connect("mouse_exited", _on_mouse_exited)
-	area_2d.connect("input_event", _on_area_input_event)
+	mouse_filter = Control.MOUSE_FILTER_PASS
+	connect("gui_input", _on_gui_input)
 
 
-func _on_mouse_entered():
-	sprite.modulate = Color(0, 1, 0)
-
-
-func _on_mouse_exited():
-	sprite.modulate = Color(1, 1, 1)  # Returns to normal
-
-
-func _on_area_input_event(_viewport, event, _shape_idx):
+func _on_gui_input(event: InputEvent):
 	if event is InputEventMouseButton \
 	and (event.button_index == MOUSE_BUTTON_RIGHT or event.button_index == MOUSE_BUTTON_LEFT) \
 	and event.pressed:
@@ -53,7 +46,8 @@ func _open_context_menu(mouse_pos: Vector2) -> void:
 
 	menu.id_pressed.connect(_on_menu_id_pressed)
 
-	menu.position = mouse_pos
+	var global_mouse_pos = get_screen_position() + mouse_pos
+	menu.position = global_mouse_pos
 	menu.popup()
 
 

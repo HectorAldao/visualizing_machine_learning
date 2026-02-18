@@ -1,9 +1,12 @@
-extends Control
+extends Button
+
+
+@export_file("*.tscn") var dtree_scene: String  # "scenes/controllers/controller_dtree/controller_dtree.gd"
 
 
 func _ready() -> void:
 	# When the NodoControl is created (the one that contains the node button) it connects to the signal "pressed" of its child Button to the funcion "_on_button_pressed".
-	$Button.pressed.connect(_on_button_pressed)
+	pressed.connect(_on_button_pressed)
 
 
 func _on_button_pressed() -> void:
@@ -40,7 +43,7 @@ func _load_tree(dtree_path: CanvasItem, json_content_raw: String) -> void:
 	var json_content: Dictionary = JSON.to_native(JSON.parse_string(json_content_raw))
 
 	# Create the tree
-	var dtree: DTreeLogical = preload("res://scenes/objects/dtree/dtree/dtree.tscn").instantiate()
+	var dtree: DTreeLogical = load(dtree_scene).instantiate()
 
 	# print(json_content[0])
 

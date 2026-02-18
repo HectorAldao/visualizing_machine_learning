@@ -1,36 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://b54b7e4e3ojl8"]
+[gd_scene format=3 uid="uid://b54b7e4e3ojl8"]
 
-[ext_resource type="Texture2D" uid="uid://bklkhvabdpoj8" path="res://assets/dnode/dnode.png" id="1_kdpii"]
 [ext_resource type="Script" uid="uid://ua3ksp37kws3" path="res://scenes/objects/dtree/dnode/dnode.gd" id="1_y57p0"]
 
-[sub_resource type="GDScript" id="GDScript_gkyod"]
-script/source = "extends Area2D
-"
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_y57p0"]
-size = Vector2(30.103165, 29.729984)
-
-[node name="Nodo" type="Node2D"]
-scale = Vector2(1.6595107, 1.6595107)
+[node name="DNode" type="Button" unique_id=1137125701]
+offset_right = 50.0
+offset_bottom = 50.0
+text = "1"
 script = ExtResource("1_y57p0")
-
-[node name="Sprite2D" type="Sprite2D" parent="."]
-scale = Vector2(0.99999994, 0.99999994)
-texture = ExtResource("1_kdpii")
-
-[node name="Label" type="Label" parent="."]
-offset_left = -13.25692
-offset_top = -9.038809
-offset_right = 22.74308
-offset_bottom = 13.961191
-scale = Vector2(0.7283554, 0.7283554)
-text = "1 < 2"
-horizontal_alignment = 1
-metadata/_edit_use_anchors_ = true
-
-[node name="Area2D" type="Area2D" parent="."]
-script = SubResource("GDScript_gkyod")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
-scale = Vector2(0.99999994, 0.99999994)
-shape = SubResource("RectangleShape2D_y57p0")

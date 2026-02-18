@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://tg5i3lmvlt3s"]
+
+[ext_resource type="Script" uid="uid://vmp74e5leqgw" path="res://scenes/objects/dtree/algorithm_dtree/algorithm_dtree.gd" id="1_vrwwl"]
+
+[node name="DTreeAlgorithm" type="Node2D" unique_id=980379247]
+script = ExtResource("1_vrwwl")
+
+[node name="ContenedorNodos" type="Node2D" parent="." unique_id=1790994942]
+
+[node name="ContenedorConexiones" type="Node2D" parent="." unique_id=1178195744]

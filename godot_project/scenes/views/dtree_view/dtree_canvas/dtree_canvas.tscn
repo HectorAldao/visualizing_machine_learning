@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://iw8rta2sbf7j"]
+
+[ext_resource type="Script" uid="uid://c7ut7plu4rtss" path="res://scenes/views/dtree_view/dtree_canvas/dtree_canvas.gd" id="1_gnma6"]
+
+[node name="DTreeCanvas" type="Control" unique_id=229777749]
+layout_mode = 3
+anchors_preset = 0
+mouse_filter = 2
+script = ExtResource("1_gnma6")
+dtree_scene = "uid://dy3l4lsa0srpr"

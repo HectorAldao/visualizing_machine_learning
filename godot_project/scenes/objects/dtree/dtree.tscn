@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://dy3l4lsa0srpr"]
+
+[ext_resource type="Script" uid="uid://07hgapjkuklf" path="res://scenes/objects/dtree/dtree.gd" id="1_6xq3c"]
+[ext_resource type="PackedScene" uid="uid://ci7giiq21giw1" path="res://scenes/objects/dtree/conection_container/conection_container.tscn" id="2_6xq3c"]
+
+[node name="DTree" type="Control" unique_id=1801940639]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_6xq3c")
+dnode_scene = "uid://b54b7e4e3ojl8"
+
+[node name="ConectionContainer" parent="." unique_id=1025502829 instance=ExtResource("2_6xq3c")]
+
+[node name="NodeContainer" type="Control" parent="." unique_id=1441689950]
+layout_mode = 1
