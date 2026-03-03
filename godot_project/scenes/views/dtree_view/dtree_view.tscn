@@ -6,6 +6,9 @@
 [ext_resource type="PackedScene" uid="uid://dy3l4lsa0srpr" path="res://scenes/objects/dtree/dtree.tscn" id="4_dtree"]
 [ext_resource type="PackedScene" uid="uid://5h4ba5ys8aml" path="res://scenes/controllers/controller_dtree/controller_dtree.tscn" id="5_pxc03"]
 
+[sub_resource type="Theme" id="Theme_pxc03"]
+RichTextLabel/font_sizes/normal_font_size = 20
+
 [node name="DTreeView" type="Control" unique_id=998695186 node_paths=PackedStringArray("manual_dtree_button", "algorithmic_dtree_button")]
 layout_mode = 3
 anchors_preset = 15
@@ -85,8 +88,8 @@ layout_mode = 2
 
 [node name="Window" type="Window" parent="." unique_id=1444752708]
 oversampling_override = 1.0
-position = Vector2i(800, 201)
-size = Vector2i(264, 318)
+position = Vector2i(20, 150)
+size = Vector2i(300, 350)
 
 [node name="RichTextLabel" type="RichTextLabel" parent="Window" unique_id=476699901]
 anchors_preset = 15
@@ -94,5 +97,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = SubResource("Theme_pxc03")
 bbcode_enabled = true
-text = "Presiona el botón [b]\"Empezar entrenamiento\"[/b]"
+text = "Presiona el botón \"Empezar entrenamiento\""

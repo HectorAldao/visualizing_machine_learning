@@ -43,8 +43,8 @@ func _ready():
 	dtree_alg_menu.        visible = false
 	window.                visible = false
 	
-	window.position.x = 800
-	window.position.y = 200
+	window.position.x = 20
+	window.position.y = 150
 	
 
 
