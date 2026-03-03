@@ -27,8 +27,12 @@ horizontal_alignment = 1
 
 [node name="NextButton" type="Button" parent="VBoxContainer" unique_id=463114050]
 layout_mode = 2
-text = "Next Step"
+text = "Siguiente paso"
 
 [node name="StartTrainingButton" type="Button" parent="VBoxContainer" unique_id=1764974417]
 layout_mode = 2
-text = "Start Training"
+text = "Empezar entrenamiento"
+
+[node name="DetailButton" type="Button" parent="VBoxContainer" unique_id=847161373]
+layout_mode = 2
+text = "Detalle"

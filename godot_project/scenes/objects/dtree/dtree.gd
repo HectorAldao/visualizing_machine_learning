@@ -32,34 +32,7 @@ func set_mode(p_mode: String) -> void:
 		relayout_tree()
 
 
-func update_canvas_size_and_center() -> void:
-	var tree_rect: Rect2 = get_tree_bounds()
-	
-	var needed := tree_rect.size
-	
-	# Get parent size, handling both Control and SubViewport parents
-	var parent_size := Vector2.ZERO
-	var parent = get_parent()
-	if parent is Control:
-		parent_size = parent.size
-	elif parent is SubViewport:
-		parent_size = parent.size
-	
-	var final_size := Vector2(
-		max(needed.x, parent_size.x),
-		max(needed.y, parent_size.y)
-	)
-	
-	# Set the attribute of the node Control
-	custom_minimum_size = final_size
-	
-	# Center the tree inside the canvas
-	var canvas_center := final_size * 0.5
-	var tree_center := tree_rect.position + tree_rect.size * 0.5
-	position = canvas_center - tree_center
-
-
-func _create_root():
+func _create_root() -> void:
 	var dnode : DNode = load(dnode_scene).instantiate()
 	dnode.id = 0
 	dnode.depth = 0
@@ -71,15 +44,59 @@ func _create_root():
 	root_id = 0
 
 
-
-func relayout_tree():
+func relayout_tree() -> void:
 	_current_inorder_index = 0
 	_assign_inorder_indices(root_id)
 	_apply_positions()
 	_redraw_edges()
 
 
-func _apply_positions():
+func update_canvas_size_and_center() -> void:
+	var tree_rect: Rect2 = get_tree_bounds()
+	
+	# DTree is a direct child of ScrollContainer
+	# The container overrides the child's position,
+	# so we must NOT set position here.
+	# Instead, we translate the nodes inside the DTree so the tree content
+	# is centered within the canvas area.
+	
+	var scroll_container: ScrollContainer = null
+	var parent = get_parent()
+	if parent is ScrollContainer:
+		scroll_container = parent
+	
+	var parent_size := scroll_container.size if scroll_container else Vector2.ZERO
+	
+	var final_size := Vector2(
+		max(tree_rect.size.x, parent_size.x),
+		max(tree_rect.size.y, parent_size.y)
+	)
+	
+	# Calculate how much to shift all node positions so the tree is
+	# centered within the final_size canvas.
+	var canvas_center   := final_size * 0.5
+	var tree_bbox_center := tree_rect.position + tree_rect.size * 0.5
+	var offset          := canvas_center - tree_bbox_center
+	
+	for node in nodes_dict.values():
+		node.position += offset
+	
+	# Set the minimum size of this Control so the ScrollContainer gets
+	# the correct scrollable area.
+	custom_minimum_size = final_size
+	
+	# Scroll must be deferred: ScrollContainer only updates its scrollbar
+	# max_value after a layout pass, which is triggered by changing
+	# custom_minimum_size. Setting scroll_horizontal/vertical immediately
+	# would be clamped to the old (smaller) range.
+	if scroll_container:
+		var target_h := int(canvas_center.x - parent_size.x * 0.5)
+		var target_v := int(canvas_center.y - parent_size.y * 0.5)
+		scroll_container.set_deferred("scroll_horizontal", target_h)
+		scroll_container.set_deferred("scroll_vertical", target_v)
+
+
+func _apply_positions() -> void:
 	print("_apply_positions called")
 	var min_x = INF
 	var max_x = -INF
@@ -129,7 +146,7 @@ func _redraw_edges():
 	edges_container.queue_redraw()
 
 
-# Calcular las dimensiones del arbol
+# Calculate dtree dimensions
 func get_tree_bounds() -> Rect2:
 	#if nodes_visual.is_empty():
 	if nodes_dict.is_empty():

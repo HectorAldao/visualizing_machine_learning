@@ -2,7 +2,7 @@ extends Control
 
 
 
-@export_file("*.tscn") var dtree_view_scene: String  # "scenes/views/dtree/dtree_view.tscn" "scenes/views/dtree/dtree_view.gd"
+const dtree_view_scene: String = Constants.SCENES.dtree_view
 
 
 

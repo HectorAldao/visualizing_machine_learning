@@ -19,7 +19,6 @@ signal add_node_requested(parent_id: int, branch_value, attribute: String, label
 
 # Algorithm state
 var is_running: bool = false
-var is_paused: bool = true
 var current_step: int = 0
 
 # Training data
@@ -27,29 +26,38 @@ var training_data: Array = []
 var available_attributes: Array[String] = []
 
 # Tree reference (passed from dtree.gd)
-var tree_ref = null
+var dtree_ref: DTreeLogical
 
 # Call stack for step-by-step execution
 var call_stack: Array = []
+var called_stack: Array = []
+
+# Details dict of facts for the current node
+# that is going to be used for futher explication
+var details: Dictionary = {}
 
 # Track parent node IDs for each context
 var pending_parent_id: int = -1
 var last_created_node_id: int = -1
 
 
-func start_training(data: Array[Dictionary], attributes: Array[String], tree) -> void:
+# Buttons related functions #
+
+func start_training(data: Array[Dictionary], attributes: Array[String], dtree: DTreeLogical) -> void:
 	training_data = data
 	available_attributes = attributes.duplicate()
-	tree_ref = tree
+	dtree_ref = dtree
 	is_running = true
-	is_paused = true
 	current_step = 0
 	call_stack.clear()
 	pending_parent_id = -1
 	last_created_node_id = -1
+
+	# The "context" dictionaries contain for deach node the information
+	# needed to process that node
 	
 	# Initialize the root node building process
-	var root_context = {
+	var root_context: Dictionary[String, Variant] = {
 		"data": data,
 		"attributes": attributes.duplicate(),
 		"parent_id": -1,  # No parent for root
@@ -59,7 +67,7 @@ func start_training(data: Array[Dictionary], attributes: Array[String], tree) ->
 	}
 	call_stack.append(root_context)
 	
-	emit_signal("step_start", "training_started", {
+	step_start.emit("training_started", {
 		"data_size": data.size(),
 		"attributes": attributes
 	})
@@ -67,103 +75,88 @@ func start_training(data: Array[Dictionary], attributes: Array[String], tree) ->
 
 func next_step() -> void:
 	if not is_running or call_stack.is_empty():
-		emit_signal("algorithm_completed")
-		is_running = false
-		return
-	
-	is_paused = false
-	_process_next_step()
-	is_paused = true
-
-
-func _process_next_step() -> void:
-	if call_stack.is_empty():
-		emit_signal("algorithm_completed")
+		algorithm_completed.emit()
 		is_running = false
 		return
 	
 	var context = call_stack.pop_back()
+	called_stack.append(context)
 	_build_node_step(context)
 
 
+# Huge function: decide the node #
+
 func _build_node_step(context: Dictionary) -> void:
+
 	var data: Array = context["data"]
 	var attributes: Array = context["attributes"]
 	var parent_id: int = context["parent_id"]
 	var branch_value = context.get("branch_value", null)
 	var depth: int = context["depth"]
 	
+	# Get the list of ground truth
 	var labels = _get_labels(data)
+
+	details["labels"] = labels
+	step_calculating_entropy.emit(data.size(), labels)
 	
-	emit_signal("step_calculating_entropy", data.size(), labels)
+	# Get the set of labels
+	var unique_labels: Array = _get_unique_labels(labels)
 	
+
+	# First, check if the node has some "extreme" case
+
 	# Check if all samples belong to the same class
-	var unique_labels = []
-	for label in labels:
-		if not unique_labels.has(label):
-			unique_labels.append(label)
-	
 	if unique_labels.size() == 1:
-		# Leaf node - all same class
+		# If all the samples belong to the same class, pick it
 		var label = labels[0]
-		emit_signal("step_all_same_class", label)
-		emit_signal("step_creating_node", "leaf", "", label)
-		
-		# Request node creation
-		emit_signal("add_node_requested", parent_id, branch_value, "", label, true)
+
+		step_all_same_class. emit(label)
+		step_creating_node.  emit("leaf", "", label)
+		add_node_requested.  emit(parent_id, branch_value, "", label, true)
 		return
 	
 	# Check if no attributes left
 	if attributes.is_empty():
-		# Leaf node - majority class
-		var majority = _majority_class(labels)
-		emit_signal("step_no_attributes_left", majority)
-		emit_signal("step_creating_node", "leaf_majority", "", majority)
-		
-		emit_signal("add_node_requested", parent_id, branch_value, "", majority, true)
+		# If there is no atribute left, pick the majority class
+		var majority_label = _majority_class(labels)
+
+		step_no_attributes_left. emit(majority_label)
+		step_creating_node.      emit("leaf_majority", "", majority_label)
+		add_node_requested.      emit(parent_id, branch_value, "", majority_label, true)
 		return
 	
 	# Calculate information gain for all attributes
-	var gains = {}
-	for attr in attributes:
-		var gain = _information_gain(data, attr)
-		gains[attr] = gain
-		emit_signal("step_calculating_gain", attr, gain)
+	var gains: Dictionary = _information_gains_for_all_atributes(attributes, data)
 	
 	# Select best attribute
-	var best_attr = ""
-	var best_gain = -INF
+	var best_attr: String = ""
+	var best_gain: float = -INF
 	for attr in gains:
 		if gains[attr] > best_gain:
 			best_gain = gains[attr]
 			best_attr = attr
 	
-	emit_signal("step_best_attribute_selected", best_attr, best_gain)
-	emit_signal("step_creating_node", "internal", best_attr, "")
+	step_best_attribute_selected. emit(best_attr, best_gain)
+	step_creating_node.           emit("internal", best_attr, "")
 	
-	# Create branches for each attribute value
-	var values = []
-	for row in data:
-		var value = row[best_attr]
-		if not values.has(value):
-			values.append(value)
+	# Create branches for each attribute value in the data
+	var best_attr_values_set: Array = _attribute_values_set_in_data(data, best_attr)
 	
-	# Add child contexts to call stack (in reverse order so they process in correct order)
-	var remaining_attrs = []
-	for attr in attributes:
-		if attr != best_attr:
-			remaining_attrs.append(attr)
-	
-	for i in range(values.size() - 1, -1, -1):
-		var value = values[i]
-		var subset = []
+	var remaining_attrs: Array = _get_remaining_attrs(attributes, best_attr)
+
+	# For each value of the selected atribute in the data
+  	# Add child contexts to call stack (in reverse order so they process in correct order)
+	for i in range(best_attr_values_set.size() - 1, -1, -1):
+		var value = best_attr_values_set[i]
+		var subset_of_data_with_value = []
 		for row in data:
 			if row[best_attr] == value:
-				subset.append(row)
+				subset_of_data_with_value.append(row)
 		
-		emit_signal("step_creating_branch", best_attr, value, subset.is_empty())
+		step_creating_branch.emit(best_attr, value, subset_of_data_with_value.is_empty())
 		
-		if subset.is_empty():
+		if subset_of_data_with_value.is_empty():
 			# Empty subset - create leaf with majority class
 			var majority = _majority_class(labels)
 			var child_context = {
@@ -178,7 +171,7 @@ func _build_node_step(context: Dictionary) -> void:
 		else:
 			# Continue building subtree
 			var child_context = {
-				"data": subset,
+				"data": subset_of_data_with_value,
 				"attributes": remaining_attrs.duplicate(),
 				"parent_id": -2,
 				"branch_value": value,
@@ -188,7 +181,7 @@ func _build_node_step(context: Dictionary) -> void:
 	
 	# Create internal node AFTER adding children to stack
 	# This ensures children are in the call stack when update_pending_parent_ids is called
-	emit_signal("add_node_requested", parent_id, branch_value, best_attr, "", false)
+	add_node_requested.emit(parent_id, branch_value, best_attr, "", false)
 
 
 # Helper functions
@@ -200,13 +193,23 @@ func _get_labels(data: Array) -> Array:
 	return labels
 
 
+func _get_unique_labels(labels: Array) -> Array:
+	var unique_labels: Array = []
+	for label in labels:
+		if not unique_labels.has(label):
+			unique_labels.append(label)
+	return unique_labels
+
+
 func _majority_class(labels: Array) -> String:
-	var counts = {}
+	# Count in a dictionary the amount of data with each label
+	var counts: Dictionary  = {}
 	for label in labels:
 		if not counts.has(label):
 			counts[label] = 0
 		counts[label] += 1
 	
+	# And iterate through the dictionary to get the highest
 	var max_label = ""
 	var max_count = 0
 	for label in counts:
@@ -238,6 +241,15 @@ func _entropy(labels: Array) -> float:
 	return entropy_val
 
 
+func _information_gains_for_all_atributes(attributes, data) -> Dictionary:
+	var gains: Dictionary = {}
+	for attr in attributes:
+		var gain = _information_gain(data, attr)
+		gains[attr] = gain
+		step_calculating_gain.emit(attr, gain)
+	return gains
+	
+
 func _information_gain(data: Array, attribute: String) -> float:
 	var labels = _get_labels(data)
 	var total_entropy = _entropy(labels)
@@ -257,6 +269,23 @@ func _information_gain(data: Array, attribute: String) -> float:
 		weighted_entropy += weight * _entropy(subset_labels)
 	
 	return total_entropy - weighted_entropy
+
+
+func _attribute_values_set_in_data(data, best_attr) -> Array:
+	var values: Array = []
+	for row in data:
+		var value = row[best_attr]
+		if not values.has(value):
+			values.append(value)
+	return values
+
+
+func _get_remaining_attrs(attributes, best_attr) -> Array:
+	var remaining_attrs = []
+	for attr in attributes:
+		if attr != best_attr:
+			remaining_attrs.append(attr)
+	return remaining_attrs
 
 
 func update_pending_parent_ids(actual_node_id: int) -> void:

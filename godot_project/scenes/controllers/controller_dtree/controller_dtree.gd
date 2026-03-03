@@ -1,27 +1,30 @@
-class_name AlgDTree
+class_name ControllerDTree
 extends Node
 
+signal next_step
+signal detail
 
-@export_file("*.tscn") var panel_algorithm_dtree_scene: String
-@export_file("*.tscn") var dnode_scene: String
+const panel_algorithm_dtree_scene: String = Constants.SCENES.panel_algorithm_dtree
+const dnode_scene: String = Constants.SCENES.dnode
 
 var dtree: DTreeLogical
-var canvas: Control
+var window: Window
 var view: Control  # Reference to the main view for UI elements
 var next_node_id: int = 0
 var mode: String = "manual"
 
 # For automatic mode
 var algorithm:              AlgorithmDTree
-var panel_algorithmn_dtree: Control
+var panel_algorithm_dtree: Control
 var next_step_button:       Button
 var start_training_button:  Button
+var detail_button:          Button
 
 
-func initialize(p_tree: DTreeLogical, p_canvas: Control, p_mode: String, p_view: Control = null) -> void:
+func initialize(p_tree: DTreeLogical, p_window: Window, p_mode: String, p_view: Control = null) -> void:
 	dtree = p_tree
-	canvas = p_canvas
-	view = p_view if p_view != null else p_canvas
+	window = p_window
+	view = p_view if p_view != null else p_tree
 	mode = p_mode
 
 	# Initialize next_node_id based on existing nodes
@@ -49,7 +52,7 @@ func _connect_all_node_signals() -> void:
 
 # Set the can_remove varible to true if not root, and connect the change_child_requested signal
 func _connect_signal_for_node(id: int) -> void:
-	var dnode = dtree.nodes_dict.get(id)
+	var dnode: DNode = dtree.nodes_dict.get(id)
 	if dnode == null:
 		return
 	
@@ -74,12 +77,12 @@ func _on_change_child_requested(type_of_change: String, parent_or_self_id: int) 
 
 
 func _add_child_node(parent_id: int) -> void:
-	var parent_dnode = dtree.nodes_dict.get(parent_id)
-	var new_id = next_node_id
+	var parent_dnode: DNode = dtree.nodes_dict.get(parent_id)
+	var new_id: int = next_node_id
 	next_node_id += 1
 	
 	# The new node is created
-	var dnode = preload("res://scenes/objects/dtree/dnode/dnode.tscn").instantiate()
+	var dnode: DNode = preload(dnode_scene).instantiate()
 	dnode.id = new_id
 	dnode.parent_id = parent_id
 	dnode.depth = parent_dnode.depth + 1
@@ -100,14 +103,14 @@ func _remove_subtree_and_self(node_id: int) -> void:
 	if not dtree.nodes_dict.has(node_id):
 		return
 
-	var dnode = dtree.nodes_dict[node_id]
+	var dnode: DNode = dtree.nodes_dict[node_id]
 
-	var parent_dnode = dtree.nodes_dict[dnode.parent_id]
+	var parent_dnode: DNode = dtree.nodes_dict[dnode.parent_id]
 	parent_dnode.sons_id.erase(dnode.id)
 
 	# Delete childs recurively
 	# Make a copy of sons_id to avoid modifying the array while iterating
-	var children_copy = dnode.sons_id.duplicate()
+	var children_copy: Array[int] = dnode.sons_id.duplicate()
 	for child_id in children_copy:
 		_remove_subtree_and_self(child_id)
 
@@ -118,40 +121,47 @@ func _remove_subtree_and_self(node_id: int) -> void:
 	dnode.queue_free()
 
 
-# Automatic mode related functions
+# Automatic mode related functions #
 
 func _setup_automatic_mode() -> void:
 
 	# Add UI for automatic mode
-	panel_algorithmn_dtree = load(panel_algorithm_dtree_scene).instantiate()
-	view.add_child(panel_algorithmn_dtree)
-	panel_algorithmn_dtree.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	panel_algorithm_dtree = preload(panel_algorithm_dtree_scene).instantiate()
+	view.add_child(panel_algorithm_dtree)
+	panel_algorithm_dtree.set_anchors_preset(Control.PRESET_TOP_LEFT)
 
-	next_step_button = panel_algorithmn_dtree.get_node("VBoxContainer/NextButton")
-	start_training_button = panel_algorithmn_dtree.get_node("VBoxContainer/StartTrainingButton")
+	next_step_button = panel_algorithm_dtree.get_node("VBoxContainer/NextButton")
+	start_training_button = panel_algorithm_dtree.get_node("VBoxContainer/StartTrainingButton")
+	detail_button = panel_algorithm_dtree.get_node("VBoxContainer/DetailButton")
 
 	next_step_button.pressed.connect(_on_step_button_pressed)
 	start_training_button.pressed.connect(_on_start_training_pressed)
+	detail_button.pressed.connect(_on_detail_button_pressed)
 
-	next_step_button.visible = false
-	start_training_button.visible = true
+	next_step_button.      visible = false
+	start_training_button. visible = true
+	detail_button.         visible = false
 
 	if algorithm:
-		algorithm.add_node_requested.connect(_on_algorithm_add_node_requested)
-		algorithm.step_start.connect(_on_algorithm_step)
-		algorithm.step_calculating_entropy.connect(_on_algorithm_step_entropy)
-		algorithm.step_calculating_gain.connect(_on_algorithm_step_gain)
-		algorithm.step_best_attribute_selected.connect(_on_algorithm_step_best_attr)
-		algorithm.step_creating_node.connect(_on_algorithm_step_node)
-		algorithm.step_creating_branch.connect(_on_algorithm_step_branch)
-		algorithm.step_all_same_class.connect(_on_algorithm_step_generic)
-		algorithm.step_no_attributes_left.connect(_on_algorithm_step_generic)
-		algorithm.algorithm_completed.connect(_on_algorithm_completed)
+
+		algorithm. add_node_requested           .connect(_on_algorithm_add_node_requested)
+
+		algorithm. step_start                   .connect(_on_algorithm_step)
+		algorithm. step_calculating_entropy     .connect(_on_algorithm_step_entropy)
+		algorithm. step_calculating_gain        .connect(_on_algorithm_step_gain)
+		algorithm. step_best_attribute_selected .connect(_on_algorithm_step_best_attr)
+		algorithm. step_creating_node           .connect(_on_algorithm_step_node)
+		algorithm. step_creating_branch         .connect(_on_algorithm_step_branch)
+		algorithm. step_all_same_class          .connect(_on_algorithm_step_generic)
+		algorithm. step_no_attributes_left      .connect(_on_algorithm_step_generic)
+		algorithm. algorithm_completed          .connect(_on_algorithm_completed)
+
+		next_step.connect(algorithm.next_step)
 
 
 
 func _on_start_training_pressed() -> void:
-	# Example data - you can modify this or add UI to input data
+	
 	var data: Array[Dictionary] = [
 		{"color": "red", "shape": "round", "size": "big", "class": "apple"},
 		{"color": "green", "shape": "round", "size": "big", "class": "apple"},
@@ -171,7 +181,7 @@ func _on_start_training_pressed() -> void:
 
 
 func _create_root_for_algorithm(attribute: String, label: String, is_leaf: bool) -> int:
-	var dnode: DNode = load(dnode_scene).instantiate()
+	var dnode: DNode = preload(dnode_scene).instantiate()
 	dnode.id = 0
 	dnode.depth = 0
 	dnode.inorder_index = 0.0
@@ -179,6 +189,9 @@ func _create_root_for_algorithm(attribute: String, label: String, is_leaf: bool)
 	dnode.label = label
 	dnode.text = label if is_leaf else attribute
 	dnode.is_leaf = is_leaf
+
+	# No popup menu if is not manual
+	dnode.was_created_by_algorithm = true
 	
 	dtree.nodes_dict[0] = dnode
 	dtree.nodes_container.add_child(dnode)
@@ -189,16 +202,16 @@ func _create_root_for_algorithm(attribute: String, label: String, is_leaf: bool)
 
 
 func _add_child_node_for_algorithm(parent_id: int, branch_value, attribute: String, label: String, is_leaf: bool) -> int:
-	var parent_dnode = dtree.nodes_dict.get(parent_id)
+	var parent_dnode: DNode = dtree.nodes_dict.get(parent_id)
 	if parent_dnode == null:
 		print("Error: Parent node not found: ", parent_id)
 		return -1
 	
-	var new_id = next_node_id
+	var new_id: int = next_node_id
 	next_node_id += 1
 	
 	# Create new node
-	var dnode: DNode = preload("res://scenes/objects/dtree/dnode/dnode.tscn").instantiate()
+	var dnode: DNode = preload(dnode_scene).instantiate()
 	dnode.id = new_id
 	dnode.parent_id = parent_id
 	dnode.depth = parent_dnode.depth + 1
@@ -207,6 +220,9 @@ func _add_child_node_for_algorithm(parent_id: int, branch_value, attribute: Stri
 	dnode.text = label if is_leaf else attribute
 	dnode.is_leaf = is_leaf
 	dnode.branch_value = branch_value
+
+	# No popup menu if is not manual
+	dnode.was_created_by_algorithm = true
 	
 	# Add to tree
 	dtree.nodes_dict[new_id] = dnode
@@ -220,11 +236,9 @@ func _on_algorithm_add_node_requested(parent_id: int, branch_value, attribute: S
 	# This is called by the algorithm to actually create nodes
 	var created_node_id: int
 	
-	if parent_id == -1:
-		# Create root
+	if parent_id == -1:  # Is root
 		created_node_id = _create_root_for_algorithm(attribute, label, is_leaf)
-	else:
-		# Create child
+	else:  # Is child
 		created_node_id = _add_child_node_for_algorithm(parent_id, branch_value, attribute, label, is_leaf)
 	
 	# Always update algorithm's call stack with the actual node ID
@@ -237,8 +251,11 @@ func _on_algorithm_add_node_requested(parent_id: int, branch_value, attribute: S
 
 
 func _on_step_button_pressed() -> void:
-	if algorithm:
-		algorithm.next_step()
+	next_step.emit()
+
+
+func _on_detail_button_pressed():
+	detail.emit()
 
 
 # Algorithm signal handlers
@@ -278,7 +295,6 @@ func _on_algorithm_completed() -> void:
 
 
 
-
 func _update_canvas() -> void:
-	if canvas and canvas.has_method("update_canvas_size_and_center"):
-		canvas.update_canvas_size_and_center()
+	if dtree and dtree.has_method("update_canvas_size_and_center"):
+		dtree.update_canvas_size_and_center()

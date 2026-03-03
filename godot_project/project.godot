@@ -23,6 +23,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 SignalsObserver="*uid://bysvvf3nfu5lt"
+Constants="*uid://o843gprkd6mi"
 
 [gui]
 

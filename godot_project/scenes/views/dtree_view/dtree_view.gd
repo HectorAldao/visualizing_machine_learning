@@ -6,26 +6,28 @@ extends Control
 @export var manual_dtree_button: Button
 @export var algorithmic_dtree_button: Button
 
-@export_file("*.tscn") var controller_dtree_scene: String
+const controller_dtree_scene: String = Constants.SCENES.controller_dtree
 
 
 @onready var scroll_container:      ScrollContainer =      $ScrollContainer
 @onready var dtree_selection_panel: CenterContainer =      $DTreeSelectionPanel
+@onready var dtree_alg_menu:        Control =              $DTreeMenu
 @onready var dtree:                 DTreeLogical =         $ScrollContainer/DTree
-@onready var dtree_menu:            Control =              $DTreeMenu
+@onready var dtree_controller:      ControllerDTree =      $ControllerDTree
+@onready var window:                Window =               $Window
 
-var dtree_controller: Node = null
-var algorithm: AlgorithmDTree = null
-var current_mode: String = ""
+var algorithm:        AlgorithmDTree
+var current_mode:     String = ""
 
+# Scroll variables
 var is_middle_mouse_dragging: bool = false
 var last_mouse_position: Vector2 = Vector2.ZERO
 
 # Zoom variables
-var zoom_level: float = 1.0
-var min_zoom: float = 0.25
-var max_zoom: float = 4.0
-var zoom_step: float = 0.1
+#var zoom_level: float = 1.0
+#var min_zoom:   float = 0.25
+#var max_zoom:   float = 4.0
+#var zoom_step:  float = 0.1
 
 
 
@@ -38,7 +40,11 @@ func _ready():
 	# Make the ui elements invisible but the selecion panel
 	dtree_selection_panel. visible = true
 	scroll_container.      visible = false
-	dtree_menu.            visible = false
+	dtree_alg_menu.        visible = false
+	window.                visible = false
+	
+	window.position.x = 800
+	window.position.y = 200
 	
 
 
@@ -46,7 +52,7 @@ func _on_manual_dtree_button_pressed():
 	# Cange visibility
 	dtree_selection_panel. visible = false
 	scroll_container.      visible = true
-	dtree_menu.            visible = true
+	dtree_alg_menu.        visible = true
 
 	# Set mode
 	current_mode = "manual"
@@ -55,15 +61,14 @@ func _on_manual_dtree_button_pressed():
 	dtree.set_mode("manual")
 	
 	# Create controller as child of this view
-	dtree_controller = load(controller_dtree_scene).instantiate()
-	add_child(dtree_controller)
-	dtree_controller.initialize(dtree, dtree, "manual", self)
+	dtree_controller.initialize(dtree, window, "manual", self)
 
 
 func _on_algorithmic_dtree_button_pressed():
 	# Cange visibility
 	dtree_selection_panel. visible = false
 	scroll_container.      visible = true
+	window.                visible = true
 
 	# Set mode
 	current_mode = "automatic"
@@ -76,37 +81,39 @@ func _on_algorithmic_dtree_button_pressed():
 	add_child(algorithm)
 	
 	# Create controller as child of this view
-	dtree_controller = load(controller_dtree_scene).instantiate()
-	add_child(dtree_controller)
 	dtree_controller.algorithm = algorithm
-	dtree_controller.initialize(dtree, dtree, "automatic", self)
+	dtree_controller.initialize(dtree, window, "automatic", self)
 
 
+# How to move the ScrollContainer
 func _input(event):
 	# Handle mouse motion for middle mouse dragging
 	if event is InputEventMouseMotion and is_middle_mouse_dragging:
+		# The scroll aplied is going to be the dif frame to frame of
+		# where the mause where and where the mouse is
 		var delta_position = event.position - last_mouse_position
+
+		# The diff is aplied
 		scroll_container.scroll_horizontal -= int(delta_position.x)
 		scroll_container.scroll_vertical -= int(delta_position.y)
+
+		# The new position is saved and the input is set as handled
 		last_mouse_position = event.position
 		get_viewport().set_input_as_handled()
 	
 	# If there is a mouse event
 	if event is InputEventMouseButton:
-		# Handle middle mouse button drag
+		# Move the view with middle mouse
 		if event.button_index == MOUSE_BUTTON_MIDDLE:
 			if event.pressed:
-				# Start dragging
 				is_middle_mouse_dragging = true
 				last_mouse_position = event.position
 			else:
-				# Stop dragging
 				is_middle_mouse_dragging = false
+
 			get_viewport().set_input_as_handled()
 		
-			get_viewport().set_input_as_handled()
-		
-		# Handle mouse wheel scrolling (only if Ctrl is NOT pressed)
+		# Move scroll container view
 		elif event.pressed and not event.ctrl_pressed:
 			# Save the diference frame to frame
 			var delta = 0

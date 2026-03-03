@@ -1,7 +1,5 @@
 [gd_resource type="Theme" format=3 uid="uid://doikux1lfpcld"]
 
-[ext_resource type="Script" uid="uid://b70cscudn8b0n" path="res://themes/main_theme.gd" id="1_rjgu6"]
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vu6l5"]
 content_margin_left = 6.0
 content_margin_top = 3.0
@@ -14,7 +12,9 @@ border_width_right = 3
 border_width_bottom = 3
 border_color = Color(0.019607844, 0.003921569, 0.019607844, 1)
 corner_radius_top_left = 10
+corner_radius_top_right = 3
 corner_radius_bottom_right = 10
+corner_radius_bottom_left = 3
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rjgu6"]
 bg_color = Color(0.3372549, 0.7058824, 0.9137255, 1)
@@ -33,4 +33,3 @@ PopupMenu/colors/font_hover_color = Color(0.019607844, 0.003921569, 0.019607844,
 PopupMenu/styles/hover = SubResource("StyleBoxFlat_rjgu6")
 PopupMenu/styles/panel = SubResource("StyleBoxFlat_vxwtt")
 VBoxContainer/constants/separation = 20
-script = ExtResource("1_rjgu6")

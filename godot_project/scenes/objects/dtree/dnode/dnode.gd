@@ -1,6 +1,9 @@
 class_name DNode
 extends Button
 
+# Theme for the leafs and the noleafs
+var leaf_theme: Theme = preload(Constants.THEMES.leaf)
+var noleaf_theme: Theme = preload(Constants.THEMES.noleaf)
 
 # Logic related variables
 var id: int
@@ -18,6 +21,9 @@ var label: String = ""      # Class label (if leaf)
 var is_leaf: bool = false   # Whether this is a leaf node
 var branch_value = null     # The value this node represents from parent's split
 
+# For the algorithmic mode
+var was_created_by_algorithm: bool = false
+
 
 
 # Signals
@@ -26,8 +32,15 @@ signal change_child_requested(type_of_change: String)
 
 
 func _ready():
-	mouse_filter = Control.MOUSE_FILTER_PASS
-	connect("gui_input", _on_gui_input)
+
+	if is_leaf:
+		theme = leaf_theme
+	else:
+		theme = noleaf_theme
+
+	if not was_created_by_algorithm:
+		mouse_filter = Control.MOUSE_FILTER_PASS
+		gui_input.connect(_on_gui_input)
 
 
 func _on_gui_input(event: InputEvent):
@@ -53,6 +66,6 @@ func _open_context_menu(mouse_pos: Vector2) -> void:
 
 func _on_menu_id_pressed(menu_id: int) -> void:
 	if menu_id == 0:
-		emit_signal("change_child_requested", "add")
+		change_child_requested.emit("add")
 	elif menu_id == 1:
-		emit_signal("change_child_requested", "remove")
+		change_child_requested.emit("remove")
