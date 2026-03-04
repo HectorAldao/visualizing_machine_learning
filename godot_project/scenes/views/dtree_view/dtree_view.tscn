@@ -5,9 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://bbvvlbyvwjc5" path="res://scenes/interface/save_button/save_button.tscn" id="2_vrs4k"]
 [ext_resource type="PackedScene" uid="uid://dy3l4lsa0srpr" path="res://scenes/objects/dtree/dtree.tscn" id="4_dtree"]
 [ext_resource type="PackedScene" uid="uid://5h4ba5ys8aml" path="res://scenes/controllers/controller_dtree/controller_dtree.tscn" id="5_pxc03"]
-
-[sub_resource type="Theme" id="Theme_pxc03"]
-RichTextLabel/font_sizes/normal_font_size = 20
+[ext_resource type="PackedScene" uid="uid://cjchbdmq0sym5" path="res://scenes/interface/window/window.tscn" id="6_txrwr"]
 
 [node name="DTreeView" type="Control" unique_id=998695186 node_paths=PackedStringArray("manual_dtree_button", "algorithmic_dtree_button")]
 layout_mode = 3
@@ -86,17 +84,4 @@ layout_mode = 2
 
 [node name="ControllerDTree" parent="." unique_id=387693380 instance=ExtResource("5_pxc03")]
 
-[node name="Window" type="Window" parent="." unique_id=1444752708]
-oversampling_override = 1.0
-position = Vector2i(20, 150)
-size = Vector2i(300, 350)
-
-[node name="RichTextLabel" type="RichTextLabel" parent="Window" unique_id=476699901]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme = SubResource("Theme_pxc03")
-bbcode_enabled = true
-text = "Presiona el botón \"Empezar entrenamiento\""
+[node name="Window" parent="." unique_id=734547246 instance=ExtResource("6_txrwr")]

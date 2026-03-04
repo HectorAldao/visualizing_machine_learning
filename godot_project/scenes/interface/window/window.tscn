@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://cjchbdmq0sym5"]
+
+[ext_resource type="Script" uid="uid://cfkexclmkwmr0" path="res://scenes/interface/window/window.gd" id="1_i8vyb"]
+
+[sub_resource type="Theme" id="Theme_pxc03"]
+RichTextLabel/font_sizes/normal_font_size = 20
+
+[node name="Window" type="Window" unique_id=734547246]
+oversampling_override = 1.0
+position = Vector2i(20, 150)
+size = Vector2i(300, 350)
+script = ExtResource("1_i8vyb")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="." unique_id=1977120745]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_pxc03")
+bbcode_enabled = true
+text = "Presiona el botón \"Empezar entrenamiento\""

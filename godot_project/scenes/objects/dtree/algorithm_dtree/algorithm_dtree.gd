@@ -3,14 +3,14 @@ class_name AlgorithmDTree
 
 
 # Signals for algorithm steps
-signal step_start(step_type: String, step_data: Dictionary)
-signal step_calculating_entropy(data_size: int, labels: Array)
-signal step_calculating_gain(attribute: String, gain: float)
-signal step_best_attribute_selected(attribute: String, gain: float)
-signal step_creating_node(node_type: String, attribute: String, label: String)
-signal step_creating_branch(parent_attr: String, branch_value, is_leaf: bool)
-signal step_all_same_class(label: String)
-signal step_no_attributes_left(majority_label: String)
+#signal step_start(step_type: String, step_data: Dictionary)
+#signal step_calculating_info_gain(data_size: int, labels: Array)
+#signal step_calculating_gain(attribute: String, gain: float)
+#signal step_best_attribute_selected(attribute: String, gain: float)
+#signal step_creating_node(node_type: String, attribute: String, label: String)
+#signal step_creating_branch(parent_attr: String, branch_value, is_leaf: bool)
+#signal step_all_same_class(label: String)
+#signal step_no_attributes_left(majority_label: String)
 signal algorithm_completed()
 
 # Signal to request node/edge creation (same as manual mode)
@@ -67,10 +67,7 @@ func start_training(data: Array[Dictionary], attributes: Array[String], dtree: D
 	}
 	call_stack.append(root_context)
 	
-	step_start.emit("training_started", {
-		"data_size": data.size(),
-		"attributes": attributes
-	})
+	
 
 
 func next_step() -> void:
@@ -96,9 +93,10 @@ func _build_node_step(context: Dictionary) -> void:
 	
 	# Get the list of ground truth
 	var labels = _get_labels(data)
-
-	details["labels"] = labels
-	step_calculating_entropy.emit(data.size(), labels)
+	
+	details["lista_etiquetas"] = labels
+	details["numero_de_datos"] = data.size()
+	details["lista_atributos"] = attributes
 	
 	# Get the set of labels
 	var unique_labels: Array = _get_unique_labels(labels)
@@ -111,22 +109,24 @@ func _build_node_step(context: Dictionary) -> void:
 		# If all the samples belong to the same class, pick it
 		var label = labels[0]
 
-		step_all_same_class. emit(label)
-		step_creating_node.  emit("leaf", "", label)
-		add_node_requested.  emit(parent_id, branch_value, "", label, true)
+		details["tipo_de_nodo"] = "leaf"
+		
+		add_node_requested.emit(parent_id, branch_value, "", label, true)
 		return
 	
 	# Check if no attributes left
 	if attributes.is_empty():
 		# If there is no atribute left, pick the majority class
 		var majority_label = _majority_class(labels)
-
-		step_no_attributes_left. emit(majority_label)
-		step_creating_node.      emit("leaf_majority", "", majority_label)
-		add_node_requested.      emit(parent_id, branch_value, "", majority_label, true)
+		
+		details["tipo_de_nodo"] = "leaf_majority"
+		details["etiqueta_mayoritaria"] = majority_label
+		
+		add_node_requested.emit(parent_id, branch_value, "", majority_label, true)
 		return
 	
 	# Calculate information gain for all attributes
+	details["ganancias_info"] = {}
 	var gains: Dictionary = _information_gains_for_all_atributes(attributes, data)
 	
 	# Select best attribute
@@ -137,8 +137,9 @@ func _build_node_step(context: Dictionary) -> void:
 			best_gain = gains[attr]
 			best_attr = attr
 	
-	step_best_attribute_selected. emit(best_attr, best_gain)
-	step_creating_node.           emit("internal", best_attr, "")
+	details["mejor_atributo"] = best_attr
+	details["valor_metrica_mejor_atributo"] = best_gain
+	details["tipo_de_nodo"] = "internal"
 	
 	# Create branches for each attribute value in the data
 	var best_attr_values_set: Array = _attribute_values_set_in_data(data, best_attr)
@@ -147,14 +148,16 @@ func _build_node_step(context: Dictionary) -> void:
 
 	# For each value of the selected atribute in the data
   	# Add child contexts to call stack (in reverse order so they process in correct order)
+	var ramas_mejor_atributo: Array
 	for i in range(best_attr_values_set.size() - 1, -1, -1):
 		var value = best_attr_values_set[i]
 		var subset_of_data_with_value = []
 		for row in data:
 			if row[best_attr] == value:
 				subset_of_data_with_value.append(row)
-		
-		step_creating_branch.emit(best_attr, value, subset_of_data_with_value.is_empty())
+				
+		ramas_mejor_atributo.append(value)
+		#step_creating_branch.emit(best_attr, value, subset_of_data_with_value.is_empty())
 		
 		if subset_of_data_with_value.is_empty():
 			# Empty subset - create leaf with majority class
@@ -246,7 +249,8 @@ func _information_gains_for_all_atributes(attributes, data) -> Dictionary:
 	for attr in attributes:
 		var gain = _information_gain(data, attr)
 		gains[attr] = gain
-		step_calculating_gain.emit(attr, gain)
+		details["ganancias_info"][attr] = gain
+		#step_calculating_gain.emit(attr, gain)
 	return gains
 	
 

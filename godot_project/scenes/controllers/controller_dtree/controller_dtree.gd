@@ -15,7 +15,7 @@ var mode: String = "manual"
 
 # For automatic mode
 var algorithm:              AlgorithmDTree
-var panel_algorithm_dtree: Control
+var panel_algorithm_dtree:  Control
 var next_step_button:       Button
 var start_training_button:  Button
 var detail_button:          Button
@@ -146,14 +146,14 @@ func _setup_automatic_mode() -> void:
 
 		algorithm. add_node_requested           .connect(_on_algorithm_add_node_requested)
 
-		algorithm. step_start                   .connect(_on_algorithm_step)
-		algorithm. step_calculating_entropy     .connect(_on_algorithm_step_entropy)
-		algorithm. step_calculating_gain        .connect(_on_algorithm_step_gain)
-		algorithm. step_best_attribute_selected .connect(_on_algorithm_step_best_attr)
-		algorithm. step_creating_node           .connect(_on_algorithm_step_node)
-		algorithm. step_creating_branch         .connect(_on_algorithm_step_branch)
-		algorithm. step_all_same_class          .connect(_on_algorithm_step_generic)
-		algorithm. step_no_attributes_left      .connect(_on_algorithm_step_generic)
+		#algorithm. step_start                   .connect(_on_algorithm_step)
+		#algorithm. step_calculating_info_gain   .connect(_on_algorithm_step_entropy)
+		#algorithm. step_calculating_gain        .connect(_on_algorithm_step_gain)
+		#algorithm. step_best_attribute_selected .connect(_on_algorithm_step_best_attr)
+		#algorithm. step_creating_node           .connect(_on_algorithm_step_node)
+		#algorithm. step_creating_branch         .connect(_on_algorithm_step_branch)
+		#algorithm. step_all_same_class          .connect(_on_algorithm_all_same_class)
+		#algorithm. step_no_attributes_left      .connect(_on_algorithm_no_atributes_left)
 		algorithm. algorithm_completed          .connect(_on_algorithm_completed)
 
 		next_step.connect(algorithm.next_step)
@@ -246,6 +246,7 @@ func _on_algorithm_add_node_requested(parent_id: int, branch_value, attribute: S
 	if algorithm and created_node_id != -1:
 		algorithm.update_pending_parent_ids(created_node_id)
 	
+	window.update_current_text(algorithm.details)
 	dtree.relayout_tree()
 	_update_canvas()
 
@@ -260,32 +261,39 @@ func _on_detail_button_pressed():
 
 # Algorithm signal handlers
 
-func _on_algorithm_step(step_type: String, step_data: Dictionary) -> void:
-	print("Step: ", step_type, " - ", step_data)
-
-
-func _on_algorithm_step_entropy(data_size: int, labels: Array) -> void:
-	print("Calculating entropy for ", data_size, " samples with labels: ", labels)
-
-
-func _on_algorithm_step_gain(attribute: String, gain: float) -> void:
-	print("Gain for ", attribute, ": ", gain)
-
-
-func _on_algorithm_step_best_attr(attribute: String, gain: float) -> void:
-	print("Best attribute selected: ", attribute, " with gain: ", gain)
-
-
-func _on_algorithm_step_node(node_type: String, attribute: String, label: String) -> void:
-	print("Creating node - Type: ", node_type, ", Attr: ", attribute, ", Label: ", label)
-
-
-func _on_algorithm_step_branch(parent_attr: String, branch_value, _is_leaf: bool) -> void:
-	print("Creating branch from ", parent_attr, " with value ", branch_value)
-
-
-func _on_algorithm_step_generic(data) -> void:
-	print("Algorithm step: ", data)
+#func _on_algorithm_step(step_type: String, step_data: Dictionary) -> void:
+	#print("Step: ", step_type, " - ", step_data)
+#
+#
+#func _on_algorithm_step_entropy(data_size: int, labels: Array) -> void:
+	#print("Calculating entropy for ", data_size, " samples with labels: ", labels)
+#
+#
+#func _on_algorithm_step_gain(attribute: String, gain: float) -> void:
+	#print("Gain for ", attribute, ": ", gain)
+#
+#
+#func _on_algorithm_step_best_attr(attribute: String, gain: float) -> void:
+	#print("Best attribute selected: ", attribute, " with gain: ", gain)
+	#node_creation_case = "default"
+#
+#
+#func _on_algorithm_step_node(node_type: String, attribute: String, label: String) -> void:
+	#print("Creating node - Type: ", node_type, ", Attr: ", attribute, ", Label: ", label)
+#
+#
+#func _on_algorithm_step_branch(parent_attr: String, branch_value, _is_leaf: bool) -> void:
+	#print("Creating branch from ", parent_attr, " with value ", branch_value)
+#
+#
+#func _on_algorithm_all_same_class(label) -> void:
+	#print("All same class: ", label)
+	#node_creation_case = "all_same_class"
+#
+#
+#func _on_algorithm_no_atributes_left(mayority) -> void:
+	#print("No atributes left, the mayority label is ", mayority )
+	#node_creation_case = "no_atributes_left"
 
 
 func _on_algorithm_completed() -> void:
