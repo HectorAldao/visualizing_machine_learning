@@ -126,8 +126,14 @@ func _build_node_step(context: Dictionary) -> void:
 		return
 	
 	# Calculate information gain for all attributes
-	details["ganancias_info"] = {}
+	#details["ganancias_info"] = {}
 	var gains: Dictionary = _information_gains_for_all_atributes(attributes, data)
+	
+	var concatenation: String = ""
+	for key in gains:
+		concatenation += str(key) + " = " + str(gains[key]) + "\n"
+	details["lista_ganancias"] = concatenation
+	
 	
 	# Select best attribute
 	var best_attr: String = ""
@@ -182,6 +188,7 @@ func _build_node_step(context: Dictionary) -> void:
 			}
 			call_stack.append(child_context)
 	
+	details["lista_ramas_mejor_atributo"] = ramas_mejor_atributo
 	# Create internal node AFTER adding children to stack
 	# This ensures children are in the call stack when update_pending_parent_ids is called
 	add_node_requested.emit(parent_id, branch_value, best_attr, "", false)
@@ -224,6 +231,10 @@ func _majority_class(labels: Array) -> String:
 
 
 func _entropy(labels: Array) -> float:
+	
+	details["metrica_de_ganancia_de_info_1"] = "la entropía"
+	details["metrica_de_ganancia_de_info_2"] = "entropía"
+	
 	if labels.is_empty():
 		return 0.0
 	
@@ -249,7 +260,7 @@ func _information_gains_for_all_atributes(attributes, data) -> Dictionary:
 	for attr in attributes:
 		var gain = _information_gain(data, attr)
 		gains[attr] = gain
-		details["ganancias_info"][attr] = gain
+		#details["ganancias_info"][attr] = gain
 		#step_calculating_gain.emit(attr, gain)
 	return gains
 	

@@ -7,25 +7,13 @@ var selected_text: String
 #var details_dict: Dictionary
 
 
-#Step: training_started - { "data_size": 5, "attributes": ["color", "shape", "size"] }
-#Calculating entropy for 5 samples with labels: ["apple", "apple", "banana", "banana", "orange"]
-#Gain for color: 1.12192809488736
-#Gain for shape: 0.97095059445467
-#Gain for size: 0.97095059445467
-#Best attribute selected: color with gain: 1.12192809488736
-#Creating node - Type: internal, Attr: color, Label: 
-#Creating branch from color with value orange
-#Creating branch from color with value yellow
-#Creating branch from color with value green
-#Creating branch from color with value red
-
 const template_texts: Dictionary[String, String] = {
 	"internal" :
 "Han bajado {numero_de_datos} datos por esta rama.
 Estos {numero_de_datos} datos tenían las etiquetas {lista_etiquetas}.
 En base a estas etiquetas se calcula la entropía de cada atributo de los datos.
 Los datos tienen los atributos {lista_atributos}, por lo que hay que calcular {metrica_de_ganancia_de_info_1} para decidir cuál sirve para dividir los mejor.
-{lista_ganancias_info}
+{lista_ganancias}
 El que tiene mejor {metrica_de_ganancia_de_info_2} es '{mejor_atributo}' con {valor_metrica_mejor_atributo}.
 Las ramas que se crean a partir de '{mejor_atributo}' son:
 {lista_ramas_mejor_atributo}",
@@ -50,6 +38,9 @@ func _ready() -> void:
 
 
 func update_current_text(details_dict: Dictionary) -> void:
+	
+	_clean_lists(details_dict)
+	
 	match details_dict["tipo_de_nodo"]:
 		"internal":
 			selected_text = template_texts["internal"]
@@ -59,3 +50,25 @@ func update_current_text(details_dict: Dictionary) -> void:
 			selected_text = template_texts["leaf_mayority"]
 			
 	rich_text_label.text = selected_text.format(details_dict)
+
+
+## For each value on the input Dictionary that is an Array[String], it will
+## change that Array for a string that concatenates each string element on
+## it, adding commas and the corresponding conjunction among elements  
+func _clean_lists(dict: Dictionary) -> void:
+	for key in dict:
+		var value = dict[key]
+		var concatenation: String = ""
+		if typeof(value) == TYPE_ARRAY:
+			var cont: int = 0
+			var size_arr: int = value.size()
+			for i in value:
+				cont += 1
+				if typeof(i) == TYPE_STRING:
+					if concatenation == "":  # If its the first
+						concatenation = "\"" + i + "\""
+					elif cont == size_arr:  # If its the last
+						concatenation += ", y " + "\"" + i + "\""
+					else:  # If is nor the first or the last
+						concatenation += ", " + "\"" + i + "\""
+			dict[key] = concatenation
