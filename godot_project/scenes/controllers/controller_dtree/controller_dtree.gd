@@ -207,10 +207,22 @@ func _add_child_node_for_algorithm(parent_id: int, branch_value, attribute: Stri
 		print("Error: Parent node not found: ", parent_id)
 		return -1
 	
+	# Check if a placeholder was pre-created for this branch and update it
+	for id in parent_dnode.sons_id:
+		var child: DNode = dtree.nodes_dict.get(id)
+		if child != null and child.branch_value == branch_value:
+			child.attribute  = attribute
+			child.label      = label
+			child.text       = label if is_leaf else attribute
+			child.is_leaf    = is_leaf
+			child.is_pending = false
+			child.theme      = child.leaf_theme if is_leaf else child.noleaf_theme
+			return id
+	
+	# No placeholder found — create a brand-new node (fallback / root-child path)
 	var new_id: int = next_node_id
 	next_node_id += 1
 	
-	# Create new node
 	var dnode: DNode = preload(dnode_scene).instantiate()
 	dnode.id = new_id
 	dnode.parent_id = parent_id
@@ -220,11 +232,8 @@ func _add_child_node_for_algorithm(parent_id: int, branch_value, attribute: Stri
 	dnode.text = label if is_leaf else attribute
 	dnode.is_leaf = is_leaf
 	dnode.branch_value = branch_value
-
-	# No popup menu if is not manual
 	dnode.was_created_by_algorithm = true
 	
-	# Add to tree
 	dtree.nodes_dict[new_id] = dnode
 	dtree.nodes_container.add_child(dnode)
 	parent_dnode.sons_id.append(new_id)
@@ -232,7 +241,34 @@ func _add_child_node_for_algorithm(parent_id: int, branch_value, attribute: Stri
 	return new_id
 
 
-func _on_algorithm_add_node_requested(parent_id: int, branch_value, attribute: String, label: String, is_leaf: bool) -> void:
+# Creates a placeholder DNode for each branch value and links them to the parent.
+# Called before update_pending_parent_ids so the algorithm can map branch_value -> node_id.
+func _create_placeholder_children(parent_id: int, parent_depth: int, branch_values: Array) -> void:
+	var branch_to_id: Dictionary = {}
+	for value in branch_values:
+		var new_id: int = next_node_id
+		next_node_id += 1
+		
+		var placeholder: DNode = preload(dnode_scene).instantiate()
+		placeholder.id                    = new_id
+		placeholder.parent_id             = parent_id
+		placeholder.depth                 = parent_depth + 1
+		placeholder.branch_value          = value
+		placeholder.was_created_by_algorithm = true
+		placeholder.is_pending            = true
+		placeholder.text                  = "..."
+		
+		dtree.nodes_dict[new_id] = placeholder
+		dtree.nodes_container.add_child(placeholder)
+		dtree.nodes_dict[parent_id].sons_id.append(new_id)
+		
+		branch_to_id[value] = new_id
+	
+	if algorithm:
+		algorithm.register_placeholder_node_ids(branch_to_id)
+
+
+func _on_algorithm_add_node_requested(parent_id: int, branch_value, attribute: String, label: String, is_leaf: bool, children_branch_values: Array) -> void:
 	# This is called by the algorithm to actually create nodes
 	var created_node_id: int
 	
@@ -241,9 +277,13 @@ func _on_algorithm_add_node_requested(parent_id: int, branch_value, attribute: S
 	else:  # Is child
 		created_node_id = _add_child_node_for_algorithm(parent_id, branch_value, attribute, label, is_leaf)
 	
-	# Always update algorithm's call stack with the actual node ID
-	# This ensures child contexts waiting in the stack get the correct parent ID
 	if algorithm and created_node_id != -1:
+		# Pre-create placeholder children BEFORE update_pending_parent_ids so that
+		# register_placeholder_node_ids can match contexts that still have parent_id == -2.
+		if not children_branch_values.is_empty():
+			var depth: int = dtree.nodes_dict[created_node_id].depth
+			_create_placeholder_children(created_node_id, depth, children_branch_values)
+		# Now resolve -2 parent placeholders to the actual node ID
 		algorithm.update_pending_parent_ids(created_node_id)
 	
 	window.update_current_text(algorithm.details)

@@ -14,5 +14,6 @@ const SCENES: Dictionary[String, String] = {
 
 const THEMES: Dictionary[String, String] = {
 	"leaf": "uid://vanr6vum3qcu",
-	"noleaf": "uid://cmsv2q8q35lvy"
+	"noleaf": "uid://cmsv2q8q35lvy",
+	"nodedefault": "uid://dxluxv1xceiqb"
 }

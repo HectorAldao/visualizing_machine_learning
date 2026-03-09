@@ -14,7 +14,8 @@ class_name AlgorithmDTree
 signal algorithm_completed()
 
 # Signal to request node/edge creation (same as manual mode)
-signal add_node_requested(parent_id: int, branch_value, attribute: String, label: String, is_leaf: bool)
+# children_branch_values carries the branch values for pre-creating placeholder children
+signal add_node_requested(parent_id: int, branch_value, attribute: String, label: String, is_leaf: bool, children_branch_values: Array)
 
 
 # Algorithm state
@@ -111,7 +112,7 @@ func _build_node_step(context: Dictionary) -> void:
 
 		details["tipo_de_nodo"] = "leaf"
 		
-		add_node_requested.emit(parent_id, branch_value, "", label, true)
+		add_node_requested.emit(parent_id, branch_value, "", label, true, [])
 		return
 	
 	# Check if no attributes left
@@ -122,7 +123,7 @@ func _build_node_step(context: Dictionary) -> void:
 		details["tipo_de_nodo"] = "leaf_majority"
 		details["etiqueta_mayoritaria"] = majority_label
 		
-		add_node_requested.emit(parent_id, branch_value, "", majority_label, true)
+		add_node_requested.emit(parent_id, branch_value, "", majority_label, true, [])
 		return
 	
 	# Calculate information gain for all attributes
@@ -191,7 +192,7 @@ func _build_node_step(context: Dictionary) -> void:
 	details["lista_ramas_mejor_atributo"] = ramas_mejor_atributo
 	# Create internal node AFTER adding children to stack
 	# This ensures children are in the call stack when update_pending_parent_ids is called
-	add_node_requested.emit(parent_id, branch_value, best_attr, "", false)
+	add_node_requested.emit(parent_id, branch_value, best_attr, "", false, best_attr_values_set)
 
 
 # Helper functions
@@ -309,3 +310,14 @@ func update_pending_parent_ids(actual_node_id: int) -> void:
 	for context in call_stack:
 		if context["parent_id"] == -2:
 			context["parent_id"] = actual_node_id
+
+
+func register_placeholder_node_ids(branch_to_id: Dictionary) -> void:
+	# Called by the controller after pre-creating placeholder children.
+	# Contexts still have parent_id == -2 at this point (called before update_pending_parent_ids).
+	# Match each context to its pre-allocated node ID by branch_value.
+	for context in call_stack:
+		if context["parent_id"] == -2:
+			var bv = context.get("branch_value", null)
+			if branch_to_id.has(bv):
+				context["node_id"] = branch_to_id[bv]

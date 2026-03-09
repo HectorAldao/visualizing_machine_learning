@@ -2,8 +2,9 @@ class_name DNode
 extends Button
 
 # Theme for the leafs and the noleafs
-var leaf_theme: Theme = preload(Constants.THEMES.leaf)
-var noleaf_theme: Theme = preload(Constants.THEMES.noleaf)
+var leaf_theme: Theme    = preload(Constants.THEMES.leaf)
+var noleaf_theme: Theme  = preload(Constants.THEMES.noleaf)
+var pending_theme: Theme = preload(Constants.THEMES.nodedefault)
 
 # Logic related variables
 var id: int
@@ -13,6 +14,9 @@ var depth: int = 0
 var inorder_index: float = 0.0
 
 var can_remove := true  # For the root node
+
+# Whether the node has not yet been decided as leaf/internal (placeholder state)
+var is_pending: bool = false
 
 
 # ML related variables
@@ -32,8 +36,16 @@ signal change_child_requested(type_of_change: String)
 
 
 func _ready():
+	# Fade in from transparent
+	modulate.a = 0.0
+	var tween := create_tween()
+	tween.tween_property(self, "modulate:a", 1.0, 0.75) \
+		.set_trans(Tween.TRANS_SINE) \
+		.set_ease(Tween.EASE_OUT)
 
-	if is_leaf:
+	if is_pending:
+		theme = pending_theme
+	elif is_leaf:
 		theme = leaf_theme
 	else:
 		theme = noleaf_theme
