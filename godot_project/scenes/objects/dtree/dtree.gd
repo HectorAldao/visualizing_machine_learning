@@ -143,7 +143,7 @@ func _assign_inorder_indices(id: int) -> void:
 
 
 func _redraw_edges():
-	edges_container.queue_redraw()
+	edges_container.refresh_connections()
 
 
 # Calculate dtree dimensions
