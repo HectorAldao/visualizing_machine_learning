@@ -81,3 +81,13 @@ func _on_menu_id_pressed(menu_id: int) -> void:
 		change_child_requested.emit("add")
 	elif menu_id == 1:
 		change_child_requested.emit("remove")
+
+
+# Crossfade to a new theme: fade out → swap → fade in
+func apply_theme_animated(new_theme: Theme, new_text: String = text) -> void:
+	var tween := create_tween()
+	tween.tween_property(self, "modulate:a", 0.0, 0.2) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	tween.tween_callback(func(): theme = new_theme; text = new_text)
+	tween.tween_property(self, "modulate:a", 1.0, 0.3) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)

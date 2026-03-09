@@ -136,7 +136,7 @@ func _update_label() -> void:
 		var to_local_pos = to_local(to_center)
 
 		var center = (from_local + to_local_pos) * 0.5
-		var direction = (to_local_pos - from_local).normalized()
+		#var direction = (to_local_pos - from_local).normalized()
 		var angle = from_local.angle_to_point(to_local_pos)
 
 		_label.text = text

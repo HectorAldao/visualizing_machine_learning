@@ -213,10 +213,9 @@ func _add_child_node_for_algorithm(parent_id: int, branch_value, attribute: Stri
 		if child != null and child.branch_value == branch_value:
 			child.attribute  = attribute
 			child.label      = label
-			child.text       = label if is_leaf else attribute
 			child.is_leaf    = is_leaf
 			child.is_pending = false
-			child.theme      = child.leaf_theme if is_leaf else child.noleaf_theme
+			child.apply_theme_animated(child.leaf_theme if is_leaf else child.noleaf_theme, label if is_leaf else attribute)
 			return id
 	
 	# No placeholder found — create a brand-new node (fallback / root-child path)
