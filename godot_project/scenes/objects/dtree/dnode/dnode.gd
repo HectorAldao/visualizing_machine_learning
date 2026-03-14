@@ -24,6 +24,7 @@ var attribute: String = ""  # Attribute to split on (if not leaf)
 var label: String = ""      # Class label (if leaf)
 var is_leaf: bool = false   # Whether this is a leaf node
 var branch_value = null     # The value this node represents from parent's split
+var information_variable_value: String = ""
 
 # For the algorithmic mode
 var was_created_by_algorithm: bool = false
@@ -53,6 +54,9 @@ func _ready():
 	if not was_created_by_algorithm:
 		mouse_filter = Control.MOUSE_FILTER_PASS
 		gui_input.connect(_on_gui_input)
+	
+	mouse_entered.connect(_on_mouse_entered)
+	mouse_exited.connect(_on_mouse_exited)
 
 
 func _on_gui_input(event: InputEvent):
@@ -91,3 +95,11 @@ func apply_theme_animated(new_theme: Theme, new_text: String = text) -> void:
 	tween.tween_callback(func(): theme = new_theme; text = new_text)
 	tween.tween_property(self, "modulate:a", 1.0, 0.3) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+
+
+func _on_mouse_entered():
+	text = information_variable_value
+
+
+func _on_mouse_exited():
+	text = attribute if attribute else label

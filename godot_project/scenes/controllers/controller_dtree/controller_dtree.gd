@@ -180,7 +180,7 @@ func _on_start_training_pressed() -> void:
 		start_training_button.visible = false
 
 
-func _create_root_for_algorithm(attribute: String, label: String, is_leaf: bool) -> int:
+func _create_root_for_algorithm(attribute: String, label: String, is_leaf: bool, info_value: String) -> int:
 	var dnode: DNode = preload(dnode_scene).instantiate()
 	dnode.id = 0
 	dnode.depth = 0
@@ -189,6 +189,7 @@ func _create_root_for_algorithm(attribute: String, label: String, is_leaf: bool)
 	dnode.label = label
 	dnode.text = label if is_leaf else attribute
 	dnode.is_leaf = is_leaf
+	dnode.information_variable_value = info_value
 
 	# No popup menu if is not manual
 	dnode.was_created_by_algorithm = true
@@ -201,7 +202,7 @@ func _create_root_for_algorithm(attribute: String, label: String, is_leaf: bool)
 	return 0
 
 
-func _add_child_node_for_algorithm(parent_id: int, branch_value, attribute: String, label: String, is_leaf: bool) -> int:
+func _add_child_node_for_algorithm(parent_id: int, branch_value, attribute: String, label: String, is_leaf: bool, info_value: String) -> int:
 	var parent_dnode: DNode = dtree.nodes_dict.get(parent_id)
 	if parent_dnode == null:
 		print("Error: Parent node not found: ", parent_id)
@@ -232,6 +233,7 @@ func _add_child_node_for_algorithm(parent_id: int, branch_value, attribute: Stri
 	dnode.is_leaf = is_leaf
 	dnode.branch_value = branch_value
 	dnode.was_created_by_algorithm = true
+	dnode.information_variable_value = info_value
 	
 	dtree.nodes_dict[new_id] = dnode
 	dtree.nodes_container.add_child(dnode)
@@ -267,14 +269,14 @@ func _create_placeholder_children(parent_id: int, parent_depth: int, branch_valu
 		algorithm.register_placeholder_node_ids(branch_to_id)
 
 
-func _on_algorithm_add_node_requested(parent_id: int, branch_value, attribute: String, label: String, is_leaf: bool, children_branch_values: Array) -> void:
+func _on_algorithm_add_node_requested(parent_id: int, branch_value, attribute: String, label: String, is_leaf: bool, children_branch_values: Array, info_value: String) -> void:
 	# This is called by the algorithm to actually create nodes
 	var created_node_id: int
 	
 	if parent_id == -1:  # Is root
-		created_node_id = _create_root_for_algorithm(attribute, label, is_leaf)
+		created_node_id = _create_root_for_algorithm(attribute, label, is_leaf, info_value)
 	else:  # Is child
-		created_node_id = _add_child_node_for_algorithm(parent_id, branch_value, attribute, label, is_leaf)
+		created_node_id = _add_child_node_for_algorithm(parent_id, branch_value, attribute, label, is_leaf, info_value)
 	
 	if algorithm and created_node_id != -1:
 		# Pre-create placeholder children BEFORE update_pending_parent_ids so that

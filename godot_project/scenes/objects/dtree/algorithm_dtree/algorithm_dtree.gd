@@ -15,7 +15,7 @@ signal algorithm_completed()
 
 # Signal to request node/edge creation (same as manual mode)
 # children_branch_values carries the branch values for pre-creating placeholder children
-signal add_node_requested(parent_id: int, branch_value, attribute: String, label: String, is_leaf: bool, children_branch_values: Array)
+signal add_node_requested(parent_id: int, branch_value, attribute: String, label: String, is_leaf: bool, children_branch_values: Array, info_value: String)
 
 
 # Algorithm state
@@ -112,7 +112,7 @@ func _build_node_step(context: Dictionary) -> void:
 
 		details["tipo_de_nodo"] = "leaf"
 		
-		add_node_requested.emit(parent_id, branch_value, "", label, true, [])
+		add_node_requested.emit(parent_id, branch_value, "", label, true, [], "")
 		return
 	
 	# Check if no attributes left
@@ -123,7 +123,7 @@ func _build_node_step(context: Dictionary) -> void:
 		details["tipo_de_nodo"] = "leaf_majority"
 		details["etiqueta_mayoritaria"] = majority_label
 		
-		add_node_requested.emit(parent_id, branch_value, "", majority_label, true, [])
+		add_node_requested.emit(parent_id, branch_value, "", majority_label, true, [], "")
 		return
 	
 	# Calculate information gain for all attributes
@@ -192,7 +192,7 @@ func _build_node_step(context: Dictionary) -> void:
 	details["lista_ramas_mejor_atributo"] = ramas_mejor_atributo
 	# Create internal node AFTER adding children to stack
 	# This ensures children are in the call stack when update_pending_parent_ids is called
-	add_node_requested.emit(parent_id, branch_value, best_attr, "", false, best_attr_values_set)
+	add_node_requested.emit(parent_id, branch_value, best_attr, "", false, best_attr_values_set, "%.2f" % best_gain)
 
 
 # Helper functions

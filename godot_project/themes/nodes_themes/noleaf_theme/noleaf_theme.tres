@@ -1,20 +1,6 @@
 [gd_resource type="Theme" format=3 uid="uid://cmsv2q8q35lvy"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vu6l5"]
-content_margin_left = 6.0
-content_margin_top = 3.0
-content_margin_right = 6.0
-content_margin_bottom = 3.0
-bg_color = Color(0.8256567, 0.36293545, 0.29278603, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.019607844, 0.003921569, 0.019607844, 1)
-corner_radius_top_left = 5
-corner_radius_top_right = 5
-corner_radius_bottom_right = 5
-corner_radius_bottom_left = 5
+[ext_resource type="StyleBox" uid="uid://gvecqnyauc81" path="res://themes/nodes_themes/noleaf_theme/noleaf_style_box.tres" id="1_s0opj"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rjgu6"]
 bg_color = Color(0.3372549, 0.7058824, 0.9137255, 1)
@@ -26,7 +12,8 @@ bg_color = Color(0, 0.44705883, 0.69803923, 1)
 Button/colors/font_color = Color(0, 0, 0, 1)
 Button/constants/h_separation = 4
 Button/font_sizes/font_size = 24
-Button/styles/normal = SubResource("StyleBoxFlat_vu6l5")
+Button/styles/hover = ExtResource("1_s0opj")
+Button/styles/normal = ExtResource("1_s0opj")
 PopupMenu/colors/font_color = Color(0.019607844, 0.003921569, 0.019607844, 1)
 PopupMenu/colors/font_disabled_color = Color(0.23753911, 0.23753914, 0.23753911, 1)
 PopupMenu/colors/font_hover_color = Color(0.019607844, 0.003921569, 0.019607844, 1)

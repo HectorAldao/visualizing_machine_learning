@@ -24,6 +24,7 @@ bg_color = Color(0, 0.44705883, 0.69803923, 1)
 Button/colors/font_color = Color(0, 0, 0, 1)
 Button/constants/h_separation = 4
 Button/font_sizes/font_size = 24
+Button/styles/hover = SubResource("StyleBoxFlat_vu6l5")
 Button/styles/normal = SubResource("StyleBoxFlat_vu6l5")
 PopupMenu/colors/font_color = Color(0.019607844, 0.003921569, 0.019607844, 1)
 PopupMenu/colors/font_disabled_color = Color(0.23753911, 0.23753914, 0.23753911, 1)
