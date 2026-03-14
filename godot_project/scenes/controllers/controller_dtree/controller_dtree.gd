@@ -212,10 +212,11 @@ func _add_child_node_for_algorithm(parent_id: int, branch_value, attribute: Stri
 	for id in parent_dnode.sons_id:
 		var child: DNode = dtree.nodes_dict.get(id)
 		if child != null and child.branch_value == branch_value:
-			child.attribute  = attribute
-			child.label      = label
-			child.is_leaf    = is_leaf
-			child.is_pending = false
+			child.attribute                = attribute
+			child.label                    = label
+			child.is_leaf                  = is_leaf
+			child.is_pending               = false
+			child.information_variable_value = info_value
 			child.apply_theme_animated(child.leaf_theme if is_leaf else child.noleaf_theme, label if is_leaf else attribute)
 			return id
 	
