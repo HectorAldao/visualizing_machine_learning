@@ -1,0 +1,55 @@
+[gd_scene format=3 uid="uid://pycmc75uwvq0"]
+
+[ext_resource type="Script" uid="uid://bbbybw8pj857m" path="res://scenes/charts/bars_chart/bars_chart.gd" id="1_16va2"]
+
+[node name="BarsChart" type="VBoxContainer" unique_id=1452738358]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_16va2")
+
+[node name="Title" type="Label" parent="." unique_id=848095017]
+layout_mode = 2
+text = "Title"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1145099043]
+layout_mode = 2
+
+[node name="TextLabelsVBoxContainer" type="VBoxContainer" parent="HBoxContainer" unique_id=1422047652]
+layout_mode = 2
+
+[node name="Label1" type="Label" parent="HBoxContainer/TextLabelsVBoxContainer" unique_id=1197540466]
+visible = false
+layout_mode = 2
+text = "color"
+
+[node name="Label2" type="Label" parent="HBoxContainer/TextLabelsVBoxContainer" unique_id=119658072]
+visible = false
+layout_mode = 2
+text = "shape"
+
+[node name="NumbersVBoxContainer" type="VBoxContainer" parent="HBoxContainer" unique_id=632553998]
+layout_mode = 2
+
+[node name="HBoxContainerPrueba1" type="HBoxContainer" parent="HBoxContainer/NumbersVBoxContainer" unique_id=1643235698]
+visible = false
+layout_mode = 2
+
+[node name="ColorRect1" type="ColorRect" parent="HBoxContainer/NumbersVBoxContainer/HBoxContainerPrueba1" unique_id=208143163]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="HBoxContainer/NumbersVBoxContainer/HBoxContainerPrueba1" unique_id=1694189319]
+layout_mode = 2
+text = "1"
+
+[node name="HBoxContainerPrueba2" type="HBoxContainer" parent="HBoxContainer/NumbersVBoxContainer" unique_id=1711938989]
+visible = false
+layout_mode = 2
+
+[node name="ColorRect2" type="ColorRect" parent="HBoxContainer/NumbersVBoxContainer/HBoxContainerPrueba2" unique_id=1183198373]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="HBoxContainer/NumbersVBoxContainer/HBoxContainerPrueba2" unique_id=303260348]
+layout_mode = 2
+text = "2"

@@ -1,34 +1,40 @@
 extends Window
 
 
-@onready var rich_text_label: RichTextLabel = $RichTextLabel
+@onready var vboxcontainer: VBoxContainer= $ScrollContainer/VBoxContainer
+@onready var label0: Label = $ScrollContainer/VBoxContainer/Label0
+@onready var label1: Label = $ScrollContainer/VBoxContainer/Label1
+@onready var scroll_container: ScrollContainer = $ScrollContainer
 
-var selected_text: String
-#var details_dict: Dictionary
+# Scroll variables
+@export var scroll_speed: int = 30
+var is_middle_mouse_dragging: bool = false
+var last_mouse_position: Vector2 = Vector2.ZERO
 
 
-const template_texts: Dictionary[String, String] = {
+
+const template_texts: Dictionary[String, Array] = {
 	"internal" :
-"Han bajado {numero_de_datos} datos por esta rama.
+["Han bajado {numero_de_datos} datos por esta rama.
 Estos {numero_de_datos} datos tenían las etiquetas {lista_etiquetas}.
 En base a estas etiquetas se calcula la entropía de cada atributo de los datos.
-Los datos tienen los atributos {lista_atributos}, por lo que hay que calcular {metrica_de_ganancia_de_info_1} para decidir cuál sirve para dividir los mejor.
-{lista_ganancias}
-El que tiene mejor {metrica_de_ganancia_de_info_2} es '{mejor_atributo}' con {valor_metrica_mejor_atributo}.
+Los datos tienen los atributos {lista_atributos}, por lo que hay que calcular {metrica_de_ganancia_de_info_1} para decidir cuál sirve para dividir los mejor.",
+#{lista_ganancias}
+"El que tiene mejor {metrica_de_ganancia_de_info_2} es '{mejor_atributo}' con {valor_metrica_mejor_atributo}.
 Las ramas que se crean a partir de '{mejor_atributo}' son:
-{lista_ramas_mejor_atributo}",
+{lista_ramas_mejor_atributo}"],
 
 	"leaf":
-"Solo ha bajado {numero_de_datos} dato por esta rama.
-Por lo tanto, para este conjunto de datos solo podemos asumir que los futuros datos que lleugen a esta rama tendrán la misma etiqueta: {lista_etiquetas}",
+["Solo ha bajado {numero_de_datos} dato por esta rama.
+Por lo tanto, para este conjunto de datos solo podemos asumir que los futuros datos que lleugen a esta rama tendrán la misma etiqueta: {lista_etiquetas}"],
 
 	"leaf_mayority":
-"Han bajado {numero_de_datos} datos por esta rama.
+["Han bajado {numero_de_datos} datos por esta rama.
 Pero no quedan atributos sin recorrer para estos datos, es decir, todos los atributos han sido valorados para clasificar los datos.
-Por lo que solo queda ver qué etiquetas tienen los datos resultantes.
-Si todos tienen la misma etiqueta, perfecto, había datos repetidos o muy similares entre los datos, pero todos estos los clasificamos igual.
+Por lo que solo queda ver qué etiquetas tienen los datos resultantes.",
+"Si todos tienen la misma etiqueta, perfecto, había datos repetidos o muy similares entre los datos, pero todos estos los clasificamos igual.
 Si hay varias etiquetas, pues los atributos escogidos no sirven para diferenciar a la perfección todos los casos de nuestro conjunto de datos. Pero hay que seleccioniar una etiqueta para este nodo hoja, por lo que se escoje la etiqueta mayoritaria.
-En este caso '{etiqueta_mayoritaria}'."
+En este caso '{etiqueta_mayoritaria}'."]
 }
 
 
@@ -39,17 +45,32 @@ func _ready() -> void:
 
 func update_current_text(details_dict: Dictionary) -> void:
 	
+	var plot_data: Dictionary[String, float]
+	
+	if typeof(details_dict["lista_ganancias"]) == TYPE_DICTIONARY:
+		plot_data = details_dict["lista_ganancias"]
+		#print("Lista de ganancias era un diccionario")  #debug
+	
 	_clean_lists(details_dict)
 	
+	var chart = vboxcontainer.get_node_or_null("BarsChart")
+	if chart:
+		vboxcontainer.remove_child(chart)
+	
+	print("tipo de nodo", details_dict["tipo_de_nodo"])  #debug
 	match details_dict["tipo_de_nodo"]:
 		"internal":
-			selected_text = template_texts["internal"]
+			#print("Internal matcheado")  #debug
+			label0.text = template_texts["internal"][0].format(details_dict)
+			vboxcontainer.add_child(BarsChart.newone("Entropía por atributo", plot_data))
+			vboxcontainer.move_child(label1, -1)
+			label1.text = template_texts["internal"][1].format(details_dict)
 		"leaf":
-			selected_text = template_texts["leaf"]
+			label0.text = template_texts["leaf"][0].format(details_dict)
+			label1.text = ""
 		"leaf_mayority":
-			selected_text = template_texts["leaf_mayority"]
-			
-	rich_text_label.text = selected_text.format(details_dict)
+			label0.text = template_texts["leaf_mayority"][0].format(details_dict)
+			label1.text = ""
 
 
 ## For each value on the input Dictionary that is an Array[String], it will
@@ -59,6 +80,7 @@ func _clean_lists(dict: Dictionary) -> void:
 	for key in dict:
 		var value = dict[key]
 		var concatenation: String = ""
+		
 		if typeof(value) == TYPE_ARRAY:
 			var cont: int = 0
 			var size_arr: int = value.size()
@@ -72,3 +94,59 @@ func _clean_lists(dict: Dictionary) -> void:
 					else:  # If is nor the first or the last
 						concatenation += ", " + "\"" + i + "\""
 			dict[key] = concatenation
+						
+		elif typeof(value) == TYPE_DICTIONARY:
+			for key_v in value:  # If the value is a dict (as in "lista_ganancias"), change it to a string
+				concatenation += str(key_v) + " = " + str(value[key_v]) + "\n"
+			dict[key] = concatenation
+
+
+# How to move the ScrollContainer
+func _input(event):
+	# Handle mouse motion for middle mouse dragging
+	if event is InputEventMouseMotion and is_middle_mouse_dragging:
+		# The scroll aplied is going to be the dif frame to frame of
+		# where the mause where and where the mouse is
+		var delta_position = event.position - last_mouse_position
+
+		# The diff is aplied
+		scroll_container.scroll_horizontal -= int(delta_position.x)
+		scroll_container.scroll_vertical -= int(delta_position.y)
+
+		# The new position is saved and the input is set as handled
+		last_mouse_position = event.position
+		get_viewport().set_input_as_handled()
+	
+	# If there is a mouse event
+	if event is InputEventMouseButton:
+		# Move the view with middle mouse
+		if event.button_index == MOUSE_BUTTON_MIDDLE:
+			if event.pressed:
+				is_middle_mouse_dragging = true
+				last_mouse_position = event.position
+			else:
+				is_middle_mouse_dragging = false
+
+			get_viewport().set_input_as_handled()
+		
+		# Move scroll container view
+		elif event.pressed and not event.ctrl_pressed:
+			# Save the diference frame to frame
+			var delta = 0
+			
+			# Determine direction
+			if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+				delta = -scroll_speed
+			elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+				delta = scroll_speed
+				
+			# Apply scroll
+			if delta != 0:
+				# Check Shift for horizontal scrolling
+				if event.shift_pressed:
+					scroll_container.scroll_horizontal += delta
+				else:
+					scroll_container.scroll_vertical += delta
+				
+				# Optional: do not pass the input to lower nodes
+				get_viewport().set_input_as_handled()

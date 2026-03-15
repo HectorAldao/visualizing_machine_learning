@@ -1,7 +1,7 @@
 extends Control
 
 
-@export var scroll_speed: int = 30
+
 
 @export var manual_dtree_button: Button
 @export var algorithmic_dtree_button: Button
@@ -22,6 +22,7 @@ var current_mode:     String = ""
 # Scroll variables
 var is_middle_mouse_dragging: bool = false
 var last_mouse_position: Vector2 = Vector2.ZERO
+@export var scroll_speed: int = 30
 
 # Zoom variables
 #var zoom_level: float = 1.0

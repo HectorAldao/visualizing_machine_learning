@@ -1,9 +1,7 @@
 [gd_scene format=3 uid="uid://cjchbdmq0sym5"]
 
 [ext_resource type="Script" uid="uid://cfkexclmkwmr0" path="res://scenes/interface/window/window.gd" id="1_i8vyb"]
-
-[sub_resource type="Theme" id="Theme_pxc03"]
-RichTextLabel/font_sizes/normal_font_size = 20
+[ext_resource type="PackedScene" uid="uid://pycmc75uwvq0" path="res://scenes/charts/bars_chart/bars_chart.tscn" id="2_q1qms"]
 
 [node name="Window" type="Window" unique_id=734547246]
 oversampling_override = 1.0
@@ -11,12 +9,26 @@ position = Vector2i(20, 150)
 size = Vector2i(300, 350)
 script = ExtResource("1_i8vyb")
 
-[node name="RichTextLabel" type="RichTextLabel" parent="." unique_id=1977120745]
+[node name="ScrollContainer" type="ScrollContainer" parent="." unique_id=1442106336]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = SubResource("Theme_pxc03")
-bbcode_enabled = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ScrollContainer" unique_id=64018849]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label0" type="Label" parent="ScrollContainer/VBoxContainer" unique_id=1548486352]
+layout_mode = 2
 text = "Presiona el botón \"Empezar entrenamiento\""
+autowrap_mode = 3
+
+[node name="BarsChart" parent="ScrollContainer/VBoxContainer" unique_id=600360616 instance=ExtResource("2_q1qms")]
+visible = false
+layout_mode = 2
+
+[node name="Label1" type="Label" parent="ScrollContainer/VBoxContainer" unique_id=1948036384]
+layout_mode = 2
+autowrap_mode = 3

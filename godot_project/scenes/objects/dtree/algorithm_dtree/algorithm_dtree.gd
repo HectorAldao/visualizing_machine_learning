@@ -128,12 +128,12 @@ func _build_node_step(context: Dictionary) -> void:
 	
 	# Calculate information gain for all attributes
 	#details["ganancias_info"] = {}
-	var gains: Dictionary = _information_gains_for_all_atributes(attributes, data)
+	var gains: Dictionary[String, float] = _information_gains_for_all_atributes(attributes, data)
 	
-	var concatenation: String = ""
-	for key in gains:
-		concatenation += str(key) + " = " + str(gains[key]) + "\n"
-	details["lista_ganancias"] = concatenation
+	#var concatenation: String = ""
+	#for key in gains:
+		#concatenation += str(key) + " = " + str(gains[key]) + "\n"
+	details["lista_ganancias"] = gains
 	
 	
 	# Select best attribute
@@ -256,8 +256,8 @@ func _entropy(labels: Array) -> float:
 	return entropy_val
 
 
-func _information_gains_for_all_atributes(attributes, data) -> Dictionary:
-	var gains: Dictionary = {}
+func _information_gains_for_all_atributes(attributes: Array, data) -> Dictionary[String, float]:
+	var gains: Dictionary[String, float] = {}
 	for attr in attributes:
 		var gain = _information_gain(data, attr)
 		gains[attr] = gain
