@@ -144,9 +144,21 @@ func _build_node_step(context: Dictionary) -> void:
 			best_gain = gains[attr]
 			best_attr = attr
 	
+	# Count how many attributes have the maximum gain
+	var max_gain_attributes: Array = []
+	for attr in gains:
+		if gains[attr] == best_gain:
+			max_gain_attributes.append(attr)
+	
 	details["mejor_atributo"] = best_attr
 	details["valor_metrica_mejor_atributo"] = best_gain
-	details["tipo_de_nodo"] = "internal"
+	details["n_atributos_con_ganancia_maxima"] = max_gain_attributes.size()
+	
+	# Set node type based on whether there are multiple attributes with max gain
+	if max_gain_attributes.size() > 1:
+		details["tipo_de_nodo"] = "internal_multi_atribute"
+	else:
+		details["tipo_de_nodo"] = "internal"
 	
 	# Create branches for each attribute value in the data
 	var best_attr_values_set: Array = _attribute_values_set_in_data(data, best_attr)

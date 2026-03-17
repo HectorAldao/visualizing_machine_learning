@@ -24,6 +24,17 @@ Los datos tienen los atributos {lista_atributos}, por lo que hay que calcular {m
 Las ramas que se crean a partir de '{mejor_atributo}' son:
 {lista_ramas_mejor_atributo}"],
 
+	"internal_multi_atribute":
+["Han bajado {numero_de_datos} datos por esta rama.
+Estos {numero_de_datos} datos tenían las etiquetas {lista_etiquetas}.
+En base a estas etiquetas se calcula la entropía de cada atributo de los datos.
+Los datos tienen los atributos {lista_atributos}, por lo que hay que calcular {metrica_de_ganancia_de_info_1} para decidir cuál sirve para dividir los mejor.",
+#{lista_ganancias}
+"Hay {n_atributos_con_ganancia_maxima} atributos con mejor {metrica_de_ganancia_de_info_2}, con un valor de {valor_metrica_mejor_atributo}.
+Por lo tanto se selecciona uno aleatoriamente y se prosigue, en este caso \"{mejor_atributo}\".
+Las ramas que se crean a partir de '{mejor_atributo}' son:
+{lista_ramas_mejor_atributo}"],
+
 	"leaf":
 ["Solo ha bajado {numero_de_datos} dato por esta rama.
 Por lo tanto, para este conjunto de datos solo podemos asumir que los futuros datos que lleugen a esta rama tendrán la misma etiqueta: {lista_etiquetas}"],
@@ -49,7 +60,6 @@ func update_current_text(details_dict: Dictionary) -> void:
 	
 	if typeof(details_dict["lista_ganancias"]) == TYPE_DICTIONARY:
 		plot_data = details_dict["lista_ganancias"]
-		#print("Lista de ganancias era un diccionario")  #debug
 	
 	_clean_lists(details_dict)
 	
@@ -57,19 +67,23 @@ func update_current_text(details_dict: Dictionary) -> void:
 	if chart:
 		vboxcontainer.remove_child(chart)
 	
-	print("tipo de nodo", details_dict["tipo_de_nodo"])  #debug
-	match details_dict["tipo_de_nodo"]:
+	var tipo_de_nodo: String = details_dict["tipo_de_nodo"]
+	match tipo_de_nodo:
 		"internal":
-			#print("Internal matcheado")  #debug
-			label0.text = template_texts["internal"][0].format(details_dict)
+			label0.text = template_texts[tipo_de_nodo][0].format(details_dict)
 			vboxcontainer.add_child(BarsChart.newone("Entropía por atributo", plot_data))
 			vboxcontainer.move_child(label1, -1)
-			label1.text = template_texts["internal"][1].format(details_dict)
+			label1.text = template_texts[tipo_de_nodo][1].format(details_dict)
+		"internal_multi_atribute":
+			label0.text = template_texts[tipo_de_nodo][0].format(details_dict)
+			vboxcontainer.add_child(BarsChart.newone("Entropía por atributo", plot_data))
+			vboxcontainer.move_child(label1, -1)
+			label1.text = template_texts[tipo_de_nodo][1].format(details_dict)
 		"leaf":
-			label0.text = template_texts["leaf"][0].format(details_dict)
+			label0.text = template_texts[tipo_de_nodo][0].format(details_dict)
 			label1.text = ""
 		"leaf_mayority":
-			label0.text = template_texts["leaf_mayority"][0].format(details_dict)
+			label0.text = template_texts[tipo_de_nodo][0].format(details_dict)
 			label1.text = ""
 
 
