@@ -15,6 +15,7 @@ const controller_dtree_scene: String = Constants.SCENES.controller_dtree
 @onready var dtree:                 DTreeLogical =         $ScrollContainer/DTree
 @onready var dtree_controller:      ControllerDTree =      $ControllerDTree
 @onready var window:                Window =               $Window
+@onready var dataset_selection:     PanelContainer =       $PanelDatasetSelection
 
 var algorithm:        AlgorithmDTree
 var current_mode:     String = ""
@@ -43,6 +44,7 @@ func _ready():
 	scroll_container.      visible = false
 	dtree_alg_menu.        visible = false
 	window.                visible = false
+	dataset_selection.     visible = false
 	
 	window.position.x = 20
 	window.position.y = 150
@@ -68,9 +70,12 @@ func _on_manual_dtree_button_pressed():
 func _on_algorithmic_dtree_button_pressed():
 	# Cange visibility
 	dtree_selection_panel. visible = false
-	scroll_container.      visible = true
-	window.                visible = true
-
+	dataset_selection.     visible = true
+	#scroll_container.      visible = true
+	#window.                visible = true
+	
+	await dataset_selection.dataset_selected()
+	
 	# Set mode
 	current_mode = "automatic"
 	

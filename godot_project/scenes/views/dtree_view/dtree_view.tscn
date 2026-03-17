@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://dy3l4lsa0srpr" path="res://scenes/objects/dtree/dtree.tscn" id="4_dtree"]
 [ext_resource type="PackedScene" uid="uid://5h4ba5ys8aml" path="res://scenes/controllers/controller_dtree/controller_dtree.tscn" id="5_pxc03"]
 [ext_resource type="PackedScene" uid="uid://cjchbdmq0sym5" path="res://scenes/interface/window/window.tscn" id="6_txrwr"]
+[ext_resource type="PackedScene" uid="uid://dpmw4sgwtmh4y" path="res://scenes/interface/panel_dataset_selection/panel_dataset_selection.tscn" id="7_6eshh"]
 
 [node name="DTreeView" type="Control" unique_id=998695186 node_paths=PackedStringArray("manual_dtree_button", "algorithmic_dtree_button")]
 layout_mode = 3
@@ -20,6 +21,7 @@ manual_dtree_button = NodePath("DTreeSelectionPanel/VBoxContainer/ManualDTreeBut
 algorithmic_dtree_button = NodePath("DTreeSelectionPanel/VBoxContainer/AlgorithmDTreeButton")
 
 [node name="DTreeMenu" type="Control" parent="." unique_id=1402860866]
+visible = false
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
@@ -81,6 +83,20 @@ mouse_filter = 2
 
 [node name="DTree" parent="ScrollContainer" unique_id=229777749 instance=ExtResource("4_dtree")]
 layout_mode = 2
+
+[node name="PanelDatasetSelection" parent="." unique_id=1243987596 instance=ExtResource("7_6eshh")]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -162.0
+offset_top = -189.5
+offset_right = 162.0
+offset_bottom = 189.5
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="ControllerDTree" parent="." unique_id=387693380 instance=ExtResource("5_pxc03")]
 
