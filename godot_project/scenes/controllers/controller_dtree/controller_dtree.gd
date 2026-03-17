@@ -162,16 +162,53 @@ func _setup_automatic_mode() -> void:
 
 func _on_start_training_pressed() -> void:
 	
-	var data: Array[Dictionary] = [
+	var data: Array[Dictionary]
+	var attributes: Array[String]
+	
+	data = [
 		{"color": "red", "shape": "round", "size": "big", "class": "apple"},
 		{"color": "green", "shape": "round", "size": "big", "class": "apple"},
 		{"color": "yellow", "shape": "long", "size": "medium", "class": "banana"},
 		{"color": "green", "shape": "long", "size": "medium", "class": "banana"},
 		{"color": "orange", "shape": "round", "size": "medium", "class": "orange"},
 	]
-	var attributes: Array[String] = ["color", "shape", "size"]
+	attributes = ["color", "shape", "size"]
+	
+	data = [
+	# --- Situación Extrema 1: Rama Pura Perfecta (Tipo=Roca + Estado=Seco -> Siempre Inerte) ---
+	{"tipo": "roca", "estado": "seco", "tamaño": "pequeño", "clase": "inerte"},
+	{"tipo": "roca", "estado": "seco", "tamaño": "grande", "clase": "inerte"},
+	{"tipo": "roca", "estado": "seco", "tamaño": "gigante", "clase": "inerte"},
+	
+	# --- Situación Extrema 2: Rama Mixta 50/50 (Tipo=Animal + Estado=Activo -> Depredador o Presa) ---
+	{"tipo": "animal", "estado": "activo", "tamaño": "pequeño", "clase": "depredador"}, # Pequeño y activo = depredador (ej. halcón)
+	{"tipo": "animal", "estado": "activo", "tamaño": "pequeño", "clase": "presa"},     # Pequeño y activo = presa (ej. conejo)
+	{"tipo": "animal", "estado": "activo", "tamaño": "grande", "clase": "depredador"}, # Grande y activo = depredador (ej. león)
+	{"tipo": "animal", "estado": "activo", "tamaño": "grande", "clase": "presa"},      # Grande y activo = presa (ej. elefante)
+	
+	# --- Situación Extrema 3: Definición con pocos atributos (Tipo=Planta -> Siempre Vegetal) ---
+	{"tipo": "planta", "estado": "viva", "tamaño": "pequeño", "clase": "vegetal"},
+	{"tipo": "planta", "estado": "muerta", "tamaño": "grande", "clase": "vegetal"},
+	{"tipo": "planta", "estado": "viva", "tamaño": "gigante", "clase": "vegetal"},
+	{"tipo": "planta", "estado": "secada", "tamaño": "pequeño", "clase": "vegetal"},
+	
+	# --- Casos de Ruido y Contradicción para probar la profundidad ---
+	{"tipo": "animal", "estado": "inactivo", "tamaño": "pequeño", "clase": "presa"},
+	{"tipo": "animal", "estado": "inactivo", "tamaño": "grande", "clase": "depredador"}, # Dormido pero grande sigue siendo depredador
+	{"tipo": "roca", "estado": "mojado", "tamaño": "pequeño", "clase": "inerte"},
+	{"tipo": "roca", "estado": "mojado", "tamaño": "gigante", "clase": "inerte"},
+	
+	# --- Casos de borde para ver cómo se ramifica el resto ---
+	{"tipo": "planta", "estado": "viva", "tamaño": "mediano", "clase": "vegetal"},
+	{"tipo": "animal", "estado": "activo", "tamaño": "mediano", "clase": "depredador"},
+	{"tipo": "animal", "estado": "activo", "tamaño": "mediano", "clase": "presa"},
+	{"tipo": "roca", "estado": "seco", "tamaño": "mediano", "clase": "inerte"},
+]
+
+	attributes = ["tipo", "estado", "tamaño"]
 	
 	if algorithm:
+		algorithm.label_column = data[0].keys().filter(func(element): return not attributes.has(element))[0]
 		algorithm.start_training(data, attributes, dtree)
 
 		print("Training started!")

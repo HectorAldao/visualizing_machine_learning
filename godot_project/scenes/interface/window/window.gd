@@ -36,7 +36,7 @@ Las ramas que se crean a partir de '{mejor_atributo}' son:
 {lista_ramas_mejor_atributo}"],
 
 	"leaf":
-["Solo ha bajado {numero_de_datos} dato por esta rama.
+["Ha bajado {numero_de_datos} datos por esta rama con la misma etiqueta.
 Por lo tanto, para este conjunto de datos solo podemos asumir que los futuros datos que lleugen a esta rama tendrán la misma etiqueta: {lista_etiquetas}"],
 
 	"leaf_mayority":

@@ -41,6 +41,7 @@ var details: Dictionary = {}
 var pending_parent_id: int = -1
 var last_created_node_id: int = -1
 
+var label_column: String
 
 # Buttons related functions #
 
@@ -212,7 +213,7 @@ func _build_node_step(context: Dictionary) -> void:
 func _get_labels(data: Array) -> Array:
 	var labels = []
 	for row in data:
-		labels.append(row["class"])
+		labels.append(row[label_column])
 	return labels
 
 
