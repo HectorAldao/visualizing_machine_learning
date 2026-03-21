@@ -31,8 +31,8 @@ func _ready() -> void:
 		hbox.add_child(number_label)
 		numbers.add_child(hbox)
 
-static func newone(title_text: String, data_dict: Dictionary[String, float]) -> BarsChart:
+static func newone(title_txt: String, data_dict: Dictionary[String, float]) -> BarsChart:
 	var new_barschart: BarsChart = preload(Constants.SCENES.barschart).instantiate()
-	new_barschart.title_text = title_text
+	new_barschart.title_text = title_txt
 	new_barschart.data_to_plot = data_dict
 	return new_barschart

@@ -1,8 +1,6 @@
 extends Control
 
 
-
-
 @export var manual_dtree_button: Button
 @export var algorithmic_dtree_button: Button
 
@@ -74,7 +72,6 @@ func _on_algorithmic_dtree_button_pressed():
 	#scroll_container.      visible = true
 	#window.                visible = true
 	
-	await dataset_selection.dataset_selected()
 	
 	# Set mode
 	current_mode = "automatic"
@@ -90,6 +87,7 @@ func _on_algorithmic_dtree_button_pressed():
 	dtree_controller.algorithm = algorithm
 	dtree_controller.initialize(dtree, window, "automatic", self)
 
+	await SignalsObserver.dataset_selected
 
 # How to move the ScrollContainer
 func _input(event):

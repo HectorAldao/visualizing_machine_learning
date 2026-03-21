@@ -10,7 +10,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_8gy84")
-dtree_view_scene = "uid://dr3bg1sj3y1nu"
 
 [node name="DTreeButton" type="Button" parent="." unique_id=514394525]
 layout_mode = 1

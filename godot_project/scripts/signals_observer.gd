@@ -3,7 +3,7 @@ extends Node
 
 # Signals
 
-#signal 	
+signal dataset_selected(data:Array[Dictionary], attrs: Array[String])
 
 
 # Variables

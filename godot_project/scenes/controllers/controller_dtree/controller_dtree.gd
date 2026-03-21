@@ -17,8 +17,10 @@ var mode: String = "manual"
 var algorithm:              AlgorithmDTree
 var panel_algorithm_dtree:  Control
 var next_step_button:       Button
-var start_training_button:  Button
 var detail_button:          Button
+var data: Array[Dictionary]
+var attributes: Array[String]
+
 
 
 func initialize(p_tree: DTreeLogical, p_window: Window, p_mode: String, p_view: Control = null) -> void:
@@ -124,22 +126,21 @@ func _remove_subtree_and_self(node_id: int) -> void:
 # Automatic mode related functions #
 
 func _setup_automatic_mode() -> void:
-
+	
+	print("algomode ")  #debug
 	# Add UI for automatic mode
 	panel_algorithm_dtree = preload(panel_algorithm_dtree_scene).instantiate()
 	view.add_child(panel_algorithm_dtree)
 	panel_algorithm_dtree.set_anchors_preset(Control.PRESET_TOP_LEFT)
 
 	next_step_button = panel_algorithm_dtree.get_node("VBoxContainer/NextButton")
-	start_training_button = panel_algorithm_dtree.get_node("VBoxContainer/StartTrainingButton")
 	detail_button = panel_algorithm_dtree.get_node("VBoxContainer/DetailButton")
 
 	next_step_button.pressed.connect(_on_step_button_pressed)
-	start_training_button.pressed.connect(_on_start_training_pressed)
+	SignalsObserver.dataset_selected.connect(_on_start_training_pressed)
 	detail_button.pressed.connect(_on_detail_button_pressed)
 
 	next_step_button.      visible = false
-	start_training_button. visible = true
 	detail_button.         visible = false
 
 	if algorithm:
@@ -159,53 +160,10 @@ func _setup_automatic_mode() -> void:
 		next_step.connect(algorithm.next_step)
 
 
-
-func _on_start_training_pressed() -> void:
+func _on_start_training_pressed(datast: Array[Dictionary], attrs: Array[String]) -> void:
 	
-	var data: Array[Dictionary]
-	var attributes: Array[String]
-	
-	data = [
-		{"color": "red", "shape": "round", "size": "big", "class": "apple"},
-		{"color": "green", "shape": "round", "size": "big", "class": "apple"},
-		{"color": "yellow", "shape": "long", "size": "medium", "class": "banana"},
-		{"color": "green", "shape": "long", "size": "medium", "class": "banana"},
-		{"color": "orange", "shape": "round", "size": "medium", "class": "orange"},
-	]
-	attributes = ["color", "shape", "size"]
-	
-	data = [
-	# --- Situación Extrema 1: Rama Pura Perfecta (Tipo=Roca + Estado=Seco -> Siempre Inerte) ---
-	{"tipo": "roca", "estado": "seco", "tamaño": "pequeño", "clase": "inerte"},
-	{"tipo": "roca", "estado": "seco", "tamaño": "grande", "clase": "inerte"},
-	{"tipo": "roca", "estado": "seco", "tamaño": "gigante", "clase": "inerte"},
-	
-	# --- Situación Extrema 2: Rama Mixta 50/50 (Tipo=Animal + Estado=Activo -> Depredador o Presa) ---
-	{"tipo": "animal", "estado": "activo", "tamaño": "pequeño", "clase": "depredador"}, # Pequeño y activo = depredador (ej. halcón)
-	{"tipo": "animal", "estado": "activo", "tamaño": "pequeño", "clase": "presa"},     # Pequeño y activo = presa (ej. conejo)
-	{"tipo": "animal", "estado": "activo", "tamaño": "grande", "clase": "depredador"}, # Grande y activo = depredador (ej. león)
-	{"tipo": "animal", "estado": "activo", "tamaño": "grande", "clase": "presa"},      # Grande y activo = presa (ej. elefante)
-	
-	# --- Situación Extrema 3: Definición con pocos atributos (Tipo=Planta -> Siempre Vegetal) ---
-	{"tipo": "planta", "estado": "viva", "tamaño": "pequeño", "clase": "vegetal"},
-	{"tipo": "planta", "estado": "muerta", "tamaño": "grande", "clase": "vegetal"},
-	{"tipo": "planta", "estado": "viva", "tamaño": "gigante", "clase": "vegetal"},
-	{"tipo": "planta", "estado": "secada", "tamaño": "pequeño", "clase": "vegetal"},
-	
-	# --- Casos de Ruido y Contradicción para probar la profundidad ---
-	{"tipo": "animal", "estado": "inactivo", "tamaño": "pequeño", "clase": "presa"},
-	{"tipo": "animal", "estado": "inactivo", "tamaño": "grande", "clase": "depredador"}, # Dormido pero grande sigue siendo depredador
-	{"tipo": "roca", "estado": "mojado", "tamaño": "pequeño", "clase": "inerte"},
-	{"tipo": "roca", "estado": "mojado", "tamaño": "gigante", "clase": "inerte"},
-	
-	# --- Casos de borde para ver cómo se ramifica el resto ---
-	{"tipo": "planta", "estado": "viva", "tamaño": "mediano", "clase": "vegetal"},
-	{"tipo": "animal", "estado": "activo", "tamaño": "mediano", "clase": "depredador"},
-	{"tipo": "animal", "estado": "activo", "tamaño": "mediano", "clase": "presa"},
-	{"tipo": "roca", "estado": "seco", "tamaño": "mediano", "clase": "inerte"},
-]
-
-	attributes = ["tipo", "estado", "tamaño"]
+	data = datast
+	attributes = attrs
 	
 	if algorithm:
 		algorithm.label_column = data[0].keys().filter(func(element): return not attributes.has(element))[0]
@@ -214,7 +172,6 @@ func _on_start_training_pressed() -> void:
 		print("Training started!")
 
 		next_step_button.visible = true
-		start_training_button.visible = false
 
 
 func _create_root_for_algorithm(attribute: String, label: String, is_leaf: bool, info_value: String) -> int:
