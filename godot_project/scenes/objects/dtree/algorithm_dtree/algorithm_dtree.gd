@@ -245,8 +245,7 @@ func _unbuild_node_step(context: Dictionary) -> void:
 		dtree_ref.remove_subtree_and_self(node_id)
 		context["node_id"] = -1
 
-	if not dtree_ref.nodes_dict.is_empty() and dtree_ref.root_id != null:
-		dtree_ref.relayout_tree()
+	dtree_ref.relayout_tree()
 	if dtree_ref.has_method("update_canvas_size_and_center"):
 		dtree_ref.update_canvas_size_and_center()
 

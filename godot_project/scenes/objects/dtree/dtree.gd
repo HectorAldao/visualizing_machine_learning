@@ -45,6 +45,10 @@ func _create_root() -> void:
 
 
 func relayout_tree() -> void:
+	if root_id == null or nodes_dict.is_empty():
+		_redraw_edges()
+		return
+
 	_current_inorder_index = 0
 	_assign_inorder_indices(root_id)
 	_apply_positions()

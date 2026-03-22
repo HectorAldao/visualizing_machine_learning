@@ -298,8 +298,8 @@ func _on_step_button_pressed() -> void:
 
 func _on_previous_step_button_pressed() -> void:
 	previous_step.emit()
-	#if next_step_button:
-	#	next_step_button.disabled = false
+	if next_step_button:
+		next_step_button.disabled = false
 
 func _on_detail_button_pressed() -> void:
 	detail.emit()
