@@ -172,3 +172,38 @@ func get_tree_bounds() -> Rect2:
 		(max_y - min_y) + margin * 2.0
 	)
 	return Rect2(pos, tree_size)
+
+
+func remove_subtree_and_self(node_id: int) -> void:
+	if not nodes_dict.has(node_id):
+		return
+
+	var dnode: DNode = nodes_dict[node_id]
+
+	var children_copy: Array[int] = dnode.sons_id.duplicate()
+	for child_id in children_copy:
+		remove_subtree_and_self(child_id)
+
+	if dnode.parent_id != null and nodes_dict.has(dnode.parent_id):
+		var parent_dnode: DNode = nodes_dict[dnode.parent_id]
+		parent_dnode.sons_id.erase(node_id)
+
+	nodes_dict.erase(node_id)
+
+	if root_id == node_id:
+		root_id = null
+
+	dnode.queue_free()
+
+
+func restore_node_as_pending(node_id: int) -> void:
+	if not nodes_dict.has(node_id):
+		return
+
+	var dnode: DNode = nodes_dict[node_id]
+	dnode.attribute = ""
+	dnode.label = ""
+	dnode.is_leaf = false
+	dnode.is_pending = true
+	dnode.information_variable_value = ""
+	dnode.apply_theme_animated(dnode.pending_theme, "...")

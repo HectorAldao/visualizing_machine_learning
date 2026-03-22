@@ -83,6 +83,12 @@ func next_step() -> void:
 	_build_node_step(context)
 
 func previous_step() -> void:
+	if called_stack.is_empty():
+		return
+
+	if not is_running:
+		is_running = true
+
 	var context = called_stack.pop_back()
 	call_stack.append(context)
 	_unbuild_node_step(context)
@@ -215,7 +221,90 @@ func _build_node_step(context: Dictionary) -> void:
 
 
 func _unbuild_node_step(context: Dictionary) -> void:
-	pass
+	if dtree_ref == null:
+		return
+
+	var node_id: int = _resolve_context_node_id(context)
+	if node_id == -1:
+		return
+
+	var is_internal_node: bool = _is_internal_context(context)
+	if is_internal_node:
+		_remove_child_contexts_for_parent(node_id)
+		_remove_visual_children_for_node(node_id)
+
+	var parent_id: int = context.get("parent_id", -1)
+	var had_placeholder: bool = int(context.get("node_id", -1)) >= 0
+
+	if parent_id == -1:
+		dtree_ref.remove_subtree_and_self(node_id)
+		context["node_id"] = -1
+	elif had_placeholder:
+		dtree_ref.restore_node_as_pending(node_id)
+	else:
+		dtree_ref.remove_subtree_and_self(node_id)
+		context["node_id"] = -1
+
+	if not dtree_ref.nodes_dict.is_empty() and dtree_ref.root_id != null:
+		dtree_ref.relayout_tree()
+	if dtree_ref.has_method("update_canvas_size_and_center"):
+		dtree_ref.update_canvas_size_and_center()
+
+
+func _resolve_context_node_id(context: Dictionary) -> int:
+	var context_node_id: int = int(context.get("node_id", -1))
+	if context_node_id >= 0 and dtree_ref.nodes_dict.has(context_node_id):
+		return context_node_id
+
+	var parent_id: int = int(context.get("parent_id", -1))
+	if parent_id == -1:
+		return int(dtree_ref.root_id) if dtree_ref.root_id != null else -1
+
+	if not dtree_ref.nodes_dict.has(parent_id):
+		return -1
+
+	var parent_node: DNode = dtree_ref.nodes_dict[parent_id]
+	var branch_value = context.get("branch_value", null)
+	for child_id in parent_node.sons_id:
+		if not dtree_ref.nodes_dict.has(child_id):
+			continue
+		var child_node: DNode = dtree_ref.nodes_dict[child_id]
+		if child_node.branch_value == branch_value:
+			return child_id
+
+	return -1
+
+
+func _is_internal_context(context: Dictionary) -> bool:
+	var data: Array = context.get("data", [])
+	var attributes: Array = context.get("attributes", [])
+	var labels: Array = _get_labels(data)
+	var unique_labels: Array = _get_unique_labels(labels)
+
+	if unique_labels.size() == 1:
+		return false
+
+	if attributes.is_empty():
+		return false
+
+	return true
+
+
+func _remove_child_contexts_for_parent(parent_node_id: int) -> void:
+	for i in range(call_stack.size() - 1, -1, -1):
+		var ctx = call_stack[i]
+		if int(ctx.get("parent_id", -999999)) == parent_node_id:
+			call_stack.remove_at(i)
+
+
+func _remove_visual_children_for_node(node_id: int) -> void:
+	if not dtree_ref.nodes_dict.has(node_id):
+		return
+
+	var dnode: DNode = dtree_ref.nodes_dict[node_id]
+	var children_copy: Array[int] = dnode.sons_id.duplicate()
+	for child_id in children_copy:
+		dtree_ref.remove_subtree_and_self(child_id)
 
 
 # Helper functions
