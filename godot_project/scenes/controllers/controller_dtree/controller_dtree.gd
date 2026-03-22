@@ -129,21 +129,23 @@ func _remove_subtree_and_self(node_id: int) -> void:
 
 func _setup_automatic_mode() -> void:
 	
-	print("algomode ")  #debug
 	# Add UI for automatic mode
 	panel_algorithm_dtree = preload(panel_algorithm_dtree_scene).instantiate()
 	view.add_child(panel_algorithm_dtree)
 	panel_algorithm_dtree.set_anchors_preset(Control.PRESET_TOP_LEFT)
 
 	next_step_button = panel_algorithm_dtree.get_node("VBoxContainer/NextButton")
+	previous_step_button = panel_algorithm_dtree.get_node("VBoxContainer/PrevButton")
 	detail_button = panel_algorithm_dtree.get_node("VBoxContainer/DetailButton")
 
 	next_step_button.pressed.connect(_on_step_button_pressed)
+	previous_step_button.pressed.connect(_on_previous_step_button_pressed)
 	if not SignalsObserver.dataset_selected.is_connected(_on_start_training_pressed):
 		SignalsObserver.dataset_selected.connect(_on_start_training_pressed)
 	detail_button.pressed.connect(_on_detail_button_pressed)
 
 	next_step_button.      visible = false
+	previous_step_button.  visible = false
 	detail_button.         visible = false
 
 	if algorithm:
@@ -169,17 +171,13 @@ func _on_start_training_pressed(datast: Array[Dictionary], attrs: Array[String])
 	data = datast
 	attributes = attrs
 	
-	print("data:", data)  # debug
-	print("attributos:", attributes)  # debug
-	
 	if algorithm:
 		var  list_of_diferences = data[0].keys().filter(func(element): return not attributes.has(element))
 		algorithm.label_column = list_of_diferences[0] #if not list_of_diferences.is_empty() else "class"  #debug
 		algorithm.start_training(data, attributes, dtree)
 
-		print("Training started!")
-
 		next_step_button.visible = true
+		previous_step_button.visible = true
 
 
 func _create_root_for_algorithm(attribute: String, label: String, is_leaf: bool, info_value: String) -> int:

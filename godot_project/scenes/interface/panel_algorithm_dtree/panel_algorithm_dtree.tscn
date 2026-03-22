@@ -29,6 +29,10 @@ horizontal_alignment = 1
 layout_mode = 2
 text = "Siguiente paso"
 
+[node name="PrevButton" type="Button" parent="VBoxContainer" unique_id=1261133843]
+layout_mode = 2
+text = "Paso previo"
+
 [node name="DetailButton" type="Button" parent="VBoxContainer" unique_id=847161373]
 layout_mode = 2
 text = "Detalle"
