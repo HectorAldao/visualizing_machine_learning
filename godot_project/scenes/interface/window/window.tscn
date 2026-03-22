@@ -22,7 +22,7 @@ size_flags_horizontal = 3
 
 [node name="Label0" type="Label" parent="ScrollContainer/VBoxContainer" unique_id=1548486352]
 layout_mode = 2
-text = "Presiona el botón \"Empezar entrenamiento\""
+text = "Presiona el botón \"Siguiente\""
 autowrap_mode = 3
 
 [node name="BarsChart" parent="ScrollContainer/VBoxContainer" unique_id=600360616 instance=ExtResource("2_q1qms")]

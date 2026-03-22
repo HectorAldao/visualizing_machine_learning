@@ -82,6 +82,11 @@ func next_step() -> void:
 	called_stack.append(context)
 	_build_node_step(context)
 
+func previous_step() -> void:
+	var context = called_stack.pop_back()
+	call_stack.append(context)
+	_unbuild_node_step(context)
+
 
 # Huge function: decide the node #
 
@@ -206,6 +211,11 @@ func _build_node_step(context: Dictionary) -> void:
 	# Create internal node AFTER adding children to stack
 	# This ensures children are in the call stack when update_pending_parent_ids is called
 	add_node_requested.emit(parent_id, branch_value, best_attr, "", false, best_attr_values_set, "%.2f" % best_gain)
+
+
+
+func _unbuild_node_step(context: Dictionary) -> void:
+	pass
 
 
 # Helper functions

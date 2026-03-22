@@ -10,6 +10,7 @@ extends PanelContainer
 @onready var informative_text: Label = $VBoxContainer/PanelContainer/Label
 
 
+const posible_y_column_names: Array[String] = ["class", "Class", "y", "Y", "label", "Label"]
 const DICT_OF_DATASETS: Dictionary = \
 	{"Frutas":
 		[
@@ -107,12 +108,14 @@ func _parse_csv(file_path):
 		return
 	
 	# Get columns
-	var headers = file.get_csv_line()
+	var headers = safe_get_array_of_strings(file.get_csv_line() as Array)
 	
-	var data_array = []
+	var data_array: Array[Dictionary] = []
 	
-	while not file.eof_reached():
+	while true:
 		var row = file.get_csv_line()
+		if file.eof_reached():
+			break  # Because the eof_reached only goes to true once it tries to reed over the lengh of the file
 		
 		if row.is_empty():
 			continue
@@ -125,6 +128,11 @@ func _parse_csv(file_path):
 		data_array.append(row_dict)
 	
 	file.close()
+	
+	for col_name in posible_y_column_names:
+		if headers.has(col_name):
+			headers.erase(col_name)
+			break  # Ensuring that only one column is deleted
 	
 	informative_text.text = "CSV cargado correctamente: %d datos" % data_array.size()
 	informative_text.label_settings.font_color = color_good

@@ -2,6 +2,7 @@ class_name ControllerDTree
 extends Node
 
 signal next_step
+signal previous_step
 signal detail
 
 const panel_algorithm_dtree_scene: String = Constants.SCENES.panel_algorithm_dtree
@@ -17,6 +18,7 @@ var mode: String = "manual"
 var algorithm:              AlgorithmDTree
 var panel_algorithm_dtree:  Control
 var next_step_button:       Button
+var previous_step_button:   Button
 var detail_button:          Button
 var data: Array[Dictionary]
 var attributes: Array[String]
@@ -137,7 +139,8 @@ func _setup_automatic_mode() -> void:
 	detail_button = panel_algorithm_dtree.get_node("VBoxContainer/DetailButton")
 
 	next_step_button.pressed.connect(_on_step_button_pressed)
-	SignalsObserver.dataset_selected.connect(_on_start_training_pressed)
+	if not SignalsObserver.dataset_selected.is_connected(_on_start_training_pressed):
+		SignalsObserver.dataset_selected.connect(_on_start_training_pressed)
 	detail_button.pressed.connect(_on_detail_button_pressed)
 
 	next_step_button.      visible = false
@@ -158,6 +161,7 @@ func _setup_automatic_mode() -> void:
 		algorithm. algorithm_completed          .connect(_on_algorithm_completed)
 
 		next_step.connect(algorithm.next_step)
+		previous_step.connect(algorithm.previous_step)
 
 
 func _on_start_training_pressed(datast: Array[Dictionary], attrs: Array[String]) -> void:
@@ -165,8 +169,12 @@ func _on_start_training_pressed(datast: Array[Dictionary], attrs: Array[String])
 	data = datast
 	attributes = attrs
 	
+	print("data:", data)  # debug
+	print("attributos:", attributes)  # debug
+	
 	if algorithm:
-		algorithm.label_column = data[0].keys().filter(func(element): return not attributes.has(element))[0]
+		var  list_of_diferences = data[0].keys().filter(func(element): return not attributes.has(element))
+		algorithm.label_column = list_of_diferences[0] #if not list_of_diferences.is_empty() else "class"  #debug
 		algorithm.start_training(data, attributes, dtree)
 
 		print("Training started!")
@@ -290,8 +298,10 @@ func _on_algorithm_add_node_requested(parent_id: int, branch_value, attribute: S
 func _on_step_button_pressed() -> void:
 	next_step.emit()
 
+func _on_previous_step_button_pressed() -> void:
+	previous_step.emit()
 
-func _on_detail_button_pressed():
+func _on_detail_button_pressed() -> void:
 	detail.emit()
 
 

@@ -69,8 +69,8 @@ func _on_algorithmic_dtree_button_pressed():
 	# Cange visibility
 	dtree_selection_panel. visible = false
 	dataset_selection.     visible = true
-	#scroll_container.      visible = true
-	#window.                visible = true
+	scroll_container.      visible = false
+	window.                visible = false
 	
 	
 	# Set mode
@@ -88,6 +88,10 @@ func _on_algorithmic_dtree_button_pressed():
 	dtree_controller.initialize(dtree, window, "automatic", self)
 
 	await SignalsObserver.dataset_selected
+
+	# Once the dataset is selected and training starts, show the tree and detail window
+	scroll_container.visible = true
+	window.visible = true
 
 # How to move the ScrollContainer
 func _input(event):
