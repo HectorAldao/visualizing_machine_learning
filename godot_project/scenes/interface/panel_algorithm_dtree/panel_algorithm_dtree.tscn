@@ -33,6 +33,15 @@ text = "Siguiente paso"
 layout_mode = 2
 text = "Paso previo"
 
+[node name="EvaluateButton" type="Button" parent="VBoxContainer" unique_id=1520567694]
+layout_mode = 2
+text = "Evaluar"
+
 [node name="DetailButton" type="Button" parent="VBoxContainer" unique_id=847161373]
+visible = false
 layout_mode = 2
 text = "Detalle"
+
+[node name="DropButton" type="Button" parent="VBoxContainer" unique_id=2102733342]
+layout_mode = 2
+text = "Dropear dato"

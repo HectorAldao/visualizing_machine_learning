@@ -2,8 +2,8 @@ class_name BarsChart extends Control
 
 @export var scale_mult: float = 100.0
 
-var data_to_plot: Dictionary[String, float]
-var title_text: String
+var data_to_plot: Dictionary[String, float] = {}
+var title_text: String = ""
 
 
 # Called when the node enters the scene tree for the first time.
@@ -36,3 +36,7 @@ static func newone(title_txt: String, data_dict: Dictionary[String, float]) -> B
 	new_barschart.title_text = title_txt
 	new_barschart.data_to_plot = data_dict
 	return new_barschart
+
+#func _init(new_title: String = "", new_data: Dictionary[String, float] = {}) -> void:
+#	title_text = new_title
+#	data_to_plot = new_data

@@ -52,4 +52,4 @@ label_settings = SubResource("LabelSettings_av435")
 
 [node name="Button" type="Button" parent="VBoxContainer" unique_id=1479662911]
 layout_mode = 2
-text = "Entrenar"
+text = "Seleccionar Dataset"

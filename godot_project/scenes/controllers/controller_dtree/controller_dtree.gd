@@ -15,11 +15,15 @@ var next_node_id: int = 0
 var mode: String = "manual"
 
 # For automatic mode
-var algorithm:              AlgorithmDTree
-var panel_algorithm_dtree:  Control
-var next_step_button:       Button
-var previous_step_button:   Button
-var detail_button:          Button
+var has_train_started: bool = false
+var algorithm:               AlgorithmDTree
+var panel_algorithm_dtree:   Control
+var panel_dataset_selection: Control
+var next_step_button:        Button
+var previous_step_button:    Button
+var evaluate_button:         Button
+var detail_button:           Button
+var drop_button:             Button
 var data: Array[Dictionary]
 var attributes: Array[String]
 
@@ -128,57 +132,73 @@ func _remove_subtree_and_self(node_id: int) -> void:
 # Automatic mode related functions #
 
 func _setup_automatic_mode() -> void:
+
+	#panel_dataset_selection = get_parent().get_node("PanelDatasetSelection")  #debug
+	panel_dataset_selection = view.get_node("PanelDatasetSelection")
 	
 	# Add UI for automatic mode
 	panel_algorithm_dtree = preload(panel_algorithm_dtree_scene).instantiate()
 	view.add_child(panel_algorithm_dtree)
 	panel_algorithm_dtree.set_anchors_preset(Control.PRESET_TOP_LEFT)
 
-	next_step_button = panel_algorithm_dtree.get_node("VBoxContainer/NextButton")
+	next_step_button     = panel_algorithm_dtree.get_node("VBoxContainer/NextButton")
 	previous_step_button = panel_algorithm_dtree.get_node("VBoxContainer/PrevButton")
-	detail_button = panel_algorithm_dtree.get_node("VBoxContainer/DetailButton")
+	evaluate_button      = panel_algorithm_dtree.get_node("VBoxContainer/EvaluateButton")
+	detail_button        = panel_algorithm_dtree.get_node("VBoxContainer/DetailButton")
+	drop_button          = panel_algorithm_dtree.get_node("VBoxContainer/DropButton")
 
 	next_step_button.pressed.connect(_on_step_button_pressed)
 	previous_step_button.pressed.connect(_on_previous_step_button_pressed)
-	if not SignalsObserver.dataset_selected.is_connected(_on_start_training_pressed):
-		SignalsObserver.dataset_selected.connect(_on_start_training_pressed)
+	evaluate_button.pressed.connect(_on_evaluate_button_pressed)
+	if not SignalsObserver.dataset_selected.is_connected(_on_dataset_selected_pressed):
+		SignalsObserver.dataset_selected.connect(_on_dataset_selected_pressed)
 	detail_button.pressed.connect(_on_detail_button_pressed)
+	drop_button.pressed.connect(_on_drop_button_pressed)
 
-	next_step_button.      visible = false
-	previous_step_button.  visible = false
-	detail_button.         visible = false
+	next_step_button.     visible = false
+	previous_step_button. visible = false
+	evaluate_button.      visible = false
+	detail_button.        visible = false
+	drop_button.          visible = false
 
 	if algorithm:
 
 		algorithm. add_node_requested           .connect(_on_algorithm_add_node_requested)
 
-		#algorithm. step_start                   .connect(_on_algorithm_step)
-		#algorithm. step_calculating_info_gain   .connect(_on_algorithm_step_entropy)
-		#algorithm. step_calculating_gain        .connect(_on_algorithm_step_gain)
-		#algorithm. step_best_attribute_selected .connect(_on_algorithm_step_best_attr)
-		#algorithm. step_creating_node           .connect(_on_algorithm_step_node)
-		#algorithm. step_creating_branch         .connect(_on_algorithm_step_branch)
-		#algorithm. step_all_same_class          .connect(_on_algorithm_all_same_class)
-		#algorithm. step_no_attributes_left      .connect(_on_algorithm_no_atributes_left)
 		algorithm. algorithm_completed          .connect(_on_algorithm_completed)
 
 		next_step.connect(algorithm.next_step)
 		previous_step.connect(algorithm.previous_step)
 
 
-func _on_start_training_pressed(datast: Array[Dictionary], attrs: Array[String]) -> void:
-	
-	data = datast
-	attributes = attrs
-	
-	if algorithm:
-		var  list_of_diferences = data[0].keys().filter(func(element): return not attributes.has(element))
-		algorithm.label_column = list_of_diferences[0] #if not list_of_diferences.is_empty() else "class"  #debug
-		algorithm.start_training(data, attributes, dtree)
+func _on_dataset_selected_pressed(datast: Array[Dictionary], attrs: Array[String]) -> void:
 
-		next_step_button.visible = true
-		previous_step_button.visible = true
+	if not has_train_started:
+		has_train_started = true
+		data = datast
+		attributes = attrs
+		
+		if algorithm:
+			var  list_of_diferences = data[0].keys().filter(func(element): return not attributes.has(element))
+			algorithm.label_column = list_of_diferences[0]
+			algorithm.start_training(data, attributes, dtree)
 
+			next_step_button.visible = true
+			previous_step_button.visible = true
+			evaluate_button.visible = true
+			evaluate_button.disabled = true
+			
+	else:
+
+		drop_button.visible = true
+		SignalsObserver.start_evaluation.emit(datast)
+
+		#next_step_button.        visible = false
+		#previous_step_button.    visible = false
+		#evaluate_button.         visible = false
+
+
+		
 
 func _create_root_for_algorithm(attribute: String, label: String, is_leaf: bool, info_value: String) -> int:
 	var dnode: DNode = preload(dnode_scene).instantiate()
@@ -300,52 +320,32 @@ func _on_previous_step_button_pressed() -> void:
 	previous_step.emit()
 	if next_step_button:
 		next_step_button.disabled = false
+		evaluate_button.disabled = true
+
+func _on_evaluate_button_pressed() -> void:
+
+	next_step_button.     visible = false
+	previous_step_button. visible = false
+	evaluate_button.      visible = false
+
+	# Here is where there must be a signal "evaluate"
+	panel_dataset_selection. visible = true
+
 
 func _on_detail_button_pressed() -> void:
 	detail.emit()
 
 
-# Algorithm signal handlers
-
-#func _on_algorithm_step(step_type: String, step_data: Dictionary) -> void:
-	#print("Step: ", step_type, " - ", step_data)
-#
-#
-#func _on_algorithm_step_entropy(data_size: int, labels: Array) -> void:
-	#print("Calculating entropy for ", data_size, " samples with labels: ", labels)
-#
-#
-#func _on_algorithm_step_gain(attribute: String, gain: float) -> void:
-	#print("Gain for ", attribute, ": ", gain)
-#
-#
-#func _on_algorithm_step_best_attr(attribute: String, gain: float) -> void:
-	#print("Best attribute selected: ", attribute, " with gain: ", gain)
-	#node_creation_case = "default"
-#
-#
-#func _on_algorithm_step_node(node_type: String, attribute: String, label: String) -> void:
-	#print("Creating node - Type: ", node_type, ", Attr: ", attribute, ", Label: ", label)
-#
-#
-#func _on_algorithm_step_branch(parent_attr: String, branch_value, _is_leaf: bool) -> void:
-	#print("Creating branch from ", parent_attr, " with value ", branch_value)
-#
-#
-#func _on_algorithm_all_same_class(label) -> void:
-	#print("All same class: ", label)
-	#node_creation_case = "all_same_class"
-#
-#
-#func _on_algorithm_no_atributes_left(mayority) -> void:
-	#print("No atributes left, the mayority label is ", mayority )
-	#node_creation_case = "no_atributes_left"
+func _on_drop_button_pressed() -> void:
+	SignalsObserver.drop_data.emit()
 
 
 func _on_algorithm_completed() -> void:
 	print("Algorithm completed!")
 	if next_step_button:
 		next_step_button.disabled = true
+	if evaluate_button:
+		evaluate_button.disabled = false
 
 
 

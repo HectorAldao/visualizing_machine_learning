@@ -15,5 +15,5 @@ func _init(p_attribute: String = "", p_is_leaf: bool = false, p_label: String = 
 	is_leaf = p_is_leaf
 	label = p_label
 
-func add_child(value, node: DNodeLogical) -> void:
-	children[value] = node
+#func aaaadd_child_node(value, node: DNodeLogical) -> void:
+#	children[value] = node

@@ -44,7 +44,7 @@ func _ready():
 	window.                visible = false
 	dataset_selection.     visible = false
 	
-	window.position.x = 20
+	window.position.x = 830
 	window.position.y = 150
 	
 
