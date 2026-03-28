@@ -12,7 +12,9 @@ const SCENES: Dictionary[String, String] = {
 	"dnode": "uid://b54b7e4e3ojl8",
 	"barschart": "uid://pycmc75uwvq0",
 	"eval_data": "uid://dlu0e0xckfe3q",
-	"eval_data_container": "uid://dli7f1or8hqm6"
+	"eval_data_container": "uid://dli7f1or8hqm6",
+
+	"nn_view": "uid://cxtlfe3b8dfux",
 	}
 
 const THEMES: Dictionary[String, String] = {

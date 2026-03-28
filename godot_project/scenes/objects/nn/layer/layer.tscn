@@ -1,0 +1,5 @@
+[gd_scene format=3 uid="uid://bs14tnn0hedwc"]
+
+[node name="Layer" type="VBoxContainer" unique_id=622756188]
+offset_right = 40.0
+offset_bottom = 40.0
