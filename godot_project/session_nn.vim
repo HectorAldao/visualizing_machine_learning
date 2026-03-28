@@ -17,7 +17,7 @@ badd +1 scenes/views/dtree_view/controller_dtree/controller_dtree.gd
 badd +27 scenes/views/dtree_view/dtree_canvas/dtree_canvas.gd
 badd +1 scenes/objects/dtree/dtree/dtree.gd
 badd +1 scenes/objects/dtree/dtree/algorithm_dtree.gd
-badd +14 scripts/signals_observer.gd
+badd +18 scripts/signals_observer.gd
 badd +78 scenes/views/dtree_view/dtree_view.gd
 badd +1 ~/eu/tfg/godot_project
 badd +1 res://scenes/views/dtree_view/dtree_canvas/dtree_canvas.tscn
@@ -43,10 +43,14 @@ badd +34 scenes/charts/bars_chart/bars_chart.gd
 badd +9 scenes/objects/dtree/eval_data/eval_data.gd
 badd +18 scenes/objects/dtree/algorithm_dtree/dnode_logical/dnode_logical.gd
 badd +1 scenes/objects/dtree/eval_data_container/eval_data_container.gd.uid
+badd +8 scenes/views/nn_view/nn_view.gd
+badd +31 scenes/interface/nn/create_nn_menu/create_nn_menu.gd
 argglobal
 %argdel
 $argadd ~/eu/tfg/godot_project
 set stal=2
+tabnew +setlocal\ bufhidden=wipe
+tabnew +setlocal\ bufhidden=wipe
 tabnew +setlocal\ bufhidden=wipe
 tabnew +setlocal\ bufhidden=wipe
 tabrewind
@@ -63,7 +67,7 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 17 - ((16 * winheight(0) + 22) / 45)
+let s:l = 17 - ((16 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
@@ -83,12 +87,12 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 14 - ((12 * winheight(0) + 22) / 45)
+let s:l = 18 - ((17 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 14
-normal! 024|
+keepjumps 18
+normal! 014|
 lcd ~/eu/tfg/godot_project
 tabnext
 edit ~/eu/tfg/godot_project/scenes/menus/main_menu.gd
@@ -104,14 +108,56 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 21 - ((20 * winheight(0) + 22) / 45)
+let s:l = 21 - ((20 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
 keepjumps 21
 normal! 060|
 lcd ~/eu/tfg/godot_project
-tabnext 3
+tabnext
+edit ~/eu/tfg/godot_project/scenes/views/nn_view/nn_view.gd
+argglobal
+balt ~/eu/tfg/godot_project/scenes/menus/main_menu.gd
+setlocal foldmethod=manual
+setlocal foldexpr=<SNR>36_GDScriptFoldLevel()
+setlocal foldmarker={{{,}}}
+setlocal foldignore=
+setlocal foldlevel=0
+setlocal foldminlines=1
+setlocal foldnestmax=20
+setlocal foldenable
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 8 - ((7 * winheight(0) + 25) / 50)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 8
+normal! 08|
+lcd ~/eu/tfg/godot_project
+tabnext
+edit ~/eu/tfg/godot_project/scenes/interface/nn/create_nn_menu/create_nn_menu.gd
+argglobal
+balt ~/eu/tfg/godot_project/scenes/views/nn_view/nn_view.gd
+setlocal foldmethod=manual
+setlocal foldexpr=<SNR>36_GDScriptFoldLevel()
+setlocal foldmarker={{{,}}}
+setlocal foldignore=
+setlocal foldlevel=0
+setlocal foldminlines=1
+setlocal foldnestmax=20
+setlocal foldenable
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 31 - ((30 * winheight(0) + 25) / 50)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 31
+normal! 05|
+lcd ~/eu/tfg/godot_project
+tabnext 5
 set stal=1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf

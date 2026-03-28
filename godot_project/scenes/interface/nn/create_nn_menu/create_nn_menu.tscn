@@ -1,0 +1,159 @@
+[gd_scene format=3 uid="uid://1ih4fque5qvn"]
+
+[ext_resource type="Script" uid="uid://duf8oh2sk7ygw" path="res://scenes/interface/nn/create_nn_menu/create_nn_menu.gd" id="1_hvrol"]
+[ext_resource type="Theme" uid="uid://c7fey4aa82nli" path="res://themes/plus_minus_buttons_theme/plus_minus_button_theme.tres" id="1_y8h1s"]
+
+[node name="CreateNnMenu" type="VBoxContainer" unique_id=2054348601]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_hvrol")
+
+[node name="LoadButton" type="Button" parent="." unique_id=614732159]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Cargar Red"
+
+[node name="NeuronsIn" type="HBoxContainer" parent="." unique_id=305446342]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="NeuronsIn" unique_id=1487239644]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Button" type="Button" parent="NeuronsIn/VBoxContainer" unique_id=324197708]
+layout_mode = 2
+theme = ExtResource("1_y8h1s")
+text = "+"
+
+[node name="MinusButton" type="Button" parent="NeuronsIn/VBoxContainer" unique_id=1246686559]
+layout_mode = 2
+theme = ExtResource("1_y8h1s")
+text = "-"
+
+[node name="TextEdit" type="TextEdit" parent="NeuronsIn" unique_id=262604579]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("1_y8h1s")
+text = "1"
+
+[node name="Label" type="Label" parent="NeuronsIn" unique_id=1132291248]
+layout_mode = 2
+theme = ExtResource("1_y8h1s")
+text = " Nº neuronas de Entrada"
+
+[node name="NeuronsOut" type="HBoxContainer" parent="." unique_id=2056658799]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="NeuronsOut" unique_id=1966324479]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Button" type="Button" parent="NeuronsOut/VBoxContainer" unique_id=1292694640]
+layout_mode = 2
+theme = ExtResource("1_y8h1s")
+text = "+"
+
+[node name="MinusButton" type="Button" parent="NeuronsOut/VBoxContainer" unique_id=1505681905]
+layout_mode = 2
+theme = ExtResource("1_y8h1s")
+text = "-"
+
+[node name="TextEdit" type="TextEdit" parent="NeuronsOut" unique_id=1698552904]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("1_y8h1s")
+text = "1"
+
+[node name="Label" type="Label" parent="NeuronsOut" unique_id=1287846896]
+layout_mode = 2
+theme = ExtResource("1_y8h1s")
+text = " Nº neuronas de Salida"
+
+[node name="Layers" type="HBoxContainer" parent="." unique_id=1979180071]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Layers" unique_id=694704067]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Button" type="Button" parent="Layers/VBoxContainer" unique_id=1430184732]
+layout_mode = 2
+theme = ExtResource("1_y8h1s")
+text = "+"
+
+[node name="MinusButton" type="Button" parent="Layers/VBoxContainer" unique_id=1844316808]
+layout_mode = 2
+theme = ExtResource("1_y8h1s")
+text = "-"
+
+[node name="TextEdit" type="TextEdit" parent="Layers" unique_id=1063497169]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("1_y8h1s")
+text = "1"
+
+[node name="Label" type="Label" parent="Layers" unique_id=1914778015]
+layout_mode = 2
+theme = ExtResource("1_y8h1s")
+text = " Nº Capas Ocultas"
+
+[node name="NeuronsLayer" type="HBoxContainer" parent="." unique_id=137626683]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="NeuronsLayer" unique_id=1243790110]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Button" type="Button" parent="NeuronsLayer/VBoxContainer" unique_id=1827217041]
+layout_mode = 2
+theme = ExtResource("1_y8h1s")
+text = "+"
+
+[node name="MinusButton" type="Button" parent="NeuronsLayer/VBoxContainer" unique_id=895040511]
+layout_mode = 2
+theme = ExtResource("1_y8h1s")
+text = "-"
+
+[node name="TextEdit" type="TextEdit" parent="NeuronsLayer" unique_id=1569282598]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("1_y8h1s")
+text = "1"
+
+[node name="Label" type="Label" parent="NeuronsLayer" unique_id=1877799795]
+layout_mode = 2
+theme = ExtResource("1_y8h1s")
+text = " Nº Neuronas en Capa "
+
+[node name="TextEdit2" type="TextEdit" parent="NeuronsLayer" unique_id=772763617]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("1_y8h1s")
+text = "1"
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="NeuronsLayer" unique_id=1904658207]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Button" type="Button" parent="NeuronsLayer/VBoxContainer2" unique_id=178652568]
+layout_mode = 2
+theme = ExtResource("1_y8h1s")
+text = "+"
+
+[node name="MinusButton" type="Button" parent="NeuronsLayer/VBoxContainer2" unique_id=1257384581]
+layout_mode = 2
+theme = ExtResource("1_y8h1s")
+text = "-"
+
+[node name="StartButton" type="Button" parent="." unique_id=1133381881]
+layout_mode = 2
+text = "Entrenar Red"

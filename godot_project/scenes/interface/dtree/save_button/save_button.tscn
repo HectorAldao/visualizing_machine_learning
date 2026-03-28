@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bbvvlbyvwjc5"]
 
-[ext_resource type="Script" uid="uid://dgln3o2k880nv" path="res://scenes/interface/save_button/save_button.gd" id="1_slsja"]
+[ext_resource type="Script" uid="uid://dgln3o2k880nv" path="res://scenes/interface/dtree/save_button/save_button.gd" id="1_slsja"]
 
 [node name="SaveButton" type="Button" unique_id=1475524492]
 offset_right = 171.0

@@ -1,12 +1,12 @@
 [gd_scene format=3 uid="uid://dr3bg1sj3y1nu"]
 
 [ext_resource type="Script" uid="uid://u1e4uao6pucs" path="res://scenes/views/dtree_view/dtree_view.gd" id="1_dgy5s"]
-[ext_resource type="PackedScene" uid="uid://0y5oidrn5nxd" path="res://scenes/interface/load_button/load_button.tscn" id="2_r3aum"]
-[ext_resource type="PackedScene" uid="uid://bbvvlbyvwjc5" path="res://scenes/interface/save_button/save_button.tscn" id="2_vrs4k"]
+[ext_resource type="PackedScene" uid="uid://0y5oidrn5nxd" path="res://scenes/interface/dtree/load_button/load_button.tscn" id="2_r3aum"]
+[ext_resource type="PackedScene" uid="uid://bbvvlbyvwjc5" path="res://scenes/interface/dtree/save_button/save_button.tscn" id="2_vrs4k"]
 [ext_resource type="PackedScene" uid="uid://dy3l4lsa0srpr" path="res://scenes/objects/dtree/dtree.tscn" id="4_dtree"]
 [ext_resource type="PackedScene" uid="uid://5h4ba5ys8aml" path="res://scenes/controllers/controller_dtree/controller_dtree.tscn" id="5_pxc03"]
-[ext_resource type="PackedScene" uid="uid://cjchbdmq0sym5" path="res://scenes/interface/window/window.tscn" id="6_txrwr"]
-[ext_resource type="PackedScene" uid="uid://dpmw4sgwtmh4y" path="res://scenes/interface/panel_dataset_selection/panel_dataset_selection.tscn" id="7_6eshh"]
+[ext_resource type="PackedScene" uid="uid://cjchbdmq0sym5" path="res://scenes/interface/dtree/window/window.tscn" id="6_txrwr"]
+[ext_resource type="PackedScene" uid="uid://dpmw4sgwtmh4y" path="res://scenes/interface/dtree/panel_dataset_selection/panel_dataset_selection.tscn" id="7_6eshh"]
 
 [node name="DTreeView" type="Control" unique_id=998695186 node_paths=PackedStringArray("manual_dtree_button", "algorithmic_dtree_button")]
 layout_mode = 3

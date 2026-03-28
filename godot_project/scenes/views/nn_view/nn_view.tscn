@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://cxtlfe3b8dfux"]
 
 [ext_resource type="Script" uid="uid://bpsdnq18e0na8" path="res://scenes/views/nn_view/nn_view.gd" id="1_qjxvp"]
+[ext_resource type="PackedScene" uid="uid://1ih4fque5qvn" path="res://scenes/interface/nn/create_nn_menu/create_nn_menu.tscn" id="2_vi2jw"]
 
 [node name="NnView" type="Control" unique_id=318267333]
 layout_mode = 3
@@ -11,7 +12,5 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_qjxvp")
 
-[node name="CreateNnMenu" type="Control" parent="." unique_id=2099346626]
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="CreateNnMenu" parent="." unique_id=1587040215 instance=ExtResource("2_vi2jw")]
+layout_mode = 0

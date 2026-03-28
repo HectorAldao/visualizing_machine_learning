@@ -14,7 +14,13 @@ signal drop_data()
 signal all_data_droped()
 
 
-@warning_ignore_restore("unused_signal")
+# res://scenes/interface/nn/create_nn_menu/create_nn_menu.gd
+signal plus(which: String)
+signal minus(which: String)
+signal create_nn_menu_button(which: String)
 
+
+
+@warning_ignore_restore("unused_signal")
 
 # Variables

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cjchbdmq0sym5"]
 
-[ext_resource type="Script" uid="uid://cfkexclmkwmr0" path="res://scenes/interface/window/window.gd" id="1_i8vyb"]
+[ext_resource type="Script" uid="uid://cfkexclmkwmr0" path="res://scenes/interface/dtree/window/window.gd" id="1_i8vyb"]
 [ext_resource type="PackedScene" uid="uid://pycmc75uwvq0" path="res://scenes/charts/bars_chart/bars_chart.tscn" id="2_q1qms"]
 
 [node name="Window" type="Window" unique_id=734547246]
