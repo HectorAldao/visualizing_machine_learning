@@ -3,11 +3,9 @@ extends PanelContainer
 @onready var vboxcont: VBoxContainer = $VBoxContainer
 @onready var new_neurons_layer: HBoxContainer = $VBoxContainer/NewNeuronsLayer
 
-var neurons_per_layer: Dictionary[int, int] = {0: 1, -1: 1}
-
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	
+
 	for c in vboxcont.get_children():
 
 		if c is Button:
@@ -23,9 +21,12 @@ func _ready() -> void:
 				continue
 
 			else:
-				var plus_button: Button = c.get_child(0).get_child(0)
-				var minus_button: Button = c.get_child(0).get_child(1)
-				var text_edit: TextEdit = c.get_child(1)
+				#var plus_button: Button = c.get_child(0).get_child(0)
+				#var minus_button: Button = c.get_child(0).get_child(1)
+				#var text_edit: TextEdit = c.get_child(1)
+				var plus_button: Button = c.get_node("VBoxContainer").get_node("PlusButton")
+				var minus_button: Button = c.get_node("VBoxContainer").get_node("MinusButton")
+				var text_edit: TextEdit = c.get_node("TextEdit")
 
 				plus_button.pressed.connect(_on_plus_pressed.bind(c))
 				minus_button.pressed.connect(_on_minus_pressed.bind(c))
@@ -39,7 +40,7 @@ func _on_button_pressed(which: String) -> void:
 
 
 ## When the text is changed, there must change 1 or 2 things.
-## Allways must change the dictionary "neurons_per_layer" respecting
+## Allways must change the dictionary "Variables.nn" respecting
 ## the limitations of each TextEdit,
 ## and in the case of a change in the number of layers, there must
 ## be changed the number of children of "NewNeuronsLayer".
@@ -47,32 +48,28 @@ func _on_text_changed(which: HBoxContainer) -> void:
 
 	var submenu_name: String = which.name
 	var textedit: TextEdit = which.get_child(1)
+	if textedit.text == "":
+		return
 	var num_of_wanted_layers: int = int(textedit.text)
 
 	match submenu_name:
 		"NeuronsIn":
 
-			# There can't be less than a neuron
-			if num_of_wanted_layers < 1:
-				textedit.text = "1"
-				neurons_per_layer[0] = 1
-				return
+			num_of_wanted_layers = _check_wanted(num_of_wanted_layers, textedit, 1)
 
-			neurons_per_layer[0] = int(num_of_wanted_layers)
+			Variables.nn[0] = int(num_of_wanted_layers)
 
 		"NeuronsOut":
 
-			# There can't be less than a neuron
-			if num_of_wanted_layers < 1:
-				textedit.text = "1"
-				neurons_per_layer[-1] = 1
-				return
+			num_of_wanted_layers = _check_wanted(num_of_wanted_layers, textedit, 1)
 
-			neurons_per_layer[-1] = int(num_of_wanted_layers)
+			Variables.nn[-1] = int(num_of_wanted_layers)
 
 		"Layers":
+
+			num_of_wanted_layers = _check_wanted(num_of_wanted_layers, textedit, 0)
 			
-			var old_num_of_hidden_layers: int = neurons_per_layer.size() - 2  # Minus the in-layer and out-layer
+			var old_num_of_hidden_layers: int = Variables.nn.size() - 2  # Minus the in-layer and out-layer
 
 			# Because the number can be changed by hand (not peressing the plus and minus)
 			# the amount of times that the change must be called is not predecible
@@ -101,7 +98,7 @@ func _on_text_changed(which: HBoxContainer) -> void:
 					new_neurons_layer.add_child(submenu_neurons_in_layer)
 
 					# Then, the dictionary is uptaded
-					neurons_per_layer[new_submenu_neuron_id] = 0
+					Variables.nn[new_submenu_neuron_id] = 0
 
 			# If layers were deleted
 			elif num_of_neurons_changed < 0:
@@ -126,7 +123,7 @@ func _on_text_changed(which: HBoxContainer) -> void:
 					submenu_neurons_in_layer_to_remove.queue_free()
 
 					# And the dictionary is updated
-					neurons_per_layer.erase(submenu_neuron_id_to_remove)
+					Variables.nn.erase(submenu_neuron_id_to_remove)
 
 			else:
 				# This print is only to check if the "text_changed" signal is emited
@@ -134,11 +131,37 @@ func _on_text_changed(which: HBoxContainer) -> void:
 				print("[LOG] The number of neurons to wich the text changed its the same")  #debug
 
 
+func _check_wanted(wanted: int, txtedt: TextEdit, minimum: int) -> int:
+
+	# There can't be less than a neuron, and less than 0 layers
+	if wanted < minimum:
+		txtedt.text = str(minimum)
+		return minimum
+
+	# There can't be more than Constants.NN_LIMITS.max_neurons neurons, and more than Constants.NN_LIMITS.max_layers layers
+	if wanted > Constants.NN_LIMITS.max_neurons:
+		txtedt.text = str(Constants.NN_LIMITS.max_neurons)
+		return Constants.NN_LIMITS.max_neurons
+	
+	return wanted
+
+
 func _on_plus_pressed(which: HBoxContainer) -> void:
 
+	var submenu_name: String = which.name
 	var textedit: TextEdit = which.get_child(1)
-	textedit.text = str(int(textedit.text) + 1)
-	textedit.text_changed.emit()
+	var num: int = int(textedit.text)
+
+
+	match submenu_name:
+		"Layers":  # There can be no more that Constants.NN_LIMITS.max_layers layers
+			if num < Constants.NN_LIMITS.max_layers:
+				textedit.text = str(num + 1 )
+				textedit.text_changed.emit()
+		_:  # The number of neurons of in-layer and out-layer cant be more than Constants.NN_LIMITS.max_neurons
+			if num < Constants.NN_LIMITS.max_neurons:
+				textedit.text = str(num + 1 )
+				textedit.text_changed.emit()
 
 
 func _on_minus_pressed(which: HBoxContainer) -> void:
@@ -159,5 +182,5 @@ func _on_minus_pressed(which: HBoxContainer) -> void:
 				textedit.text_changed.emit()
 
 
-func _update_neuron() -> void:
+func _update_nn() -> void:
 	pass

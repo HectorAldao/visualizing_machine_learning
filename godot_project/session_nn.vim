@@ -44,7 +44,7 @@ badd +9 scenes/objects/dtree/eval_data/eval_data.gd
 badd +18 scenes/objects/dtree/algorithm_dtree/dnode_logical/dnode_logical.gd
 badd +1 scenes/objects/dtree/eval_data_container/eval_data_container.gd.uid
 badd +43 scenes/views/nn_view/nn_view.gd
-badd +109 scenes/interface/nn/create_nn_menu/create_nn_menu.gd
+badd +72 scenes/interface/nn/create_nn_menu/create_nn_menu.gd
 badd +68 scenes/objects/nn/dense_conection_container/dense_conection_container.gd
 badd +11 scenes/objects/nn/nn/neural_network.gd
 badd +41 scenes/objects/nn/layer/layer.gd
@@ -164,12 +164,12 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 109 - ((15 * winheight(0) + 25) / 50)
+let s:l = 72 - ((20 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 109
-normal! 044|
+keepjumps 72
+normal! 0
 lcd ~/eu/tfg/godot_project
 tabnext
 edit ~/eu/tfg/godot_project/scenes/interface/nn/layers_in_neuron_submenu/neurons_in_layer.gd

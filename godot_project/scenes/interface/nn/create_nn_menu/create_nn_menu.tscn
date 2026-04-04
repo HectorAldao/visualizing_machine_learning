@@ -114,58 +114,6 @@ layout_mode = 2
 [node name="NeuronsInLayer" parent="VBoxContainer/NewNeuronsLayer" unique_id=1166179227 instance=ExtResource("3_e6v37")]
 layout_mode = 2
 
-[node name="NeuronsLayer" type="HBoxContainer" parent="VBoxContainer" unique_id=137626683]
-visible = false
-layout_mode = 2
-size_flags_horizontal = 0
-
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/NeuronsLayer" unique_id=1243790110]
-layout_mode = 2
-theme_override_constants/separation = 5
-
-[node name="Button" type="Button" parent="VBoxContainer/NeuronsLayer/VBoxContainer" unique_id=1827217041]
-layout_mode = 2
-theme = ExtResource("1_y8h1s")
-text = "+"
-
-[node name="MinusButton" type="Button" parent="VBoxContainer/NeuronsLayer/VBoxContainer" unique_id=895040511]
-layout_mode = 2
-theme = ExtResource("1_y8h1s")
-text = "-"
-
-[node name="TextEdit" type="TextEdit" parent="VBoxContainer/NeuronsLayer" unique_id=1569282598]
-custom_minimum_size = Vector2(100, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-theme = ExtResource("1_y8h1s")
-text = "0"
-
-[node name="Label" type="Label" parent="VBoxContainer/NeuronsLayer" unique_id=1877799795]
-layout_mode = 2
-theme = ExtResource("1_y8h1s")
-text = " Nº Neuronas en Capa "
-
-[node name="TextEdit2" type="TextEdit" parent="VBoxContainer/NeuronsLayer" unique_id=772763617]
-custom_minimum_size = Vector2(100, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-theme = ExtResource("1_y8h1s")
-text = "1"
-
-[node name="VBoxContainer2" type="VBoxContainer" parent="VBoxContainer/NeuronsLayer" unique_id=1904658207]
-layout_mode = 2
-theme_override_constants/separation = 5
-
-[node name="Button" type="Button" parent="VBoxContainer/NeuronsLayer/VBoxContainer2" unique_id=178652568]
-layout_mode = 2
-theme = ExtResource("1_y8h1s")
-text = "+"
-
-[node name="MinusButton" type="Button" parent="VBoxContainer/NeuronsLayer/VBoxContainer2" unique_id=1257384581]
-layout_mode = 2
-theme = ExtResource("1_y8h1s")
-text = "-"
-
 [node name="StartButton" type="Button" parent="VBoxContainer" unique_id=1133381881]
 layout_mode = 2
 text = "Entrenar Red"

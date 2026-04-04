@@ -3,6 +3,8 @@ class_name NeuralNetwork extends Control
 
 @onready var layers: HBoxContainer = $Layers
 
+var nn_dict: Dictionary[int, int]
+
 
 func _ready() -> void:
 

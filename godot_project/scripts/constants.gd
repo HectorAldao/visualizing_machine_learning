@@ -25,3 +25,8 @@ const THEMES: Dictionary[String, String] = {
 	"noleaf": "uid://cmsv2q8q35lvy",
 	"nodedefault": "uid://dxluxv1xceiqb"
 }
+
+const NN_LIMITS: Dictionary[String, int] = {
+	"max_layers" = 6,
+	"max_neurons" = 6,
+}
