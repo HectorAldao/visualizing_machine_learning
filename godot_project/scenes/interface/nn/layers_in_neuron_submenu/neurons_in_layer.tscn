@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://e7nvan78e0pf"]
+
+[ext_resource type="Script" uid="uid://bgvdxqdqu1mfv" path="res://scenes/interface/nn/layers_in_neuron_submenu/neurons_in_layer.gd" id="1_k8x3v"]
+[ext_resource type="Theme" uid="uid://c7fey4aa82nli" path="res://themes/plus_minus_buttons_theme/plus_minus_button_theme.tres" id="1_tpiad"]
+
+[node name="NeuronsInLayer" type="VBoxContainer" unique_id=1166179227]
+theme_override_constants/separation = 5
+script = ExtResource("1_k8x3v")
+
+[node name="Label" type="Label" parent="." unique_id=811448609]
+layout_mode = 2
+text = "Neuronas
+Capa 1"
+
+[node name="TextEdit" type="TextEdit" parent="." unique_id=1446018218]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("1_tpiad")
+text = "1"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=943316970]
+layout_mode = 2
+
+[node name="PlusButton" type="Button" parent="HBoxContainer" unique_id=1378819464]
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("1_tpiad")
+text = "+"
+
+[node name="MinusButton" type="Button" parent="HBoxContainer" unique_id=2049031064]
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("1_tpiad")
+text = "-"

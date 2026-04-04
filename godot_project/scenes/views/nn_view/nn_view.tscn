@@ -2,15 +2,36 @@
 
 [ext_resource type="Script" uid="uid://bpsdnq18e0na8" path="res://scenes/views/nn_view/nn_view.gd" id="1_qjxvp"]
 [ext_resource type="PackedScene" uid="uid://1ih4fque5qvn" path="res://scenes/interface/nn/create_nn_menu/create_nn_menu.tscn" id="2_vi2jw"]
+[ext_resource type="PackedScene" uid="uid://dy4hc0eciyisw" path="res://scenes/objects/nn/nn/neural_network.tscn" id="3_1dbvi"]
 
 [node name="NnView" type="Control" unique_id=318267333]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_top = 4.0
+offset_bottom = 4.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_qjxvp")
 
+[node name="NeuralNetwork" parent="." unique_id=1605831336 instance=ExtResource("3_1dbvi")]
+layout_mode = 1
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+
 [node name="CreateNnMenu" parent="." unique_id=1587040215 instance=ExtResource("2_vi2jw")]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -292.5
+offset_top = -216.0
+offset_right = 292.5
+offset_bottom = 216.0
+grow_horizontal = 2
+grow_vertical = 2

@@ -1,5 +1,12 @@
 [gd_scene format=3 uid="uid://bs14tnn0hedwc"]
 
+[ext_resource type="Script" uid="uid://bv8fwrekofui2" path="res://scenes/objects/nn/layer/layer.gd" id="1_5gmp5"]
+[ext_resource type="PackedScene" uid="uid://re6neyyt2frx" path="res://scenes/objects/nn/neuron/neuron.tscn" id="1_sad2w"]
+
 [node name="Layer" type="VBoxContainer" unique_id=622756188]
 offset_right = 40.0
 offset_bottom = 40.0
+script = ExtResource("1_5gmp5")
+
+[node name="Neuron" parent="." unique_id=661788437 instance=ExtResource("1_sad2w")]
+layout_mode = 2

@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://0ug2o1llytkb"]
+
+[ext_resource type="Script" uid="uid://cwa74fw6w7c16" path="res://scenes/objects/nn/dense_conection_container/dense_conection_container.gd" id="1_wl45p"]
+
+[node name="DenseConectionContainer" type="Control" unique_id=1386064707]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_wl45p")

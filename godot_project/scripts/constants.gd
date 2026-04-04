@@ -15,6 +15,9 @@ const SCENES: Dictionary[String, String] = {
 	"eval_data_container": "uid://dli7f1or8hqm6",
 
 	"nn_view": "uid://cxtlfe3b8dfux",
+	"layer": "uid://bs14tnn0hedwc",
+	"neuron": "uid://re6neyyt2frx",
+	"neuronsinlayer": "uid://e7nvan78e0pf",
 	}
 
 const THEMES: Dictionary[String, String] = {

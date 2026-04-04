@@ -14,11 +14,22 @@ signal drop_data()
 signal all_data_droped()
 
 
-# res://scenes/interface/nn/create_nn_menu/create_nn_menu.gd
-signal plus(which: String)
-signal minus(which: String)
+# scenes/interface/nn/create_nn_menu/create_nn_menu.gd
+signal plus(which: String, layer: int)
+signal minus(which: String, layer: int)
 signal create_nn_menu_button(which: String)
 
+
+# 
+signal add_layer()
+signal remove_layer()
+
+
+# 
+signal add_neuron(layer: int)
+signal remove_neuron(layer: int)
+signal change_layer(layer: int)
+signal update_conections(layer: int, neuron: int)
 
 
 @warning_ignore_restore("unused_signal")

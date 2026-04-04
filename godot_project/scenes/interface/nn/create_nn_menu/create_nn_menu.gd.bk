@@ -1,0 +1,155 @@
+extends PanelContainer
+
+@onready var vboxcont: VBoxContainer = $VBoxContainer
+
+var neurons_per_layer: Dictionary[int, int]
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	neurons_per_layer = {}
+	
+	for c in vboxcont.get_children():
+
+		if c is Button:
+			c.pressed.connect(_on_button_pressed.bind(c.name))
+
+		elif c is HBoxContainer:
+			var plus_button: Button = c.get_child(0).get_child(0)
+			var minus_button: Button = c.get_child(0).get_child(1)
+
+			plus_button.pressed.connect(_on_plus_pressed.bind(c))
+			minus_button.pressed.connect(_on_minus_pressed.bind(c))
+
+			#if c.name == "NeuronsLayer":
+			#	plus_button = c.get_child(-1).get_child(0)
+			#	minus_button = c.get_child(-1).get_child(1)
+			#
+			#	plus_button.pressed.connect(_on_plus_pressed.bind(c, true))
+			#	minus_button.pressed.connect(_on_minus_pressed.bind(c, true))
+
+
+
+func _on_button_pressed(which: String) -> void:
+	print("[LOG] Signal 'create nn menu button' emited by %s" % which)
+	SignalsObserver.create_nn_menu_button.emit(which)
+
+
+func _on_plus_pressed(which: HBoxContainer, is_layer_to_add_neurons: bool = false) -> void:
+	var container: HBoxContainer = which
+	var container_name: String = container.name
+	
+	# Special handling for NeuronsLayer2 (button that selects which layer to view)
+	if is_layer_to_add_neurons:
+		var txtedit2: TextEdit = container.get_node("TextEdit2")
+		var num2: int = int(txtedit2.text)
+		var num_layers: int = int(vboxcont.get_node("Layers").get_node("TextEdit").text)
+		
+		# Can only increase if it doesn't exceed the number of layers
+		if num2 < num_layers:
+			txtedit2.text = str(num2 + 1)
+			print("[LOG] Signal 'plus' emited by NeuronsLayer2, now at layer %d" % (num2 + 1))
+			SignalsObserver.plus.emit(container_name, num2 + 1)
+		return
+	
+	# Regular handling for other containers
+	var txtedit: TextEdit = container.get_node("TextEdit")
+	var num: int = int(txtedit.text)
+	
+	match container_name:
+		"Layers":
+			txtedit.text = str(num + 1)
+			# When adding hidden layers, initialize layer 1 with 1 neuron if it's the first layer
+			if num == 0:  # num was 0 before increment, now it's 1
+				neurons_per_layer[1] = 1
+				var neurons_layer_container = vboxcont.get_node("NeuronsLayer")
+				var neurons_textedits = neurons_layer_container.get_node("TextEdit")
+				neurons_textedits.text = "1"
+			
+			print("[LOG] Signal 'plus' emited by Layers")
+			SignalsObserver.plus.emit(container_name)
+			
+		"NeuronsLayer":
+			# Check if there are layers available
+			var num_layers: int = int(vboxcont.get_node("Layers").get_node("TextEdit").text)
+			
+			if num_layers > 0:
+				txtedit.text = str(num + 1)
+				# Update neurons_per_layer for layer 1
+				neurons_per_layer[1] = num + 1
+				
+				print("[LOG] Signal 'plus' emited by NeuronsLayer, layer 1 now has %d neurons" % (num + 1))
+				SignalsObserver.plus.emit(container_name)
+		
+		_:
+			SignalsObserver.plus.emit(container_name)
+
+
+
+
+func _on_minus_pressed(which: HBoxContainer, is_layer_to_add_neurons: bool = false) -> void:
+	var container: HBoxContainer = which
+	var container_name: String = container.name
+	
+	# Special handling for NeuronsLayer2 (button that selects which layer to view)
+	if is_layer_to_add_neurons:
+		var txtedit2: TextEdit = container.get_node("TextEdit2")
+		var num2: int = int(txtedit2.text)
+		
+		# Can only decrease if it's > 1
+		if num2 > 1:
+			txtedit2.text = str(num2 - 1)
+			print("[LOG] Signal 'minus' emited by NeuronsLayer2, now at layer %d" % (num2 - 1))
+			SignalsObserver.minus.emit(container_name, num2 - 1)
+		return
+	
+	# Regular handling for other containers
+	var txtedit: TextEdit = container.get_node("TextEdit")
+	var num: int = int(txtedit.text)
+	
+	match container_name:
+		"Layers":
+			# Allow removing layers, but layer 1 becomes 0 neurons when no hidden layers exist
+			if num > 0:
+				txtedit.text = str(num - 1)
+				
+				var neurons_layer_container = vboxcont.get_node("NeuronsLayer")
+
+				if num == 1:  # Going from 1 layer to 0 layers
+					neurons_per_layer[1] = 0
+					var neurons_textedits = neurons_layer_container.get_node("TextEdit")
+					neurons_textedits.text = "0"
+				
+				# Validate that TextEdit2 doesn't exceed the new number of layers
+				var new_num_layers: int = int(txtedit.text)
+				var txtedit2: TextEdit = neurons_layer_container.get_node("TextEdit2")
+				var num2: int = int(txtedit2.text)
+				
+				if num2 > new_num_layers and new_num_layers > 0:
+					txtedit2.text = str(new_num_layers)
+					print("[LOG] TextEdit2 adjusted to %d (exceeded number of layers)" % new_num_layers)
+				elif new_num_layers == 0:
+					txtedit2.text = "1"
+					print("[LOG] TextEdit2 set to 1 (no layers)")
+				
+				print("[LOG] Signal 'minus' emited by Layers")
+				SignalsObserver.minus.emit(container_name)
+		
+		"NeuronsLayer":
+			# Layer 1 neurons cannot go below 1 if layers exist
+			var num_layers: int = int(vboxcont.get_node("Layers").get_node("TextEdit").text)
+			
+			if num_layers > 0 and num > 1:  # Can decrease if there are layers and value is > 1
+				txtedit.text = str(num - 1)
+				neurons_per_layer[1] = num - 1
+				
+				print("[LOG] Signal 'minus' emited by NeuronsLayer, layer 1 now has %d neurons" % (num - 1))
+				SignalsObserver.minus.emit(container_name)
+			elif num_layers == 0 and num > 0:  # Can decrease to 0 if no layers exist
+				txtedit.text = str(num - 1)
+				neurons_per_layer[1] = num - 1
+				
+				print("[LOG] Signal 'minus' emited by NeuronsLayer, layer 1 now has %d neurons" % (num - 1))
+				SignalsObserver.minus.emit(container_name)
+		
+		_:
+			SignalsObserver.minus.emit(container_name)

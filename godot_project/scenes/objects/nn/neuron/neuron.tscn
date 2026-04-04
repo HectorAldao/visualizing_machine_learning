@@ -1,6 +1,9 @@
 [gd_scene format=3 uid="uid://re6neyyt2frx"]
 
+[ext_resource type="Script" uid="uid://bj4h34um2h24t" path="res://scenes/objects/nn/neuron/neuron.gd" id="1_kiclu"]
+
 [node name="Neuron" type="Button" unique_id=661788437]
 offset_right = 12.0
 offset_bottom = 6.0
-text = "1"
+text = "Σ"
+script = ExtResource("1_kiclu")

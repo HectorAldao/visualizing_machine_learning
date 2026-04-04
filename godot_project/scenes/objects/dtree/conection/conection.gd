@@ -4,7 +4,7 @@ class_name Conection
 @export var from_node: Control
 @export var to_node: Control
 @export var text: String = ""
-@export var font: Font
+@export var font: Font = ThemeDB.fallback_font
 @export var font_size: int = 16
 @export var font_color: Color = Color.WHITE
 @export var text_margin: float = 10.0
@@ -43,6 +43,20 @@ func _ready() -> void:
 		 .set_trans(Tween.TRANS_LINEAR)\
 		 .set_ease(Tween.EASE_IN_OUT)
 	tween.tween_callback(Callable(self, "_update_from_progress"))
+
+
+static func newone(new_from_node: Control, new_to_node: Control, new_text: String = "", new_font: Font = ThemeDB.fallback_font, new_font_size: int = 16, new_font_color: Color = Color.WHITE, new_text_margin: float = 10.0, new_line_width: float = 2.0, new_line_color: Color = Color.BLACK) -> Conection:
+	var new_conection: Conection = preload(Constants.SCENES.conection).instantiate()
+	new_conection.from_node = new_from_node
+	new_conection.to_node = new_to_node
+	new_conection.text = new_text
+	new_conection.font = new_font
+	new_conection.font_size = new_font_size
+	new_conection.font_color = new_font_color
+	new_conection.text_margin = new_text_margin
+	new_conection.line_width = new_line_width
+	new_conection.line_color = new_line_color
+	return new_conection
 
 
 func _process(_delta: float) -> void:
