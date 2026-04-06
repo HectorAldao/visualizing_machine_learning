@@ -5,8 +5,8 @@
 [ext_resource type="PackedScene" uid="uid://e7nvan78e0pf" path="res://scenes/interface/nn/layers_in_neuron_submenu/neurons_in_layer.tscn" id="3_e6v37"]
 
 [node name="CreateNnMenu" type="PanelContainer" unique_id=677229503]
-offset_right = 585.0
-offset_bottom = 432.0
+offset_right = 491.0
+offset_bottom = 573.0
 script = ExtResource("1_hvrol")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=2054348601]
@@ -109,10 +109,15 @@ theme = ExtResource("1_y8h1s")
 text = " Nº Capas Ocultas"
 
 [node name="NewNeuronsLayer" type="HBoxContainer" parent="VBoxContainer" unique_id=793557005]
+custom_minimum_size = Vector2(0, 138)
 layout_mode = 2
 
 [node name="NeuronsInLayer" parent="VBoxContainer/NewNeuronsLayer" unique_id=1166179227 instance=ExtResource("3_e6v37")]
 layout_mode = 2
+
+[node name="ReloadButton" type="Button" parent="VBoxContainer" unique_id=670981445]
+layout_mode = 2
+text = "Previsualizar red"
 
 [node name="StartButton" type="Button" parent="VBoxContainer" unique_id=1133381881]
 layout_mode = 2

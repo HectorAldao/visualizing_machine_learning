@@ -9,12 +9,14 @@ var _connections: Dictionary = {}
 
 func _ready() -> void:
 	SignalsObserver.update_conections.connect(update_conections)
-	_refresh_all_connections()
+	SignalsObserver.update_all_conections.connect(refresh_all_connections)
+	refresh_all_connections()
 
 
 func update_conections(layer_id: int, neuron_id: int) -> void:
 	var _unused_neuron_id := neuron_id
 	var layer_position: int = _get_layer_position_from_id(layer_id)
+	_remove_non_adjacent_connections()
 
 	_refresh_pair_connections(layer_position - 1)
 	_refresh_pair_connections(layer_position)
@@ -42,15 +44,15 @@ func _refresh_pair_connections(pair_start_position: int) -> void:
 			_add_connection(from_neuron, to_neuron, key)
 
 
-func _refresh_all_connections() -> void:
+func refresh_all_connections() -> void:
+	_remove_non_adjacent_connections()
 	for pair_start_layer in _get_layer_count() - 1:
 		_refresh_pair_connections(pair_start_layer)
 
 
 func _add_connection(from_neuron: Neuron, to_neuron: Neuron, key: String) -> void:
-	var conection: Conection = preload(Constants.SCENES.conection).instantiate()
-	conection.from_node = from_neuron
-	conection.to_node = to_neuron
+
+	var conection: Conection = Conection.newone(from_neuron, to_neuron, 1, Color.GREEN)
 
 	add_child(conection)
 	_connections[key] = conection
@@ -71,6 +73,23 @@ func _remove_connections_between_layers(from_layer_id: int, to_layer_id: int) ->
 	for key in _connections:
 		var ids: PackedInt32Array = _get_key_values(key)
 		if ids.size() == 4 and ids[0] == from_layer_id and ids[2] == to_layer_id:
+			keys_to_remove.append(key)
+
+	for key in keys_to_remove:
+		_remove_connection(key)
+
+
+func _remove_non_adjacent_connections() -> void:
+	var keys_to_remove: Array[String] = []
+	for key in _connections:
+		var ids: PackedInt32Array = _get_key_values(key)
+		if ids.size() != 4:
+			keys_to_remove.append(key)
+			continue
+
+		var from_position: int = _get_layer_position_from_id(ids[0])
+		var to_position: int = _get_layer_position_from_id(ids[2])
+		if to_position - from_position != 1:
 			keys_to_remove.append(key)
 
 	for key in keys_to_remove:

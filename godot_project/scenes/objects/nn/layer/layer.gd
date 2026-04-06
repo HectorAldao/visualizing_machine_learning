@@ -3,6 +3,7 @@ class_name Layer extends VBoxContainer
 var _id: int = -2
 
 func _ready() -> void:
+	alignment = BoxContainer.ALIGNMENT_CENTER
 	SignalsObserver.add_neuron.connect(_on_add_neuron)
 	SignalsObserver.remove_neuron.connect(_on_remove_neuron)
 

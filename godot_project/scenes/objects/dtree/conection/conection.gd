@@ -1,5 +1,5 @@
-extends Line2D
-class_name Conection
+class_name Conection extends Line2D
+const scene_uid: String = Constants.SCENES.conection
 
 @export var from_node: Control
 @export var to_node: Control
@@ -45,17 +45,17 @@ func _ready() -> void:
 	tween.tween_callback(Callable(self, "_update_from_progress"))
 
 
-static func newone(new_from_node: Control, new_to_node: Control, new_text: String = "", new_font: Font = ThemeDB.fallback_font, new_font_size: int = 16, new_font_color: Color = Color.WHITE, new_text_margin: float = 10.0, new_line_width: float = 2.0, new_line_color: Color = Color.BLACK) -> Conection:
-	var new_conection: Conection = preload(Constants.SCENES.conection).instantiate()
+static func newone(new_from_node: Control, new_to_node: Control, new_line_width: float = 2.0, new_line_color: Color = Color.BLACK, new_text: String = "", new_font: Font = ThemeDB.fallback_font, new_font_size: int = 16, new_font_color: Color = Color.WHITE, new_text_margin: float = 10.0) -> Conection:
+	var new_conection: Conection = preload(scene_uid).instantiate()
 	new_conection.from_node = new_from_node
 	new_conection.to_node = new_to_node
+	new_conection.line_width = new_line_width
+	new_conection.line_color = new_line_color
 	new_conection.text = new_text
 	new_conection.font = new_font
 	new_conection.font_size = new_font_size
 	new_conection.font_color = new_font_color
 	new_conection.text_margin = new_text_margin
-	new_conection.line_width = new_line_width
-	new_conection.line_color = new_line_color
 	return new_conection
 
 

@@ -18,7 +18,6 @@ func _ready() -> void:
 				for child in c.get_children():
 					c.remove_child(child)
 					child.queue_free()
-				continue
 
 			else:
 				#var plus_button: Button = c.get_child(0).get_child(0)
@@ -36,7 +35,13 @@ func _ready() -> void:
 
 func _on_button_pressed(which: String) -> void:
 	print("[LOG] Signal 'create nn menu button' emited by %s" % which)
-	SignalsObserver.create_nn_menu_button.emit(which)
+	match which:
+		"LoadButton":
+			SignalsObserver.load_nn.emit()
+		"ReloadButton":
+			SignalsObserver.reload_nn.emit()
+		"StartButton": 
+			SignalsObserver.train_nn.emit()
 
 
 ## When the text is changed, there must change 1 or 2 things.
@@ -57,19 +62,19 @@ func _on_text_changed(which: HBoxContainer) -> void:
 
 			num_of_wanted_layers = _check_wanted(num_of_wanted_layers, textedit, 1)
 
-			Variables.nn[0] = int(num_of_wanted_layers)
+			Variables.nn_tmp[0] = int(num_of_wanted_layers)
 
 		"NeuronsOut":
 
 			num_of_wanted_layers = _check_wanted(num_of_wanted_layers, textedit, 1)
 
-			Variables.nn[-1] = int(num_of_wanted_layers)
+			Variables.nn_tmp[-1] = int(num_of_wanted_layers)
 
 		"Layers":
 
 			num_of_wanted_layers = _check_wanted(num_of_wanted_layers, textedit, 0)
 			
-			var old_num_of_hidden_layers: int = Variables.nn.size() - 2  # Minus the in-layer and out-layer
+			var old_num_of_hidden_layers: int = Variables.nn_tmp.size() - 2  # Minus the in-layer and out-layer
 
 			# Because the number can be changed by hand (not peressing the plus and minus)
 			# the amount of times that the change must be called is not predecible
@@ -98,7 +103,7 @@ func _on_text_changed(which: HBoxContainer) -> void:
 					new_neurons_layer.add_child(submenu_neurons_in_layer)
 
 					# Then, the dictionary is uptaded
-					Variables.nn[new_submenu_neuron_id] = 0
+					Variables.nn_tmp[new_submenu_neuron_id] = 0
 
 			# If layers were deleted
 			elif num_of_neurons_changed < 0:
@@ -123,7 +128,7 @@ func _on_text_changed(which: HBoxContainer) -> void:
 					submenu_neurons_in_layer_to_remove.queue_free()
 
 					# And the dictionary is updated
-					Variables.nn.erase(submenu_neuron_id_to_remove)
+					Variables.nn_tmp.erase(submenu_neuron_id_to_remove)
 
 			else:
 				# This print is only to check if the "text_changed" signal is emited

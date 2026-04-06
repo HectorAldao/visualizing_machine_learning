@@ -30,33 +30,33 @@ static func newone(new_neuron_id: int) -> NeuronsInLayer:
 ## Called when the pluss button is pressed
 func _on_plus_pressed() -> void:
 	# The nn dictionary must have the key (just yo be sure)
-	if Variables.nn.has(neuron_id):
+	if Variables.nn_tmp.has(neuron_id):
 		# And then check if its going to exceed the limits
-		if Variables.nn[neuron_id] < Constants.NN_LIMITS.max_neurons:
+		if Variables.nn_tmp[neuron_id] < Constants.NN_LIMITS.max_neurons:
 			# If not, all its okey
 			textedit.text = str(int(textedit.text) + 1)
 			textedit.text_changed.emit()
 
-			#Variables.nn[neuron_id] += 1
-
 
 func _on_minus_pressed() -> void:
 	# The nn dictionary must have the key (just yo be sure)
-	if Variables.nn.has(neuron_id):
+	if Variables.nn_tmp.has(neuron_id):
 		# And then check if its going to exceed the limits
-		if Variables.nn[neuron_id] > 1:
+		if Variables.nn_tmp[neuron_id] > 1:
 			# If not, all its okey
 			textedit.text = str(int(textedit.text) - 1)
 			textedit.text_changed.emit()
-
-			#Variables.nn[neuron_id] -= 1
 
 
 func _on_text_changed() -> void:
 
 	var num_of_wanted_neurons: int = int(textedit.text)
+	if textedit.text == "":
+		return
 	num_of_wanted_neurons = _check_wanted(num_of_wanted_neurons, textedit, 1)
-	Variables.nn[neuron_id] = num_of_wanted_neurons
+
+	if Variables.nn_tmp.has(neuron_id):
+		Variables.nn_tmp[neuron_id] = num_of_wanted_neurons
 
 
 func _check_wanted(wanted: int, txtedt: TextEdit, minimum: int) -> int:
