@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://cc5wob07h6vdm"]
+
+[ext_resource type="Script" uid="uid://c2ilasubdxu0u" path="res://scenes/charts/function_plot/function_plot.gd" id="1_ewlvb"]
+
+[node name="FunctionPlot" type="Control" unique_id=1669830370]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ewlvb")

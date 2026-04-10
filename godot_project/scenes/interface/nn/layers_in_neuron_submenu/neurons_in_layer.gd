@@ -29,34 +29,37 @@ static func newone(new_neuron_id: int) -> NeuronsInLayer:
 
 ## Called when the pluss button is pressed
 func _on_plus_pressed() -> void:
+	var nn_logic = Variables.get("nn")
 	# The nn dictionary must have the key (just yo be sure)
-	if Variables.nn_tmp.has(neuron_id):
+	if nn_logic.nn_tmp.has(neuron_id):
 		# And then check if its going to exceed the limits
-		if Variables.nn_tmp[neuron_id] < Constants.NN_LIMITS.max_neurons:
+		if nn_logic.nn_tmp[neuron_id].size() < Constants.NN_LIMITS.max_neurons:
 			# If not, all its okey
 			textedit.text = str(int(textedit.text) + 1)
 			textedit.text_changed.emit()
 
 
 func _on_minus_pressed() -> void:
+	var nn_logic = Variables.get("nn")
 	# The nn dictionary must have the key (just yo be sure)
-	if Variables.nn_tmp.has(neuron_id):
+	if nn_logic.nn_tmp.has(neuron_id):
 		# And then check if its going to exceed the limits
-		if Variables.nn_tmp[neuron_id] > 1:
+		if nn_logic.nn_tmp[neuron_id].size() > 1:
 			# If not, all its okey
 			textedit.text = str(int(textedit.text) - 1)
 			textedit.text_changed.emit()
 
 
 func _on_text_changed() -> void:
+	var nn_logic = Variables.get("nn")
 
 	var num_of_wanted_neurons: int = int(textedit.text)
 	if textedit.text == "":
 		return
 	num_of_wanted_neurons = _check_wanted(num_of_wanted_neurons, textedit, 1)
 
-	if Variables.nn_tmp.has(neuron_id):
-		Variables.nn_tmp[neuron_id] = num_of_wanted_neurons
+	if nn_logic.nn_tmp.has(neuron_id):
+		nn_logic.set_layer_neuron_count_tmp(neuron_id, num_of_wanted_neurons)
 
 
 func _check_wanted(wanted: int, txtedt: TextEdit, minimum: int) -> int:

@@ -4,26 +4,16 @@
 [ext_resource type="Script" uid="uid://cephgxs7rofhq" path="res://scenes/objects/nn/nn/neural_network.gd" id="1_ldy44"]
 [ext_resource type="PackedScene" uid="uid://0ug2o1llytkb" path="res://scenes/objects/nn/dense_conection_container/dense_conection_container.tscn" id="3_cdegm"]
 
-[node name="NeuralNetwork" type="Control" unique_id=1546045477]
-layout_mode = 3
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
+[node name="NeuralNetwork" type="MarginContainer" unique_id=1025306840]
+offset_right = 40.0
+offset_bottom = 40.0
 script = ExtResource("1_ldy44")
 
 [node name="DenseConectionContainer" parent="." unique_id=1386064707 instance=ExtResource("3_cdegm")]
-layout_mode = 1
+layout_mode = 2
 
 [node name="Layers" type="HBoxContainer" parent="." unique_id=2044067605]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+layout_mode = 2
 theme_override_constants/separation = 100
 
 [node name="InLayer" parent="Layers" unique_id=622756188 instance=ExtResource("1_jb3y3")]

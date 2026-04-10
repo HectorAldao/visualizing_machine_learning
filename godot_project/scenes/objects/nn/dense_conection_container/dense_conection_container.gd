@@ -10,7 +10,7 @@ var _connections: Dictionary = {}
 func _ready() -> void:
 	SignalsObserver.update_conections.connect(update_conections)
 	SignalsObserver.update_all_conections.connect(refresh_all_connections)
-	refresh_all_connections()
+	#refresh_all_connections()
 
 
 func update_conections(layer_id: int, neuron_id: int) -> void:
@@ -52,7 +52,19 @@ func refresh_all_connections() -> void:
 
 func _add_connection(from_neuron: Neuron, to_neuron: Neuron, key: String) -> void:
 
-	var conection: Conection = Conection.newone(from_neuron, to_neuron, 1, Color.GREEN)
+	# To take the weight of of the conection
+	# First, the the index of the previous neuron in the weight array of the next neuron
+	var from_neuron_index: int = from_neuron._id
+	# Then the layer
+	var to_layer_id: int = to_neuron._layer_id
+	# And take the weight: access to the matrix of the to_layer, then to the column of to_neuron,
+	# and take the specific weight of the previous neuron
+	var weight: float = Variables.nn.nn_tmp_dict[to_layer_id][to_neuron._id][from_neuron_index] * Constants.NN_CONECTION_SCALE
+	#var weight: float = 3
+
+	var conection_color: Color = 
+
+	var conection: Conection = Conection.newone(from_neuron, to_neuron, weight, Color.GREEN)
 
 	add_child(conection)
 	_connections[key] = conection

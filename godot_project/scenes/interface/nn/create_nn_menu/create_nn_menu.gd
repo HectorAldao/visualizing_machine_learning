@@ -42,6 +42,7 @@ func _on_button_pressed(which: String) -> void:
 			SignalsObserver.reload_nn.emit()
 		"StartButton": 
 			SignalsObserver.train_nn.emit()
+			print(Variables.nn.nn_tmp_dict)
 
 
 ## When the text is changed, there must change 1 or 2 things.
@@ -61,20 +62,18 @@ func _on_text_changed(which: HBoxContainer) -> void:
 		"NeuronsIn":
 
 			num_of_wanted_layers = _check_wanted(num_of_wanted_layers, textedit, 1)
-
-			Variables.nn_tmp[0] = int(num_of_wanted_layers)
+			Variables.nn.set_layer_neuron_count_tmp(0, num_of_wanted_layers)
 
 		"NeuronsOut":
 
 			num_of_wanted_layers = _check_wanted(num_of_wanted_layers, textedit, 1)
-
-			Variables.nn_tmp[-1] = int(num_of_wanted_layers)
+			Variables.nn.set_layer_neuron_count_tmp(-1, num_of_wanted_layers)
 
 		"Layers":
 
 			num_of_wanted_layers = _check_wanted(num_of_wanted_layers, textedit, 0)
 			
-			var old_num_of_hidden_layers: int = Variables.nn_tmp.size() - 2  # Minus the in-layer and out-layer
+			var old_num_of_hidden_layers: int = Variables.nn.nn_tmp_dict.size() - 2  # Minus the in-layer and out-layer
 
 			# Because the number can be changed by hand (not peressing the plus and minus)
 			# the amount of times that the change must be called is not predecible
@@ -102,8 +101,7 @@ func _on_text_changed(which: HBoxContainer) -> void:
 					# And added as child
 					new_neurons_layer.add_child(submenu_neurons_in_layer)
 
-					# Then, the dictionary is uptaded
-					Variables.nn_tmp[new_submenu_neuron_id] = 0
+					# The weights matrix is synchronized centrally in Variables.
 
 			# If layers were deleted
 			elif num_of_neurons_changed < 0:
@@ -115,7 +113,6 @@ func _on_text_changed(which: HBoxContainer) -> void:
 					print("current_neurons_left_to_remove ", current_neurons_left_to_remove)  #debug
 
 					var submenu_index_to_remove: int = num_of_wanted_layers + current_neurons_left_to_remove - 1
-					var submenu_neuron_id_to_remove: int = submenu_index_to_remove + 1
 
 					# Each subnmenu's index $n$ corresponds to a neuron id $n+1$: submenu 0 -> neuron id 1
 					# when removing a neuron, the variable "num" (num of neurons) is equal to the index
@@ -127,14 +124,15 @@ func _on_text_changed(which: HBoxContainer) -> void:
 					new_neurons_layer.remove_child(submenu_neurons_in_layer_to_remove)
 					submenu_neurons_in_layer_to_remove.queue_free()
 
-					# And the dictionary is updated
-					Variables.nn_tmp.erase(submenu_neuron_id_to_remove)
+					# The weights matrix is synchronized centrally in Variables.
 
 			else:
 				# This print is only to check if the "text_changed" signal is emited
 				# even if the text is "changed" to be the same.
 				print("[LOG] The number of neurons to wich the text changed its the same")  #debug
 
+			Variables.nn.set_hidden_layer_count_tmp(num_of_wanted_layers)
+	
 
 func _check_wanted(wanted: int, txtedt: TextEdit, minimum: int) -> int:
 

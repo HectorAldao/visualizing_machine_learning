@@ -3,6 +3,13 @@ class_name Layer extends VBoxContainer
 var _id: int = -2
 
 func _ready() -> void:
+
+	for child in get_children():
+		remove_child(child)
+		child.queue_free()
+	
+	add_child(Neuron.newone(0, _id))
+
 	alignment = BoxContainer.ALIGNMENT_CENTER
 	SignalsObserver.add_neuron.connect(_on_add_neuron)
 	SignalsObserver.remove_neuron.connect(_on_remove_neuron)
@@ -18,7 +25,7 @@ func _on_add_neuron(layer_id: int) -> void:
 	if layer_id == _id:
 
 		# Create it
-		var new_neuron: Neuron = Neuron.newone(get_child_count())
+		var new_neuron: Neuron = Neuron.newone(get_child_count(), _id)
 		# And add it as a child
 		add_child(new_neuron)
 
@@ -36,6 +43,7 @@ func _on_remove_neuron(layer_id: int) -> void:
 
 		# Delete the last neuron
 		var last_neuron: Neuron = get_child(-1)
+		remove_child(last_neuron)
 		last_neuron.queue_free()
 
 		# Inform the controller

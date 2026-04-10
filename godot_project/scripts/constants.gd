@@ -26,7 +26,14 @@ const THEMES: Dictionary[String, String] = {
 	"nodedefault": "uid://dxluxv1xceiqb"
 }
 
+const REFCOUNTS: Dictionary[String, String] = {
+	"neural_network_logical": "uid://be7g05yi62lb2",
+}
+
 const NN_LIMITS: Dictionary[String, int] = {
 	"max_layers" = 6,
 	"max_neurons" = 6,
 }
+
+const NN_FILL_VALUE: float = 0.5
+const NN_CONECTION_SCALE: float = 2

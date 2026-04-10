@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://cc3e3evd7rf4q"]
+
+[ext_resource type="Script" uid="uid://dc2mib24wp7e" path="res://scenes/objects/nn/algorithm_nn/algorithm_nn.gd" id="1_nrt3f"]
+
+[node name="AlgorithmNn" type="Node" unique_id=1426363480]
+script = ExtResource("1_nrt3f")

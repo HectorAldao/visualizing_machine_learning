@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://c5te6p4kcvt70"]
+
+[ext_resource type="Script" uid="uid://epcx77cmj87" path="res://scenes/charts/functions/relu/relu.gd" id="1_srivl"]
+
+[node name="Relu" type="Line2D" unique_id=1223718995]
+position = Vector2(207, 106)
+width = 3.0
+script = ExtResource("1_srivl")
