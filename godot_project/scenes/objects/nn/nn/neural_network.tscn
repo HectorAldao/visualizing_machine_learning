@@ -14,7 +14,7 @@ layout_mode = 2
 
 [node name="Layers" type="HBoxContainer" parent="." unique_id=2044067605]
 layout_mode = 2
-theme_override_constants/separation = 100
+theme_override_constants/separation = 125
 
 [node name="InLayer" parent="Layers" unique_id=622756188 instance=ExtResource("1_jb3y3")]
 layout_mode = 2

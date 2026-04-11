@@ -35,5 +35,12 @@ const NN_LIMITS: Dictionary[String, int] = {
 	"max_neurons" = 6,
 }
 
+const ACT_FUNCS: Dictionary[String, int] = {
+	"relu": 0,
+	"sigmoid": 1,
+	"softmax": 2,
+}
+
 const NN_FILL_VALUE: float = 0.5
 const NN_CONECTION_SCALE: float = 2
+const NN_CONECTION_BIAS: float = 0

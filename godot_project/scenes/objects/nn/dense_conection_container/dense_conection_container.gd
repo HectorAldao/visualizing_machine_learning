@@ -59,15 +59,39 @@ func _add_connection(from_neuron: Neuron, to_neuron: Neuron, key: String) -> voi
 	var to_layer_id: int = to_neuron._layer_id
 	# And take the weight: access to the matrix of the to_layer, then to the column of to_neuron,
 	# and take the specific weight of the previous neuron
-	var weight: float = Variables.nn.nn_tmp_dict[to_layer_id][to_neuron._id][from_neuron_index] * Constants.NN_CONECTION_SCALE
+	var weight: float = Variables.nn.nn_tmp_dict[to_layer_id][to_neuron._id][from_neuron_index] #* Constants.NN_CONECTION_SCALE
 	#var weight: float = 3
 
-	var conection_color: Color = 
+	var connection_color: Color = _get_connection_color(weight)
 
-	var conection: Conection = Conection.newone(from_neuron, to_neuron, weight, Color.GREEN)
+	# If the value is too low, the conection is going to disapear,
+	# something that may not be desired.
+	# If NN_CONECTION_BIAS = 0, it will disapear
+	var width: float
+	if weight > 0:
+		width = (weight + Constants.NN_CONECTION_BIAS) * Constants.NN_CONECTION_SCALE
+	else: 
+		width = (-weight + Constants.NN_CONECTION_BIAS) * Constants.NN_CONECTION_SCALE
 
-	add_child(conection)
-	_connections[key] = conection
+	var connection: Conection = Conection.newone(from_neuron, to_neuron, width, connection_color)
+
+	add_child(connection)
+	_connections[key] = connection
+
+
+func _get_connection_color(weight: float) -> Color:
+	if weight == 0:
+		return Color.BLACK
+	elif weight > 0:
+		if weight <= 1:
+			return Color.CYAN
+		else:
+			return Color.GREEN
+	else:  # weight < 0
+		if weight >= -1:
+			return Color.YELLOW
+		else:
+			return Color.RED
 
 
 func _remove_connection(key: String) -> void:

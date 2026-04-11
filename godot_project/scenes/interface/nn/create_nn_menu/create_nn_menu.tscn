@@ -77,6 +77,25 @@ layout_mode = 2
 theme = ExtResource("1_y8h1s")
 text = " Nº neuronas de Salida"
 
+[node name="VBoxContainer2" type="VBoxContainer" parent="VBoxContainer/NeuronsOut" unique_id=1251177453]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Label" type="Label" parent="VBoxContainer/NeuronsOut/VBoxContainer2" unique_id=1002450509]
+layout_mode = 2
+text = "Función activación"
+
+[node name="OptionButton" type="OptionButton" parent="VBoxContainer/NeuronsOut/VBoxContainer2" unique_id=1614355264]
+layout_mode = 2
+selected = 0
+item_count = 3
+popup/item_0/text = "relu"
+popup/item_0/id = 0
+popup/item_1/text = "sigmoid"
+popup/item_1/id = 1
+popup/item_2/text = "softmax"
+popup/item_2/id = 2
+
 [node name="Layers" type="HBoxContainer" parent="VBoxContainer" unique_id=1979180071]
 layout_mode = 2
 size_flags_horizontal = 0

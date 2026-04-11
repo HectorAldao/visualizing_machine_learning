@@ -1,7 +1,11 @@
+## The logical part of the nn
 class_name NeuralNetworkLogial extends RefCounted
 
 var nn_dict: Dictionary[int, Array] = {0: [[1]], -1: [[0.5]]}
+var nn_func_dict: Dictionary[int, int] = {-1: Constants.ACT_FUNCS.softmax}
+# The tmp_dicts are used to save the state of the create_nn_menu
 var nn_tmp_dict: Dictionary[int, Array] = {0: [[1]], -1: [[0.5]]}
+var nn_func_tmp_dict: Dictionary[int, int] = {-1: Constants.ACT_FUNCS.softmax}
 
 
 static func newone() -> NeuralNetworkLogial:
@@ -15,7 +19,7 @@ func set_layer_neuron_count_tmp(layer_id: int, target_neurons: int) -> void:
 	nn_tmp_dict[layer_id] = _resize_layer_matrix(nn_tmp_dict.get(layer_id, []), target_neurons, previous_layer_neurons)
 
 	var next_layer_id: int = _get_next_layer_id(layer_id)
-	if next_layer_id != -9999 and nn_tmp_dict.has(next_layer_id):
+	if next_layer_id != -2 and nn_tmp_dict.has(next_layer_id):
 		var current_neurons: int = nn_tmp_dict[layer_id].size()
 		nn_tmp_dict[next_layer_id] = _resize_layer_matrix(nn_tmp_dict[next_layer_id], nn_tmp_dict[next_layer_id].size(), current_neurons)
 
@@ -68,7 +72,7 @@ func _get_previous_layer_neuron_count(layer_id: int) -> int:
 
 func _get_next_layer_id(layer_id: int) -> int:
 	if layer_id == -1:
-		return -9999
+		return -2
 
 	if layer_id == 0:
 		return 1 if nn_tmp_dict.has(1) else -1
@@ -79,7 +83,7 @@ func _get_next_layer_id(layer_id: int) -> int:
 	if nn_tmp_dict.has(-1):
 		return -1
 
-	return -9999
+	return -2
 
 
 func _get_layer_neuron_count(layer_id: int) -> int:

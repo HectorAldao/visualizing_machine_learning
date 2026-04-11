@@ -20,9 +20,6 @@ func _ready() -> void:
 					child.queue_free()
 
 			else:
-				#var plus_button: Button = c.get_child(0).get_child(0)
-				#var minus_button: Button = c.get_child(0).get_child(1)
-				#var text_edit: TextEdit = c.get_child(1)
 				var plus_button: Button = c.get_node("VBoxContainer").get_node("PlusButton")
 				var minus_button: Button = c.get_node("VBoxContainer").get_node("MinusButton")
 				var text_edit: TextEdit = c.get_node("TextEdit")
@@ -42,7 +39,8 @@ func _on_button_pressed(which: String) -> void:
 			SignalsObserver.reload_nn.emit()
 		"StartButton": 
 			SignalsObserver.train_nn.emit()
-			print(Variables.nn.nn_tmp_dict)
+			visible = false
+			#print(Variables.nn.nn_tmp_dict)  #debug
 
 
 ## When the text is changed, there must change 1 or 2 things.
