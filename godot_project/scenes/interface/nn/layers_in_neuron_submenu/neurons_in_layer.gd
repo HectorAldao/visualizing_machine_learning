@@ -6,6 +6,7 @@ class_name NeuronsInLayer extends VBoxContainer
 @onready var textedit: TextEdit = $TextEdit
 @onready var plusbutton: Button = $HBoxContainer/PlusButton
 @onready var minusbutton: Button = $HBoxContainer/MinusButton
+@onready var activation_option_button: OptionButton = $VBoxContainer2/OptionButton
 
 
 var neuron_id: int
@@ -13,11 +14,19 @@ var neuron_id: int
 
 
 func _ready() -> void:
+	label.text = "Neuronas\nCapa %s" % neuron_id
 
 	# Connect all the signals
 	plusbutton.pressed.connect(_on_plus_pressed)
 	minusbutton.pressed.connect(_on_minus_pressed)
 	textedit.text_changed.connect(_on_text_changed)
+	activation_option_button.item_selected.connect(_on_activation_selected)
+
+	var nn_logic = Variables.get("nn")
+	if nn_logic.nn_func_tmp_dict.has(neuron_id):
+		activation_option_button.select(nn_logic.nn_func_tmp_dict[neuron_id])
+	else:
+		nn_logic.set_layer_activation_tmp(neuron_id, activation_option_button.get_selected_id())
 
 
 ## Constructor of the class
@@ -75,3 +84,7 @@ func _check_wanted(wanted: int, txtedt: TextEdit, minimum: int) -> int:
 		return Constants.NN_LIMITS.max_neurons
 	
 	return wanted
+
+
+func _on_activation_selected(activation_func_id: int) -> void:
+	Variables.nn.set_layer_activation_tmp(neuron_id, activation_func_id)

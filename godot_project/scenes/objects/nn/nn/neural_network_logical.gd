@@ -12,6 +12,18 @@ static func newone() -> NeuralNetworkLogial:
 	return NeuralNetworkLogial.new()
 
 
+func set_layer_activation_tmp(layer_id: int, activation_func_id: int) -> void:
+	if layer_id == 0:
+		return
+
+	nn_func_tmp_dict[layer_id] = activation_func_id
+
+
+func apply_tmp_to_main() -> void:
+	nn_dict = nn_tmp_dict.duplicate(true)
+	nn_func_dict = nn_func_tmp_dict.duplicate(true)
+
+
 func set_layer_neuron_count_tmp(layer_id: int, target_neurons: int) -> void:
 	target_neurons = max(target_neurons, 1)
 
@@ -35,6 +47,7 @@ func set_hidden_layer_count_tmp(target_hidden_layers: int) -> void:
 		var previous_neurons: int = _get_layer_neuron_count(previous_layer_id)
 
 		nn_tmp_dict[new_hidden_layer_id] = _resize_layer_matrix([], 1, previous_neurons)
+		nn_func_tmp_dict[new_hidden_layer_id] = Constants.ACT_FUNCS.relu
 
 		if nn_tmp_dict.has(-1):
 			nn_tmp_dict[-1] = _resize_layer_matrix(nn_tmp_dict[-1], nn_tmp_dict[-1].size(), 1)
@@ -44,6 +57,7 @@ func set_hidden_layer_count_tmp(target_hidden_layers: int) -> void:
 	while current_hidden_layers > target_hidden_layers:
 		var layer_id_to_remove: int = current_hidden_layers
 		nn_tmp_dict.erase(layer_id_to_remove)
+		nn_func_tmp_dict.erase(layer_id_to_remove)
 		current_hidden_layers -= 1
 
 		var new_previous_layer_id: int = 0 if current_hidden_layers == 0 else current_hidden_layers

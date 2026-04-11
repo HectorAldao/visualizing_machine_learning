@@ -96,7 +96,7 @@ func _on_reload_nn() -> void:
 	SignalsObserver.update_all_conections.emit()
 
 	# and save the new nn
-	Variables.nn.nn_dict = nn_tmp_dict.duplicate()
+	Variables.nn.apply_tmp_to_main()
 
 	# Center the nn
 	_center_nn()

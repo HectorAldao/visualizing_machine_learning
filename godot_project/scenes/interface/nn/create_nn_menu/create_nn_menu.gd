@@ -28,6 +28,12 @@ func _ready() -> void:
 				minus_button.pressed.connect(_on_minus_pressed.bind(c))
 				text_edit.text_changed.connect(_on_text_changed.bind(c))
 
+				if c.name == "NeuronsOut":
+					var activation_option_button: OptionButton = c.get_node("VBoxContainer2").get_node("OptionButton")
+					activation_option_button.item_selected.connect(_on_output_activation_selected)
+					if Variables.nn.nn_func_tmp_dict.has(-1):
+						activation_option_button.select(Variables.nn.nn_func_tmp_dict[-1])
+
 
 
 func _on_button_pressed(which: String) -> void:
@@ -37,6 +43,8 @@ func _on_button_pressed(which: String) -> void:
 			SignalsObserver.load_nn.emit()
 		"ReloadButton":
 			SignalsObserver.reload_nn.emit()
+			print(Variables.nn.nn_tmp_dict)  #debug
+			print(Variables.nn.nn_func_tmp_dict)  #debug
 		"StartButton": 
 			SignalsObserver.train_nn.emit()
 			visible = false
@@ -181,6 +189,10 @@ func _on_minus_pressed(which: HBoxContainer) -> void:
 			if num > 1:
 				textedit.text = str(num - 1 )
 				textedit.text_changed.emit()
+
+
+func _on_output_activation_selected(activation_func_id: int) -> void:
+	Variables.nn.set_layer_activation_tmp(-1, activation_func_id)
 
 
 func _update_nn() -> void:
