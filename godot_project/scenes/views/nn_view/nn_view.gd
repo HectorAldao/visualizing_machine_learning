@@ -1,6 +1,9 @@
 extends Control
 
 
+@onready var panel_algorithm_nn: PanelContainer = $PanelAlgorithmNn
+@onready var create_nn_menu: PanelContainer = $CreateNnMenu
+
 var state: String = "create_nn"  # Other values: train_nn, evaluate_nn
 
 var nn_size: Vector2
@@ -12,11 +15,18 @@ var _is_centering: bool = false
 
 func _ready() -> void:
 
+	# Create nn menu realted buttons
 	SignalsObserver.load_nn  .connect(_on_load_nn)
 	SignalsObserver.reload_nn.connect(_on_reload_nn)
 	SignalsObserver.train_nn .connect(_on_train_nn)
 
+	# Centering the nn realted info
 	SignalsObserver.nn_inform_size.connect(_on_set_nn_size)
+
+	# Dataset selection info
+	SignalsObserver.dataset_selected_nn.connect(_on_dataset_selected)
+	
+	panel_algorithm_nn.visible = false
 
 	_center_nn()
 
@@ -103,7 +113,9 @@ func _on_reload_nn() -> void:
 
 
 func _on_train_nn() -> void:
-	pass
+	state = "train_nn"
+	create_nn_menu.visible = false
+	panel_algorithm_nn.visible = true
 
 
 ## Move the nn of the view to the center
@@ -139,3 +151,12 @@ func _on_set_nn_size(new_nn_size: Vector2) -> void:
 	nn_size = new_nn_size
 	#print("1") #debug
 	#nn_size_updated.emit()
+
+
+func _on_dataset_selected(data:Array[Dictionary], attrs: Array[String], nn_restrictions: Dictionary[int, int]):
+
+	# TODO: things related to set the "data" and "attrs" for the training
+
+	SignalsObserver.establish_nn_dset_restrictions.emit(nn_restrictions)
+
+	pass

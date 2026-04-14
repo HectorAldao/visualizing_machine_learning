@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://t7yhp2dspky0"]
+
+[ext_resource type="Script" uid="uid://c32l0xvmgns3s" path="res://scenes/interface/nn/panel_algorithm_nn/panel_algorithm_nn.gd" id="1_kr5pl"]
+
+[node name="PanelAlgorithmNn" type="PanelContainer" unique_id=2144642879]
+script = ExtResource("1_kr5pl")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=332046027]
+layout_mode = 2
+
+[node name="NextNeuronButton" type="Button" parent="VBoxContainer" unique_id=597519075]
+layout_mode = 2
+text = "Siguiente neurona"
+
+[node name="NextLayerButton" type="Button" parent="VBoxContainer" unique_id=1829642143]
+layout_mode = 2
+text = "Siguiente capa"
+
+[node name="NextStepButton" type="Button" parent="VBoxContainer" unique_id=735567149]
+layout_mode = 2
+text = "Siguiente paso"

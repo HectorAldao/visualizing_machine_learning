@@ -54,7 +54,7 @@ func _on_button_pressed(option: String):
 ## the selection, of if the csv was read without problem
 func _on_dataset_selected():
 	match selected_option:
-		"Csv":
+		"Cargar\nCsv":
 			_load_csv()
 		_:
 			informative_text.text = "Se seleccionó el dataset %s " % selected_option

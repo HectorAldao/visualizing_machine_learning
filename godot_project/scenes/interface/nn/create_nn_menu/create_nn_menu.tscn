@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://duf8oh2sk7ygw" path="res://scenes/interface/nn/create_nn_menu/create_nn_menu.gd" id="1_hvrol"]
 [ext_resource type="Theme" uid="uid://c7fey4aa82nli" path="res://themes/plus_minus_buttons_theme/plus_minus_button_theme.tres" id="1_y8h1s"]
-[ext_resource type="PackedScene" uid="uid://e7nvan78e0pf" path="res://scenes/interface/nn/layers_in_neuron_submenu/neurons_in_layer.tscn" id="3_e6v37"]
+[ext_resource type="PackedScene" uid="uid://e7nvan78e0pf" path="res://scenes/interface/nn/neurons_in_layer_submenu/neurons_in_layer.tscn" id="3_e6v37"]
 
 [node name="CreateNnMenu" type="PanelContainer" unique_id=677229503]
 offset_right = 491.0

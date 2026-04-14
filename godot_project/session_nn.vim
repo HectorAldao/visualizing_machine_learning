@@ -14,7 +14,7 @@ badd +1 scenes/views/dtree_view/controller_dtree/controller_dtree.gd
 badd +27 scenes/views/dtree_view/dtree_canvas/dtree_canvas.gd
 badd +1 scenes/objects/dtree/dtree/dtree.gd
 badd +1 scenes/objects/dtree/dtree/algorithm_dtree.gd
-badd +28 scripts/signals_observer.gd
+badd +25 scripts/signals_observer.gd
 badd +32 scenes/views/dtree_view/dtree_view.gd
 badd +1 ~/eu/tfg/godot_project
 badd +1 res://scenes/views/dtree_view/dtree_canvas/dtree_canvas.tscn
@@ -40,23 +40,28 @@ badd +34 scenes/charts/bars_chart/bars_chart.gd
 badd +9 scenes/objects/dtree/eval_data/eval_data.gd
 badd +18 scenes/objects/dtree/algorithm_dtree/dnode_logical/dnode_logical.gd
 badd +1 scenes/objects/dtree/eval_data_container/eval_data_container.gd.uid
-badd +116 scenes/views/nn_view/nn_view.gd
-badd +42 scenes/interface/nn/create_nn_menu/create_nn_menu.gd
+badd +160 scenes/views/nn_view/nn_view.gd
+badd +167 scenes/interface/nn/create_nn_menu/create_nn_menu.gd
 badd +74 scenes/objects/nn/dense_conection_container/dense_conection_container.gd
 badd +1 scenes/objects/nn/nn/neural_network.gd
 badd +21 scenes/objects/nn/layer/layer.gd
 badd +1 res://scenes/interface/nn/create_nn_menu/create_nn_menu.gd
 badd +9 scenes/objects/nn/neuron/neuron.gd
 badd +71 scenes/interface/dtree/window/window.gd
-badd +34 scenes/interface/nn/layers_in_neuron_submenu/neurons_in_layer.gd
-badd +4 scripts/variables.gd
+badd +1 scenes/interface/nn/layers_in_neuron_submenu/neurons_in_layer.gd
+badd +5 scripts/variables.gd
 badd +55 scenes/interface/scroll_container/scroll_container.gd
 badd +15 scenes/charts/function_plot/function_plot.gd
 badd +5 scenes/objects/nn/nn/neural_network_logical.gd
+badd +19 scenes/objects/nn/algorithm_nn/algorithm_nn.gd
+badd +1 scenes/interface/nn/neurons_in_layer_submenu/neurons_in_layer.gd
+badd +92 scenes/interface/nn/panel_dataset_selection/panel_dataset_selection.gd
 argglobal
 %argdel
 $argadd ~/eu/tfg/godot_project
 set stal=2
+tabnew +setlocal\ bufhidden=wipe
+tabnew +setlocal\ bufhidden=wipe
 tabnew +setlocal\ bufhidden=wipe
 tabnew +setlocal\ bufhidden=wipe
 tabnew +setlocal\ bufhidden=wipe
@@ -82,7 +87,7 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 39 - ((38 * winheight(0) + 25) / 50)
+let s:l = 39 - ((29 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
@@ -103,12 +108,12 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 39 - ((36 * winheight(0) + 25) / 50)
+let s:l = 11 - ((10 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 39
-normal! 019|
+keepjumps 11
+normal! 08|
 lcd ~/eu/tfg/godot_project
 tabnext
 edit ~/eu/tfg/godot_project/scripts/variables.gd
@@ -124,12 +129,12 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 3 - ((2 * winheight(0) + 25) / 50)
+let s:l = 5 - ((3 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 3
-normal! 046|
+keepjumps 5
+normal! 035|
 lcd ~/eu/tfg/godot_project
 tabnext
 edit ~/eu/tfg/godot_project/scenes/menus/main_menu.gd
@@ -145,7 +150,7 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 21 - ((17 * winheight(0) + 25) / 50)
+let s:l = 21 - ((15 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
@@ -166,12 +171,12 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 116 - ((26 * winheight(0) + 25) / 50)
+let s:l = 160 - ((47 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 116
-normal! 034|
+keepjumps 160
+normal! 021|
 lcd ~/eu/tfg/godot_project
 tabnext
 edit ~/eu/tfg/godot_project/scenes/interface/nn/create_nn_menu/create_nn_menu.gd
@@ -187,15 +192,15 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 43 - ((42 * winheight(0) + 25) / 50)
+let s:l = 167 - ((25 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 43
-normal! 024|
+keepjumps 167
+normal! 053|
 lcd ~/eu/tfg/godot_project
 tabnext
-edit ~/eu/tfg/godot_project/scenes/interface/nn/layers_in_neuron_submenu/neurons_in_layer.gd
+edit ~/eu/tfg/godot_project/scenes/interface/nn/panel_dataset_selection/panel_dataset_selection.gd
 argglobal
 balt ~/eu/tfg/godot_project/scenes/interface/nn/create_nn_menu/create_nn_menu.gd
 setlocal foldmethod=manual
@@ -208,12 +213,33 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 61 - ((24 * winheight(0) + 25) / 50)
+let s:l = 196 - ((24 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 61
-normal! 017|
+keepjumps 196
+normal! 047|
+lcd ~/eu/tfg/godot_project
+tabnext
+edit ~/eu/tfg/godot_project/scenes/interface/nn/neurons_in_layer_submenu/neurons_in_layer.gd
+argglobal
+balt ~/eu/tfg/godot_project/scenes/interface/nn/layers_in_neuron_submenu/neurons_in_layer.gd
+setlocal foldmethod=manual
+setlocal foldexpr=<SNR>36_GDScriptFoldLevel()
+setlocal foldmarker={{{,}}}
+setlocal foldignore=
+setlocal foldlevel=0
+setlocal foldminlines=1
+setlocal foldnestmax=20
+setlocal foldenable
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 1 - ((0 * winheight(0) + 25) / 50)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 1
+normal! 0
 lcd ~/eu/tfg/godot_project
 tabnext
 edit ~/eu/tfg/godot_project/scenes/objects/nn/nn/neural_network.gd
@@ -229,7 +255,7 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 1 - ((0 * winheight(0) + 25) / 50)
+let s:l = 1 - ((0 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
@@ -250,7 +276,7 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 21 - ((20 * winheight(0) + 25) / 50)
+let s:l = 21 - ((15 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
@@ -271,7 +297,7 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 4 - ((3 * winheight(0) + 25) / 50)
+let s:l = 4 - ((2 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
@@ -292,7 +318,7 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 74 - ((34 * winheight(0) + 25) / 50)
+let s:l = 74 - ((31 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
@@ -313,14 +339,35 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 5 - ((4 * winheight(0) + 25) / 50)
+let s:l = 5 - ((3 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
 keepjumps 5
 normal! 047|
 lcd ~/eu/tfg/godot_project
-tabnext 12
+tabnext
+edit ~/eu/tfg/godot_project/scenes/objects/nn/algorithm_nn/algorithm_nn.gd
+argglobal
+balt ~/eu/tfg/godot_project/scenes/objects/nn/nn/neural_network_logical.gd
+setlocal foldmethod=manual
+setlocal foldexpr=<SNR>36_GDScriptFoldLevel()
+setlocal foldmarker={{{,}}}
+setlocal foldignore=
+setlocal foldlevel=0
+setlocal foldminlines=1
+setlocal foldnestmax=20
+setlocal foldenable
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 19 - ((14 * winheight(0) + 22) / 45)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 19
+normal! 064|
+lcd ~/eu/tfg/godot_project
+tabnext 6
 set stal=1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf

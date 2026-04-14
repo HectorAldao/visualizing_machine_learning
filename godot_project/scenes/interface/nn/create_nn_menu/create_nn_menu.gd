@@ -1,10 +1,22 @@
 extends PanelContainer
 
+
 @onready var vboxcont: VBoxContainer = $VBoxContainer
 @onready var new_neurons_layer: HBoxContainer = $VBoxContainer/NewNeuronsLayer
 
+var nn_restr_dict: Dictionary[int, int]
+
+var textedit_in: TextEdit
+var textedit_out: TextEdit
+
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+
+	# When a dataset is selected, there are restrictions about "in" and "out" neurons.
+	# When this signal is emited, the dictionary with the restrictions is saved
+	# on the nn menu for it to be used in the function "_check_wanted"
+	SignalsObserver.establish_nn_dset_restrictions.connect(_on_restrictions_set)
 
 	for c in vboxcont.get_children():
 
@@ -28,7 +40,14 @@ func _ready() -> void:
 				minus_button.pressed.connect(_on_minus_pressed.bind(c))
 				text_edit.text_changed.connect(_on_text_changed.bind(c))
 
+				if c.name == "NeuronsIn":
+
+					textedit_in = text_edit
+
 				if c.name == "NeuronsOut":
+
+					textedit_out = text_edit
+
 					var activation_option_button: OptionButton = c.get_node("VBoxContainer2").get_node("OptionButton")
 					activation_option_button.item_selected.connect(_on_output_activation_selected)
 					if Variables.nn.nn_func_tmp_dict.has(-1):
@@ -46,8 +65,9 @@ func _on_button_pressed(which: String) -> void:
 			print(Variables.nn.nn_tmp_dict)  #debug
 			print(Variables.nn.nn_func_tmp_dict)  #debug
 		"StartButton": 
+			SignalsObserver.reload_nn.emit()
 			SignalsObserver.train_nn.emit()
-			visible = false
+			#visible = false
 			#print(Variables.nn.nn_tmp_dict)  #debug
 
 
@@ -67,12 +87,12 @@ func _on_text_changed(which: HBoxContainer) -> void:
 	match submenu_name:
 		"NeuronsIn":
 
-			num_of_wanted_layers = _check_wanted(num_of_wanted_layers, textedit, 1)
+			num_of_wanted_layers = _check_wanted(num_of_wanted_layers, textedit, 1, 0)
 			Variables.nn.set_layer_neuron_count_tmp(0, num_of_wanted_layers)
 
 		"NeuronsOut":
 
-			num_of_wanted_layers = _check_wanted(num_of_wanted_layers, textedit, 1)
+			num_of_wanted_layers = _check_wanted(num_of_wanted_layers, textedit, 1, -1)
 			Variables.nn.set_layer_neuron_count_tmp(-1, num_of_wanted_layers)
 
 		"Layers":
@@ -140,7 +160,12 @@ func _on_text_changed(which: HBoxContainer) -> void:
 			Variables.nn.set_hidden_layer_count_tmp(num_of_wanted_layers)
 	
 
-func _check_wanted(wanted: int, txtedt: TextEdit, minimum: int) -> int:
+func _check_wanted(wanted: int, txtedt: TextEdit, minimum: int, is_in_or_out: int = 1) -> int:
+
+	# If there are restrictions aplyed to layers 0 or -1, here are aplyed
+	if nn_restr_dict.has(is_in_or_out):
+		txtedt.text = str(nn_restr_dict[is_in_or_out])
+		return nn_restr_dict[is_in_or_out]
 
 	# There can't be less than a neuron, and less than 0 layers
 	if wanted < minimum:
@@ -194,6 +219,22 @@ func _on_minus_pressed(which: HBoxContainer) -> void:
 func _on_output_activation_selected(activation_func_id: int) -> void:
 	Variables.nn.set_layer_activation_tmp(-1, activation_func_id)
 
+
+func _on_restrictions_set(nn_restr: Dictionary[int, int]) -> void:
+
+	# Save the dictionary for the restrictions to be aplyed
+	# if the user tries to change them
+	nn_restr_dict = nn_restr.duplicate()
+
+	if nn_restr.has(0):
+		textedit_in.text = str(nn_restr[0])
+		textedit_in.text_changed.emit()
+
+	if nn_restr.has(-1):
+		textedit_out.text = str(nn_restr[-1])
+		textedit_out.text_changed.emit()
+
+	SignalsObserver.reload_nn.emit.call_deferred()
 
 func _update_nn() -> void:
 	pass

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://e7nvan78e0pf"]
 
-[ext_resource type="Script" uid="uid://bgvdxqdqu1mfv" path="res://scenes/interface/nn/layers_in_neuron_submenu/neurons_in_layer.gd" id="1_k8x3v"]
+[ext_resource type="Script" uid="uid://bgvdxqdqu1mfv" path="res://scenes/interface/nn/neurons_in_layer_submenu/neurons_in_layer.gd" id="1_k8x3v"]
 [ext_resource type="Theme" uid="uid://c7fey4aa82nli" path="res://themes/plus_minus_buttons_theme/plus_minus_button_theme.tres" id="1_tpiad"]
 
 [node name="NeuronsInLayer" type="VBoxContainer" unique_id=1166179227]

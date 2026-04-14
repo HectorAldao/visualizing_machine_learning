@@ -41,6 +41,11 @@ const ACT_FUNCS: Dictionary[String, int] = {
 	"softmax": 2,
 }
 
+const LOSS_FUNCS: Dictionary[String, int] = {
+	"mse": 0,
+	"coss_entr": 1,
+}
+
 const NN_FILL_VALUE: float = 0.5
 const NN_CONECTION_SCALE: float = 2
 const NN_CONECTION_BIAS: float = 0

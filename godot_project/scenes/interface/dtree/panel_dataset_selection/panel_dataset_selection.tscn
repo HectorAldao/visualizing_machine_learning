@@ -8,7 +8,7 @@ font_size = 18
 
 [sub_resource type="LabelSettings" id="LabelSettings_av435"]
 
-[node name="PanelContainer" type="PanelContainer" unique_id=1243987596]
+[node name="PanelDatasetSelection" type="PanelContainer" unique_id=1243987596]
 offset_right = 40.0
 offset_bottom = 40.0
 theme_override_styles/panel = ExtResource("1_cevo3")
@@ -39,7 +39,8 @@ text = "Frutas"
 [node name="Button2" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=500426794]
 custom_minimum_size = Vector2(150, 250)
 layout_mode = 2
-text = "Csv"
+text = "Cargar
+Csv"
 
 [node name="PanelContainer" type="PanelContainer" parent="VBoxContainer" unique_id=1205582973]
 layout_mode = 2
