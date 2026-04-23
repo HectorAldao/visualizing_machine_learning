@@ -12,9 +12,13 @@ var _is_centering: bool = false
 
 var train_data: Array[Dictionary]
 var train_attributtes: Array[String]
+var train_target_attribute: String = ""
+var algorithm: AlgorithmNn
 
 
 func _ready() -> void:
+	algorithm = AlgorithmNn.new()
+	add_child(algorithm)
 
 	# Create nn menu realted buttons
 	SignalsObserver.load_nn  .connect(_on_load_nn)
@@ -117,6 +121,7 @@ func _on_train_nn() -> void:
 	state = "train_nn"
 	create_nn_menu.visible = false
 	panel_algorithm_nn.visible = true
+	_configure_algorithm_training()
 
 
 ## Move the nn of the view to the center
@@ -158,7 +163,39 @@ func _on_dataset_selected(data:Array[Dictionary], attrs: Array[String], nn_restr
 
 	train_data = data.duplicate(true)
 	train_attributtes = attrs.duplicate()
+	train_target_attribute = _find_target_attribute(train_data, train_attributtes)
 
 	SignalsObserver.establish_nn_dset_restrictions.emit(nn_restrictions)
 
 	pass
+
+
+func _configure_algorithm_training() -> void:
+	if algorithm == null or train_data.is_empty() or train_target_attribute.is_empty():
+		return
+
+	var loss_type: int = Constants.LOSS_FUNCS.mse
+	if Variables.nn.nn_func_dict.get(-1, -1) == Constants.ACT_FUNCS.softmax:
+		loss_type = Constants.LOSS_FUNCS.coss_entr
+
+	algorithm.configure_training(
+		train_data,
+		train_attributtes,
+		train_target_attribute,
+		Variables.nn.nn_tmp_dict,
+		Variables.nn.nn_func_dict,
+		0.1,
+		loss_type
+	)
+
+
+func _find_target_attribute(data: Array[Dictionary], attrs: Array[String]) -> String:
+	if data.is_empty():
+		return ""
+
+	var row: Dictionary = data[0]
+	for key in row.keys():
+		if not attrs.has(str(key)):
+			return str(key)
+
+	return ""

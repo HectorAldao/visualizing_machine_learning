@@ -3,23 +3,114 @@ class_name AlgorithmNn extends Node
 # Intermediate states stored for backpropagation and visualization
 var layer_outputs: Dictionary = {} # Store 'a' values (after activation)
 var layer_weighted_sums: Dictionary = {} # Store 'z' values (before activation)
+var layer_deltas: Dictionary = {}
+
+var _weights: Dictionary = {}
+var _activations: Dictionary = {}
+var _train_data: Array[Dictionary] = []
+var _train_attributes: Array[String] = []
+var _target_attribute: String = ""
+var _learning_rate: float = 0.1
+var _loss_type: int = Constants.LOSS_FUNCS.mse
+
+var _sorted_layer_indices: Array[int] = []
+var _reversed_layer_indices: Array[int] = []
+
+var _current_data_idx: int = 0
+var _current_phase: String = "idle"
+var _current_layer_cursor: int = 0
+var _current_neuron_cursor: int = 0
+var _current_input_data: Array = []
+var _current_target_data: Array = []
+
+var _cached_phase: String = ""
+var _cached_layer_idx: int = 0
+var _cached_z_values: Array = []
+var _cached_a_values: Array = []
+var _cached_deltas: Array = []
+
+
+func _ready() -> void:
+	SignalsObserver.train_nn_next_neuron.connect(train_next_neuron)
+	SignalsObserver.train_nn_next_layer.connect(train_next_layer)
+	SignalsObserver.train_nn_next_step.connect(train_next_step)
+	SignalsObserver.train_nn_complete.connect(train_complete)
 
 
 func train_step(
-	weights: Dictionary, 
-	activations: Dictionary, 
-	input_data: Array, 
-	target_data: Array, 
+	weights: Dictionary,
+	activations: Dictionary,
+	input_data: Array,
+	target_data: Array,
 	learning_rate: float,
 	loss_type: int = Constants.LOSS_FUNCS.mse
 ) -> void:
-	# Forward Pass
 	var output_data: Array = perform_forward_propagation(weights, activations, input_data)
-
 	print("[LOG] the output for input data was %s" % output_data)
-	
-	# Backward
 	perform_backward_propagation(weights, activations, target_data, learning_rate, loss_type)
+
+
+func configure_training(
+	train_data: Array[Dictionary],
+	train_attributes: Array[String],
+	target_attribute: String,
+	weights: Dictionary,
+	activations: Dictionary,
+	learning_rate: float,
+	loss_type: int = Constants.LOSS_FUNCS.mse
+) -> void:
+	_train_data = train_data.duplicate(true)
+	_train_attributes = train_attributes.duplicate()
+	_target_attribute = target_attribute
+	_weights = weights
+	_activations = activations
+	_learning_rate = learning_rate
+	_loss_type = loss_type
+	_sorted_layer_indices = _get_sorted_layer_indices(_weights.keys())
+	_reversed_layer_indices = _sorted_layer_indices.duplicate()
+	_reversed_layer_indices.reverse()
+	_current_data_idx = 0
+	_current_phase = "idle"
+	_reset_runtime_state()
+
+	if _train_data.is_empty() or _target_attribute.is_empty():
+		_current_phase = "finished"
+		return
+
+	_prepare_current_sample()
+
+
+func train_next_neuron() -> void:
+	_advance_one_neuron()
+
+
+func train_next_layer() -> void:
+	if _is_training_finished():
+		return
+
+	var phase_before: String = _current_phase
+	var layer_before: int = _get_current_layer_idx()
+
+	while not _is_training_finished() and _current_phase == phase_before and _get_current_layer_idx() == layer_before:
+		if not _advance_one_neuron():
+			break
+
+
+func train_next_step() -> void:
+	if _is_training_finished():
+		return
+
+	var data_before: int = _current_data_idx
+
+	while not _is_training_finished() and _current_data_idx == data_before:
+		if not _advance_one_neuron():
+			break
+
+
+func train_complete() -> void:
+	while not _is_training_finished():
+		if not _advance_one_neuron():
+			break
 
 
 # --- Forward methods ---
@@ -27,41 +118,33 @@ func train_step(
 ## Pass the output of each layer for the next one in order
 func perform_forward_propagation(weights: Dictionary, activations: Dictionary, input_data: Array) -> Array:
 	layer_outputs[0] = input_data
-	
-	# Get sorted hidden layers and ensure output layer (-1) is last
-	# for the for_loop
+
 	var layer_indices: Array[int] = _get_sorted_layer_indices(weights.keys())
-	
 	var current_input: Array[float] = input_data
-	# Compute for each layer, the forward step
-	# updating the "current" input variable
+
 	for l_idx in layer_indices:
 		var layer_results: Dictionary[String, Array] = compute_layer_forward(current_input, weights[l_idx], activations[l_idx], l_idx)
 		layer_weighted_sums[l_idx] = layer_results["z"]
 		layer_outputs[l_idx] = layer_results["a"]
 		current_input = layer_results["a"]
-		
+
 	return current_input
 
 
 ## Pass a input of a layer
 func compute_layer_forward(inputs: Array, layer_weights: Array, activation_type: int, layer_idx: int) -> Dictionary:
-	
-	# To save the raw output
 	var z_values: Array = []
-	# To save the activation function output 
 	var a_values: Array = []
-	
-	# Compute the raw ouput
+
 	for i in range(layer_weights.size()):
 		var neuron_weights: Array[Array] = layer_weights[i]
 		var z: float = compute_dot_product(inputs, neuron_weights)
-		
 		z_values.append(z)
-	
-	# Apply the activation function
+
 	if _is_softmax_activation(activation_type):
 		a_values = _apply_softmax(z_values)
+		for i in range(a_values.size()):
+			SignalsObserver.forward_step_completed.emit(layer_idx, i, a_values[i])
 	else:
 		for i in range(z_values.size()):
 			var neuron_output: float = apply_activation(z_values[i], activation_type)
@@ -69,7 +152,6 @@ func compute_layer_forward(inputs: Array, layer_weights: Array, activation_type:
 			a_values.append(neuron_output)
 
 	return {"z": z_values, "a": a_values}
-
 
 
 # --- Backward methods ---
@@ -82,22 +164,16 @@ func perform_backward_propagation(
 	lr: float,
 	loss_type: int = Constants.LOSS_FUNCS.mse
 ) -> void:
-
-	# Save the gradient for each layer
 	var deltas: Dictionary = {}
 	var layer_indices: Array[int] = _get_sorted_layer_indices(weights.keys())
-	layer_indices.reverse()  # Start from output layer
-	
-	# For each layer, compute its gradient, save it in the dictionary
-	# and update de weights of the layer
+	layer_indices.reverse()
+
 	for l_idx in layer_indices:
-
-		# Compute the gradient
 		var next_layer_idx: int = _get_next_layer_index(l_idx, layer_indices)
-		var next_deltas: Array[float] = deltas.get(next_layer_idx, [])  # If the layer is -1, returns []
-		var next_weights: Array = weights.get(next_layer_idx, [])  # If the layer is -1, returns []
+		var next_deltas: Array[float] = deltas.get(next_layer_idx, [])
+		var next_weights: Array = weights.get(next_layer_idx, [])
 
-		var layer_deltas: Array[float] = compute_layer_deltas(
+		var current_layer_deltas: Array[float] = compute_layer_deltas(
 			l_idx,
 			target,
 			layer_outputs[l_idx],
@@ -107,11 +183,9 @@ func perform_backward_propagation(
 			next_deltas,
 			next_weights
 		)
-		
-		# Save it
-		deltas[l_idx] = layer_deltas
-		
-		# Immediately update weights after calculating deltas for this layer (stochastic approach)
+
+		deltas[l_idx] = current_layer_deltas
+
 		var prev_layer_idx = _get_previous_layer_index(l_idx, weights.keys())
 		update_layer_weights(weights[l_idx], deltas[l_idx], layer_outputs[prev_layer_idx], lr, l_idx)
 
@@ -126,44 +200,41 @@ func compute_layer_deltas(
 	act_type: int,
 	loss_type: int,
 	next_deltas: Array,
-	next_weights: Array
+	next_weights: Array,
+	emit_signals: bool = true
 ) -> Array[float]:
-
 	var num_neurons: int = z_values.size()
 	var upstream_gradients: Array[float] = []
 	upstream_gradients.resize(num_neurons)
 
-	# Calculate gradient that reaches this layer
 	if layer_idx == -1:
-		# For softmax + cross entropy, gradient wrt logits is (output - target).
 		if _is_softmax_activation(act_type) and loss_type == Constants.LOSS_FUNCS.coss_entr:
 			var output_deltas: Array[float] = []
 			for i in range(num_neurons):
 				var output_delta: float = output_values[i] - target[i]
 				output_deltas.append(output_delta)
-				SignalsObserver.backward_step_completed.emit(layer_idx, i, output_delta)
+				if emit_signals:
+					SignalsObserver.backward_step_completed.emit(layer_idx, i, output_delta)
 			return output_deltas
 
 		upstream_gradients = _compute_output_loss_error(output_values, target, loss_type)
 	else:
-		# Chain rule: d f(g(x)) / dx = d g(x) / dx * d f(g(x)) / dg(x) 
 		for i in range(num_neurons):
 			var error_sum: float = 0.0
 			for j in range(next_deltas.size()):
 				error_sum += next_weights[j][i] * next_deltas[j]
 			upstream_gradients[i] = error_sum
 
-	# Calculate softmax if is needed
 	if _is_softmax_activation(act_type):
 		var current_output = output_values if layer_idx == -1 else _apply_activation_values(z_values, act_type)
-		return _apply_softmax_backprop(current_output, upstream_gradients, layer_idx)
+		return _apply_softmax_backprop(current_output, upstream_gradients, layer_idx, emit_signals)
 
-	# Apply derivate neuron to neuron if is not softmax
 	var deltas: Array[float] = []
 	for i in range(num_neurons):
 		var delta: float = upstream_gradients[i] * apply_activation_derivative(z_values[i], act_type)
 		deltas.append(delta)
-		SignalsObserver.backward_step_completed.emit(layer_idx, i, delta)
+		if emit_signals:
+			SignalsObserver.backward_step_completed.emit(layer_idx, i, delta)
 
 	return deltas
 
@@ -188,12 +259,249 @@ func _compute_output_loss_error(output_values: Array, target: Array, loss_type: 
 	return output_error
 
 
-func update_layer_weights(layer_weights: Array, layer_deltas: Array, prev_outputs: Array, lr: float, l_idx: int) -> void:
+func update_layer_weights(layer_weights: Array, current_layer_deltas: Array, prev_outputs: Array, lr: float, l_idx: int) -> void:
 	for i in range(layer_weights.size()):
 		for j in range(layer_weights[i].size()):
-			var gradient = layer_deltas[i] * prev_outputs[j]
+			var gradient = current_layer_deltas[i] * prev_outputs[j]
 			layer_weights[i][j] -= lr * gradient
 			SignalsObserver.weight_updated.emit(l_idx, i, j, layer_weights[i][j])
+
+
+# --- Incremental training flow ---
+
+func _advance_one_neuron() -> bool:
+	if _is_training_finished():
+		return false
+
+	match _current_phase:
+		"forward":
+			return _advance_forward_neuron()
+		"backward":
+			return _advance_backward_neuron()
+		"update":
+			return _advance_update_neuron()
+		_:
+			return false
+
+
+func _advance_forward_neuron() -> bool:
+	var layer_idx: int = _get_current_layer_idx()
+	if layer_idx == -9999:
+		return false
+
+	_prepare_forward_cache(layer_idx)
+
+	var neuron_output: float = _cached_a_values[_current_neuron_cursor]
+	SignalsObserver.forward_step_completed.emit(layer_idx, _current_neuron_cursor, neuron_output)
+
+	_current_neuron_cursor += 1
+	if _current_neuron_cursor >= _cached_a_values.size():
+		layer_weighted_sums[layer_idx] = _cached_z_values.duplicate(true)
+		layer_outputs[layer_idx] = _cached_a_values.duplicate(true)
+		_current_input_data = _cached_a_values.duplicate(true)
+		_current_layer_cursor += 1
+		_current_neuron_cursor = 0
+		_clear_layer_cache()
+
+		if _current_layer_cursor >= _sorted_layer_indices.size():
+			_current_phase = "backward"
+			_current_layer_cursor = 0
+
+	return true
+
+
+func _advance_backward_neuron() -> bool:
+	var layer_idx: int = _get_current_layer_idx()
+	if layer_idx == -9999:
+		return false
+
+	_prepare_backward_cache(layer_idx)
+
+	var delta: float = _cached_deltas[_current_neuron_cursor]
+	SignalsObserver.backward_step_completed.emit(layer_idx, _current_neuron_cursor, delta)
+
+	_current_neuron_cursor += 1
+	if _current_neuron_cursor >= _cached_deltas.size():
+		layer_deltas[layer_idx] = _cached_deltas.duplicate(true)
+		_current_layer_cursor += 1
+		_current_neuron_cursor = 0
+		_clear_layer_cache()
+
+		if _current_layer_cursor >= _reversed_layer_indices.size():
+			_current_phase = "update"
+			_current_layer_cursor = 0
+
+	return true
+
+
+func _advance_update_neuron() -> bool:
+	var layer_idx: int = _get_current_layer_idx()
+	if layer_idx == -9999:
+		return false
+
+	var previous_layer_idx: int = _get_previous_layer_index(layer_idx, _weights.keys())
+	var prev_outputs: Array = layer_outputs.get(previous_layer_idx, [])
+	var layer_weights: Array = _weights.get(layer_idx, [])
+	var neuron_weights: Array = layer_weights[_current_neuron_cursor]
+	var neuron_delta: float = layer_deltas[layer_idx][_current_neuron_cursor]
+
+	for weight_idx in range(neuron_weights.size()):
+		var gradient: float = neuron_delta * prev_outputs[weight_idx]
+		neuron_weights[weight_idx] -= _learning_rate * gradient
+		SignalsObserver.weight_updated.emit(layer_idx, _current_neuron_cursor, weight_idx, neuron_weights[weight_idx])
+
+	SignalsObserver.update_all_conections.emit()
+
+	_current_neuron_cursor += 1
+	if _current_neuron_cursor >= layer_weights.size():
+		_current_layer_cursor += 1
+		_current_neuron_cursor = 0
+
+		if _current_layer_cursor >= _reversed_layer_indices.size():
+			_finish_current_sample()
+
+	return true
+
+
+func _prepare_current_sample() -> void:
+	_reset_runtime_state()
+
+	if _current_data_idx < 0 or _current_data_idx >= _train_data.size():
+		_current_phase = "finished"
+		return
+
+	var row: Dictionary = _train_data[_current_data_idx]
+	_current_input_data = _extract_input_data(row)
+	_current_target_data = _extract_target_data(row)
+	layer_outputs[0] = _current_input_data.duplicate(true)
+	_current_phase = "forward"
+
+
+func _finish_current_sample() -> void:
+	_sync_weights_with_variables()
+	_current_data_idx += 1
+
+	if _current_data_idx >= _train_data.size():
+		_current_phase = "finished"
+		print("[LOG] NN training completed")
+		return
+
+	_prepare_current_sample()
+
+
+func _extract_input_data(row: Dictionary) -> Array:
+	var input_data: Array = []
+	for attr in _train_attributes:
+		input_data.append(float(row.get(attr, 0.0)))
+	return input_data
+
+
+func _extract_target_data(row: Dictionary) -> Array:
+	var target_value = row.get(_target_attribute, 0)
+	var output_neurons: int = 1
+	if _weights.has(-1):
+		output_neurons = _weights[-1].size()
+
+	if output_neurons <= 1:
+		return [float(target_value)]
+
+	var target_data: Array = []
+	target_data.resize(output_neurons)
+	target_data.fill(0.0)
+
+	var class_idx: int = int(target_value)
+	if class_idx >= 0 and class_idx < output_neurons:
+		target_data[class_idx] = 1.0
+
+	return target_data
+
+
+func _prepare_forward_cache(layer_idx: int) -> void:
+	if _cached_phase == "forward" and _cached_layer_idx == layer_idx:
+		return
+
+	var z_values: Array = []
+	var layer_weights: Array = _weights[layer_idx]
+	for neuron_weights in layer_weights:
+		z_values.append(compute_dot_product(_current_input_data, neuron_weights))
+
+	var a_values: Array = []
+	if _is_softmax_activation(_activations[layer_idx]):
+		a_values = _apply_softmax(z_values)
+	else:
+		for z in z_values:
+			a_values.append(apply_activation(z, _activations[layer_idx]))
+
+	_cached_phase = "forward"
+	_cached_layer_idx = layer_idx
+	_cached_z_values = z_values
+	_cached_a_values = a_values
+	_cached_deltas = []
+
+
+func _prepare_backward_cache(layer_idx: int) -> void:
+	if _cached_phase == "backward" and _cached_layer_idx == layer_idx:
+		return
+
+	var next_layer_idx: int = _get_next_layer_index(layer_idx, _sorted_layer_indices)
+	var next_deltas: Array = layer_deltas.get(next_layer_idx, [])
+	var next_weights: Array = _weights.get(next_layer_idx, [])
+	var deltas: Array = compute_layer_deltas(
+		layer_idx,
+		_current_target_data,
+		layer_outputs[layer_idx],
+		layer_weighted_sums[layer_idx],
+		_activations[layer_idx],
+		_loss_type,
+		next_deltas,
+		next_weights,
+		false
+	)
+
+	_cached_phase = "backward"
+	_cached_layer_idx = layer_idx
+	_cached_z_values = []
+	_cached_a_values = []
+	_cached_deltas = deltas
+
+
+func _clear_layer_cache() -> void:
+	_cached_phase = ""
+	_cached_layer_idx = 0
+	_cached_z_values = []
+	_cached_a_values = []
+	_cached_deltas = []
+
+
+func _reset_runtime_state() -> void:
+	layer_outputs.clear()
+	layer_weighted_sums.clear()
+	layer_deltas.clear()
+	_current_layer_cursor = 0
+	_current_neuron_cursor = 0
+	_current_input_data = []
+	_current_target_data = []
+	_clear_layer_cache()
+
+
+func _sync_weights_with_variables() -> void:
+	Variables.nn.nn_tmp_dict = _weights
+	Variables.nn.nn_dict = _weights.duplicate(true)
+
+
+func _is_training_finished() -> bool:
+	return _current_phase == "finished" or _train_data.is_empty()
+
+
+func _get_current_layer_idx() -> int:
+	match _current_phase:
+		"forward":
+			if _current_layer_cursor >= 0 and _current_layer_cursor < _sorted_layer_indices.size():
+				return _sorted_layer_indices[_current_layer_cursor]
+		"backward", "update":
+			if _current_layer_cursor >= 0 and _current_layer_cursor < _reversed_layer_indices.size():
+				return _reversed_layer_indices[_current_layer_cursor]
+	return -9999
 
 
 # --- Math utilities ---
@@ -215,10 +523,9 @@ func apply_activation(x: float, type: int) -> float:
 			return 1.0 / (1.0 + exp(-x))
 		Constants.ACT_FUNCS.softmax:
 			return x
-		#"tanh":
-		#	return (exp(x) - exp(-x)) / (exp(x) + exp(-x))
 		_:
-			return x # Identity
+			return x
+
 
 func apply_activation_derivative(x: float, type: int) -> float:
 	match type:
@@ -229,9 +536,6 @@ func apply_activation_derivative(x: float, type: int) -> float:
 			return s * (1.0 - s)
 		Constants.ACT_FUNCS.softmax:
 			return 1.0
-		#"tanh":
-		#	var t = apply_activation(x, "tanh")
-		#	return 1.0 - (t * t)
 		_:
 			return 1.0
 
@@ -279,7 +583,7 @@ func _apply_softmax(z_values: Array) -> Array:
 	return softmax_values
 
 
-func _apply_softmax_backprop(activated_values: Array, upstream_gradients: Array, layer_idx: int) -> Array:
+func _apply_softmax_backprop(activated_values: Array, upstream_gradients: Array, layer_idx: int, emit_signals: bool = true) -> Array:
 	var deltas: Array = []
 	deltas.resize(activated_values.size())
 
@@ -290,10 +594,10 @@ func _apply_softmax_backprop(activated_values: Array, upstream_gradients: Array,
 	for i in range(activated_values.size()):
 		var delta: float = activated_values[i] * (upstream_gradients[i] - dot_product)
 		deltas[i] = delta
-		SignalsObserver.backward_step_completed.emit(layer_idx, i, delta)
+		if emit_signals:
+			SignalsObserver.backward_step_completed.emit(layer_idx, i, delta)
 
 	return deltas
-
 
 
 # --- Helpe logic for dictionary keys ---
@@ -301,19 +605,25 @@ func _apply_softmax_backprop(activated_values: Array, upstream_gradients: Array,
 func _get_sorted_layer_indices(keys: Array[int]) -> Array[int]:
 	var hidden: Array[int] = []
 	for k in keys:
-		if k > 0: hidden.append(k)
+		if k > 0:
+			hidden.append(k)
 	hidden.sort()
-	if -1 in keys: hidden.append(-1)
+	if -1 in keys:
+		hidden.append(-1)
 	return hidden
 
+
 func _get_previous_layer_index(current: int, all_keys: Array) -> int:
-	if current == 1: return 0
+	if current == 1:
+		return 0
 	if current == -1:
 		var max_hidden = 0
 		for k in all_keys:
-			if k > max_hidden: max_hidden = k
+			if k > max_hidden:
+				max_hidden = k
 		return max_hidden
 	return current - 1
+
 
 func _get_next_layer_index(current: int, sorted_indices: Array) -> int:
 	var idx = sorted_indices.find(current)
