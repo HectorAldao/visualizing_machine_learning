@@ -93,3 +93,277 @@ Será necesaria una herramienta software para creación de aplicaciones orientad
 - [x] Traballo a proposta do alumno
 - [ ] Traballo en colaboración con entidade externa
 - [ ] Traballo en coordinación con outros traballos
+
+################################################################## Copia
+
+# nome 
+
+# apelidos 
+
+# dni 
+
+# telefono 
+
+# titulos en galego castelan e ingles 
+
+Visualizando aprendizaxe máquina: da abstracción ó entendemento. 
+
+Visualizando aprendizaje máquina: de la abstracción al entendimiento. 
+
+Visualizing machine learning: from abstraction to understanding. 
+
+ 
+
+# tutores 
+
+  
+
+# Tipo de proxecto 
+
+  
+
+- [x] Clásico de enxeñería 
+
+- [ ] De desenvolvemento en investigación 
+
+  
+
+  
+
+# Breve descripción 
+
+  
+
+La inteligencia artificial es una rama de las ciencias de la computación que, a parteaparte de por sus sorprendentes resultados prácticos, destaca por requerir de unos conocimientos de matemáticos, informáticos y técnicos muy profundos para alcanzar a entender en su totalidad los motivos por los que estos algoritmos alcanzan resultados "inteligentes". 
+
+Este trabajo propone acercar una mayor comprensión sobre el cómo se pasa de una serie de operaciones sin sentido a un algoritmo capaz de detectar patrones que ni los humanos alcanzan a percibir. 
+
+Para ello, se desarrollará una aplicación web que permita apreciar de forma visual los pasos que componen el proceso de entrenamiento de diversos modelos de aprendizaje máquina. 
+
+Se programarán desde 0 los algoritmos a representar, y se conectarán sus partes logicas y sus procesos a componentes visuales que, acompañados con una explicación, aceracarán al usuario a comprender su funcionamiento. ((no se si hay que contar aquí cómo va a funcionar por debajo, como en el ejemplo se menciona lo de los dos submodelos, yo expliqué aquí lo de la representación logíca vs la visual)) 
+
+((Me he dado cuenta de que estoy hablando en plural cuando hablo de "algoritmos". No se cuánto me compromete eso a que tienen que haber 100% más de 1 modelo, o cuánto importa)) 
+
+ 
+
+La inteligencia artificial constituye una de las áreas más relevantes dentro de las ciencias de la computación en la actualidad, con aplicaciones en múltiples ámbitos como la medicina, la industria o los servicios digitales. Sin embargo, su aprendizaje presenta una dificultad significativa debido a la necesidad de comprender conceptos avanzados de matemáticas, programación y lógica computacional. 
+
+En particular, algoritmos como las redes neuronales o los árboles de decisión resultan complejos de entender, ya que su funcionamiento interno no siempre es intuitivo y, en muchos casos, se perciben como “cajas negras”. Esta dificultad se ve agravada por la falta de herramientas educativas que permitan visualizar de forma clara e interactiva cómo operan estos modelos. 
+
+Por ello, este proyecto propone el desarrollo de una aplicación educativa que facilite la comprensión de estos algoritmos mediante representaciones visuales e interactivas, reduciendo la barrera de entrada al aprendizaje de la inteligencia artificial. 
+
+ 
+
+  
+
+  
+
+# Objetivos concretos 
+
+     Realizar un estudio conceptual de los algoritmos de inteligencia artificial seleccionados. 
+
+    Identificar las partes difíciles de comprender de cada algoritmo y como representarlo visualmente. 
+
+    Desarrollar una primera versión de una aplicación educativa orientada a la comprensión del funcionamiento de algoritmos de inteligencia artificial. 
+
+    Despliegue en web pública de la aplicación para facilitar su uso 
+
+    A nivel formativo, adquirir conocimientos sobre el desarrollo de interfaces gráficas, el despliegue de aplicaciones web y profundizar en el funcionamiento de los algoritmos estudiados. 
+
+  
+
+  
+
+# Método de trabajo 
+
+  
+
+Se seguirá una metodología ágil inspirada en Scrum, adaptada al contexto académico del proyecto. El desarrollo se organizará en iteraciones o sprints semanales, en las que se definirán objetivos concretos a partir de un backlog de tareas previamente establecido. Al final de cada sprint, se realizarán revisiones con los directores del proyecto, quienes, proporcionarán orientación y validarán los avances realizados. 
+
+ 
+
+ 
+
+%Este enfoque permitirá estructurar el trabajo de forma progresiva, facilitar la incorporación de mejoras continuas y asegurar un seguimiento constante del desarrollo de la aplicación. 
+
+  
+
+# Fases principais 
+
+  
+
+((no se si hay que ponerlo en modo lista o en modo redacción)) 
+
+  
+
+1. Investigación de los requisitos técnicos del proyecto para la decisión de los recursos software a utilizar. %2. Pruebas prototipo iniciales para determinar si la herramienta seleccionada cumple los requerimientos para un producto mínimo viable. 
+
+2. Estudio del estado del arte sobre aplicaciones educativas en el campo de la informática. 
+
+3.  Estudio de los algoritmos y análisis de aquellos pasos que dificultan su comprensión. 
+
+4. Desarrollo de la primera versión la aplicación que permita el modelado de algoritmos básicos y su visualización, incluyendo análisis desarrollo y validación. 
+
+5. Desarrollo de la segunda versión la aplicación que permita el modelado de algoritmos avanzados y su visualización, incluyendo análisis desarrollo y validación. 
+
+6. Despliegue web. 
+
+%3. Crear los prototipos base de representación estática de los modelos de aprendizaje máquina. ((no se en qué medida debo especifiar a qué me refiero con "representación estática". si yo q estoy en el proyecto no lo pillé a la primera, quien lea esto, menos. Pero ns si importa que quien lea el anteproyecto deba entenderlo todo)) 
+
+%4. Crear una representación lógica de los procesos internos de cada modelo de aprendizaje máquina. 
+
+%5. Conectar la representación visual a la lógica. 
+
+%6. Programar el algoritmo de aprendizaje máquina para que modifique las representaciones lógicas adecuadamente. 
+
+%7. ((no se si me falta algo más de los pasos, ni tampoco se si debo poner este séptimo paso o es jugársela)) Contrastar los resultados obtenidos por los modelos con librerías estandart. 
+
+%8. ((No se si hay que poner "repetir desde el paso 3 para cada modelo de apr máquin)) 
+
+  
+
+  
+
+# Materiales y medios 
+
+  
+
+((Cuánto tengo que bajar en la escala de cosas que necesito? Pongo "computador" o se da por supuesto? jsjs. Supongo que no tengo que decir que necesito un editor de código... no? O como es para cualquier tipo de ingeniería, hay que especificarlo todo.)) 
+
+     Ordenador personal 
+
+    Herramienta software para la generación de interfaces o entornos dinámicos 
+
+    Lenguajes de programación: Python, C#, Typescript o similar en función de la herramienta seleccionada 
+
+    Github 
+
+    Referencias en la literatura para la revisión de los algoritmos. 
+
+   
+
+  
+
+# Modalidade 
+
+  
+
+- [ ] Traballo resultante oferta centro 
+
+- [x] Traballo a proposta do alumno 
+
+- [ ] Traballo en colaboración con entidade externa 
+
+- [ ] Traballo en coordinación con outros traballos 
+
+ 
+################################################################### FINAL
+
+# nome 
+
+Héctor
+
+
+# apelidos 
+
+Aldao Amoedo
+
+
+# dni 
+
+dni
+
+
+# telefono 
+
+gryésbab
+
+# titulos en galego castelan e ingles 
+
+Visualizando aprendizaxe máquina: da abstracción ó entendemento. 
+
+Visualizando aprendizaje máquina: de la abstracción al entendimiento. 
+
+Visualizing machine learning: from abstraction to understanding. 
+
+
+# tutores 
+
+Alejandro Rodríguez Arias
+Samuel Magaz Romero
+
+
+# Tipo de proxecto 
+
+
+- [x] Clásico de enxeñería 
+
+- [ ] De desenvolvemento en investigación 
+
+
+# Breve descripción 
+
+La inteligencia artificial constituye una de las áreas más destacadas en la actualidad dentro de las ciencias de la computación. Cuenta con aplicaciones en múltiples ámbitos como la medicina, la industria o los servicios digitales. Sin embargo, su entendimiento presenta una dificultad significativa debido a la necesidad de comprender conceptos avanzados de matemáticas, programación y lógica computacional. 
+
+En particular, algoritmos como las redes neuronales o los árboles de decisión resultan complejos de entender, ya que su funcionamiento interno no siempre es intuitivo y, en muchos casos, se perciben como “cajas negras”. Esta dificultad se ve agravada por la falta de herramientas educativas que permitan visualizar de forma clara e interactiva cómo operan estos modelos. 
+
+Por ello, este proyecto propone el desarrollo de una aplicación educativa que facilite la comprensión de estos algoritmos mediante representaciones visuales e interactivas, reduciendo la barrera de entrada al aprendizaje de la inteligencia artificial* acercándolo a perfiles no expertos*.
+
+ 
+# Objetivos concretos 
+
+ - Realizar un estudio conceptual de los algoritmos de inteligencia artificial seleccionados. 
+- Identificar las partes difíciles de comprender de cada algoritmo y como representarlo visualmente. 
+- Desarrollar una primera versión de una aplicación educativa orientada a la comprensión del funcionamiento de algoritmos de inteligencia artificial. 
+- Despliegue en web pública de la aplicación para facilitar su uso.
+- A nivel formativo, adquirir conocimientos sobre el desarrollo de interfaces gráficas, el despliegue de aplicaciones web y profundizar en el funcionamiento de los algoritmos estudiados. 
+  
+
+# Método de trabajo 
+
+Se seguirá una metodología ágil inspirada en Scrum, adaptada al contexto académico del proyecto.
+El desarrollo se organizará en iteraciones o sprints semanales, en las que se definirán objetivos concretos a partir de un backlog de tareas previamente establecido.
+Al final de cada sprint, se realizarán revisiones con los directores del proyecto, quienes proporcionarán orientación y validarán los avances realizados. 
+
+
+# Fases principais 
+
+1. Investigación de los requisitos técnicos del proyecto para la decisión de los recursos software a utilizar, recurriendo al desarrollo de prototipos iniciales para determinar si la herramienta seleccionada cumple los requerimientos necesarios.
+
+2. Estudio del estado del arte sobre aplicaciones educativas en el campo de la informática. 
+
+3. Estudio de los algoritmos y análisis de aquellos pasos que dificultan su comprensión.
+
+4. Desarrollo de la primera versión la aplicación que permita el modelado de algoritmos básicos y su visualización, incluyendo análisis desarrollo y validación. 
+
+5. Desarrollo de la segunda versión la aplicación que permita el modelado de algoritmos avanzados y su visualización, incluyendo análisis desarrollo y validación. 
+
+6. Despliegue web. 
+
+
+# Materiales y medios 
+
+- Ordenador personal 
+
+- Herramienta software para la generación de interfaces o entornos dinámicos 
+
+- Lenguajes de programación asociados a la herramienta seleccionada.
+
+- Github 
+
+- Referencias en la literatura para la revisión de los algoritmos. 
+
+
+# Modalidade 
+
+  
+
+- [ ] Traballo resultante oferta centro 
+
+- [x] Traballo a proposta do alumno 
+
+- [ ] Traballo en colaboración con entidade externa 
+
+- [ ] Traballo en coordinación con outros traballos 
+
+
