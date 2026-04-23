@@ -10,7 +10,8 @@ var nn_size: Vector2
 
 var _is_centering: bool = false
 
-#signal nn_size_updated
+var train_data: Array[Dictionary]
+var train_attributtes: Array[String]
 
 
 func _ready() -> void:
@@ -155,7 +156,8 @@ func _on_set_nn_size(new_nn_size: Vector2) -> void:
 
 func _on_dataset_selected(data:Array[Dictionary], attrs: Array[String], nn_restrictions: Dictionary[int, int]):
 
-	# TODO: things related to set the "data" and "attrs" for the training
+	train_data = data.duplicate(true)
+	train_attributtes = attrs.duplicate()
 
 	SignalsObserver.establish_nn_dset_restrictions.emit(nn_restrictions)
 

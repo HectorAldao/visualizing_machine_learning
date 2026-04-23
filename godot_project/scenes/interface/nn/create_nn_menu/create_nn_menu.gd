@@ -67,8 +67,7 @@ func _on_button_pressed(which: String) -> void:
 		"StartButton": 
 			SignalsObserver.reload_nn.emit()
 			SignalsObserver.train_nn.emit()
-			#visible = false
-			#print(Variables.nn.nn_tmp_dict)  #debug
+			visible = false			#print(Variables.nn.nn_tmp_dict)  #debug
 
 
 ## When the text is changed, there must change 1 or 2 things.

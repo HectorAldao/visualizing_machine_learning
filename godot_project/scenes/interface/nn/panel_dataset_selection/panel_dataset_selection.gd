@@ -56,9 +56,14 @@ func _ready() -> void:
 	
 	for button: Button in hboxcontainer.get_children():
 		button.pressed.connect(_on_button_pressed.bind(button.text))
+	
+	SignalsObserver.train_nn.connect(_on_nn_train_started)
 
 func _on_entrenar_button_pressed():
 	SignalsObserver.dataset_selected_nn.emit(datast_info, attrs_info, nn_restrictions)
+	visible = false
+
+func _on_nn_train_started():
 	visible = false
 
 func _on_button_pressed(option: String):
