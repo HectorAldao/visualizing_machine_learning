@@ -1,4 +1,3 @@
-## The logical part of the nn
 class_name NeuralNetworkLogial extends RefCounted
 
 var nn_dict: Dictionary[int, Array] = {0: [[1]], -1: [[0.5]]}
@@ -8,42 +7,62 @@ var nn_tmp_dict: Dictionary[int, Array] = {0: [[1]], -1: [[0.5]]}
 var nn_func_tmp_dict: Dictionary[int, int] = {-1: Constants.ACT_FUNCS.softmax}
 
 
+## Constructor of the class
 static func newone() -> NeuralNetworkLogial:
 	return NeuralNetworkLogial.new()
 
 
+## Sets the activation function for a layer
 func set_layer_activation_tmp(layer_id: int, activation_func_id: int) -> void:
+
+	# The in_layer has no activation function
 	if layer_id == 0:
 		return
 
 	nn_func_tmp_dict[layer_id] = activation_func_id
 
 
+## True copy (deep copy) of the tmp dictionary into the definitive one
 func apply_tmp_to_main() -> void:
 	nn_dict = nn_tmp_dict.duplicate(true)
 	nn_func_dict = nn_func_tmp_dict.duplicate(true)
 
 
+## Change the info about a layer: its weights
 func set_layer_neuron_count_tmp(layer_id: int, target_neurons: int) -> void:
+
+	# Ensure that there is at least one neuron (else there wont be layer)
 	target_neurons = max(target_neurons, 1)
 
+	# Get the info about how many conetions come from the prev layer
 	var previous_layer_neurons: int = _get_previous_layer_neuron_count(layer_id)
+	# And use the info to create the matrix of weights
 	nn_tmp_dict[layer_id] = _resize_layer_matrix(nn_tmp_dict.get(layer_id, []), target_neurons, previous_layer_neurons)
 
+	# Because of this change in the amount of neurons, the next layer must
+	# change its weights too
 	var next_layer_id: int = _get_next_layer_id(layer_id)
 	if next_layer_id != -2 and nn_tmp_dict.has(next_layer_id):
 		var current_neurons: int = nn_tmp_dict[layer_id].size()
 		nn_tmp_dict[next_layer_id] = _resize_layer_matrix(nn_tmp_dict[next_layer_id], nn_tmp_dict[next_layer_id].size(), current_neurons)
 
 
+## Called by the create_nn_menu to change the amount of neurons on a layer
 func set_hidden_layer_count_tmp(target_hidden_layers: int) -> void:
+
+	# Ensure that there is at least one neuron (else there wont be layer)
 	target_hidden_layers = max(target_hidden_layers, 0)
 
 	var current_hidden_layers: int = _get_hidden_layer_count()
 
+	# And while there are more or less layers
+
+	# If there are less
 	while current_hidden_layers < target_hidden_layers:
+		# Create a new layer
 		var new_hidden_layer_id: int = current_hidden_layers + 1
 		var previous_layer_id: int = 0 if new_hidden_layer_id == 1 else new_hidden_layer_id - 1
+		#var previous_layer_id: int = new_hidden_layer_id - 1
 		var previous_neurons: int = _get_layer_neuron_count(previous_layer_id)
 
 		nn_tmp_dict[new_hidden_layer_id] = _resize_layer_matrix([], 1, previous_neurons)

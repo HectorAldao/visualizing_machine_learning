@@ -36,6 +36,8 @@ func _refresh_pair_connections(pair_start_position: int) -> void:
 
 	_remove_connections_between_layers(from_layer_id, to_layer_id)
 
+	await get_tree().process_frame
+
 	for from_neuron_id in from_layer.get_child_count():
 		for to_neuron_id in to_layer.get_child_count():
 			var key: String = _make_connection_key(from_layer_id, from_neuron_id, to_layer_id, to_neuron_id)
@@ -59,7 +61,7 @@ func _add_connection(from_neuron: Neuron, to_neuron: Neuron, key: String) -> voi
 	var to_layer_id: int = to_neuron._layer_id
 	# And take the weight: access to the matrix of the to_layer, then to the column of to_neuron,
 	# and take the specific weight of the previous neuron
-	var weight: float = Variables.nn.nn_tmp_dict[to_layer_id][to_neuron._id][from_neuron_index] #* Constants.NN_CONECTION_SCALE
+	var weight: float = Variables.nn.nn_tmp_dict[to_layer_id][to_neuron._id][from_neuron_index]
 	#var weight: float = 3
 
 	var connection_color: Color = _get_connection_color(weight)
