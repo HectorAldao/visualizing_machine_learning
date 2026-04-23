@@ -23,3 +23,8 @@ text = "Siguiente paso"
 [node name="CompleteTrainButton" type="Button" parent="VBoxContainer" unique_id=1855667876]
 layout_mode = 2
 text = "Acabar entrenamiento"
+
+[node name="TestButton" type="Button" parent="VBoxContainer" unique_id=921408889]
+layout_mode = 2
+disabled = true
+text = "Evaluar red"

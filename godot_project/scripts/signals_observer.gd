@@ -51,5 +51,6 @@ signal train_nn_next_neuron
 signal train_nn_next_layer
 signal train_nn_next_step
 signal train_nn_complete
+signal test_nn_start
 
 @warning_ignore_restore("unused_signal")

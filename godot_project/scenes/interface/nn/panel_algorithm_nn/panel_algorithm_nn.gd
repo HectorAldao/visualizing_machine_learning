@@ -6,3 +6,4 @@ func _ready() -> void:
 	$VBoxContainer/NextLayerButton.pressed.connect(func(): SignalsObserver.train_nn_next_layer.emit())
 	$VBoxContainer/NextStepButton.pressed.connect(func(): SignalsObserver.train_nn_next_step.emit())
 	$VBoxContainer/CompleteTrainButton.pressed.connect(func(): SignalsObserver.train_nn_complete.emit())
+	$VBoxContainer/TestButton.pressed.connect(func(): SignalsObserver.test_nn_start.emit())
