@@ -7,22 +7,58 @@ extends Control
 var _connections: Dictionary = {}
 
 
+var _pending_updates: Array[int] = []
+var _is_update_queued: bool = false
+
+
 func _ready() -> void:
 	SignalsObserver.update_conections.connect(update_conections)
 	SignalsObserver.update_all_conections.connect(refresh_all_connections)
-	#refresh_all_connections()
 
 
 func update_conections(layer_id: int, _neuron_id: int) -> void:
+	if not _pending_updates.has(layer_id):
+		_pending_updates.append(layer_id)
+	_queue_update()
+
+
+func refresh_all_connections() -> void:
+	_pending_updates = [-2] # Special value to indicate full refresh
+	_queue_update()
+
+
+func _queue_update() -> void:
+	if _is_update_queued or not is_inside_tree():
+		return
+	_is_update_queued = true
+	_do_updates.call_deferred()
+
+
+func _do_updates() -> void:
+	_is_update_queued = false
+	if _pending_updates.has(-2):
+		_actual_refresh_all_connections()
+	else:
+		for layer_id in _pending_updates:
+			_actual_update_conections(layer_id)
+	_pending_updates.clear()
+
+
+func _actual_update_conections(layer_id: int) -> void:
 	var layer_position: int = _get_layer_position_from_id(layer_id)
 	if layer_position == -1:
-		refresh_all_connections()
+		_actual_refresh_all_connections()
 		return
 
 	_remove_non_adjacent_connections()
-
 	_refresh_pair_connections(layer_position - 1)
 	_refresh_pair_connections(layer_position)
+
+
+func _actual_refresh_all_connections() -> void:
+	_remove_non_adjacent_connections()
+	for pair_start_layer in _get_layer_count() - 1:
+		_refresh_pair_connections(pair_start_layer)
 
 
 func _refresh_pair_connections(pair_start_position: int) -> void:
@@ -39,9 +75,6 @@ func _refresh_pair_connections(pair_start_position: int) -> void:
 
 	_remove_connections_between_layers(from_layer_id, to_layer_id)
 
-	# Removed await to prevent race conditions and redundant connections
-	# The connection handles its own point updates in _process
-
 	for from_neuron_id in from_layer.get_child_count():
 		for to_neuron_id in to_layer.get_child_count():
 			var key: String = _make_connection_key(from_layer_id, from_neuron_id, to_layer_id, to_neuron_id)
@@ -50,22 +83,23 @@ func _refresh_pair_connections(pair_start_position: int) -> void:
 			_add_connection(from_neuron, to_neuron, key)
 
 
-func refresh_all_connections() -> void:
-	_remove_non_adjacent_connections()
-	for pair_start_layer in _get_layer_count() - 1:
-		_refresh_pair_connections(pair_start_layer)
-
-
 func _add_connection(from_neuron: Neuron, to_neuron: Neuron, key: String) -> void:
-
-	# To take the weight of of the conection
-	# First, the the index of the previous neuron in the weight array of the next neuron
 	var from_neuron_index: int = from_neuron._id
-	# Then the layer
 	var to_layer_id: int = to_neuron._layer_id
-	# And take the weight: access to the matrix of the to_layer, then to the column of to_neuron,
-	# and take the specific weight of the previous neuron
-	var weight: float = Variables.nn.nn_tmp_dict[to_layer_id][to_neuron._id][from_neuron_index]
+	
+	# Safety checks to prevent "Out of bounds" errors during rapid structural changes
+	if not Variables.nn.nn_tmp_dict.has(to_layer_id):
+		return
+		
+	var layer_matrix: Array = Variables.nn.nn_tmp_dict[to_layer_id]
+	if to_neuron._id < 0 or to_neuron._id >= layer_matrix.size():
+		return
+		
+	var neuron_weights: Array = layer_matrix[to_neuron._id]
+	if from_neuron_index < 0 or from_neuron_index >= neuron_weights.size():
+		return
+
+	var weight: float = neuron_weights[from_neuron_index]
 	#var weight: float = 3
 
 	var connection_color: Color = _get_connection_color(weight)
