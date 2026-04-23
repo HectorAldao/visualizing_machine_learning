@@ -13,9 +13,12 @@ func _ready() -> void:
 	#refresh_all_connections()
 
 
-func update_conections(layer_id: int, neuron_id: int) -> void:
-	var _unused_neuron_id := neuron_id
+func update_conections(layer_id: int, _neuron_id: int) -> void:
 	var layer_position: int = _get_layer_position_from_id(layer_id)
+	if layer_position == -1:
+		refresh_all_connections()
+		return
+
 	_remove_non_adjacent_connections()
 
 	_refresh_pair_connections(layer_position - 1)
@@ -36,7 +39,8 @@ func _refresh_pair_connections(pair_start_position: int) -> void:
 
 	_remove_connections_between_layers(from_layer_id, to_layer_id)
 
-	await get_tree().process_frame
+	# Removed await to prevent race conditions and redundant connections
+	# The connection handles its own point updates in _process
 
 	for from_neuron_id in from_layer.get_child_count():
 		for to_neuron_id in to_layer.get_child_count():
@@ -127,7 +131,9 @@ func _remove_non_adjacent_connections() -> void:
 
 		var from_position: int = _get_layer_position_from_id(ids[0])
 		var to_position: int = _get_layer_position_from_id(ids[2])
-		if to_position - from_position != 1:
+		
+		# If either layer is not found or they are not adjacent, remove the connection
+		if from_position == -1 or to_position == -1 or to_position - from_position != 1:
 			keys_to_remove.append(key)
 
 	for key in keys_to_remove:
@@ -162,7 +168,9 @@ func _get_layer_by_position(layer_position: int) -> Layer:
 
 
 func _get_layer_position_from_id(layer_id: int) -> int:
-	if layer_id == -1:
-		return _get_layer_count() - 1
+	for i in range(layers.get_child_count()):
+		var layer = layers.get_child(i)
+		if layer is Layer and layer._id == layer_id:
+			return i
 
-	return layer_id
+	return -1
