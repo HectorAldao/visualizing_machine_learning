@@ -19,3 +19,7 @@ text = "Siguiente capa"
 [node name="NextStepButton" type="Button" parent="VBoxContainer" unique_id=735567149]
 layout_mode = 2
 text = "Siguiente paso"
+
+[node name="CompleteTrainButton" type="Button" parent="VBoxContainer" unique_id=1855667876]
+layout_mode = 2
+text = "Acabar entrenamiento"

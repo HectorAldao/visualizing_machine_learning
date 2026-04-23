@@ -50,5 +50,6 @@ signal weight_updated(layer_idx, neuron_idx, weight_idx, new_value)
 signal train_nn_next_neuron
 signal train_nn_next_layer
 signal train_nn_next_step
+signal train_nn_complete
 
 @warning_ignore_restore("unused_signal")
