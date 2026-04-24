@@ -112,6 +112,8 @@ func _add_connection(from_neuron: Neuron, to_neuron: Neuron, key: String) -> voi
 		width = (weight + Constants.NN_CONECTION_BIAS) * Constants.NN_CONECTION_SCALE
 	else: 
 		width = (-weight + Constants.NN_CONECTION_BIAS) * Constants.NN_CONECTION_SCALE
+	
+	width = min(Constants.NN_MAX_WIDTH, width)
 
 	var connection: Conection = Conection.newone(from_neuron, to_neuron, width, connection_color)
 
