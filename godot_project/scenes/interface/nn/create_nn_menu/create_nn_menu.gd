@@ -8,6 +8,7 @@ var nn_restr_dict: Dictionary[int, int]
 
 var textedit_in: TextEdit
 var textedit_out: TextEdit
+var optionbutton_act_func_out: OptionButton
 
 
 # Called when the node enters the scene tree for the first time.
@@ -48,10 +49,10 @@ func _ready() -> void:
 
 					textedit_out = text_edit
 
-					var activation_option_button: OptionButton = c.get_node("VBoxContainer2").get_node("OptionButton")
-					activation_option_button.item_selected.connect(_on_output_activation_selected)
+					optionbutton_act_func_out = c.get_node("VBoxContainer2").get_node("OptionButton")
+					optionbutton_act_func_out.item_selected.connect(_on_output_activation_selected)
 					if Variables.nn.nn_func_tmp_dict.has(-1):
-						activation_option_button.select(Variables.nn.nn_func_tmp_dict[-1])
+						optionbutton_act_func_out.select(Variables.nn.nn_func_tmp_dict[-1])
 
 
 
@@ -232,6 +233,10 @@ func _on_restrictions_set(nn_restr: Dictionary[int, int]) -> void:
 	if nn_restr.has(-1):
 		textedit_out.text = str(nn_restr[-1])
 		textedit_out.text_changed.emit()
+	
+	if nn_restr.has(-2):
+		optionbutton_act_func_out.select(nn_restr[-2])
+		optionbutton_act_func_out.disabled = true
 
 	SignalsObserver.reload_nn.emit.call_deferred()
 

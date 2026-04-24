@@ -45,8 +45,10 @@ text = "Fn act"
 [node name="OptionButton" type="OptionButton" parent="VBoxContainer2" unique_id=1091060907]
 layout_mode = 2
 selected = 0
-item_count = 2
+item_count = 3
 popup/item_0/text = "relu"
 popup/item_0/id = 0
 popup/item_1/text = "sigm"
 popup/item_1/id = 1
+popup/item_2/text = "idnt"
+popup/item_2/id = 3

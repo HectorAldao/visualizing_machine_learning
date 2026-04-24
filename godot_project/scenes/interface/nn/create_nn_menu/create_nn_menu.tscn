@@ -88,13 +88,15 @@ text = "Función activación"
 [node name="OptionButton" type="OptionButton" parent="VBoxContainer/NeuronsOut/VBoxContainer2" unique_id=1614355264]
 layout_mode = 2
 selected = 0
-item_count = 3
+item_count = 4
 popup/item_0/text = "relu"
 popup/item_0/id = 0
 popup/item_1/text = "sigmoid"
 popup/item_1/id = 1
 popup/item_2/text = "softmax"
 popup/item_2/id = 2
+popup/item_3/text = "identity"
+popup/item_3/id = 3
 
 [node name="Layers" type="HBoxContainer" parent="VBoxContainer" unique_id=1979180071]
 layout_mode = 2

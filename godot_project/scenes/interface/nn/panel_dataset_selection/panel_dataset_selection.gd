@@ -23,7 +23,8 @@ const DICT_OF_DATASETS: Dictionary = {
 			{"health": 0.10, "stamina": 0.05, "distance": 0.80, "class": "curarse"},
 			{"health": 0.55, "stamina": 0.60, "distance": 0.65, "class": "acechar"}
 		],
-		["health", "stamina", "distance"]
+		["health", "stamina", "distance"],
+		[Constants.ACT_FUNCS.softmax]
 	],
 	"Cultivos": [
 		[
@@ -36,7 +37,8 @@ const DICT_OF_DATASETS: Dictionary = {
 			{"hydration": 0.10, "light": 0.85, "nutrients": 0.45, "temperature": 0.25, "target": 1.50},
 			{"hydration": 0.60, "light": 0.60, "nutrients": 0.80, "temperature": 0.70, "target": 10.20}
 		],
-		["hydration", "light", "nutrients", "temperature"]
+		["hydration", "light", "nutrients", "temperature"],
+		[Constants.ACT_FUNCS.identity]
 	]
 }
 
@@ -44,6 +46,7 @@ const DICT_OF_DATASETS: Dictionary = {
 var selected_option: String
 var datast_info: Array[Dictionary]
 var attrs_info: Array[String]
+var act_func_restriction: int
 var nn_restrictions: Dictionary[int, int]
 var target_column_name: String = ""
 var class_decoder_map: Dictionary = {}
@@ -84,6 +87,7 @@ func _on_dataset_selected():
 			# Save its info on the relevant variables
 			datast_info = safe_get_array_of_dicts(DICT_OF_DATASETS[selected_option][0])
 			attrs_info = safe_get_array_of_strings(DICT_OF_DATASETS[selected_option][1])
+			act_func_restriction = DICT_OF_DATASETS[selected_option][2][0]
 
 			# Extract its analysis to ensure the correct change of informative text
 			# and restrictions over the nn
@@ -95,7 +99,7 @@ func _on_dataset_selected():
 				return
 
 			# Set the stablished restrictions
-			nn_restrictions = {0: attrs_info.size(), -1: target_info["count"]}  # Restrictions for "in" and "out"
+			nn_restrictions = {0: attrs_info.size(), -1: target_info["count"], -2: act_func_restriction}  # Restrictions for "in" and "out"
 
 			informative_text.text = _build_dataset_summary_text(selected_option, attrs_info.size(), target_info)
 			informative_text.label_settings.font_color = color_good
@@ -191,6 +195,11 @@ func _parse_csv(file_path):
 		entrenar_button.disabled = true
 		return
 
+	if target_info.kind == "classification":
+		act_func_restriction = Constants.ACT_FUNCS.softmax
+	elif target_info.kind == "regression":
+		act_func_restriction = Constants.ACT_FUNCS.identity
+
 	# If there weren't an error,
 	# change the text
 	informative_text.text = _build_dataset_summary_text(file_path.get_file(), headers.size(), target_info)
@@ -198,7 +207,7 @@ func _parse_csv(file_path):
 	# and update the info
 	datast_info = data_array
 	attrs_info = headers
-	nn_restrictions = {0: headers.size(), -1: target_info["count"]}  # Restrictions for "in" and "out"
+	nn_restrictions = {0: headers.size(), -1: target_info["count"], -2: act_func_restriction}  # Restrictions for "in" and "out"
 	entrenar_button.disabled = false
 
 

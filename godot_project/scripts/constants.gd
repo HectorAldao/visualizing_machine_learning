@@ -39,6 +39,7 @@ const ACT_FUNCS: Dictionary[String, int] = {
 	"relu": 0,
 	"sigmoid": 1,
 	"softmax": 2,
+	"identity": 3,
 }
 
 const LOSS_FUNCS: Dictionary[String, int] = {
