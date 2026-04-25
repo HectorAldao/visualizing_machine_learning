@@ -174,3 +174,10 @@ func _update_label() -> void:
 func set_text(new_text: String) -> void:
 	text = new_text
 	queue_redraw()
+
+
+func set_line_style(new_line_width: float, new_line_color: Color) -> void:
+	line_width = new_line_width
+	line_color = new_line_color
+	width = new_line_width
+	default_color = new_line_color

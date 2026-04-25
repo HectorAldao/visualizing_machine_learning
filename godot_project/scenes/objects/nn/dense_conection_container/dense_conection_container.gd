@@ -14,6 +14,7 @@ var _is_update_queued: bool = false
 func _ready() -> void:
 	SignalsObserver.update_conections.connect(update_conections)
 	SignalsObserver.update_all_conections.connect(refresh_all_connections)
+	SignalsObserver.weight_updated.connect(update_connection_weight)
 
 
 func update_conections(layer_id: int, _neuron_id: int) -> void:
@@ -25,6 +26,25 @@ func update_conections(layer_id: int, _neuron_id: int) -> void:
 func refresh_all_connections() -> void:
 	_pending_updates = [-2] # Special value to indicate full refresh
 	_queue_update()
+
+
+func update_connection_weight(layer_idx: int, neuron_idx: int, weight_idx: int, new_value: float) -> void:
+	var to_layer_position: int = _get_layer_position_from_id(layer_idx)
+	if to_layer_position <= 0:
+		return
+
+	var from_layer: Layer = _get_layer_by_position(to_layer_position - 1)
+	var to_layer: Layer = _get_layer_by_position(to_layer_position)
+	if from_layer == null or to_layer == null:
+		return
+
+	var from_neuron: Neuron = _get_neuron(from_layer, weight_idx)
+	var to_neuron: Neuron = _get_neuron(to_layer, neuron_idx)
+	if from_neuron == null or to_neuron == null:
+		return
+
+	var key: String = _make_connection_key(from_layer._id, weight_idx, layer_idx, neuron_idx)
+	_update_connection_weight(from_neuron, to_neuron, key, new_value)
 
 
 func _queue_update() -> void:
@@ -83,57 +103,84 @@ func _refresh_pair_connections(pair_start_position: int) -> void:
 			_add_connection(from_neuron, to_neuron, key)
 
 
-func _add_connection(from_neuron: Neuron, to_neuron: Neuron, key: String) -> void:
+func _add_connection(from_neuron: Neuron, to_neuron: Neuron, key: String, weight_override: Variant = null) -> void:
 	var from_neuron_index: int = from_neuron._id
 	var to_layer_id: int = to_neuron._layer_id
 	
-	# Safety checks to prevent "Out of bounds" errors during rapid structural changes
-	if not Variables.nn.nn_tmp_dict.has(to_layer_id):
-		return
-		
-	var layer_matrix: Array = Variables.nn.nn_tmp_dict[to_layer_id]
-	if to_neuron._id < 0 or to_neuron._id >= layer_matrix.size():
-		return
-		
-	var neuron_weights: Array = layer_matrix[to_neuron._id]
-	if from_neuron_index < 0 or from_neuron_index >= neuron_weights.size():
-		return
-
-	var weight: float = neuron_weights[from_neuron_index]
-	#var weight: float = 3
+	var weight: float
+	if weight_override == null:
+		var found_weight: Variant = _get_connection_weight(to_layer_id, to_neuron._id, from_neuron_index)
+		if found_weight == null:
+			return
+		weight = found_weight
+	else:
+		weight = weight_override
 
 	var connection_color: Color = _get_connection_color(weight)
+	var connection_width: float = _get_connection_width(weight)
 
-	# If the value is too low, the conection is going to disapear,
-	# something that may not be desired.
-	# If NN_CONECTION_BIAS = 0, it will disapear
-	var width: float
-	if weight > 0:
-		width = (weight + Constants.NN_CONECTION_BIAS) * Constants.NN_CONECTION_SCALE
-	else: 
-		width = (-weight + Constants.NN_CONECTION_BIAS) * Constants.NN_CONECTION_SCALE
-	
-	width = min(Constants.NN_MAX_WIDTH, width)
-
-	var connection: Conection = Conection.newone(from_neuron, to_neuron, width, connection_color)
+	var connection: Conection = Conection.newone(from_neuron, to_neuron, connection_width, connection_color)
 
 	add_child(connection)
 	_connections[key] = connection
 
 
+func _update_connection_weight(from_neuron: Neuron, to_neuron: Neuron, key: String, weight: float) -> void:
+	if Constants.NN_REDRAW_CONECTIONS:
+		_redraw_connection(from_neuron, to_neuron, key, weight)
+		return
+
+	if not _connections.has(key) or not is_instance_valid(_connections[key]):
+		_add_connection(from_neuron, to_neuron, key, weight)
+		return
+
+	var conection: Conection = _connections[key]
+	conection.set_line_style(_get_connection_width(weight), _get_connection_color(weight))
+
+
+func _redraw_connection(from_neuron: Neuron, to_neuron: Neuron, key: String, weight: float) -> void:
+	_remove_connection(key)
+	_add_connection(from_neuron, to_neuron, key, weight)
+
+
+func _get_connection_weight(to_layer_id: int, to_neuron_id: int, from_neuron_index: int) -> Variant:
+	# Safety checks to prevent "Out of bounds" errors during rapid structural changes
+	if not Variables.nn.nn_tmp_dict.has(to_layer_id):
+		return null
+		
+	var layer_matrix: Array = Variables.nn.nn_tmp_dict[to_layer_id]
+	if to_neuron_id < 0 or to_neuron_id >= layer_matrix.size():
+		return null
+		
+	var neuron_weights: Array = layer_matrix[to_neuron_id]
+	if from_neuron_index < 0 or from_neuron_index >= neuron_weights.size():
+		return null
+
+	return float(neuron_weights[from_neuron_index])
+
+
+func _get_connection_width(weight: float) -> float:
+	# If the value is too low, the conection is going to disapear,
+	# something that may not be desired.
+	# If NN_CONECTION_BIAS = 0, it will disapear
+	var connection_width: float
+	if weight > 0:
+		connection_width = (weight + Constants.NN_CONECTION_BIAS) * Constants.NN_CONECTION_SCALE
+	else: 
+		connection_width = (-weight + Constants.NN_CONECTION_BIAS) * Constants.NN_CONECTION_SCALE
+	
+	return min(Constants.NN_MAX_WIDTH, connection_width)
+
+
 func _get_connection_color(weight: float) -> Color:
 	if weight == 0:
 		return Color.BLACK
-	elif weight > 0:
-		if weight <= 1:
-			return Color.CYAN
-		else:
-			return Color.GREEN
-	else:  # weight < 0
-		if weight >= -1:
-			return Color.YELLOW
-		else:
-			return Color.RED
+
+	var intensity: float = clamp(abs(weight), 0.0, 1.0)
+	if weight > 0:
+		return Color.CYAN.lerp(Color.GREEN, intensity)
+
+	return Color.YELLOW.lerp(Color.RED, intensity)
 
 
 func _remove_connection(key: String) -> void:
@@ -201,6 +248,12 @@ func _get_layer_by_position(layer_position: int) -> Layer:
 	if layer_position < 0 or layer_position >= _get_layer_count():
 		return null
 	return layers.get_child(layer_position) as Layer
+
+
+func _get_neuron(layer: Layer, neuron_id: int) -> Neuron:
+	if neuron_id < 0 or neuron_id >= layer.get_child_count():
+		return null
+	return layer.get_child(neuron_id) as Neuron
 
 
 func _get_layer_position_from_id(layer_id: int) -> int:

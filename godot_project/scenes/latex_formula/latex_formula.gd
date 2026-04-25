@@ -6,12 +6,14 @@ var resolution_scale: float = 10.0  # Cambiado a float para el cargador SVG
 
 @onready var _http: HTTPRequest = $HTTPRequest
 
+
 static func newone(latex_text: String, color: Color = Color.WHITE) -> LatexFormula:
 	# Asegúrate de que la ruta en Constants sea correcta
 	var new_latexformula: LatexFormula = preload(Constants.SCENES.latex_formula).instantiate()
 	new_latexformula.formula = latex_text
 	new_latexformula.text_color = color
 	return new_latexformula
+
 
 func _ready() -> void:
 	# Conexión segura
@@ -20,6 +22,7 @@ func _ready() -> void:
 	
 	if not formula.is_empty():
 		request_formula(formula)
+
 
 func request_formula(latex_string: String) -> void:
 	formula = latex_string
@@ -35,6 +38,14 @@ func request_formula(latex_string: String) -> void:
 	var error = _http.request(url)
 	if error != OK:
 		push_error("LatexFormula: Error al iniciar petición HTTP.")
+
+
+func reset_sprite() -> void:
+	formula = ""
+	texture = null
+	centered = true
+	offset = Vector2.ZERO
+
 
 func _on_request_completed(_result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
 	if response_code != 200:

@@ -1,10 +1,15 @@
 class_name NeuralNetworkLogial extends RefCounted
 
-var nn_dict: Dictionary[int, Array] = {0: [[1]], -1: [[0.5]]}
+var nn_dict: Dictionary[int, Array] = {0: [[1]], -1: [[0.0]]}
 var nn_func_dict: Dictionary[int, int] = {-1: Constants.ACT_FUNCS.softmax}
 # The tmp_dicts are used to save the state of the create_nn_menu
-var nn_tmp_dict: Dictionary[int, Array] = {0: [[1]], -1: [[0.5]]}
+var nn_tmp_dict: Dictionary[int, Array] = {0: [[1]], -1: [[0.0]]}
 var nn_func_tmp_dict: Dictionary[int, int] = {-1: Constants.ACT_FUNCS.softmax}
+
+
+func _init() -> void:
+	nn_tmp_dict[-1][0][0] = _random_connection_weight()
+	nn_dict = nn_tmp_dict.duplicate(true)
 
 
 ## Constructor of the class
@@ -24,6 +29,7 @@ func set_layer_activation_tmp(layer_id: int, activation_func_id: int) -> void:
 
 ## True copy (deep copy) of the tmp dictionary into the definitive one
 func apply_tmp_to_main() -> void:
+	_force_input_layer_weights_to_one(nn_tmp_dict)
 	nn_dict = nn_tmp_dict.duplicate(true)
 	nn_func_dict = nn_func_tmp_dict.duplicate(true)
 
@@ -38,6 +44,8 @@ func set_layer_neuron_count_tmp(layer_id: int, target_neurons: int) -> void:
 	var previous_layer_neurons: int = _get_previous_layer_neuron_count(layer_id)
 	# And use the info to create the matrix of weights
 	nn_tmp_dict[layer_id] = _resize_layer_matrix(nn_tmp_dict.get(layer_id, []), target_neurons, previous_layer_neurons)
+	if layer_id == 0:
+		_force_input_layer_weights_to_one(nn_tmp_dict)
 
 	# Because of this change in the amount of neurons, the next layer must
 	# change its weights too
@@ -149,8 +157,31 @@ func _resize_layer_matrix(current_matrix: Array, target_rows: int, target_column
 			if col_idx < source_row.size():
 				new_row[col_idx] = source_row[col_idx]
 			else:
-				new_row[col_idx] = Constants.NN_FILL_VALUE
+				new_row[col_idx] = _random_connection_weight()
 
 		resized_matrix[row_idx] = new_row
 
 	return resized_matrix
+
+
+func _random_connection_weight() -> float:
+	return Constants.NN_CONNECTION_RANDOM_MULT * randfn(0.0, sqrt(Constants.NN_CONNECTION_VARIANCE))
+
+
+func _force_input_layer_weights_to_one(target_dict: Dictionary[int, Array]) -> void:
+	if not target_dict.has(0):
+		return
+
+	var input_layer_matrix: Array = target_dict[0]
+	for row_idx in range(input_layer_matrix.size()):
+		if not (input_layer_matrix[row_idx] is Array):
+			input_layer_matrix[row_idx] = [1.0]
+			continue
+
+		var neuron_weights: Array = input_layer_matrix[row_idx]
+		if neuron_weights.is_empty():
+			neuron_weights.append(1.0)
+			continue
+
+		for weight_idx in range(neuron_weights.size()):
+			neuron_weights[weight_idx] = 1.0

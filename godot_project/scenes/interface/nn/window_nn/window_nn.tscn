@@ -22,10 +22,14 @@ size_flags_horizontal = 3
 
 [node name="Label0" type="Label" parent="ScrollContainer/VBoxContainer" unique_id=775268905]
 layout_mode = 2
-text = "La formula de la salida de la red es:"
 autowrap_mode = 3
 
 [node name="Control" type="Control" parent="ScrollContainer/VBoxContainer" unique_id=340299460]
 layout_mode = 2
 
 [node name="LatexFormula" parent="ScrollContainer/VBoxContainer/Control" unique_id=42571569 instance=ExtResource("2_f5hif")]
+formula = ""
+
+[node name="Label1" type="Label" parent="ScrollContainer/VBoxContainer" unique_id=904132594]
+layout_mode = 2
+autowrap_mode = 3

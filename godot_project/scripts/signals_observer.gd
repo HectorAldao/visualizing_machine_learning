@@ -50,8 +50,8 @@ signal backward_step_completed(layer_idx, neuron_idx, delta_value)
 signal weight_updated(layer_idx, neuron_idx, weight_idx, new_value)
 
 # panel algorithm nn
-signal train_nn_next_neuron
-signal train_nn_next_layer
+signal train_nn_next_neuron(neuron_id: int, layer_id: int)
+signal train_nn_next_layer(layer_id: int)
 signal train_nn_next_step
 signal train_nn_complete
 signal test_nn_start

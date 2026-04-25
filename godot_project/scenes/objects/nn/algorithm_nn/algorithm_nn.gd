@@ -22,6 +22,7 @@ var _current_layer_cursor: int = 0
 var _current_neuron_cursor: int = 0
 var _current_input_data: Array = []
 var _current_target_data: Array = []
+var _backprop_weights_snapshot: Dictionary = {}
 
 var _cached_phase: String = ""
 var _cached_layer_idx: int = 0
@@ -80,11 +81,11 @@ func configure_training(
 	_prepare_current_sample()
 
 
-func train_next_neuron() -> void:
+func train_next_neuron(_neuron_id: int = -1, _layer_id: int = -9999) -> void:
 	_advance_one_neuron()
 
 
-func train_next_layer() -> void:
+func train_next_layer(_layer_id: int = -9999) -> void:
 	if _is_training_finished():
 		return
 
@@ -165,13 +166,15 @@ func perform_backward_propagation(
 	loss_type: int = Constants.LOSS_FUNCS.mse
 ) -> void:
 	var deltas: Dictionary = {}
-	var layer_indices: Array[int] = _get_sorted_layer_indices(weights.keys())
-	layer_indices.reverse()
+	var forward_layer_indices: Array[int] = _get_sorted_layer_indices(weights.keys())
+	var backward_layer_indices: Array[int] = forward_layer_indices.duplicate()
+	backward_layer_indices.reverse()
+	var weights_snapshot: Dictionary = weights.duplicate(true)
 
-	for l_idx in layer_indices:
-		var next_layer_idx: int = _get_next_layer_index(l_idx, layer_indices)
+	for l_idx in backward_layer_indices:
+		var next_layer_idx: int = _get_next_layer_index(l_idx, forward_layer_indices)
 		var next_deltas: Array[float] = deltas.get(next_layer_idx, [])
-		var next_weights: Array = weights.get(next_layer_idx, [])
+		var next_weights: Array = weights_snapshot.get(next_layer_idx, [])
 
 		var current_layer_deltas: Array[float] = compute_layer_deltas(
 			l_idx,
@@ -185,9 +188,8 @@ func perform_backward_propagation(
 		)
 
 		deltas[l_idx] = current_layer_deltas
-
 		var prev_layer_idx = _get_previous_layer_index(l_idx, weights.keys())
-		update_layer_weights(weights[l_idx], deltas[l_idx], layer_outputs[prev_layer_idx], lr, l_idx)
+		update_layer_weights(weights[l_idx], current_layer_deltas, layer_outputs[prev_layer_idx], lr, l_idx)
 
 
 ## Calculates deltas for both output and hidden layers.
@@ -278,8 +280,6 @@ func _advance_one_neuron() -> bool:
 			return _advance_forward_neuron()
 		"backward":
 			return _advance_backward_neuron()
-		"update":
-			return _advance_update_neuron()
 		_:
 			return false
 
@@ -306,6 +306,7 @@ func _advance_forward_neuron() -> bool:
 		if _current_layer_cursor >= _sorted_layer_indices.size():
 			_current_phase = "backward"
 			_current_layer_cursor = 0
+			_backprop_weights_snapshot = _weights.duplicate(true)
 
 	return true
 
@@ -319,43 +320,14 @@ func _advance_backward_neuron() -> bool:
 
 	var delta: float = _cached_deltas[_current_neuron_cursor]
 	SignalsObserver.backward_step_completed.emit(layer_idx, _current_neuron_cursor, delta)
+	_store_current_delta(layer_idx, _current_neuron_cursor, delta)
+	_update_neuron_weights(layer_idx, _current_neuron_cursor, delta)
 
 	_current_neuron_cursor += 1
 	if _current_neuron_cursor >= _cached_deltas.size():
-		layer_deltas[layer_idx] = _cached_deltas.duplicate(true)
 		_current_layer_cursor += 1
 		_current_neuron_cursor = 0
 		_clear_layer_cache()
-
-		if _current_layer_cursor >= _reversed_layer_indices.size():
-			_current_phase = "update"
-			_current_layer_cursor = 0
-
-	return true
-
-
-func _advance_update_neuron() -> bool:
-	var layer_idx: int = _get_current_layer_idx()
-	if layer_idx == -9999:
-		return false
-
-	var previous_layer_idx: int = _get_previous_layer_index(layer_idx, _weights.keys())
-	var prev_outputs: Array = layer_outputs.get(previous_layer_idx, [])
-	var layer_weights: Array = _weights.get(layer_idx, [])
-	var neuron_weights: Array = layer_weights[_current_neuron_cursor]
-	var neuron_delta: float = layer_deltas[layer_idx][_current_neuron_cursor]
-
-	for weight_idx in range(neuron_weights.size()):
-		var gradient: float = neuron_delta * prev_outputs[weight_idx]
-		neuron_weights[weight_idx] -= _learning_rate * gradient
-		SignalsObserver.weight_updated.emit(layer_idx, _current_neuron_cursor, weight_idx, neuron_weights[weight_idx])
-
-	SignalsObserver.update_all_conections.emit()
-
-	_current_neuron_cursor += 1
-	if _current_neuron_cursor >= layer_weights.size():
-		_current_layer_cursor += 1
-		_current_neuron_cursor = 0
 
 		if _current_layer_cursor >= _reversed_layer_indices.size():
 			_finish_current_sample()
@@ -445,7 +417,7 @@ func _prepare_backward_cache(layer_idx: int) -> void:
 
 	var next_layer_idx: int = _get_next_layer_index(layer_idx, _sorted_layer_indices)
 	var next_deltas: Array = layer_deltas.get(next_layer_idx, [])
-	var next_weights: Array = _weights.get(next_layer_idx, [])
+	var next_weights: Array = _backprop_weights_snapshot.get(next_layer_idx, [])
 	var deltas: Array = compute_layer_deltas(
 		layer_idx,
 		_current_target_data,
@@ -465,6 +437,36 @@ func _prepare_backward_cache(layer_idx: int) -> void:
 	_cached_deltas = deltas
 
 
+func _store_current_delta(layer_idx: int, neuron_idx: int, delta: float) -> void:
+	if not layer_deltas.has(layer_idx):
+		var deltas: Array = []
+		deltas.resize(_cached_deltas.size())
+		deltas.fill(0.0)
+		layer_deltas[layer_idx] = deltas
+
+	layer_deltas[layer_idx][neuron_idx] = delta
+
+
+func _update_neuron_weights(layer_idx: int, neuron_idx: int, neuron_delta: float) -> void:
+	var previous_layer_idx: int = _get_previous_layer_index(layer_idx, _weights.keys())
+	var prev_outputs: Array = layer_outputs.get(previous_layer_idx, [])
+	var layer_weights: Array = _weights.get(layer_idx, [])
+	if neuron_idx < 0 or neuron_idx >= layer_weights.size():
+		return
+
+	var neuron_weights: Array = layer_weights[neuron_idx]
+	for weight_idx in range(neuron_weights.size()):
+		if weight_idx >= prev_outputs.size():
+			break
+
+		var gradient: float = neuron_delta * prev_outputs[weight_idx]
+		neuron_weights[weight_idx] -= _learning_rate * gradient
+		SignalsObserver.weight_updated.emit(layer_idx, neuron_idx, weight_idx, neuron_weights[weight_idx])
+
+	Variables.nn.nn_tmp_dict = _weights
+	Variables.nn.nn_dict = _weights.duplicate(true)
+
+
 func _clear_layer_cache() -> void:
 	_cached_phase = ""
 	_cached_layer_idx = 0
@@ -477,6 +479,7 @@ func _reset_runtime_state() -> void:
 	layer_outputs.clear()
 	layer_weighted_sums.clear()
 	layer_deltas.clear()
+	_backprop_weights_snapshot.clear()
 	_current_layer_cursor = 0
 	_current_neuron_cursor = 0
 	_current_input_data = []
@@ -498,7 +501,7 @@ func _get_current_layer_idx() -> int:
 		"forward":
 			if _current_layer_cursor >= 0 and _current_layer_cursor < _sorted_layer_indices.size():
 				return _sorted_layer_indices[_current_layer_cursor]
-		"backward", "update":
+		"backward":
 			if _current_layer_cursor >= 0 and _current_layer_cursor < _reversed_layer_indices.size():
 				return _reversed_layer_indices[_current_layer_cursor]
 	return -9999

@@ -51,7 +51,12 @@ const LOSS_FUNCS: Dictionary[String, int] = {
 	"coss_entr": 1,
 }
 
-const NN_FILL_VALUE: float = 0.5
-const NN_CONECTION_SCALE: float = 2
+const NN_REDRAW_CONECTIONS: bool = false
+
+const NN_CONNECTION_RANDOM_MULT: float = 0.1
+const NN_CONNECTION_VARIANCE: float = 0.5
+const NN_CONECTION_SCALE: float = 20
 const NN_CONECTION_BIAS: float = 0
 const NN_MAX_WIDTH: float = 5
+
+const NEURON_EVALUATED_SCALE: Vector2 = Vector2(1.25, 1.25)
