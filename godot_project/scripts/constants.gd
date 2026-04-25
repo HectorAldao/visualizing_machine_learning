@@ -18,6 +18,10 @@ const SCENES: Dictionary[String, String] = {
 	"layer": "uid://bs14tnn0hedwc",
 	"neuron": "uid://re6neyyt2frx",
 	"neuronsinlayer": "uid://e7nvan78e0pf",
+
+	"popupinfo": "uid://ccqd5qw3k7i4y",
+
+	"latex_formula": "uid://c0p8glq0rsesw",
 	}
 
 const THEMES: Dictionary[String, String] = {

@@ -33,6 +33,9 @@ signal nn_inform_size(nn_position: Vector2)
 signal add_neuron(layer_id: int)
 signal remove_neuron(layer_id: int)
 
+# neuron
+signal info_neuron(neuron_id: int, layer_id: int)
+
 # dense
 signal update_conections(layer_id: int, num_of_neurons: int)
 signal update_all_conections
@@ -52,5 +55,7 @@ signal train_nn_next_layer
 signal train_nn_next_step
 signal train_nn_complete
 signal test_nn_start
+
+# window_nn
 
 @warning_ignore_restore("unused_signal")

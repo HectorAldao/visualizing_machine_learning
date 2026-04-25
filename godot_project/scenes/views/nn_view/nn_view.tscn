@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://dy4hc0eciyisw" path="res://scenes/objects/nn/nn/neural_network.tscn" id="3_1dbvi"]
 [ext_resource type="PackedScene" uid="uid://t7yhp2dspky0" path="res://scenes/interface/nn/panel_algorithm_nn/panel_algorithm_nn.tscn" id="4_x56ox"]
 [ext_resource type="PackedScene" uid="uid://b53esskdnv1b2" path="res://scenes/interface/nn/panel_dataset_selection/panel_dataset_selection.tscn" id="5_u7vn5"]
+[ext_resource type="PackedScene" uid="uid://c5d88cv8owt2d" path="res://scenes/interface/nn/window_nn/window_nn.tscn" id="6_d8qv5"]
 
 [node name="NnView" type="Control" unique_id=318267333]
 layout_mode = 3
@@ -59,3 +60,7 @@ offset_right = -9.999878
 offset_bottom = 212.5
 grow_horizontal = 0
 grow_vertical = 2
+
+[node name="WindowNn" parent="." unique_id=789302501 instance=ExtResource("6_d8qv5")]
+position = Vector2i(905, 253)
+visible = false

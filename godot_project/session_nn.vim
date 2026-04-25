@@ -31,7 +31,7 @@ badd +73 scenes/objects/dtree/dtree.gd
 badd +1 scenes/objects/dtree/algorithm_dtree/algorithm_dtree.tscn
 badd +73 scenes/objects/dtree/conection/conection.gd
 badd +7 scenes/objects/dtree/conection_container/conection_container.gd
-badd +35 scripts/constants.gd
+badd +53 scripts/constants.gd
 badd +1 scenes/interface/window/window.gd
 badd +66 scenes/objects/dtree/eval_data_container/eval_data_container.gd
 badd +1 scenes/interface/panel_dataset_selection/panel_dataset_selection.gd
@@ -40,8 +40,8 @@ badd +9 scenes/objects/dtree/eval_data/eval_data.gd
 badd +18 scenes/objects/dtree/algorithm_dtree/dnode_logical/dnode_logical.gd
 badd +1 scenes/objects/dtree/eval_data_container/eval_data_container.gd.uid
 badd +117 scenes/views/nn_view/nn_view.gd
-badd +48 scenes/interface/nn/create_nn_menu/create_nn_menu.gd
-badd +117 scenes/objects/nn/dense_conection_container/dense_conection_container.gd
+badd +239 scenes/interface/nn/create_nn_menu/create_nn_menu.gd
+badd +116 scenes/objects/nn/dense_conection_container/dense_conection_container.gd
 badd +1 scenes/objects/nn/nn/neural_network.gd
 badd +21 scenes/objects/nn/layer/layer.gd
 badd +1 res://scenes/interface/nn/create_nn_menu/create_nn_menu.gd
@@ -54,8 +54,9 @@ badd +15 scenes/charts/function_plot/function_plot.gd
 badd +60 scenes/objects/nn/nn/neural_network_logical.gd
 badd +1 scenes/interface/nn/neurons_in_layer_submenu/neurons_in_layer.gd
 badd +9 scenes/interface/nn/panel_algorithm_nn/panel_algorithm_nn.gd
-badd +1 scenes/interface/nn/panel_dataset_selection/panel_dataset_selection.gd
+badd +210 scenes/interface/nn/panel_dataset_selection/panel_dataset_selection.gd
 badd +1 scenes/objects/nn/algorithm_nn/algorithm_nn.gd
+badd +0 ~/eu/tfg/godot_project
 argglobal
 %argdel
 $argadd ~/eu/tfg/godot_project
@@ -87,12 +88,12 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 30 - ((29 * winheight(0) + 25) / 50)
+let s:l = 53 - ((49 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 30
-normal! 031|
+keepjumps 53
+normal! 029|
 lcd ~/eu/tfg/godot_project
 tabnext
 edit ~/eu/tfg/godot_project/scripts/signals_observer.gd
@@ -108,12 +109,12 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 54 - ((48 * winheight(0) + 25) / 50)
+let s:l = 25 - ((19 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 54
-normal! 020|
+keepjumps 25
+normal! 08|
 lcd ~/eu/tfg/godot_project
 tabnext
 edit ~/eu/tfg/godot_project/scripts/variables.gd
@@ -171,12 +172,12 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 164 - ((49 * winheight(0) + 25) / 50)
+let s:l = 168 - ((24 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 164
-normal! 08|
+keepjumps 168
+normal! 021|
 lcd ~/eu/tfg/godot_project
 tabnext
 edit ~/eu/tfg/godot_project/scenes/interface/nn/create_nn_menu/create_nn_menu.gd
@@ -192,12 +193,12 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 113 - ((47 * winheight(0) + 25) / 50)
+let s:l = 239 - ((17 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 113
-normal! 035|
+keepjumps 239
+normal! 049|
 lcd ~/eu/tfg/godot_project
 tabnext
 edit ~/eu/tfg/godot_project/scenes/interface/nn/neurons_in_layer_submenu/neurons_in_layer.gd
@@ -297,12 +298,12 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 145 - ((26 * winheight(0) + 25) / 50)
+let s:l = 116 - ((26 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 145
-normal! 0
+keepjumps 116
+normal! 045|
 lcd ~/eu/tfg/godot_project
 tabnext
 edit ~/eu/tfg/godot_project/scenes/objects/nn/algorithm_nn/algorithm_nn.gd
@@ -318,12 +319,12 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 1 - ((0 * winheight(0) + 25) / 50)
+let s:l = 317 - ((48 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 1
-normal! 017|
+keepjumps 317
+normal! 0
 lcd ~/eu/tfg/godot_project
 tabnext
 edit ~/eu/tfg/godot_project/scenes/objects/nn/nn/neural_network_logical.gd
@@ -360,14 +361,14 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 63 - ((24 * winheight(0) + 25) / 50)
+let s:l = 211 - ((35 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 63
-normal! 021|
+keepjumps 211
+normal! 022|
 lcd ~/eu/tfg/godot_project
-tabnext 12
+tabnext 11
 set stal=1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
