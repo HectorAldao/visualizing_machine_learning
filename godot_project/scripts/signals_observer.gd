@@ -58,4 +58,7 @@ signal test_nn_start
 
 # window_nn
 
+# panel training nn
+signal save_nn
+
 @warning_ignore_restore("unused_signal")

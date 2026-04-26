@@ -4,6 +4,7 @@ extends Control
 @onready var panel_algorithm_nn: PanelContainer = $PanelAlgorithmNn
 @onready var create_nn_menu: PanelContainer = $CreateNnMenu
 @onready var dataset_selecion_menu: PanelContainer = $PanelDatasetSelection
+@onready var panel_trainin_nn: PanelContainer = $PanelTrainingNn
 @onready var window_nn: WindowNn = $WindowNn
 
 var state: String = "create_nn"  # Other values: train_nn, evaluate_nn
@@ -36,6 +37,7 @@ func _ready() -> void:
 	create_nn_menu.visible = true
 	dataset_selecion_menu.visible = true
 	panel_algorithm_nn.visible = false
+	panel_trainin_nn.visible = false
 	window_nn.visible = false
 
 	_center_nn()
@@ -127,6 +129,7 @@ func _on_train_nn() -> void:
 	create_nn_menu.visible = false
 	panel_algorithm_nn.visible = true
 	window_nn.visible = true
+	panel_trainin_nn.visible = true
 	_configure_algorithm_training()
 
 
