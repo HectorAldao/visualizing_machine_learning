@@ -139,7 +139,7 @@ func _update_connection_weight(from_neuron: Neuron, to_neuron: Neuron, key: Stri
 
 
 func _redraw_connection(from_neuron: Neuron, to_neuron: Neuron, key: String, weight: float) -> void:
-	_remove_connection(key)
+	_remove_connection(key, true)
 	_add_connection(from_neuron, to_neuron, key, weight)
 
 
@@ -183,13 +183,16 @@ func _get_connection_color(weight: float) -> Color:
 	return Color.YELLOW.lerp(Color.RED, intensity)
 
 
-func _remove_connection(key: String) -> void:
+func _remove_connection(key: String, animated: bool = false) -> void:
 	if not _connections.has(key):
 		return
 
 	var conection: Conection = _connections[key]
 	if is_instance_valid(conection):
-		conection.queue_free()
+		if animated:
+			conection.destroy_animated()
+		else:
+			conection.queue_free()
 	_connections.erase(key)
 
 

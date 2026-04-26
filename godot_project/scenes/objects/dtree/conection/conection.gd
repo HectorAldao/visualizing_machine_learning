@@ -15,6 +15,7 @@ var _label: Label
 
 var _anim_progress : float = 0.0
 var _animating : bool = false
+var _animation_tween: Tween
 
 func _ready() -> void:
 	_label = Label.new()
@@ -29,20 +30,7 @@ func _ready() -> void:
 		points = _calc_points(1.0)
 		return
 
-	# --- animación inicial ---
-	_animating = true
-	_label.modulate.a = 0.0
-	points = _calc_points(0.0)
-
-	var tween = create_tween()
-	tween.tween_property(self, "_anim_progress", 1.0, 0.5)\
-		 .set_trans(Tween.TRANS_LINEAR)\
-		 .set_ease(Tween.EASE_IN_OUT)\
-		 .connect("finished", Callable(self, "_on_anim_finished"))
-	tween.parallel().tween_property(_label, "modulate:a", 1.0, 0.5)\
-		 .set_trans(Tween.TRANS_LINEAR)\
-		 .set_ease(Tween.EASE_IN_OUT)
-	tween.tween_callback(Callable(self, "_update_from_progress"))
+	play_draw_animation()
 
 
 static func newone(new_from_node: Control, new_to_node: Control, new_line_width: float = 2.0, new_line_color: Color = Color.BLACK, new_text: String = "", new_font: Font = ThemeDB.fallback_font, new_font_size: int = 16, new_font_color: Color = Color.WHITE, new_text_margin: float = 10.0) -> Conection:
@@ -131,10 +119,48 @@ func _update_from_progress() -> void:
 	_update_label()
 
 
-func _on_anim_finished() -> void:
+func play_draw_animation(duration: float = 0.5) -> void:
+	_anim_progress = 0.0
+	if _label:
+		_label.modulate.a = 0.0
+	_play_progress_animation(1.0, 1.0, duration, Callable(self, "_on_draw_anim_finished"))
+
+
+func destroy_animated(duration: float = 0.5) -> void:
+	_play_progress_animation(0.0, 0.0, duration, Callable(self, "_on_destroy_anim_finished"))
+
+
+func _play_progress_animation(target_progress: float, target_alpha: float, duration: float, finished_callback: Callable) -> void:
+	if _animation_tween and _animation_tween.is_valid():
+		_animation_tween.kill()
+
+	_animating = true
+	points = _calc_points(_anim_progress)
+
+	_animation_tween = create_tween()
+	_animation_tween.tween_property(self, "_anim_progress", target_progress, duration)\
+		.set_trans(Tween.TRANS_LINEAR)\
+		.set_ease(Tween.EASE_IN_OUT)
+	_animation_tween.parallel().tween_property(_label, "modulate:a", target_alpha, duration)\
+		.set_trans(Tween.TRANS_LINEAR)\
+		.set_ease(Tween.EASE_IN_OUT)
+	_animation_tween.tween_callback(Callable(self, "_update_from_progress"))
+	_animation_tween.finished.connect(finished_callback)
+
+
+func _on_draw_anim_finished() -> void:
 	_animating = false
+	_animation_tween = null
 	points = _calc_points(1.0)
 	_update_label()
+
+
+func _on_destroy_anim_finished() -> void:
+	_animating = false
+	_animation_tween = null
+	_anim_progress = 0.0
+	points = _calc_points(0.0)
+	queue_free()
 
 
 func _update_label() -> void:

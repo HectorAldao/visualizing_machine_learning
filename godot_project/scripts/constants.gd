@@ -51,7 +51,7 @@ const LOSS_FUNCS: Dictionary[String, int] = {
 	"coss_entr": 1,
 }
 
-const NN_REDRAW_CONECTIONS: bool = false
+const NN_REDRAW_CONECTIONS: bool = true
 
 const NN_CONNECTION_RANDOM_MULT: float = 0.1
 const NN_CONNECTION_VARIANCE: float = 0.5
