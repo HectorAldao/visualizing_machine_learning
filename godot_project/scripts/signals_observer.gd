@@ -61,4 +61,8 @@ signal test_nn_start
 # panel training nn
 signal save_nn
 
+# panel export format
+signal export_onnx
+signal export_nnef
+
 @warning_ignore_restore("unused_signal")

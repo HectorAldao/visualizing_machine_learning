@@ -5,6 +5,7 @@ extends Control
 @onready var create_nn_menu: PanelContainer = $CreateNnMenu
 @onready var dataset_selecion_menu: PanelContainer = $PanelDatasetSelection
 @onready var panel_trainin_nn: PanelContainer = $PanelTrainingNn
+@onready var panel_export_format: PanelContainer = $PanelExportFormat
 @onready var window_nn: WindowNn = $WindowNn
 
 var state: String = "create_nn"  # Other values: train_nn, evaluate_nn
@@ -34,10 +35,14 @@ func _ready() -> void:
 	# Dataset selection info
 	SignalsObserver.dataset_selected_nn.connect(_on_dataset_selected)
 	
+	# Save nn pressed
+	SignalsObserver.save_nn.connect(_on_save_nn_pressed)
+	
 	create_nn_menu.visible = true
 	dataset_selecion_menu.visible = true
 	panel_algorithm_nn.visible = false
 	panel_trainin_nn.visible = false
+	panel_export_format.visible = false
 	window_nn.visible = false
 
 	_center_nn()
@@ -208,3 +213,6 @@ func _find_target_attribute(data: Array[Dictionary], attrs: Array[String]) -> St
 			return str(key)
 
 	return ""
+
+func _on_save_nn_pressed() -> void:
+	panel_export_format.visible = not panel_export_format.visible

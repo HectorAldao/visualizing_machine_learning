@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://b53esskdnv1b2" path="res://scenes/interface/nn/panel_dataset_selection/panel_dataset_selection.tscn" id="5_u7vn5"]
 [ext_resource type="PackedScene" uid="uid://bciy4mexxcgpl" path="res://scenes/interface/nn/panel_training_nn/panel_training_nn.tscn" id="6_63jeq"]
 [ext_resource type="PackedScene" uid="uid://c5d88cv8owt2d" path="res://scenes/interface/nn/window_nn/window_nn.tscn" id="6_d8qv5"]
+[ext_resource type="PackedScene" uid="uid://ph5tvag4oa6d" path="res://scenes/interface/nn/panel_export_format/panel_export_format.tscn" id="7_qsqlw"]
 
 [node name="NnView" type="Control" unique_id=318267333]
 layout_mode = 3
@@ -71,6 +72,21 @@ anchor_right = 1.0
 offset_left = -159.0
 offset_bottom = 46.0
 grow_horizontal = 0
+
+[node name="PanelExportFormat" parent="." unique_id=2111158799 instance=ExtResource("7_qsqlw")]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -44.5
+offset_top = -48.0
+offset_right = 44.5
+offset_bottom = 48.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="WindowNn" parent="." unique_id=789302501 instance=ExtResource("6_d8qv5")]
 position = Vector2i(905, 253)
