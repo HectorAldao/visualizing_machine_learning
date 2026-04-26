@@ -50,16 +50,17 @@ var act_func_restriction: int
 var nn_restrictions: Dictionary[int, int]
 var target_column_name: String = ""
 var class_decoder_map: Dictionary = {}
+var _web_csv_callback: Variant
 
 
 func _ready() -> void:
-	
+
 	entrenar_button.disabled = true
 	entrenar_button.pressed.connect(_on_entrenar_button_pressed)
-	
+
 	for button: Button in hboxcontainer.get_children():
 		button.pressed.connect(_on_button_pressed.bind(button.text))
-	
+
 	SignalsObserver.train_nn.connect(_on_nn_train_started)
 
 func _on_entrenar_button_pressed():
@@ -110,38 +111,111 @@ func _on_dataset_selected():
 ## and returns and array with each entity
 ## on the csv as a dictionary.
 func _load_csv():
+	if OS.has_feature("web") and Engine.has_singleton("JavaScriptBridge"):
+		_load_csv_from_browser()
+		return
+
 	var file_dialog = FileDialog.new()
-	
+
 	# Config to access to the file system
 	file_dialog.access = FileDialog.ACCESS_FILESYSTEM
 	file_dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILE
 	file_dialog.filters = PackedStringArray(["*.csv ; CSV Files"])
-	
+
 	# Use the native file selector
 	# if it cant, will load the godot default
 	if "use_native_dialog" in file_dialog:
 		file_dialog.use_native_dialog = true
-	
+
 	# Connect to the selection signal
 	file_dialog.file_selected.connect(func(file_path: String):
 		_parse_csv(file_path)
 		file_dialog.queue_free()
 	)
-	
+
 	# Clear if canceled
-	file_dialog.canceled.connect(func(): 
+	file_dialog.canceled.connect(func():
 		file_dialog.queue_free()
 	)
-	
+
 	add_child(file_dialog)
 	file_dialog.popup_centered_ratio(0.4)
 
 
+func _load_csv_from_browser():
+	var js_bridge = Engine.get_singleton("JavaScriptBridge")
+	_web_csv_callback = js_bridge.create_callback(_on_web_csv_loaded)
+	js_bridge.get_interface("window").godotCsvUploadCallback = _web_csv_callback
+
+	js_bridge.eval(
+		"""
+		(function () {
+			const input = document.createElement("input");
+			input.type = "file";
+			input.accept = ".csv,text/csv";
+			input.style.display = "none";
+			input.addEventListener("change", function () {
+				const file = input.files && input.files[0];
+				if (!file) {
+					input.remove();
+					return;
+				}
+				const reader = new FileReader();
+				reader.onload = function (event) {
+					window.godotCsvUploadCallback(event.target.result, file.name);
+					input.remove();
+				};
+				reader.onerror = function () {
+					window.godotCsvUploadCallback("", file.name, "No se pudo leer el archivo.");
+					input.remove();
+				};
+				reader.readAsText(file);
+			});
+			document.body.appendChild(input);
+			input.click();
+		})();
+		""",
+		true
+	)
+
+
+func _on_web_csv_loaded(args: Array) -> void:
+	if args.size() >= 3 and not str(args[2]).is_empty():
+		informative_text.text = str(args[2])
+		informative_text.label_settings.font_color = color_error
+		entrenar_button.disabled = true
+		return
+
+	if args.is_empty() or str(args[0]).is_empty():
+		informative_text.text = "No se seleccionó ningún CSV."
+		informative_text.label_settings.font_color = color_error
+		entrenar_button.disabled = true
+		return
+
+	var csv_text := str(args[0])
+	var display_name := "dataset.csv"
+	if args.size() >= 2 and not str(args[1]).is_empty():
+		display_name = str(args[1])
+
+	var temp_path := "user://selected_nn_dataset.csv"
+	var file := FileAccess.open(temp_path, FileAccess.WRITE)
+	if file == null:
+		var error = FileAccess.get_open_error()
+		informative_text.text = "Error preparando el CSV: %d" % error
+		informative_text.label_settings.font_color = color_error
+		entrenar_button.disabled = true
+		return
+
+	file.store_string(csv_text)
+	file.close()
+	_parse_csv(temp_path, display_name)
+
+
 ## Checks if the csv selected has the correct format
 ## and parses it to the corresponding file type
-func _parse_csv(file_path):
+func _parse_csv(file_path, display_name: String = ""):
 	var file = FileAccess.open(file_path, FileAccess.READ)
-	
+
 	# If there were a problem with the file
 	if file == null:
 		var error = FileAccess.get_open_error()
@@ -149,7 +223,7 @@ func _parse_csv(file_path):
 		informative_text.label_settings.font_color = color_error
 		entrenar_button.disabled = true
 		return
-	
+
 	# Get columns
 	var headers = safe_get_array_of_strings(file.get_csv_line() as Array)
 	var target_col_name = _find_target_column(headers)
@@ -159,28 +233,28 @@ func _parse_csv(file_path):
 		informative_text.label_settings.font_color = color_error
 		entrenar_button.disabled = true
 		return
-	
+
 	# Each data its going to be in this Array
 	var data_array: Array[Dictionary] = []
-	
+
 	# While true, but is while there is lines to read
 	while true:
 		var row = file.get_csv_line()
 		if file.eof_reached():
 			break  # Because the eof_reached only goes to true once it tries to reed over the lengh of the file
-		
+
 		if row.is_empty():
 			continue
-		
+
 		# Map column with value for each row
 		var row_dict = {}
 		for i in range(min(headers.size(), row.size())):
 			row_dict[headers[i]] = row[i]
-		
+
 		data_array.append(row_dict)
-	
+
 	file.close()
-	
+
 	# Delete the target column. No loger needed
 	headers.erase(target_col_name)
 
@@ -202,7 +276,9 @@ func _parse_csv(file_path):
 
 	# If there weren't an error,
 	# change the text
-	informative_text.text = _build_dataset_summary_text(file_path.get_file(), headers.size(), target_info)
+	if display_name.is_empty():
+		display_name = file_path.get_file()
+	informative_text.text = _build_dataset_summary_text(display_name, headers.size(), target_info)
 	informative_text.label_settings.font_color = color_good
 	# and update the info
 	datast_info = data_array
@@ -219,7 +295,7 @@ func _find_target_column(headers: Array[String]) -> String:
 	return ""
 
 
-## Processes the target column, ensuring that if is a string, it changes to 
+## Processes the target column, ensuring that if is a string, it changes to
 ## int, asociating an int to each class. Returns the Dictionary of information
 ## needed by the information_text to explain the data loaded.
 func _analyze_and_prepare_target(data_array: Array[Dictionary], target_col_hint: String = "") -> Dictionary:
@@ -338,10 +414,10 @@ func one_hot_encode_string_targets(data_array: Array[Dictionary], target_col_nam
 ## At the time of writing this code, Godot does not suppot nested complex types
 ## such as Array[Array[Dictionary]].
 ## So its necessary this function to keep the hard typed in other parts of the code
-## where the nesting does not goes that deep. 
+## where the nesting does not goes that deep.
 func safe_get_array_of_dicts(data: Array) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
-	
+
 	if data is Array:
 		for item in data:
 			if item is Dictionary:
@@ -349,7 +425,7 @@ func safe_get_array_of_dicts(data: Array) -> Array[Dictionary]:
 				result.append(mutable_item)
 			else:
 				print("An element on the so called \"Array of Dictionary\" isn't a Dictionary: {item}")
-	
+
 	return result
 
 
@@ -357,15 +433,15 @@ func safe_get_array_of_dicts(data: Array) -> Array[Dictionary]:
 ## At the time of writing this code, Godot does not suppot nested complex types
 ## such as Array[Array[Dictionary]].
 ## So its necessary this function to keep the hard typed in other parts of the code
-## where the nesting does not goes that deep. 
+## where the nesting does not goes that deep.
 func safe_get_array_of_strings(data: Array) -> Array[String]:
 	var result: Array[String] = []
-	
+
 	if data is Array:
 		for item in data:
 			if item is String:
 				result.append(item)
 			else:
 				print("An element on the so called \"Array of String\" isn't a String: {item}")
-	
+
 	return result
