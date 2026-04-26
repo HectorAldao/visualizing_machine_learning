@@ -17,6 +17,10 @@ func export_to_nnef(path: String, weights: Dictionary, activations: Dictionary) 
 
 	# Standart header
 	file.store_line("version 1.0;")
+	file.store_line("# godot_nn_metadata = %s" % JSON.stringify({
+		"weights": weights,
+		"activations": activations,
+	}))
 	file.store_line("")
 	
 	# Get sorted ids
@@ -29,7 +33,8 @@ func export_to_nnef(path: String, weights: Dictionary, activations: Dictionary) 
 	
 	# Define input
 	# Asume that the input size is the input of the first array of weights
-	var input_size = weights[1].size() # Filas de la primera capa oculta = neuronas entrada
+	var first_weight_layer_id: int = layer_ids[1] if layer_ids.size() > 1 else -1
+	var input_size = weights[first_weight_layer_id][0].size()
 	file.store_line("\tinput = external(shape = [1, %d]);" % input_size)
 	
 	var last_tensor_name = "input"

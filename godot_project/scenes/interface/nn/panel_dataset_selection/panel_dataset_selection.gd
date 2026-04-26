@@ -51,6 +51,7 @@ var nn_restrictions: Dictionary[int, int]
 var target_column_name: String = ""
 var class_decoder_map: Dictionary = {}
 var _web_csv_callback: Variant
+var _web_nn_callback: Variant
 
 
 func _ready() -> void:
@@ -62,6 +63,7 @@ func _ready() -> void:
 		button.pressed.connect(_on_button_pressed.bind(button.text))
 
 	SignalsObserver.train_nn.connect(_on_nn_train_started)
+	SignalsObserver.load_nn.connect(_load_network)
 
 func _on_entrenar_button_pressed():
 	SignalsObserver.dataset_selected_nn.emit(datast_info, attrs_info, nn_restrictions)
@@ -69,6 +71,140 @@ func _on_entrenar_button_pressed():
 
 func _on_nn_train_started():
 	visible = false
+
+
+func _load_network() -> void:
+	if OS.has_feature("web") and Engine.has_singleton("JavaScriptBridge"):
+		_load_network_from_browser()
+		return
+
+	var file_dialog := FileDialog.new()
+	file_dialog.access = FileDialog.ACCESS_FILESYSTEM
+	file_dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILE
+	file_dialog.filters = PackedStringArray(["*.onnx, *.nnef ; Neural Network Files"])
+
+	if "use_native_dialog" in file_dialog:
+		file_dialog.use_native_dialog = true
+
+	file_dialog.file_selected.connect(func(file_path: String):
+		_import_network(file_path)
+		file_dialog.queue_free()
+	)
+
+	file_dialog.canceled.connect(func():
+		file_dialog.queue_free()
+	)
+
+	add_child(file_dialog)
+	file_dialog.popup_centered_ratio(0.4)
+
+
+func _load_network_from_browser() -> void:
+	var js_bridge = Engine.get_singleton("JavaScriptBridge")
+	_web_nn_callback = js_bridge.create_callback(_on_web_network_loaded)
+	js_bridge.get_interface("window").godotNnUploadCallback = _web_nn_callback
+
+	js_bridge.eval(
+		"""
+		(function () {
+			const input = document.createElement("input");
+			input.type = "file";
+			input.accept = ".onnx,.nnef";
+			input.style.display = "none";
+			input.addEventListener("change", function () {
+				const file = input.files && input.files[0];
+				if (!file) {
+					input.remove();
+					return;
+				}
+				const reader = new FileReader();
+				reader.onload = function (event) {
+					window.godotNnUploadCallback(event.target.result, file.name);
+					input.remove();
+				};
+				reader.onerror = function () {
+					window.godotNnUploadCallback("", file.name, "No se pudo leer el archivo.");
+					input.remove();
+				};
+				reader.readAsText(file);
+			});
+			document.body.appendChild(input);
+			input.click();
+		})();
+		""",
+		true
+	)
+
+
+func _on_web_network_loaded(args: Array) -> void:
+	if args.size() >= 3 and not str(args[2]).is_empty():
+		_show_network_load_error(str(args[2]))
+		return
+
+	if args.size() < 2 or str(args[0]).is_empty() or str(args[1]).is_empty():
+		_show_network_load_error("No se seleccionó ninguna red.")
+		return
+
+	var display_name := str(args[1])
+	var extension := display_name.get_extension().to_lower()
+	var temp_path := "user://selected_network.%s" % extension
+	var file := FileAccess.open(temp_path, FileAccess.WRITE)
+	if file == null:
+		_show_network_load_error("Error preparando la red: %d" % FileAccess.get_open_error())
+		return
+
+	file.store_string(str(args[0]))
+	file.close()
+	_import_network(temp_path, display_name)
+
+
+func _import_network(file_path: String, display_name: String = "") -> void:
+	var extension := file_path.get_extension().to_lower()
+	var result: Dictionary
+
+	match extension:
+		"onnx":
+			result = ONNXImporter.new().import_network(file_path)
+		"nnef":
+			result = NNEFImporter.new().import_network(file_path)
+		_:
+			_show_network_load_error("Formato de red no soportado: .%s" % extension)
+			return
+
+	if not result.get("ok", false):
+		_show_network_load_error(str(result.get("message", "No se pudo cargar la red.")))
+		return
+
+	Variables.nn.nn_tmp_dict = _to_typed_weight_dict(result.get("weights", {}))
+	Variables.nn.nn_func_tmp_dict = _to_typed_activation_dict(result.get("activations", {}))
+	if not Variables.nn.nn_func_tmp_dict.has(-1):
+		Variables.nn.nn_func_tmp_dict[-1] = Constants.ACT_FUNCS.identity
+
+	SignalsObserver.reload_nn.emit.call_deferred()
+
+	if display_name.is_empty():
+		display_name = file_path.get_file()
+	informative_text.text = "Red cargada correctamente: %s" % display_name
+	informative_text.label_settings.font_color = color_good
+
+
+func _show_network_load_error(message: String) -> void:
+	informative_text.text = message
+	informative_text.label_settings.font_color = color_error
+
+
+func _to_typed_weight_dict(source: Dictionary) -> Dictionary[int, Array]:
+	var result: Dictionary[int, Array] = {}
+	for key in source.keys():
+		result[int(key)] = source[key]
+	return result
+
+
+func _to_typed_activation_dict(source: Dictionary) -> Dictionary[int, int]:
+	var result: Dictionary[int, int] = {}
+	for key in source.keys():
+		result[int(key)] = int(source[key])
+	return result
 
 func _on_button_pressed(option: String):
 	selected_option = option
