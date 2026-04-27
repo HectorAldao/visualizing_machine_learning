@@ -8,9 +8,9 @@ extends PanelContainer
 @onready var hboxcontainer: HBoxContainer = $VBoxContainer/HBoxContainer
 @onready var entrenar_button: Button = $VBoxContainer/Button
 @onready var informative_text: Label = $VBoxContainer/PanelContainer/Label
+@onready var target_selector: HBoxContainer = $VBoxContainer/ScrollContainer/TargetSelector
 
 
-const posible_y_column_names: Array[String] = ["class", "Class", "y", "Y", "label", "Label", "target", "Target"]
 const DICT_OF_DATASETS: Dictionary = {
 	"EnemyAI": [
 		[
@@ -46,10 +46,15 @@ const DICT_OF_DATASETS: Dictionary = {
 var selected_option: String
 var datast_info: Array[Dictionary]
 var attrs_info: Array[String]
+var target_attrs_info: Array[String]
 var act_func_restriction: int
 var nn_restrictions: Dictionary[int, int]
-var target_column_name: String = ""
+var target_column_names: Array[String] = []
 var class_decoder_map: Dictionary = {}
+var csv_display_name: String = ""
+var csv_headers: Array[String] = []
+var csv_column_types: Dictionary = {}
+var csv_raw_data: Array[Dictionary] = []
 var _web_csv_callback: Variant
 var _web_nn_callback: Variant
 
@@ -66,7 +71,7 @@ func _ready() -> void:
 	SignalsObserver.load_nn.connect(_load_network)
 
 func _on_entrenar_button_pressed():
-	SignalsObserver.dataset_selected_nn.emit(datast_info, attrs_info, nn_restrictions)
+	SignalsObserver.dataset_selected_nn.emit(datast_info, attrs_info, target_attrs_info, nn_restrictions)
 	visible = false
 
 func _on_nn_train_started():
@@ -218,17 +223,20 @@ func _on_button_pressed(option: String):
 func _on_dataset_selected():
 	match selected_option:
 		"Cargar\nCsv":
+			_reset_csv_target_selector()
 			_load_csv()
 		_:  # If a default dataset was selected
+			_reset_csv_target_selector()
 
 			# Save its info on the relevant variables
 			datast_info = safe_get_array_of_dicts(DICT_OF_DATASETS[selected_option][0])
 			attrs_info = safe_get_array_of_strings(DICT_OF_DATASETS[selected_option][1])
+			target_attrs_info = _get_target_attrs_from_inputs(datast_info, attrs_info)
 			act_func_restriction = DICT_OF_DATASETS[selected_option][2][0]
 
 			# Extract its analysis to ensure the correct change of informative text
 			# and restrictions over the nn
-			var target_info = _analyze_and_prepare_target(datast_info)
+			var target_info = _analyze_and_prepare_targets(datast_info, target_attrs_info)
 			if not target_info["ok"]:
 				informative_text.text = target_info["message"]
 				informative_text.label_settings.font_color = color_error
@@ -362,10 +370,9 @@ func _parse_csv(file_path, display_name: String = ""):
 
 	# Get columns
 	var headers = safe_get_array_of_strings(file.get_csv_line() as Array)
-	var target_col_name = _find_target_column(headers)
-	if target_col_name.is_empty():
+	if headers.size() < 2:
 		file.close()
-		informative_text.text = "El CSV no tiene columna objetivo (class, y, label, ...)."
+		informative_text.text = "El CSV debe tener al menos dos columnas."
 		informative_text.label_settings.font_color = color_error
 		entrenar_button.disabled = true
 		return
@@ -391,52 +398,29 @@ func _parse_csv(file_path, display_name: String = ""):
 
 	file.close()
 
-	# Delete the target column. No loger needed
-	headers.erase(target_col_name)
-
-	# The "target_info" is used to show the text in the UI
-	var target_info = _analyze_and_prepare_target(data_array, target_col_name)
-
-	# If there were an error with the analyze
-	if not target_info["ok"]:
-		print("[LOG] The parsed csv wasn't parsed well") #debug
-		informative_text.text = target_info["message"]
+	if data_array.is_empty():
+		informative_text.text = "El dataset no contiene filas."
 		informative_text.label_settings.font_color = color_error
 		entrenar_button.disabled = true
 		return
 
-	if target_info.kind == "classification":
-		act_func_restriction = Constants.ACT_FUNCS.softmax
-	elif target_info.kind == "regression":
-		act_func_restriction = Constants.ACT_FUNCS.identity
-
-	# If there weren't an error,
-	# change the text
 	if display_name.is_empty():
 		display_name = file_path.get_file()
-	informative_text.text = _build_dataset_summary_text(display_name, headers.size(), target_info)
-	informative_text.label_settings.font_color = color_good
-	# and update the info
-	datast_info = data_array
-	attrs_info = headers
-	nn_restrictions = {0: headers.size(), -1: target_info["count"], -2: act_func_restriction}  # Restrictions for "in" and "out"
-	entrenar_button.disabled = false
+
+	csv_raw_data = data_array
+	csv_headers = headers
+	csv_display_name = display_name
+	csv_column_types = _infer_column_types(csv_raw_data, csv_headers)
+	_show_csv_target_selector(csv_headers)
 
 
-## To find the name on the target column
-func _find_target_column(headers: Array[String]) -> String:
-	for col_name in posible_y_column_names:
-		if headers.has(col_name):
-			return col_name
-	return ""
-
-
-## Processes the target column, ensuring that if is a string, it changes to
-## int, asociating an int to each class. Returns the Dictionary of information
-## needed by the information_text to explain the data loaded.
-func _analyze_and_prepare_target(data_array: Array[Dictionary], target_col_hint: String = "") -> Dictionary:
+## Processes the target columns and returns the information needed by the UI
+## and NN restrictions. Classification targets are encoded in-place.
+func _analyze_and_prepare_targets(data_array: Array[Dictionary], target_cols: Array[String]) -> Dictionary:
 	if data_array.is_empty():
 		return {"ok": false, "message": "El dataset no contiene filas."}
+	if target_cols.is_empty():
+		return {"ok": false, "message": "Seleccione variable/s objetivo."}
 
 	# Datasets coming from constants can contain read-only dictionaries.
 	# Clone each row to a mutable dictionary before any in-place update.
@@ -444,33 +428,32 @@ func _analyze_and_prepare_target(data_array: Array[Dictionary], target_col_hint:
 		var mutable_row: Dictionary = data_array[i].duplicate(true)
 		data_array[i] = mutable_row
 
-	var resolved_target_col = target_col_hint
-	if resolved_target_col.is_empty():
-		resolved_target_col = _find_target_column(safe_get_array_of_strings(data_array[0].keys()))
-
-	if resolved_target_col.is_empty():
-		return {"ok": false, "message": "No se detectó columna objetivo (class, y, label, ...)."}
+	var column_types: Dictionary = _infer_column_types(data_array, target_cols)
+	for target_col in target_cols:
+		if not column_types.has(target_col):
+			return {"ok": false, "message": "No se detectó la columna objetivo %s." % target_col}
 
 	var has_string_values = false
 	var has_float_values = false
 	var has_int_values = false
 
-	for row in data_array:
-		if not row.has(resolved_target_col):
-			continue
-		var normalized_value = _normalize_numeric_value(row[resolved_target_col])
-		row[resolved_target_col] = normalized_value
-		match typeof(normalized_value):
-			TYPE_STRING:
+	for target_col in target_cols:
+		match column_types[target_col]:
+			"string":
 				has_string_values = true
-			TYPE_FLOAT:
+			"float":
 				has_float_values = true
-			TYPE_INT:
+			"int":
 				has_int_values = true
+
+		_normalize_column_values(data_array, target_col)
+
+	if target_cols.size() > 1 and has_string_values:
+		return {"ok": false, "message": "Solo puede seleccionarse una variable categórica."}
 
 	var info: Dictionary = {
 		"ok": true,
-		"target_col": resolved_target_col,
+		"target_cols": target_cols.duplicate(),
 		"kind": "classification",
 		"count": 0,
 	}
@@ -478,27 +461,21 @@ func _analyze_and_prepare_target(data_array: Array[Dictionary], target_col_hint:
 	class_decoder_map = {}
 
 	if has_string_values:
-		class_decoder_map = one_hot_encode_string_targets(data_array, resolved_target_col)
+		class_decoder_map = one_hot_encode_string_targets(data_array, target_cols[0])
 		Variables.nn_output_class_decoder = class_decoder_map
 		info["kind"] = "classification"
 		info["count"] = class_decoder_map.size()
-	elif has_float_values and not has_int_values:
-		var unique_float_values: Dictionary = {}
-		for row in data_array:
-			if row.has(resolved_target_col):
-				unique_float_values[row[resolved_target_col]] = true
+	elif target_cols.size() == 1 and has_int_values and not has_float_values:
+		class_decoder_map = encode_int_targets(data_array, target_cols[0])
+		Variables.nn_output_class_decoder = class_decoder_map
+		info["kind"] = "classification"
+		info["count"] = class_decoder_map.size()
+	else:
 		Variables.nn_output_class_decoder = {}
 		info["kind"] = "regression"
-		#info["count"] = unique_float_values.size()
-		info["count"] = 1  #TODO: make that the regression problemens can have more than one target
+		info["count"] = target_cols.size()
 
-	else:
-		class_decoder_map = encode_int_targets(data_array, resolved_target_col)
-		Variables.nn_output_class_decoder = class_decoder_map
-		info["kind"] = "classification"
-		info["count"] = class_decoder_map.size()
-
-	target_column_name = resolved_target_col
+	target_column_names = target_cols.duplicate()
 	return info
 
 
@@ -510,6 +487,197 @@ func _normalize_numeric_value(value: Variant) -> Variant:
 		if text.is_valid_float():
 			return float(text)
 	return value
+
+
+func _normalize_column_values(data_array: Array[Dictionary], column_name: String) -> void:
+	for row in data_array:
+		if row.has(column_name):
+			row[column_name] = _normalize_numeric_value(row[column_name])
+
+
+func _infer_column_types(data_array: Array[Dictionary], columns: Array[String]) -> Dictionary:
+	var column_types: Dictionary = {}
+	for column_name in columns:
+		var has_string_values := false
+		var has_float_values := false
+		var has_int_values := false
+
+		for row in data_array:
+			if not row.has(column_name):
+				continue
+
+			var normalized_value = _normalize_numeric_value(row[column_name])
+			match typeof(normalized_value):
+				TYPE_STRING:
+					has_string_values = true
+				TYPE_FLOAT:
+					has_float_values = true
+				TYPE_INT:
+					has_int_values = true
+
+		if has_string_values:
+			column_types[column_name] = "string"
+		elif has_float_values:
+			column_types[column_name] = "float"
+		elif has_int_values:
+			column_types[column_name] = "int"
+		else:
+			column_types[column_name] = "string"
+
+	return column_types
+
+
+func _reset_csv_target_selector() -> void:
+	for child in target_selector.get_children():
+		target_selector.remove_child(child)
+		child.queue_free()
+
+	csv_display_name = ""
+	csv_headers = []
+	csv_column_types = {}
+	csv_raw_data = []
+	target_attrs_info = []
+	target_column_names = []
+	Variables.nn_output_class_decoder = {}
+	entrenar_button.disabled = true
+
+
+func _show_csv_target_selector(headers: Array[String]) -> void:
+	for child in target_selector.get_children():
+		target_selector.remove_child(child)
+		child.queue_free()
+
+	csv_headers = headers.duplicate()
+	csv_column_types = _infer_column_types(csv_raw_data, csv_headers)
+
+	for header in csv_headers:
+		var check_button := CheckButton.new()
+		check_button.text = header
+		check_button.toggled.connect(_on_target_check_toggled)
+		target_selector.add_child(check_button)
+
+	informative_text.text = "Seleccione variable/s objetivo"
+	informative_text.label_settings.font_color = color_good
+	entrenar_button.disabled = true
+
+
+func _on_target_check_toggled(_button_pressed: bool) -> void:
+	var selected_targets: Array[String] = _get_selected_target_columns()
+	_update_target_buttons_state(selected_targets)
+
+	if selected_targets.is_empty():
+		informative_text.text = "Seleccione variable/s objetivo"
+		informative_text.label_settings.font_color = color_good
+		entrenar_button.disabled = true
+		return
+
+	if selected_targets.size() >= csv_headers.size():
+		informative_text.text = "Debe quedar al menos un atributo de entrada."
+		informative_text.label_settings.font_color = color_error
+		entrenar_button.disabled = true
+		return
+
+	var prepared_data := safe_get_array_of_dicts(csv_raw_data)
+	var input_attrs := _get_input_attrs_from_targets(csv_headers, selected_targets)
+	var target_info := _analyze_and_prepare_targets(prepared_data, selected_targets)
+	if not target_info["ok"]:
+		informative_text.text = target_info["message"]
+		informative_text.label_settings.font_color = color_error
+		entrenar_button.disabled = true
+		return
+
+	_encode_categorical_input_columns(prepared_data, input_attrs)
+
+	datast_info = prepared_data
+	attrs_info = input_attrs
+	target_attrs_info = selected_targets
+	act_func_restriction = Constants.ACT_FUNCS.softmax if target_info["kind"] == "classification" else Constants.ACT_FUNCS.identity
+	nn_restrictions = {0: attrs_info.size(), -1: target_info["count"], -2: act_func_restriction}
+
+	if _selected_targets_include_categorical(selected_targets):
+		informative_text.text = "Seleccionada variable categórica,\n no seleccione más variables"
+	else:
+		informative_text.text = _build_dataset_summary_text(csv_display_name, attrs_info.size(), target_info)
+	informative_text.label_settings.font_color = color_good
+	entrenar_button.disabled = false
+
+
+func _get_selected_target_columns() -> Array[String]:
+	var selected_targets: Array[String] = []
+	for child in target_selector.get_children():
+		if child is CheckButton and child.button_pressed:
+			selected_targets.append(child.text)
+	return selected_targets
+
+
+func _update_target_buttons_state(selected_targets: Array[String]) -> void:
+	var has_selection := not selected_targets.is_empty()
+	var selected_type := ""
+	if has_selection:
+		selected_type = str(csv_column_types.get(selected_targets[0], "string"))
+
+	for child in target_selector.get_children():
+		if not (child is CheckButton):
+			continue
+
+		var check_button: CheckButton = child
+		var button_type := str(csv_column_types.get(check_button.text, "string"))
+		check_button.disabled = false
+
+		if not check_button.button_pressed and has_selection:
+			check_button.disabled = selected_type == "string" or button_type == "string"
+
+	if has_selection and selected_type == "string":
+		informative_text.text = "Seleccionada variable categórica,\n no seleccione más variables"
+		informative_text.label_settings.font_color = color_good
+
+
+func _selected_targets_include_categorical(selected_targets: Array[String]) -> bool:
+	for target in selected_targets:
+		if csv_column_types.get(target, "") == "string":
+			return true
+	return false
+
+
+func _get_input_attrs_from_targets(headers: Array[String], target_cols: Array[String]) -> Array[String]:
+	var input_attrs: Array[String] = []
+	for header in headers:
+		if not target_cols.has(header):
+			input_attrs.append(header)
+	return input_attrs
+
+
+func _get_target_attrs_from_inputs(data_array: Array[Dictionary], input_attrs: Array[String]) -> Array[String]:
+	var target_attrs: Array[String] = []
+	if data_array.is_empty():
+		return target_attrs
+
+	for key in data_array[0].keys():
+		var key_text := str(key)
+		if not input_attrs.has(key_text):
+			target_attrs.append(key_text)
+
+	return target_attrs
+
+
+func _encode_categorical_input_columns(data_array: Array[Dictionary], input_attrs: Array[String]) -> void:
+	var column_types: Dictionary = _infer_column_types(data_array, input_attrs)
+	for input_attr in input_attrs:
+		if column_types.get(input_attr, "") != "string":
+			_normalize_column_values(data_array, input_attr)
+			continue
+
+		var value_to_id: Dictionary = {}
+		var next_id := 0
+		for row in data_array:
+			if not row.has(input_attr):
+				continue
+
+			var value_text := str(row[input_attr])
+			if not value_to_id.has(value_text):
+				value_to_id[value_text] = next_id
+				next_id += 1
+			row[input_attr] = value_to_id[value_text]
 
 
 func _build_dataset_summary_text(dataset_name: String, input_attrs_count: int, target_info: Dictionary) -> String:

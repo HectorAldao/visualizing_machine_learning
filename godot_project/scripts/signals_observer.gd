@@ -8,7 +8,7 @@ extends Node
 
 
 signal dataset_selected(data:Array[Dictionary], attrs: Array[String])
-signal dataset_selected_nn(data:Array[Dictionary], attrs: Array[String], nn_restrictions: Dictionary[int, int])
+signal dataset_selected_nn(data:Array[Dictionary], attrs: Array[String], target_attrs: Array[String], nn_restrictions: Dictionary[int, int])
 
 signal start_evaluation(data:Array[Dictionary])
 

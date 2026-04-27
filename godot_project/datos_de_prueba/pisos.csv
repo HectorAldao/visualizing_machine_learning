@@ -1,0 +1,11 @@
+input_int_habitaciones,input_float_superficie,input_int_antiguedad,input_float_distancia,input_str_orientacion,target_float_precio,target_int_clase,target_str_calificacion
+3,85.5,10,2.5,Norte,250.0,1,A
+2,60.0,40,5.0,Sur,150.5,3,C
+4,120.2,5,1.2,Este,450.0,0,A
+1,45.0,20,10.5,Oeste,90.0,4,D
+3,95.8,15,3.8,Norte,210.2,2,B
+2,70.3,30,6.1,Sur,175.4,3,C
+5,200.0,2,0.5,Este,800.1,0,A
+3,88.4,12,4.2,Norte,235.6,2,B
+2,55.9,50,8.0,Sur,120.0,5,D
+4,110.5,8,2.0,Este,380.7,1,A

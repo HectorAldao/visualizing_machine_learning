@@ -9,7 +9,7 @@ var _weights: Dictionary = {}
 var _activations: Dictionary = {}
 var _train_data: Array[Dictionary] = []
 var _train_attributes: Array[String] = []
-var _target_attribute: String = ""
+var _target_attributes: Array[String] = []
 var _learning_rate: float = 0.1
 var _loss_type: int = Constants.LOSS_FUNCS.mse
 
@@ -54,7 +54,7 @@ func train_step(
 func configure_training(
 	train_data: Array[Dictionary],
 	train_attributes: Array[String],
-	target_attribute: String,
+	target_attributes: Array[String],
 	weights: Dictionary,
 	activations: Dictionary,
 	learning_rate: float,
@@ -62,7 +62,7 @@ func configure_training(
 ) -> void:
 	_train_data = train_data.duplicate(true)
 	_train_attributes = train_attributes.duplicate()
-	_target_attribute = target_attribute
+	_target_attributes = target_attributes.duplicate()
 	_weights = weights
 	_activations = activations
 	_learning_rate = learning_rate
@@ -74,7 +74,7 @@ func configure_training(
 	_current_phase = "idle"
 	_reset_runtime_state()
 
-	if _train_data.is_empty() or _target_attribute.is_empty():
+	if _train_data.is_empty() or _target_attributes.is_empty():
 		_current_phase = "finished"
 		return
 
@@ -369,18 +369,21 @@ func _extract_input_data(row: Dictionary) -> Array:
 
 
 func _extract_target_data(row: Dictionary) -> Array:
-	var target_value = row.get(_target_attribute, 0)
 	var output_neurons: int = 1
 	if _weights.has(-1):
 		output_neurons = _weights[-1].size()
 
-	if output_neurons <= 1:
-		return [float(target_value)]
+	if output_neurons <= 1 or _target_attributes.size() > 1:
+		var regression_targets: Array = []
+		for target_attribute in _target_attributes:
+			regression_targets.append(float(row.get(target_attribute, 0.0)))
+		return regression_targets
 
 	var target_data: Array = []
 	target_data.resize(output_neurons)
 	target_data.fill(0.0)
 
+	var target_value = row.get(_target_attributes[0], 0)
 	var class_idx: int = int(target_value)
 	if class_idx >= 0 and class_idx < output_neurons:
 		target_data[class_idx] = 1.0

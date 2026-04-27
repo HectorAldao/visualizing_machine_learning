@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://b1e38gmye1m1t"
+
+[deps]
+
+files=["res://datos_de_prueba/pisos.input.translation", "res://datos_de_prueba/pisos.input.translation", "res://datos_de_prueba/pisos.input.translation", "res://datos_de_prueba/pisos.input.translation", "res://datos_de_prueba/pisos.target.translation", "res://datos_de_prueba/pisos.target.translation", "res://datos_de_prueba/pisos.target.translation"]
+
+source_file="res://datos_de_prueba/pisos.csv"
+dest_files=["res://datos_de_prueba/pisos.input.translation", "res://datos_de_prueba/pisos.input.translation", "res://datos_de_prueba/pisos.input.translation", "res://datos_de_prueba/pisos.input.translation", "res://datos_de_prueba/pisos.target.translation", "res://datos_de_prueba/pisos.target.translation", "res://datos_de_prueba/pisos.target.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://b53esskdnv1b2"]
 
 [ext_resource type="Script" uid="uid://dh5h5i8vmraue" path="res://scenes/interface/nn/panel_dataset_selection/panel_dataset_selection.gd" id="1_omw0a"]
+[ext_resource type="PackedScene" uid="uid://c8awyfuu7i3ih" path="res://scenes/interface/scroll_container/scroll_container.tscn" id="2_djbkb"]
 [ext_resource type="StyleBox" uid="uid://cx6vv3aydlb2v" path="res://themes/default_panel_container_stylebox/default_panel_container_stylebox.tres" id="2_vqiwo"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_djbkb"]
@@ -39,6 +40,14 @@ custom_minimum_size = Vector2(120, 250)
 layout_mode = 2
 text = "Cargar
 Csv"
+
+[node name="ScrollContainer" parent="VBoxContainer" unique_id=1226361611 instance=ExtResource("2_djbkb")]
+custom_minimum_size = Vector2(0, 51.91)
+layout_mode = 2
+is_horizontal = true
+
+[node name="TargetSelector" type="HBoxContainer" parent="VBoxContainer/ScrollContainer" unique_id=709835528]
+layout_mode = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="VBoxContainer" unique_id=1748401210]
 layout_mode = 2

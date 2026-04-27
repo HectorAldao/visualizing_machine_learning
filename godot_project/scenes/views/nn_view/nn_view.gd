@@ -16,7 +16,7 @@ var _is_centering: bool = false
 
 var train_data: Array[Dictionary]
 var train_attributtes: Array[String]
-var train_target_attribute: String = ""
+var train_target_attributes: Array[String] = []
 var algorithm: AlgorithmNn
 
 
@@ -173,11 +173,11 @@ func _on_set_nn_size(new_nn_size: Vector2) -> void:
 	#nn_size_updated.emit()
 
 
-func _on_dataset_selected(data:Array[Dictionary], attrs: Array[String], nn_restrictions: Dictionary[int, int]):
+func _on_dataset_selected(data:Array[Dictionary], attrs: Array[String], target_attrs: Array[String], nn_restrictions: Dictionary[int, int]):
 
 	train_data = data.duplicate(true)
 	train_attributtes = attrs.duplicate()
-	train_target_attribute = _find_target_attribute(train_data, train_attributtes)
+	train_target_attributes = target_attrs.duplicate()
 
 	SignalsObserver.establish_nn_dset_restrictions.emit(nn_restrictions)
 	update_neuron_texts_for_layer(train_attributtes, 0)
@@ -226,17 +226,17 @@ func _get_output_neuron_texts() -> Array[String]:
 		print("[LOG] NnView prepared %d classification output labels for softmax layer" % output_texts.size())
 		return output_texts
 
-	if train_target_attribute.is_empty():
-		print("[LOG] NnView could not prepare output labels because target attribute is empty")
+	if train_target_attributes.is_empty():
+		print("[LOG] NnView could not prepare output labels because target attributes are empty")
 		return output_texts
 
-	output_texts.append(train_target_attribute)
-	print("[LOG] NnView prepared regression output label '%s'" % train_target_attribute)
+	output_texts = train_target_attributes.duplicate()
+	print("[LOG] NnView prepared %d regression output labels" % output_texts.size())
 	return output_texts
 
 
 func _configure_algorithm_training() -> void:
-	if algorithm == null or train_data.is_empty() or train_target_attribute.is_empty():
+	if algorithm == null or train_data.is_empty() or train_target_attributes.is_empty():
 		return
 
 	var loss_type: int = Constants.LOSS_FUNCS.mse
@@ -246,24 +246,12 @@ func _configure_algorithm_training() -> void:
 	algorithm.configure_training(
 		train_data,
 		train_attributtes,
-		train_target_attribute,
+		train_target_attributes,
 		Variables.nn.nn_tmp_dict,
 		Variables.nn.nn_func_dict,
 		0.1,
 		loss_type
 	)
-
-
-func _find_target_attribute(data: Array[Dictionary], attrs: Array[String]) -> String:
-	if data.is_empty():
-		return ""
-
-	var row: Dictionary = data[0]
-	for key in row.keys():
-		if not attrs.has(str(key)):
-			return str(key)
-
-	return ""
 
 func _on_save_nn_pressed() -> void:
 	panel_export_format.visible = not panel_export_format.visible

@@ -1,6 +1,7 @@
 extends ScrollContainer
 
 
+@export var is_horizontal: bool = false
 @export var scroll_speed: int = 30
 
 var is_middle_mouse_dragging: bool = false
@@ -53,10 +54,16 @@ func _input(event: InputEvent) -> void:
 			# Apply scroll
 			if delta != 0:
 				# Check Shift for horizontal scrolling
-				if event.shift_pressed:
-					scroll_horizontal += delta
+				if is_horizontal:
+					if event.shift_pressed:
+						scroll_vertical += delta
+					else:
+						scroll_horizontal += delta
 				else:
-					scroll_vertical += delta
+					if event.shift_pressed:
+						scroll_horizontal += delta
+					else:
+						scroll_vertical += delta
 				
 				# Optional: do not pass the input to lower nodes
 				get_viewport().set_input_as_handled()
