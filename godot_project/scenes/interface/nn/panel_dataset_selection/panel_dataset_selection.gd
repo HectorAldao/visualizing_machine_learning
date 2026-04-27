@@ -493,13 +493,10 @@ func _analyze_and_prepare_target(data_array: Array[Dictionary], target_col_hint:
 		info["count"] = 1  #TODO: make that the regression problemens can have more than one target
 
 	else:
-		var unique_int_classes: Dictionary = {}
-		for row in data_array:
-			if row.has(resolved_target_col):
-				unique_int_classes[int(row[resolved_target_col])] = true
-		Variables.nn_output_class_decoder = {}
+		class_decoder_map = encode_int_targets(data_array, resolved_target_col)
+		Variables.nn_output_class_decoder = class_decoder_map
 		info["kind"] = "classification"
-		info["count"] = unique_int_classes.size()
+		info["count"] = class_decoder_map.size()
 
 	target_column_name = resolved_target_col
 	return info
@@ -543,7 +540,40 @@ func one_hot_encode_string_targets(data_array: Array[Dictionary], target_col_nam
 
 		row[target_col_name] = string_to_int[label_text]
 
+	print("[LOG] Encoded %d string target classes for NN softmax output" % int_to_string.size())
 	return int_to_string
+
+
+## Encodes integer labels to contiguous class ids and returns a decoder map:
+## output neuron id -> original integer value.
+func encode_int_targets(data_array: Array[Dictionary], target_col_name: String) -> Dictionary:
+	var unique_values: Array[int] = []
+	var seen_values: Dictionary = {}
+
+	for row in data_array:
+		if not row.has(target_col_name):
+			continue
+
+		var original_value: int = int(row[target_col_name])
+		if not seen_values.has(original_value):
+			seen_values[original_value] = true
+			unique_values.append(original_value)
+
+	unique_values.sort()
+
+	var original_to_class_id: Dictionary = {}
+	var class_id_to_original: Dictionary = {}
+	for class_id in range(unique_values.size()):
+		var original_class_value: int = unique_values[class_id]
+		original_to_class_id[original_class_value] = class_id
+		class_id_to_original[class_id] = original_class_value
+
+	for row in data_array:
+		if row.has(target_col_name):
+			row[target_col_name] = original_to_class_id[int(row[target_col_name])]
+
+	print("[LOG] Encoded %d integer target classes for NN softmax output" % class_id_to_original.size())
+	return class_id_to_original
 
 
 ## Takes an Array and ensures that it is returned as and Array[Dictionay]

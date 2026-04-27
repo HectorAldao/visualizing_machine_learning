@@ -180,8 +180,59 @@ func _on_dataset_selected(data:Array[Dictionary], attrs: Array[String], nn_restr
 	train_target_attribute = _find_target_attribute(train_data, train_attributtes)
 
 	SignalsObserver.establish_nn_dset_restrictions.emit(nn_restrictions)
+	update_neuron_texts_for_layer(train_attributtes, 0)
+	update_neuron_texts_for_layer(_get_output_neuron_texts(), -1)
 
 	pass
+
+
+func update_neuron_texts_for_layer(texts: Array[String], layer_id: int) -> void:
+	print("[LOG] NnView requested text update for layer %d with %d labels" % [layer_id, texts.size()])
+
+	var expected_neurons: int = _get_expected_neuron_count(layer_id)
+	var labels_to_apply: Array[String] = texts.duplicate()
+	if expected_neurons <= 0:
+		print("[LOG] NnView could not find layer %d while updating neuron texts. Texts will be cached for late neurons." % layer_id)
+	elif texts.size() > expected_neurons:
+		print("[LOG] NnView received %d labels for layer %d, but the layer has %d neurons. Extra labels will be ignored by neurons without matching id." % [texts.size(), layer_id, expected_neurons])
+		labels_to_apply.resize(expected_neurons)
+	elif texts.size() < expected_neurons:
+		print("[LOG] NnView received %d labels for layer %d, but the layer has %d neurons. Missing labels will reset to Sigma." % [texts.size(), layer_id, expected_neurons])
+		while labels_to_apply.size() < expected_neurons:
+			labels_to_apply.append("Σ")
+
+	SignalsObserver.set_nn_layer_neuron_texts(layer_id, labels_to_apply)
+
+
+func _get_expected_neuron_count(layer_id: int) -> int:
+	if Variables.nn.nn_tmp_dict.has(layer_id):
+		return Variables.nn.nn_tmp_dict[layer_id].size()
+
+	if Variables.nn.nn_dict.has(layer_id):
+		return Variables.nn.nn_dict[layer_id].size()
+
+	return 0
+
+
+func _get_output_neuron_texts() -> Array[String]:
+	var output_texts: Array[String] = []
+	var output_activation: int = Variables.nn.nn_func_tmp_dict.get(-1, Variables.nn.nn_func_dict.get(-1, Constants.ACT_FUNCS.identity))
+
+	if output_activation == Constants.ACT_FUNCS.softmax and not Variables.nn_output_class_decoder.is_empty():
+		var class_ids: Array = Variables.nn_output_class_decoder.keys()
+		class_ids.sort()
+		for class_id in class_ids:
+			output_texts.append(str(Variables.nn_output_class_decoder[class_id]))
+		print("[LOG] NnView prepared %d classification output labels for softmax layer" % output_texts.size())
+		return output_texts
+
+	if train_target_attribute.is_empty():
+		print("[LOG] NnView could not prepare output labels because target attribute is empty")
+		return output_texts
+
+	output_texts.append(train_target_attribute)
+	print("[LOG] NnView prepared regression output label '%s'" % train_target_attribute)
+	return output_texts
 
 
 func _configure_algorithm_training() -> void:

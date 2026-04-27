@@ -16,6 +16,8 @@ func _ready() -> void:
 	SignalsObserver.train_nn.connect(_reset_evaluated_scale)
 	SignalsObserver.train_nn_next_step.connect(_reset_evaluated_scale)
 	SignalsObserver.train_nn_complete.connect(_reset_evaluated_scale)
+	SignalsObserver.nn_neuron_text_changed.connect(_on_neuron_text_changed)
+	_apply_cached_text()
 
 
 static func newone(new_id: int, new_layer_id) -> Neuron:
@@ -32,6 +34,19 @@ func _on_pressed() -> void:
 
 func _on_training_step_completed(layer_id: int, neuron_id: int, _value: float) -> void:
 	_set_evaluated(neuron_id == _id and layer_id == _layer_id)
+
+
+func _on_neuron_text_changed(layer_id: int, neuron_id: int, new_text: String) -> void:
+	if layer_id != _layer_id or neuron_id != _id:
+		return
+
+	text = new_text
+	print("[LOG] Neuron %d on layer %d changed text to '%s'" % [_id, _layer_id, new_text])
+
+
+func _apply_cached_text() -> void:
+	if SignalsObserver.has_nn_neuron_text(_layer_id, _id):
+		_on_neuron_text_changed(_layer_id, _id, SignalsObserver.get_nn_neuron_text(_layer_id, _id))
 
 
 func _set_evaluated(is_evaluated: bool) -> void:
