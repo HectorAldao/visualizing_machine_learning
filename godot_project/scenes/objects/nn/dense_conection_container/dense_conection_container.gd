@@ -119,7 +119,7 @@ func _add_connection(from_neuron: Neuron, to_neuron: Neuron, key: String, weight
 	var connection_color: Color = _get_connection_color(weight)
 	var connection_width: float = _get_connection_width(weight)
 
-	var connection: Conection = Conection.newone(from_neuron, to_neuron, connection_width, connection_color)
+	var connection: Conection = Conection.newone(to_neuron, from_neuron, connection_width, connection_color)
 
 	add_child(connection)
 	_connections[key] = connection
@@ -190,10 +190,30 @@ func _remove_connection(key: String, animated: bool = false) -> void:
 	var conection: Conection = _connections[key]
 	if is_instance_valid(conection):
 		if animated:
+			_prepare_connection_for_output_to_input_destroy(conection, key)
 			conection.destroy_animated()
 		else:
 			conection.queue_free()
 	_connections.erase(key)
+
+
+func _prepare_connection_for_output_to_input_destroy(conection: Conection, key: String) -> void:
+	var ids: PackedInt32Array = _get_key_values(key)
+	if ids.size() != 4:
+		return
+
+	var from_layer: Layer = _get_layer_by_position(_get_layer_position_from_id(ids[0]))
+	var to_layer: Layer = _get_layer_by_position(_get_layer_position_from_id(ids[2]))
+	if from_layer == null or to_layer == null:
+		return
+
+	var from_neuron: Neuron = _get_neuron(from_layer, ids[1])
+	var to_neuron: Neuron = _get_neuron(to_layer, ids[3])
+	if from_neuron == null or to_neuron == null:
+		return
+
+	conection.from_node = from_neuron
+	conection.to_node = to_neuron
 
 
 func _remove_connections_between_layers(from_layer_id: int, to_layer_id: int) -> void:

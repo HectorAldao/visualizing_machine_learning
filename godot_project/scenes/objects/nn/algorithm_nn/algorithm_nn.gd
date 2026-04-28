@@ -10,7 +10,7 @@ var _activations: Dictionary = {}
 var _train_data: Array[Dictionary] = []
 var _train_attributes: Array[String] = []
 var _target_attributes: Array[String] = []
-var _learning_rate: float = 0.1
+var _learning_rate: float = 0.01
 var _loss_type: int = Constants.LOSS_FUNCS.mse
 
 var _sorted_layer_indices: Array[int] = []
@@ -248,7 +248,7 @@ func _compute_output_loss_error(output_values: Array, target: Array, loss_type: 
 	match loss_type:
 		Constants.LOSS_FUNCS.mse:
 			for i in range(num_neurons):
-				output_error.append(output_values[i] - target[i])
+				output_error.append(abs(output_values[i] - target[i]))
 		Constants.LOSS_FUNCS.coss_entr:
 			var epsilon: float = 1e-8
 			for i in range(num_neurons):
