@@ -234,9 +234,11 @@ func _on_restrictions_set(nn_restr: Dictionary[int, int]) -> void:
 		textedit_out.text = str(nn_restr[-1])
 		textedit_out.text_changed.emit()
 	
-	if nn_restr.has(-2):
-		optionbutton_act_func_out.select(nn_restr[-2])
-		optionbutton_act_func_out.disabled = true
+		if nn_restr.has(-2):
+			var restricted_activation: int = int(nn_restr[-2])
+			Variables.nn.set_layer_activation_tmp(-1, restricted_activation)
+			optionbutton_act_func_out.select(optionbutton_act_func_out.get_item_index(restricted_activation))
+			optionbutton_act_func_out.disabled = true
 
 	SignalsObserver.reload_nn.emit.call_deferred()
 
