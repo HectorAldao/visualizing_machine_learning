@@ -14,5 +14,6 @@ layout_mode = 2
 text = "ONNX"
 
 [node name="NNEFButton" type="Button" parent="VBoxContainer" unique_id=1483863745]
+visible = false
 layout_mode = 2
 text = "NNEF"
