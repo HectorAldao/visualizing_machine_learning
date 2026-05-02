@@ -25,6 +25,7 @@ func import_network(file_path: String) -> Dictionary:
 	var initializers: Array = graph.get("initializer", [])
 	var nodes: Array = graph.get("node", [])
 	var weights: Dictionary[int, Array] = {}
+	var biases: Dictionary[int, Array] = {}
 	var activations: Dictionary[int, int] = {}
 
 	for initializer in initializers:
@@ -32,16 +33,19 @@ func import_network(file_path: String) -> Dictionary:
 			continue
 
 		var name := str(initializer.get("name", ""))
-		if not name.begins_with("W"):
-			continue
-
-		var layer_id := int(name.substr(1))
 		var dims: Array = initializer.get("dims", [])
-		var flat_weights: Array = initializer.get("float_data", [])
-		if dims.size() < 2:
-			return {"ok": false, "message": "El tensor %s no tiene dimensiones suficientes." % name}
+		var float_data: Array = initializer.get("float_data", [])
 
-		weights[layer_id] = _unflatten_weights(flat_weights, int(dims[0]), int(dims[1]))
+		if name.begins_with("W"):
+			var layer_id := int(name.substr(1))
+			if dims.size() < 2:
+				return {"ok": false, "message": "El tensor %s no tiene dimensiones suficientes." % name}
+
+			weights[layer_id] = _unflatten_weights(float_data, int(dims[0]), int(dims[1]))
+		elif name.begins_with("B"):
+			var layer_id := int(name.substr(1))
+			var bias_size := int(dims[0]) if not dims.is_empty() else float_data.size()
+			biases[layer_id] = _to_float_vector(float_data, bias_size)
 
 	for node in nodes:
 		if not (node is Dictionary):
@@ -61,6 +65,7 @@ func import_network(file_path: String) -> Dictionary:
 	return {
 		"ok": true,
 		"weights": weights,
+		"biases": biases,
 		"activations": activations,
 	}
 
@@ -80,3 +85,16 @@ func _unflatten_weights(flat_weights: Array, rows: int, cols: int) -> Array:
 		matrix.append(row)
 
 	return matrix
+
+
+func _to_float_vector(source: Array, size: int) -> Array:
+	var vector: Array = []
+	vector.resize(max(size, 0))
+
+	for idx in range(vector.size()):
+		if idx < source.size():
+			vector[idx] = float(source[idx])
+		else:
+			vector[idx] = 0.0
+
+	return vector

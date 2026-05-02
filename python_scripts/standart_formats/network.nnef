@@ -1,0 +1,12 @@
+version 1.0;
+# godot_nn_metadata = {"activations":{"-1":3},"biases":{"-1":[0.993949520588219]},"weights":{"-1":[[1.93992007980634,1.92595985995864,-0.96516402657498]],"0":[[1.0],[1.0],[1.0]]}}
+
+graph network(input) -> (output)
+{
+	input = external(shape = [1, 3]);
+	w_out1 = variable(shape = [1, 3], label = 'w_out1');
+	b_out1 = variable(shape = [1], label = 'b_out1');
+	m_out1 = matmul(input, w_out1);
+	z_out1 = add(m_out1, b_out1);
+	output = z_out1;
+}

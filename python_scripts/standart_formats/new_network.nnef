@@ -1,0 +1,11 @@
+# NNEF graph definition
+version 1.0;
+
+graph simple_linear(
+    input: tensor<1, 3>
+) -> (output: tensor<1, 1>)
+{
+    weights = constant<1, 3>(data = [2.0, 2.0, -1.0]);
+    bias = constant<1>(data = [0.0]);
+    output = matmul(input, transpose(weights)) + bias;
+}

@@ -56,10 +56,10 @@ func _export_network(file_path: String, format: String) -> bool:
 
 	match format:
 		"onnx":
-			ONNXExporter.new().export_network(Variables.nn.nn_dict, Variables.nn.nn_func_dict, file_path)
+			ONNXExporter.new().export_network(Variables.nn.nn_dict, Variables.nn.nn_bias_dict, Variables.nn.nn_func_dict, file_path)
 			SignalsObserver.export_onnx.emit()
 		"nnef":
-			NNEFExporter.new().export_to_nnef(file_path, Variables.nn.nn_dict, Variables.nn.nn_func_dict)
+			NNEFExporter.new().export_to_nnef(file_path, Variables.nn.nn_dict, Variables.nn.nn_bias_dict, Variables.nn.nn_func_dict)
 			SignalsObserver.export_nnef.emit()
 		_:
 			return false

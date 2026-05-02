@@ -182,7 +182,11 @@ func _import_network(file_path: String, display_name: String = "") -> void:
 
 	Variables.nn.nn_tmp_dict = _to_typed_weight_dict(result.get("weights", {}))
 	Variables.nn.nn_func_tmp_dict = _to_typed_activation_dict(result.get("activations", {}))
-	Variables.nn.reset_biases_tmp_to_random()
+	var imported_biases: Dictionary = result.get("biases", {})
+	if imported_biases.is_empty():
+		Variables.nn.reset_biases_tmp_to_random()
+	else:
+		Variables.nn.nn_bias_tmp_dict = _to_typed_bias_dict(imported_biases)
 	if not Variables.nn.nn_func_tmp_dict.has(-1):
 		Variables.nn.nn_func_tmp_dict[-1] = Constants.ACT_FUNCS.identity
 
@@ -210,6 +214,13 @@ func _to_typed_activation_dict(source: Dictionary) -> Dictionary[int, int]:
 	var result: Dictionary[int, int] = {}
 	for key in source.keys():
 		result[int(key)] = int(source[key])
+	return result
+
+
+func _to_typed_bias_dict(source: Dictionary) -> Dictionary[int, Array]:
+	var result: Dictionary[int, Array] = {}
+	for key in source.keys():
+		result[int(key)] = source[key]
 	return result
 
 func _on_button_pressed(option: String):

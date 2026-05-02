@@ -43,6 +43,7 @@ func _try_import_metadata(content: String) -> Dictionary:
 		return {
 			"ok": true,
 			"weights": _dictionary_with_int_keys(parsed.get("weights", {}), true),
+			"biases": _dictionary_with_int_keys(parsed.get("biases", {}), true),
 			"activations": _dictionary_with_int_keys(parsed.get("activations", {}), false),
 		}
 
@@ -51,6 +52,7 @@ func _try_import_metadata(content: String) -> Dictionary:
 
 func _import_from_graph_text(content: String) -> Dictionary:
 	var weights: Dictionary[int, Array] = {}
+	var biases: Dictionary[int, Array] = {}
 	var activations: Dictionary[int, int] = {}
 
 	for line in content.split("\n"):
@@ -67,6 +69,14 @@ func _import_from_graph_text(content: String) -> Dictionary:
 			var shape := _extract_shape(trimmed)
 			if shape.size() >= 2:
 				weights[layer_id] = _zeros_matrix(int(shape[0]), int(shape[1]))
+			continue
+
+		if trimmed.begins_with("b_") and trimmed.contains("variable"):
+			var variable_name := trimmed.get_slice(" ", 0)
+			var layer_id := _layer_id_from_nnef_name(variable_name.trim_prefix("b_"))
+			var shape := _extract_shape(trimmed)
+			if not shape.is_empty():
+				biases[layer_id] = _zeros_vector(int(shape[0]))
 			continue
 
 		for activation_name in ACTIVATION_MAP.keys():
@@ -93,6 +103,7 @@ func _import_from_graph_text(content: String) -> Dictionary:
 	return {
 		"ok": true,
 		"weights": weights,
+		"biases": biases,
 		"activations": activations,
 	}
 
@@ -151,6 +162,13 @@ func _zeros_matrix(rows: int, cols: int) -> Array:
 			row.append(0.0)
 		matrix.append(row)
 	return matrix
+
+
+func _zeros_vector(size: int) -> Array:
+	var vector: Array = []
+	for _idx in range(max(size, 1)):
+		vector.append(0.0)
+	return vector
 
 
 func _get_sorted_layer_ids(keys: Array) -> Array[int]:

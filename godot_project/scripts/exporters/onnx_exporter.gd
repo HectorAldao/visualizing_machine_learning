@@ -9,7 +9,7 @@ const ACTIVATION_MAP = {
 	3: "Identity"
 }
 
-func export_network(weights: Dictionary, activations: Dictionary, file_path: String) -> void:
+func export_network(weights: Dictionary, biases: Dictionary, activations: Dictionary, file_path: String) -> void:
 	var layer_ids = weights.keys()
 	layer_ids.sort()
 	
@@ -37,7 +37,7 @@ func export_network(weights: Dictionary, activations: Dictionary, file_path: Str
 		var current_weights = weights[current_id]
 		var activation_id = activations.get(current_id, 3) # Default Identity
 		
-		# 1. Definir Initializers (Pesos)
+		# 1. Definir Initializers (Pesos y bias)
 		# En ONNX, los pesos son tensores. Convertimos Array[Array] a Array plano.
 		var flattened_weights = []
 		var shape = [current_weights.size(), 0]
@@ -53,10 +53,20 @@ func export_network(weights: Dictionary, activations: Dictionary, file_path: Str
 			"dims": shape,
 			"float_data": flattened_weights
 		})
+
+		var bias_name = "B" + str(current_id)
+		var current_biases: Array = _get_layer_biases(biases, current_id, shape[0])
+		onnx_graph.graph.initializer.append({
+			"name": bias_name,
+			"data_type": 1, # float32
+			"dims": [shape[0]],
+			"float_data": current_biases
+		})
 		
 		# 2. Definir Nodos (Operación MatMul + Activación)
 		var input_name = "input_" + str(current_id) if i == 0 else "act_" + str(layer_ids[i-1])
 		var matmul_output = "matmul_" + str(current_id)
+		var biased_output = "biased_" + str(current_id)
 		var act_output = "act_" + str(current_id)
 		
 		# Nodo de multiplicación de matrices: Y = W \cdot X
@@ -66,10 +76,17 @@ func export_network(weights: Dictionary, activations: Dictionary, file_path: Str
 			"op_type": "MatMul",
 			"name": "MatMul_" + str(current_id)
 		})
+
+		onnx_graph.graph.node.append({
+			"input": [matmul_output, bias_name],
+			"output": [biased_output],
+			"op_type": "Add",
+			"name": "AddBias_" + str(current_id)
+		})
 		
 		# Nodo de activación
 		onnx_graph.graph.node.append({
-			"input": [matmul_output],
+			"input": [biased_output],
 			"output": [act_output],
 			"op_type": ACTIVATION_MAP[activation_id],
 			"name": "Activation_" + str(current_id)
@@ -90,6 +107,21 @@ func export_network(weights: Dictionary, activations: Dictionary, file_path: Str
 
 	# Guardar archivo
 	_save_json(onnx_graph, file_path)
+
+
+func _get_layer_biases(biases: Dictionary, layer_id: int, target_size: int) -> Array:
+	var layer_biases: Array = biases.get(layer_id, [])
+	var result: Array = []
+	result.resize(max(target_size, 0))
+
+	for bias_idx in range(result.size()):
+		if bias_idx < layer_biases.size():
+			result[bias_idx] = float(layer_biases[bias_idx])
+		else:
+			result[bias_idx] = 0.0
+
+	return result
+
 
 func _save_json(data: Dictionary, path: String) -> void:
 	var file = FileAccess.open(path, FileAccess.WRITE)

@@ -9,7 +9,7 @@ const ACTIVATIONS = {
 	3: "identity"
 }
 
-func export_to_nnef(path: String, weights: Dictionary, activations: Dictionary) -> void:
+func export_to_nnef(path: String, weights: Dictionary, biases: Dictionary, activations: Dictionary) -> void:
 	var file = FileAccess.open(path, FileAccess.WRITE)
 	if not file:
 		push_error("No se pudo crear el archivo NNEF")
@@ -19,6 +19,7 @@ func export_to_nnef(path: String, weights: Dictionary, activations: Dictionary) 
 	file.store_line("version 1.0;")
 	file.store_line("# godot_nn_metadata = %s" % JSON.stringify({
 		"weights": weights,
+		"biases": biases,
 		"activations": activations,
 	}))
 	file.store_line("")
@@ -51,10 +52,14 @@ func export_to_nnef(path: String, weights: Dictionary, activations: Dictionary) 
 		# NNEF requieres to define the weight as variables
 		var weight_var = "w_" + str(id).replace("-", "out")
 		file.store_line("\t%s = variable(shape = [%d, %d], label = '%s');" % [weight_var, rows, cols, weight_var])
+		var bias_var = "b_" + str(id).replace("-", "out")
+		file.store_line("\t%s = variable(shape = [%d], label = '%s');" % [bias_var, rows, bias_var])
 		
 		# Matmul
 		var linear_output = "z_" + str(id).replace("-", "out")
-		file.store_line("\t%s = matmul(%s, %s);" % [linear_output, last_tensor_name, weight_var])
+		var matmul_output = "m_" + str(id).replace("-", "out")
+		file.store_line("\t%s = matmul(%s, %s);" % [matmul_output, last_tensor_name, weight_var])
+		file.store_line("\t%s = add(%s, %s);" % [linear_output, matmul_output, bias_var])
 		
 		# Activation operation
 		var act_func = ACTIVATIONS.get(activation_id, "identity")

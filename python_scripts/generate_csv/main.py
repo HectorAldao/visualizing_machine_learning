@@ -4,7 +4,7 @@ import os
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-n_filas = 500
+n_filas = 50
 np.random.seed(42)
 
 data = {
