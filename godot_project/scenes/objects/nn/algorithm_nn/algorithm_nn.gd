@@ -1,25 +1,48 @@
 class_name AlgorithmNn extends Node
 
+
+# Nn related variables
+
+# Weights of the network, its going to be updated on each 
+var _weights: Dictionary = {}
+# Activacion function for each layer
+var _activations: Dictionary = {}
+# The data used to train the nn
+var _train_data: Array[Dictionary] = []
+# The input atributes
+var _train_attributes: Array[String] = []
+# Tht names on the output neurons
+var _target_attributes: Array[String] = []
+
+# Learning rate
+var _learning_rate: float = 0.01
+# Function to which compute the error
+var _loss_type: int = Constants.LOSS_FUNCS.mse
+
+
+# Logistic variables
+
+# Arrays used to iterate over the layers
+var _sorted_layer_indices: Array[int] = []
+var _reversed_layer_indices: Array[int] = []
+
 # Intermediate states stored for backpropagation and visualization
 var layer_outputs: Dictionary = {} # Store 'a' values (after activation)
 var layer_weighted_sums: Dictionary = {} # Store 'z' values (before activation)
 var layer_deltas: Dictionary = {}
 
-var _weights: Dictionary = {}
-var _activations: Dictionary = {}
-var _train_data: Array[Dictionary] = []
-var _train_attributes: Array[String] = []
-var _target_attributes: Array[String] = []
-var _learning_rate: float = 0.01
-var _loss_type: int = Constants.LOSS_FUNCS.mse
 
-var _sorted_layer_indices: Array[int] = []
-var _reversed_layer_indices: Array[int] = []
+# State machine related variables
 
+# Current item in traning data
 var _current_data_idx: int = 0
+# State of the nn
 var _current_phase: String = "idle"
+# Index of the current layer
 var _current_layer_cursor: int = 0
+# Index of the current neuron in the current laer
 var _current_neuron_cursor: int = 0
+# The array of current input data
 var _current_input_data: Array = []
 var _current_target_data: Array = []
 var _backprop_weights_snapshot: Dictionary = {}
@@ -32,25 +55,27 @@ var _cached_deltas: Array = []
 
 
 func _ready() -> void:
+	# Connect the signals related to the buttons in panel_algorithm_nn
 	SignalsObserver.train_nn_next_neuron.connect(train_next_neuron)
 	SignalsObserver.train_nn_next_layer.connect(train_next_layer)
 	SignalsObserver.train_nn_next_step.connect(train_next_step)
 	SignalsObserver.train_nn_complete.connect(train_complete)
 
 
-func train_step(
-	weights: Dictionary,
-	activations: Dictionary,
-	input_data: Array,
-	target_data: Array,
-	learning_rate: float,
-	loss_type: int = Constants.LOSS_FUNCS.mse
-) -> void:
-	var output_data: Array = perform_forward_propagation(weights, activations, input_data)
-	print("[LOG] the output for input data was %s" % output_data)
-	perform_backward_propagation(weights, activations, target_data, learning_rate, loss_type)
+# func train_step(
+# 	weights: Dictionary,
+# 	activations: Dictionary,
+# 	input_data: Array,
+# 	target_data: Array,
+# 	learning_rate: float,
+# 	loss_type: int = Constants.LOSS_FUNCS.mse
+# ) -> void:
+# 	var output_data: Array = perform_forward_propagation(weights, activations, input_data)
+# 	print("[LOG] the output for input data was %s" % output_data)
+# 	perform_backward_propagation(weights, activations, target_data, learning_rate, loss_type)
 
 
+## Prepares the variables for the training
 func configure_training(
 	train_data: Array[Dictionary],
 	train_attributes: Array[String],
@@ -60,6 +85,7 @@ func configure_training(
 	learning_rate: float,
 	loss_type: int = Constants.LOSS_FUNCS.mse
 ) -> void:
+
 	_train_data = train_data.duplicate(true)
 	_train_attributes = train_attributes.duplicate()
 	_target_attributes = target_attributes.duplicate()
@@ -117,83 +143,84 @@ func train_complete() -> void:
 # --- Forward methods ---
 
 ## Pass the output of each layer for the next one in order
-func perform_forward_propagation(weights: Dictionary, activations: Dictionary, input_data: Array) -> Array:
-	layer_outputs[0] = input_data
-
-	var layer_indices: Array[int] = _get_sorted_layer_indices(weights.keys())
-	var current_input: Array[float] = input_data
-
-	for l_idx in layer_indices:
-		var layer_results: Dictionary[String, Array] = compute_layer_forward(current_input, weights[l_idx], activations[l_idx], l_idx)
-		layer_weighted_sums[l_idx] = layer_results["z"]
-		layer_outputs[l_idx] = layer_results["a"]
-		current_input = layer_results["a"]
-
-	return current_input
+# func perform_forward_propagation(weights: Dictionary, activations: Dictionary, input_data: Array) -> Array:
+# 	layer_outputs[0] = input_data
+# 
+# 	var layer_indices: Array[int] = _get_sorted_layer_indices(weights.keys())
+# 	var current_input: Array[float] = input_data
+# 
+# 	for l_idx in layer_indices:
+# 		var layer_results: Dictionary[String, Array] = compute_layer_forward(current_input, weights[l_idx], activations[l_idx], l_idx)
+# 		layer_weighted_sums[l_idx] = layer_results["z"]
+# 		layer_outputs[l_idx] = layer_results["a"]
+# 		current_input = layer_results["a"]
+# 
+# 	return current_input
 
 
 ## Pass a input of a layer
-func compute_layer_forward(inputs: Array, layer_weights: Array, activation_type: int, layer_idx: int) -> Dictionary:
-	var z_values: Array = []
-	var a_values: Array = []
-
-	for i in range(layer_weights.size()):
-		var neuron_weights: Array[Array] = layer_weights[i]
-		var z: float = compute_dot_product(inputs, neuron_weights)
-		z_values.append(z)
-
-	if _is_softmax_activation(activation_type):
-		a_values = _apply_softmax(z_values)
-		for i in range(a_values.size()):
-			SignalsObserver.forward_step_completed.emit(layer_idx, i, a_values[i])
-	else:
-		for i in range(z_values.size()):
-			var neuron_output: float = apply_activation(z_values[i], activation_type)
-			SignalsObserver.forward_step_completed.emit(layer_idx, i, neuron_output)
-			a_values.append(neuron_output)
-
-	return {"z": z_values, "a": a_values}
+# func compute_layer_forward(inputs: Array, layer_weights: Array, activation_type: int, layer_idx: int) -> Dictionary:
+# 	var z_values: Array = []
+# 	var a_values: Array = []
+# 
+# 	for i in range(layer_weights.size()):
+# 		var neuron_weights: Array[Array] = layer_weights[i]
+# 		var z: float = compute_dot_product(inputs, neuron_weights)
+# 		z_values.append(z)
+# 
+# 	if _is_softmax_activation(activation_type):
+# 		a_values = _apply_softmax(z_values)
+# 		for i in range(a_values.size()):
+# 			SignalsObserver.forward_step_completed.emit(layer_idx, i, a_values[i])
+# 	else:
+# 		for i in range(z_values.size()):
+# 			var neuron_output: float = apply_activation(z_values[i], activation_type)
+# 			SignalsObserver.forward_step_completed.emit(layer_idx, i, neuron_output)
+# 			a_values.append(neuron_output)
+# 
+# 	return {"z": z_values, "a": a_values}
 
 
 # --- Backward methods ---
 
 ## Update the weights basen on the error of the output
-func perform_backward_propagation(
-	weights: Dictionary,
-	activations: Dictionary,
-	target: Array,
-	lr: float,
-	loss_type: int = Constants.LOSS_FUNCS.mse
-) -> void:
-	var deltas: Dictionary = {}
-	var forward_layer_indices: Array[int] = _get_sorted_layer_indices(weights.keys())
-	var backward_layer_indices: Array[int] = forward_layer_indices.duplicate()
-	backward_layer_indices.reverse()
-	var weights_snapshot: Dictionary = weights.duplicate(true)
-
-	for l_idx in backward_layer_indices:
-		var next_layer_idx: int = _get_next_layer_index(l_idx, forward_layer_indices)
-		var next_deltas: Array[float] = deltas.get(next_layer_idx, [])
-		var next_weights: Array = weights_snapshot.get(next_layer_idx, [])
-
-		var current_layer_deltas: Array[float] = compute_layer_deltas(
-			l_idx,
-			target,
-			layer_outputs[l_idx],
-			layer_weighted_sums[l_idx],
-			activations[l_idx],
-			loss_type,
-			next_deltas,
-			next_weights
-		)
-
-		deltas[l_idx] = current_layer_deltas
-		var prev_layer_idx = _get_previous_layer_index(l_idx, weights.keys())
-		update_layer_weights(weights[l_idx], current_layer_deltas, layer_outputs[prev_layer_idx], lr, l_idx)
+# func perform_backward_propagation(
+# 	weights: Dictionary,
+# 	activations: Dictionary,
+# 	target: Array,
+# 	lr: float,
+# 	loss_type: int = Constants.LOSS_FUNCS.mse
+# ) -> void:
+# 	var deltas: Dictionary = {}
+# 	var forward_layer_indices: Array[int] = _get_sorted_layer_indices(weights.keys())
+# 	var backward_layer_indices: Array[int] = forward_layer_indices.duplicate()
+# 	backward_layer_indices.reverse()
+# 	var weights_snapshot: Dictionary = weights.duplicate(true)
+# 
+# 	for l_idx in backward_layer_indices:
+# 		var next_layer_idx: int = _get_next_layer_index(l_idx, forward_layer_indices)
+# 		var next_deltas: Array[float] = deltas.get(next_layer_idx, [])
+# 		var next_weights: Array = weights_snapshot.get(next_layer_idx, [])
+# 
+# 		var current_layer_deltas: Array[float] = compute_layer_deltas(
+# 			l_idx,
+# 			target,
+# 			layer_outputs[l_idx],
+# 			layer_weighted_sums[l_idx],
+# 			activations[l_idx],
+# 			loss_type,
+# 			next_deltas,
+# 			next_weights
+# 		)
+# 
+# 		deltas[l_idx] = current_layer_deltas
+# 		var prev_layer_idx = _get_previous_layer_index(l_idx, weights.keys())
+# 		update_layer_weights(weights[l_idx], current_layer_deltas, layer_outputs[prev_layer_idx], lr, l_idx)
 
 
 ## Calculates deltas for both output and hidden layers.
 ## Output layer is handled as a special case internally.
+## It outputs an Array of the 
 func compute_layer_deltas(
 	layer_idx: int,
 	target: Array,
@@ -205,21 +232,44 @@ func compute_layer_deltas(
 	next_weights: Array,
 	emit_signals: bool = true
 ) -> Array[float]:
+
+	# Get the number of neurons
 	var num_neurons: int = z_values.size()
 	var upstream_gradients: Array[float] = []
 	upstream_gradients.resize(num_neurons)
 
+	# If its the las layer
 	if layer_idx == -1:
+		# and softmax function with coross_entropy
 		if _is_softmax_activation(act_type) and loss_type == Constants.LOSS_FUNCS.coss_entr:
+			# Initialize the array of deltas
 			var output_deltas: Array[float] = []
+			# For each neuron
 			for i in range(num_neurons):
+				# Compute the delta
+				# SOFTMAX + CROSS-ENTROPY OPTIMIZATION:
+				# Mathematically, the output delta is calculated via the chain rule by multiplying the 
+				# derivative of the loss function (-target / output) by the derivative (Jacobian) of 
+				# the Softmax activation function.
+				#
+				# THE PROBLEM: This approach is computationally expensive and numerically unstable, as 
+				# it involves divisions by very small values that can lead to gradient explosion or NaN errors.
+				#
+				# THE SOLUTION: When combined, the derivative of the loss with respect to the net input 
+				# (logits) simplifies elegantly to (output - target). This is the industry standard 
+				# because it is exact, computationally efficient, and provides perfect numerical stability.
 				var output_delta: float = output_values[i] - target[i]
 				output_deltas.append(output_delta)
 				if emit_signals:
 					SignalsObserver.backward_step_completed.emit(layer_idx, i, output_delta)
 			return output_deltas
 
+		# if its not softmax with coross_entropy
+		# just compute the difference between output and target
+		# with the corresponding loss type
 		upstream_gradients = _compute_output_loss_error(output_values, target, loss_type)
+
+	# If its not the last layer
 	else:
 		for i in range(num_neurons):
 			var error_sum: float = 0.0
@@ -241,14 +291,23 @@ func compute_layer_deltas(
 	return deltas
 
 
+## Computes the loss based on the specified loss function
+##
+## Returns an Array of the error of each neuron
 func _compute_output_loss_error(output_values: Array, target: Array, loss_type: int) -> Array[float]:
+
 	var output_error: Array[float] = []
 	var num_neurons: int = output_values.size()
 
+	# Each loss_func calculates the loss in a different way
 	match loss_type:
+
+		# MSE
 		Constants.LOSS_FUNCS.mse:
 			for i in range(num_neurons):
-				output_error.append(abs(output_values[i] - target[i]))
+				output_error.append(output_values[i] - target[i])
+
+		# Cross entropy
 		Constants.LOSS_FUNCS.coss_entr:
 			var epsilon: float = 1e-8
 			for i in range(num_neurons):
@@ -261,12 +320,12 @@ func _compute_output_loss_error(output_values: Array, target: Array, loss_type: 
 	return output_error
 
 
-func update_layer_weights(layer_weights: Array, current_layer_deltas: Array, prev_outputs: Array, lr: float, l_idx: int) -> void:
-	for i in range(layer_weights.size()):
-		for j in range(layer_weights[i].size()):
-			var gradient = current_layer_deltas[i] * prev_outputs[j]
-			layer_weights[i][j] -= lr * gradient
-			SignalsObserver.weight_updated.emit(l_idx, i, j, layer_weights[i][j])
+# func update_layer_weights(layer_weights: Array, current_layer_deltas: Array, prev_outputs: Array, lr: float, l_idx: int) -> void:
+# 	for i in range(layer_weights.size()):
+# 		for j in range(layer_weights[i].size()):
+# 			var gradient = current_layer_deltas[i] * prev_outputs[j]
+# 			layer_weights[i][j] -= lr * gradient
+# 			SignalsObserver.weight_updated.emit(l_idx, i, j, layer_weights[i][j])
 
 
 # --- Incremental training flow ---
