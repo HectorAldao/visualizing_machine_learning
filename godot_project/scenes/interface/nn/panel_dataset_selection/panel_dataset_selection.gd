@@ -182,6 +182,7 @@ func _import_network(file_path: String, display_name: String = "") -> void:
 
 	Variables.nn.nn_tmp_dict = _to_typed_weight_dict(result.get("weights", {}))
 	Variables.nn.nn_func_tmp_dict = _to_typed_activation_dict(result.get("activations", {}))
+	Variables.nn.reset_biases_tmp_to_random()
 	if not Variables.nn.nn_func_tmp_dict.has(-1):
 		Variables.nn.nn_func_tmp_dict[-1] = Constants.ACT_FUNCS.identity
 

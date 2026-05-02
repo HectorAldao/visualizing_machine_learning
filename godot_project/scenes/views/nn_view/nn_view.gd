@@ -248,6 +248,7 @@ func _configure_algorithm_training() -> void:
 		train_attributtes,
 		train_target_attributes,
 		Variables.nn.nn_tmp_dict,
+		Variables.nn.nn_bias_tmp_dict,
 		Variables.nn.nn_func_dict,
 		Constants.NN_LEARNINGRATE,
 		loss_type

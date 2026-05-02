@@ -5,6 +5,8 @@ class_name AlgorithmNn extends Node
 
 # Weights of the network, its going to be updated on each 
 var _weights: Dictionary = {}
+# Biases of each trainable neuron, parallel to _weights by layer and neuron.
+var _biases: Dictionary = {}
 # Activacion function for each layer
 var _activations: Dictionary = {}
 # The data used to train the nn
@@ -81,6 +83,7 @@ func configure_training(
 	train_attributes: Array[String],
 	target_attributes: Array[String],
 	weights: Dictionary,
+	biases: Dictionary,
 	activations: Dictionary,
 	learning_rate: float,
 	loss_type: int = Constants.LOSS_FUNCS.mse
@@ -90,6 +93,7 @@ func configure_training(
 	_train_attributes = train_attributes.duplicate()
 	_target_attributes = target_attributes.duplicate()
 	_weights = weights
+	_biases = _ensure_biases_match_weights(biases, _weights)
 	_activations = activations
 	_learning_rate = learning_rate
 	_loss_type = loss_type
@@ -477,8 +481,10 @@ func _prepare_forward_cache(layer_idx: int) -> void:
 
 	var z_values: Array = []
 	var layer_weights: Array = _weights[layer_idx]
-	for neuron_weights in layer_weights:
-		z_values.append(compute_dot_product(_current_input_data, neuron_weights))
+	for neuron_idx in range(layer_weights.size()):
+		var neuron_weights: Array = layer_weights[neuron_idx]
+		var neuron_bias: float = _get_neuron_bias(layer_idx, neuron_idx)
+		z_values.append(compute_weighted_sum(_current_input_data, neuron_weights, neuron_bias))
 
 	var a_values: Array = []
 	if _is_softmax_activation(_activations[layer_idx]):
@@ -546,8 +552,11 @@ func _update_neuron_weights(layer_idx: int, neuron_idx: int, neuron_delta: float
 		neuron_weights[weight_idx] -= _learning_rate * gradient
 		SignalsObserver.weight_updated.emit(layer_idx, neuron_idx, weight_idx, neuron_weights[weight_idx])
 
+	_update_neuron_bias(layer_idx, neuron_idx, neuron_delta)
 	Variables.nn.nn_tmp_dict = _weights
 	Variables.nn.nn_dict = _weights.duplicate(true)
+	Variables.nn.nn_bias_tmp_dict = _biases
+	Variables.nn.nn_bias_dict = _biases.duplicate(true)
 
 
 func _clear_layer_cache() -> void:
@@ -573,6 +582,8 @@ func _reset_runtime_state() -> void:
 func _sync_weights_with_variables() -> void:
 	Variables.nn.nn_tmp_dict = _weights
 	Variables.nn.nn_dict = _weights.duplicate(true)
+	Variables.nn.nn_bias_tmp_dict = _biases
+	Variables.nn.nn_bias_dict = _biases.duplicate(true)
 
 
 func _is_training_finished() -> bool:
@@ -599,6 +610,80 @@ func compute_dot_product(inputs: Array, neuron_weights: Array) -> float:
 	for i in range(inputs.size()):
 		activation_sum += inputs[i] * neuron_weights[i]
 	return activation_sum
+
+
+func compute_weighted_sum(inputs: Array, neuron_weights: Array, bias: float) -> float:
+	return compute_dot_product(inputs, neuron_weights) + bias
+
+
+func _get_neuron_bias(layer_idx: int, neuron_idx: int) -> float:
+	if not _biases.has(layer_idx):
+		return 0.0
+
+	var layer_biases: Array = _biases[layer_idx]
+	if neuron_idx < 0 or neuron_idx >= layer_biases.size():
+		return 0.0
+
+	return float(layer_biases[neuron_idx])
+
+
+func _update_neuron_bias(layer_idx: int, neuron_idx: int, neuron_delta: float) -> void:
+	if not _biases.has(layer_idx):
+		_biases[layer_idx] = _create_bias_vector(_weights.get(layer_idx, []).size())
+
+	var layer_biases: Array = _biases[layer_idx]
+	if neuron_idx < 0:
+		return
+
+	while neuron_idx >= layer_biases.size():
+		layer_biases.append(_random_bias())
+
+	var bias_gradient: float = neuron_delta
+	layer_biases[neuron_idx] -= _learning_rate * bias_gradient
+
+
+func _ensure_biases_match_weights(biases: Dictionary, weights: Dictionary) -> Dictionary:
+	var synced_biases: Dictionary = biases
+
+	for layer_idx in weights.keys():
+		if layer_idx == 0:
+			synced_biases.erase(layer_idx)
+			continue
+
+		var layer_weights: Array = weights[layer_idx]
+		var layer_biases: Array = synced_biases.get(layer_idx, [])
+		var synced_layer_biases: Array = []
+		synced_layer_biases.resize(layer_weights.size())
+
+		for neuron_idx in range(layer_weights.size()):
+			if neuron_idx < layer_biases.size():
+				synced_layer_biases[neuron_idx] = float(layer_biases[neuron_idx])
+			else:
+				synced_layer_biases[neuron_idx] = _random_bias()
+
+		synced_biases[layer_idx] = synced_layer_biases
+
+	var layers_to_remove: Array = []
+	for layer_idx in synced_biases.keys():
+		if layer_idx == 0 or not weights.has(layer_idx):
+			layers_to_remove.append(layer_idx)
+
+	for layer_idx in layers_to_remove:
+		synced_biases.erase(layer_idx)
+
+	return synced_biases
+
+
+func _create_bias_vector(size: int) -> Array:
+	var biases: Array = []
+	biases.resize(max(size, 0))
+	for i in range(biases.size()):
+		biases[i] = _random_bias()
+	return biases
+
+
+func _random_bias() -> float:
+	return Constants.NN_CONNECTION_RANDOM_MULT * randfn(0.0, sqrt(Constants.NN_CONNECTION_VARIANCE))
 
 
 func apply_activation(x: float, type: int) -> float:

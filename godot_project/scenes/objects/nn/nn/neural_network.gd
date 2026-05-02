@@ -4,6 +4,7 @@ class_name NeuralNetwork extends MarginContainer
 @onready var layers: HBoxContainer = $Layers
 
 var nn_dict: Dictionary[int, int]
+var nn_bias_dict: Dictionary[int, Array]
 
 
 func _ready() -> void:

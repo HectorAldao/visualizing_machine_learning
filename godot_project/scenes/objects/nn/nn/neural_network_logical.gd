@@ -2,14 +2,18 @@ class_name NeuralNetworkLogial extends RefCounted
 
 var nn_dict: Dictionary[int, Array] = {0: [[1]], -1: [[0.0]]}
 var nn_func_dict: Dictionary[int, int] = {-1: Constants.ACT_FUNCS.softmax}
+var nn_bias_dict: Dictionary[int, Array] = {-1: [0.0]}
 # The tmp_dicts are used to save the state of the create_nn_menu
 var nn_tmp_dict: Dictionary[int, Array] = {0: [[1]], -1: [[0.0]]}
 var nn_func_tmp_dict: Dictionary[int, int] = {-1: Constants.ACT_FUNCS.softmax}
+var nn_bias_tmp_dict: Dictionary[int, Array] = {-1: [0.0]}
 
 
 func _init() -> void:
 	nn_tmp_dict[-1][0][0] = _random_connection_weight()
+	nn_bias_tmp_dict[-1][0] = _random_bias()
 	nn_dict = nn_tmp_dict.duplicate(true)
+	nn_bias_dict = nn_bias_tmp_dict.duplicate(true)
 
 
 ## Constructor of the class
@@ -30,8 +34,15 @@ func set_layer_activation_tmp(layer_id: int, activation_func_id: int) -> void:
 ## True copy (deep copy) of the tmp dictionary into the definitive one
 func apply_tmp_to_main() -> void:
 	_force_input_layer_weights_to_one(nn_tmp_dict)
+	_sync_bias_dict_to_weights(nn_bias_tmp_dict, nn_tmp_dict)
 	nn_dict = nn_tmp_dict.duplicate(true)
 	nn_func_dict = nn_func_tmp_dict.duplicate(true)
+	nn_bias_dict = nn_bias_tmp_dict.duplicate(true)
+
+
+func reset_biases_tmp_to_random() -> void:
+	nn_bias_tmp_dict.clear()
+	_sync_bias_dict_to_weights(nn_bias_tmp_dict, nn_tmp_dict)
 
 
 ## Change the info about a layer: its weights
@@ -46,6 +57,9 @@ func set_layer_neuron_count_tmp(layer_id: int, target_neurons: int) -> void:
 	nn_tmp_dict[layer_id] = _resize_layer_matrix(nn_tmp_dict.get(layer_id, []), target_neurons, previous_layer_neurons)
 	if layer_id == 0:
 		_force_input_layer_weights_to_one(nn_tmp_dict)
+		nn_bias_tmp_dict.erase(0)
+	else:
+		nn_bias_tmp_dict[layer_id] = _resize_bias_vector(nn_bias_tmp_dict.get(layer_id, []), target_neurons)
 
 	# Because of this change in the amount of neurons, the next layer must
 	# change its weights too
@@ -75,6 +89,7 @@ func set_hidden_layer_count_tmp(target_hidden_layers: int) -> void:
 
 		nn_tmp_dict[new_hidden_layer_id] = _resize_layer_matrix([], 1, previous_neurons)
 		nn_func_tmp_dict[new_hidden_layer_id] = Constants.ACT_FUNCS.relu
+		nn_bias_tmp_dict[new_hidden_layer_id] = _resize_bias_vector([], 1)
 
 		if nn_tmp_dict.has(-1):
 			nn_tmp_dict[-1] = _resize_layer_matrix(nn_tmp_dict[-1], nn_tmp_dict[-1].size(), 1)
@@ -85,6 +100,7 @@ func set_hidden_layer_count_tmp(target_hidden_layers: int) -> void:
 		var layer_id_to_remove: int = current_hidden_layers
 		nn_tmp_dict.erase(layer_id_to_remove)
 		nn_func_tmp_dict.erase(layer_id_to_remove)
+		nn_bias_tmp_dict.erase(layer_id_to_remove)
 		current_hidden_layers -= 1
 
 		var new_previous_layer_id: int = 0 if current_hidden_layers == 0 else current_hidden_layers
@@ -164,8 +180,44 @@ func _resize_layer_matrix(current_matrix: Array, target_rows: int, target_column
 	return resized_matrix
 
 
+func _resize_bias_vector(current_biases: Array, target_size: int) -> Array:
+	target_size = max(target_size, 1)
+
+	var resized_biases: Array = []
+	resized_biases.resize(target_size)
+
+	for bias_idx in range(target_size):
+		if bias_idx < current_biases.size():
+			resized_biases[bias_idx] = float(current_biases[bias_idx])
+		else:
+			resized_biases[bias_idx] = _random_bias()
+
+	return resized_biases
+
+
 func _random_connection_weight() -> float:
 	return Constants.NN_CONNECTION_RANDOM_MULT * randfn(0.0, sqrt(Constants.NN_CONNECTION_VARIANCE))
+
+
+func _random_bias() -> float:
+	return _random_connection_weight()
+
+
+func _sync_bias_dict_to_weights(target_bias_dict: Dictionary[int, Array], weight_dict: Dictionary[int, Array]) -> void:
+	var layers_to_remove: Array[int] = []
+	for layer_id in target_bias_dict.keys():
+		if layer_id == 0 or not weight_dict.has(layer_id):
+			layers_to_remove.append(layer_id)
+
+	for layer_id in layers_to_remove:
+		target_bias_dict.erase(layer_id)
+
+	for layer_id in weight_dict.keys():
+		if layer_id == 0:
+			continue
+
+		var layer_matrix: Array = weight_dict[layer_id]
+		target_bias_dict[layer_id] = _resize_bias_vector(target_bias_dict.get(layer_id, []), layer_matrix.size())
 
 
 func _force_input_layer_weights_to_one(target_dict: Dictionary[int, Array]) -> void:
