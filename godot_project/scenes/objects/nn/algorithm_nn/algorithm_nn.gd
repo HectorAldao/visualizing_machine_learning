@@ -15,7 +15,7 @@ var _train_attributes: Array[String] = []
 var _target_attributes: Array[String] = []
 
 # Learning rate
-var _learning_rate: float = 0.01
+var _learning_rate: float = Constants.NN_LEARNINGRATE
 # Function to which compute the error
 var _loss_type: int = Constants.LOSS_FUNCS.mse
 
@@ -271,18 +271,39 @@ func compute_layer_deltas(
 
 	# If its not the last layer
 	else:
+		# For a hidden layer there is no direct target value to compare against.
+		# Its error comes from every neuron in the next layer that used this
+		# neuron's output as an input. Each next-layer delta says "how much the
+		# loss changes with that next neuron's weighted sum", and next_weights[j][i]
+		# says how strongly this current neuron contributed to next neuron j.
+		#
+		# The weighted sum below is therefore the chain rule term:
+		# dLoss / dCurrentActivation[i] =
+		#     sum_j(next_weights[j][i] * next_deltas[j])
+		#
+		# We store it in upstream_gradients because it is the gradient arriving
+		# from the layer upstream in backpropagation. It is not this layer's delta
+		# yet: it is still with respect to the current neuron's activated output.
 		for i in range(num_neurons):
 			var error_sum: float = 0.0
 			for j in range(next_deltas.size()):
 				error_sum += next_weights[j][i] * next_deltas[j]
 			upstream_gradients[i] = error_sum
 
+	# Probably never its going to be needed
+	# If the act funct is softmax but the error is not coross entropy
 	if _is_softmax_activation(act_type):
 		var current_output = output_values if layer_idx == -1 else _apply_activation_values(z_values, act_type)
 		return _apply_softmax_backprop(current_output, upstream_gradients, layer_idx, emit_signals)
 
 	var deltas: Array[float] = []
 	for i in range(num_neurons):
+		# Convert the upstream gradient from "with respect to this neuron's
+		# activation" (a) into "with respect to this neuron's weighted sum z".
+		# This multiplication is the local activation part of the chain rule:
+		# delta_i = dLoss/dActivation_i * dActivation_i/dZ_i.
+		# Those deltas are the values used later to compute weight gradients:
+		# dLoss/dWeight_i_k = delta_i * previous_layer_output_k.
 		var delta: float = upstream_gradients[i] * apply_activation_derivative(z_values[i], act_type)
 		deltas.append(delta)
 		if emit_signals:

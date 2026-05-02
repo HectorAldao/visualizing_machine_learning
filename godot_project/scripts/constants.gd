@@ -60,3 +60,5 @@ const NN_CONECTION_BIAS: float = 0
 const NN_MAX_WIDTH: float = 5
 
 const NEURON_EVALUATED_SCALE: Vector2 = Vector2(1.25, 1.25)
+
+const NN_LEARNINGRATE: float = 0.001
