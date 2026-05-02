@@ -1,17 +1,19 @@
-import torch
-from onnx2torch import convert
+import os
+import onnx
 
-# 1. Cargar y convertir el modelo ONNX a un objeto nn.Module de PyTorch
-ruta_onnx = 'modelo.onnx'
-model_pytorch = convert(ruta_onnx)
+def check_onnx_model(file_path):
+    try:
+        # Cargar el modelo
+        model = onnx.load(file_path)
 
-# 2. Poner el modelo en modo evaluación
-model_pytorch.eval()
+        # Verificar que el grafo sea válido (nodos, entradas, salidas, etc.)
+        onnx.checker.check_model(model)
+        
+        print(f"Éxito: El archivo '{file_path}' se ha importado y verificado correctamente.")
+        
+    except Exception as e:
+        print(f"Error: No se pudo cargar el modelo. Detalle: {e}")
 
-# 3. Verificar con un tensor de prueba (ejemplo para una imagen RGB de 224x224)
-input_dummy = torch.randn(1, 3, 224, 224)
-
-with torch.no_grad():
-    output = model_pytorch(input_dummy)
-
-print(f"Forma del output: {output.shape}")
+if __name__ == "__main__":
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    check_onnx_model("network.onnx")

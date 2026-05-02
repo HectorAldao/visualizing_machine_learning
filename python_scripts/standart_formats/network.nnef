@@ -1,12 +1,11 @@
 version 1.0;
-# godot_nn_metadata = {"activations":{"-1":3},"biases":{"-1":[0.993949520588219]},"weights":{"-1":[[1.93992007980634,1.92595985995864,-0.96516402657498]],"0":[[1.0],[1.0],[1.0]]}}
+# godot_nn_metadata = {"activations":{"-1":3},"biases":{"-1":[0.993947643206937]},"weights":{"-1":[[1.938003488678,1.92870554200893,-0.961838516038765]],"0":[[1.0],[1.0],[1.0]]}}
 
-graph network(input) -> (output)
+graph network(input: tensor<1, 3>) -> (output: tensor<1, 1>)
 {
-	input = external(shape = [1, 3]);
-	w_out1 = variable(shape = [1, 3], label = 'w_out1');
-	b_out1 = variable(shape = [1], label = 'b_out1');
-	m_out1 = matmul(input, w_out1);
-	z_out1 = add(m_out1, b_out1);
-	output = z_out1;
+	w_out = constant<1, 3>(data = [1.938003488678, 1.92870554200893, -0.96183851603877]);
+	b_out = constant<1>(data = [0.99394764320694]);
+	m_out = matmul(input, transpose(w_out));
+	z_out = add(m_out, b_out);
+	output = z_out;
 }
