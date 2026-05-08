@@ -7,7 +7,12 @@ var _sorted_layer_indices: Array[int] = []
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+
 	SignalsObserver.train_nn.connect(_reset_training_cursor)
+
+	# Nn train finished
+	SignalsObserver.nn_train_finished.connect(_on_nn_train_finished)
+
 	$VBoxContainer/NextNeuronButton.pressed.connect(_on_next_neuron_pressed)
 	$VBoxContainer/NextLayerButton.pressed.connect(_on_next_layer_pressed)
 	$VBoxContainer/NextStepButton.pressed.connect(func(): SignalsObserver.train_nn_next_step.emit())
@@ -88,3 +93,11 @@ func _get_sorted_layer_indices(keys: Array[int]) -> Array[int]:
 		hidden_layers.append(-1)
 
 	return hidden_layers
+
+
+func _on_nn_train_finished() -> void:
+	$VBoxContainer/NextNeuronButton.disabled = true
+	$VBoxContainer/NextLayerButton.disabled = true
+	$VBoxContainer/NextStepButton.disabled = true
+	$VBoxContainer/CompleteTrainButton.disabled = true
+	$VBoxContainer/TestButton.disabled = false

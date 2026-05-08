@@ -439,6 +439,7 @@ func _finish_current_sample() -> void:
 
 	if _current_data_idx >= _train_data.size():
 		_current_phase = "finished"
+		SignalsObserver.nn_train_finished.emit()
 		print("[LOG] NN training completed")
 		return
 
