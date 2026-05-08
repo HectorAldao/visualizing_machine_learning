@@ -1,19 +1,20 @@
-class_name NnEvalData extends VBoxContainer
+class_name NnEvalData extends Label
 
 
 # List of the names of the atributes
-var atr_array: Array[String] = []
+var atr_name: String
 
 func _ready() -> void:
 
 	SignalsObserver.add_change_eval_data.connect(_on_change_nn_eval_data)
 
-# Constructor
-static func newone(new_atr_array: Array[String]) -> NnEvalData:
+## Constructor
+static func newone(new_atr_name: String) -> NnEvalData:
 	var evaldata: NnEvalData = preload(Constants.SCENES.nn_eval_data).instantiate()
-	evaldata.atr_array = new_atr_array
+	evaldata.atr_name = new_atr_name
 	return evaldata
 
 
-func _on_change_nn_eval_data(dict: Dictionary) -> void:
-	pass
+## To change the value due to a new data to be processed
+func _on_change_nn_eval_data(dict_of_values: Dictionary[String, String]) -> void:
+	text = dict_of_values[atr_name]

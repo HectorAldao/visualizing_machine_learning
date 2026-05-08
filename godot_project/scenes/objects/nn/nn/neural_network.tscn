@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://bs14tnn0hedwc" path="res://scenes/objects/nn/layer/layer.tscn" id="1_jb3y3"]
 [ext_resource type="Script" uid="uid://cephgxs7rofhq" path="res://scenes/objects/nn/nn/neural_network.gd" id="1_ldy44"]
 [ext_resource type="PackedScene" uid="uid://0ug2o1llytkb" path="res://scenes/objects/nn/dense_conection_container/dense_conection_container.tscn" id="3_cdegm"]
+[ext_resource type="PackedScene" uid="uid://bdapcoxrq8x3x" path="res://scenes/objects/nn/nn_eval_data_container/nn_eval_data_container.tscn" id="3_sqehu"]
 
 [node name="NeuralNetwork" type="MarginContainer" unique_id=1025306840]
 offset_right = 40.0
@@ -10,6 +11,9 @@ offset_bottom = 40.0
 script = ExtResource("1_ldy44")
 
 [node name="DenseConectionContainer" parent="." unique_id=1386064707 instance=ExtResource("3_cdegm")]
+layout_mode = 2
+
+[node name="NnEvalDataContainer" parent="." unique_id=962423117 instance=ExtResource("3_sqehu")]
 layout_mode = 2
 
 [node name="Layers" type="HBoxContainer" parent="." unique_id=2044067605]
