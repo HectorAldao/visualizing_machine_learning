@@ -75,6 +75,7 @@ signal forward_step_completed(layer_idx, neuron_idx, output_value)
 signal backward_step_completed(layer_idx, neuron_idx, delta_value)
 signal weight_updated(layer_idx, neuron_idx, weight_idx, new_value)
 signal nn_train_finished
+signal add_change_eval_data(dict_of_data)
 
 # panel algorithm nn
 signal train_nn_next_neuron(neuron_id: int, layer_id: int)

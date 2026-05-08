@@ -13,6 +13,7 @@ const SCENES: Dictionary[String, String] = {
 	"barschart": "uid://pycmc75uwvq0",
 	"eval_data": "uid://dlu0e0xckfe3q",
 	"eval_data_container": "uid://dli7f1or8hqm6",
+	"nn_eval_data":"uid://0nval2e1ex2v",
 
 	"nn_view": "uid://cxtlfe3b8dfux",
 	"layer": "uid://bs14tnn0hedwc",

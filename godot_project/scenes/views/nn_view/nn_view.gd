@@ -37,6 +37,9 @@ func _ready() -> void:
 	
 	# Save nn pressed
 	SignalsObserver.save_nn.connect(_on_save_nn_pressed)
+
+	# Start the inference mode
+	SignalsObserver.test_nn_start.connect(_on_start_nn_inferece)
 	
 	create_nn_menu.visible = true
 	dataset_selecion_menu.visible = true
@@ -256,3 +259,8 @@ func _configure_algorithm_training() -> void:
 
 func _on_save_nn_pressed() -> void:
 	panel_export_format.visible = not panel_export_format.visible
+
+
+func _on_start_nn_inferece() -> void:
+	
+	panel_algorithm_nn.visible = false
