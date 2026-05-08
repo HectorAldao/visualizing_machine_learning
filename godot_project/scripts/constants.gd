@@ -62,4 +62,16 @@ const NN_MAX_WIDTH: float = 5
 
 const NEURON_EVALUATED_SCALE: Vector2 = Vector2(1.25, 1.25)
 
+const NN_EVAL_DATA_DISPLAY_DECIMALS: int = 3
+const NN_EVAL_DATA_GAP: float = 24.0
+const NN_EVAL_DATA_EXPECTED_GAP: float = 56.0
+const NN_EVAL_DATA_APPEAR_OFFSET: Vector2 = Vector2(-32.0, 0.0)
+const NN_EVAL_DATA_ENTER_OFFSET: Vector2 = Vector2(42.0, 0.0)
+const NN_EVAL_DATA_ERROR_RETURN_OFFSET: Vector2 = Vector2(-42.0, 0.0)
+const NN_EVAL_DATA_APPEAR_TIME: float = 0.25
+const NN_EVAL_DATA_APPEAR_FADE_TIME: float = 0.2
+const NN_EVAL_DATA_MOVE_FADE_TIME: float = 0.35
+const NN_EVAL_DATA_EXPECTED_FADE_TIME: float = 0.25
+const NN_EVAL_DATA_NEXT_STEP_DELAY: float = 0.25
+
 const NN_LEARNINGRATE: float = 0.001

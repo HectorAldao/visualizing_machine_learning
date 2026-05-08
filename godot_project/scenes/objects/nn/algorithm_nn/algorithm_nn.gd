@@ -54,6 +54,10 @@ var _is_completing_training: bool = false
 # Prevents the input-value labels from playing the "enter network" animation more
 # than once for the same sample.
 var _input_values_entered_for_current_sample: bool = false
+# Output values already emitted for the current sample, keyed by output neuron id.
+# It lets the output column update one neuron at a time without clearing older
+# output labels.
+var _current_output_values: Dictionary = {}
 
 var _cached_phase: String = ""
 var _cached_layer_idx: int = 0
@@ -70,23 +74,10 @@ func _ready() -> void:
 	SignalsObserver.train_nn_complete.connect(train_complete)
 
 
-# func train_step(
-# 	weights: Dictionary,
-# 	activations: Dictionary,
-# 	input_data: Array,
-# 	target_data: Array,
-# 	learning_rate: float,
-# 	loss_type: int = Constants.LOSS_FUNCS.mse
-# ) -> void:
-# 	var output_data: Array = perform_forward_propagation(weights, activations, input_data)
-# 	print("[LOG] the output for input data was %s" % output_data)
-# 	perform_backward_propagation(weights, activations, target_data, learning_rate, loss_type)
-
-
 ## Prepares the variables for the training.
-## This is also the entry point for the visual input-data flow: it asks the
-## NnEvalDataContainer to create one label per input attribute, prepares sample
-## 0, and emits that sample without the "appear from left" animation.
+## This is also the entry point for the visual eval-data flow: it asks the three
+## NnEvalDataContainer roles to create labels, prepares sample 0, and emits input
+## plus expected values without the "appear from left" animation.
 func configure_training(
 	train_data: Array[Dictionary],
 	train_attributes: Array[String],
@@ -116,29 +107,33 @@ func configure_training(
 
 	if _train_data.is_empty() or _target_attributes.is_empty():
 		_current_phase = "finished"
-		SignalsObserver.clear_nn_eval_data.emit()
+		_clear_all_eval_data()
 		return
 
-	SignalsObserver.setup_nn_eval_data.emit(_train_attributes)
+	SignalsObserver.setup_nn_eval_data.emit("input", _train_attributes)
+	SignalsObserver.setup_nn_eval_data.emit("output", _get_output_value_keys())
+	SignalsObserver.setup_nn_eval_data.emit("expected", _get_output_value_keys())
 	_prepare_current_sample()
 	_emit_current_eval_data(false)
+	_emit_current_expected_data(false)
+	SignalsObserver.clear_nn_eval_data.emit("output")
 
 
 ## Advances exactly one neuron-sized operation in the current phase.
-## If the algorithm is waiting on load_sample, this button consumes that visual
-## sample-change step before forward propagation continues.
+## Visual phases count as one operation too, so this button can step through
+## load_sample, compare_outputs and return_errors one click at a time.
 func train_next_neuron(_neuron_id: int = -1, _layer_id: int = -9999) -> void:
 	_advance_one_neuron()
 
 
 ## Advances until the current layer changes.
-## The load_sample phase is treated as its own stop, so layer-level navigation
-## still pauses to show the next row entering the input layer.
+## Visual transition phases are treated as their own stops, so layer-level
+## navigation pauses on input loading, output comparison and error return.
 func train_next_layer(_layer_id: int = -9999) -> void:
 	if _is_training_finished():
 		return
 
-	if _current_phase == "load_sample":
+	if _is_visual_transition_phase():
 		_advance_one_neuron()
 		return
 
@@ -151,25 +146,25 @@ func train_next_layer(_layer_id: int = -9999) -> void:
 
 
 ## Advances one full training row.
-## When the previous row has just finished backpropagation, load_sample is the
-## next step and only changes the visible input values.
+## Unlike neuron/layer navigation, this waits for the output/error animations so
+## the row reads as input -> output -> comparison -> error return.
 func train_next_step() -> void:
 	if _is_training_finished():
-		return
-
-	if _current_phase == "load_sample":
-		_advance_one_neuron()
 		return
 
 	var data_before: int = _current_data_idx
 
 	while not _is_training_finished() and _current_data_idx == data_before:
+		var phase_before: String = _current_phase
+		var should_wait_for_input_enter: bool = _should_wait_for_input_enter_on_next_advance()
 		if not _advance_one_neuron():
 			break
+		await _wait_for_visual_transition_if_needed(phase_before, should_wait_for_input_enter)
 
 
 ## Finishes all remaining training work without emitting intermediate
-## load_sample animations. The visual labels are cleared when the final row ends.
+## visual transition animations. The visual labels are cleared when the final row
+## ends.
 func train_complete() -> void:
 	_is_completing_training = true
 	while not _is_training_finished():
@@ -179,81 +174,6 @@ func train_complete() -> void:
 
 
 # --- Forward methods ---
-
-## Pass the output of each layer for the next one in order
-# func perform_forward_propagation(weights: Dictionary, activations: Dictionary, input_data: Array) -> Array:
-# 	layer_outputs[0] = input_data
-# 
-# 	var layer_indices: Array[int] = _get_sorted_layer_indices(weights.keys())
-# 	var current_input: Array[float] = input_data
-# 
-# 	for l_idx in layer_indices:
-# 		var layer_results: Dictionary[String, Array] = compute_layer_forward(current_input, weights[l_idx], activations[l_idx], l_idx)
-# 		layer_weighted_sums[l_idx] = layer_results["z"]
-# 		layer_outputs[l_idx] = layer_results["a"]
-# 		current_input = layer_results["a"]
-# 
-# 	return current_input
-
-
-## Pass a input of a layer
-# func compute_layer_forward(inputs: Array, layer_weights: Array, activation_type: int, layer_idx: int) -> Dictionary:
-# 	var z_values: Array = []
-# 	var a_values: Array = []
-# 
-# 	for i in range(layer_weights.size()):
-# 		var neuron_weights: Array[Array] = layer_weights[i]
-# 		var z: float = compute_dot_product(inputs, neuron_weights)
-# 		z_values.append(z)
-# 
-# 	if _is_softmax_activation(activation_type):
-# 		a_values = _apply_softmax(z_values)
-# 		for i in range(a_values.size()):
-# 			SignalsObserver.forward_step_completed.emit(layer_idx, i, a_values[i])
-# 	else:
-# 		for i in range(z_values.size()):
-# 			var neuron_output: float = apply_activation(z_values[i], activation_type)
-# 			SignalsObserver.forward_step_completed.emit(layer_idx, i, neuron_output)
-# 			a_values.append(neuron_output)
-# 
-# 	return {"z": z_values, "a": a_values}
-
-
-# --- Backward methods ---
-
-## Update the weights basen on the error of the output
-# func perform_backward_propagation(
-# 	weights: Dictionary,
-# 	activations: Dictionary,
-# 	target: Array,
-# 	lr: float,
-# 	loss_type: int = Constants.LOSS_FUNCS.mse
-# ) -> void:
-# 	var deltas: Dictionary = {}
-# 	var forward_layer_indices: Array[int] = _get_sorted_layer_indices(weights.keys())
-# 	var backward_layer_indices: Array[int] = forward_layer_indices.duplicate()
-# 	backward_layer_indices.reverse()
-# 	var weights_snapshot: Dictionary = weights.duplicate(true)
-# 
-# 	for l_idx in backward_layer_indices:
-# 		var next_layer_idx: int = _get_next_layer_index(l_idx, forward_layer_indices)
-# 		var next_deltas: Array[float] = deltas.get(next_layer_idx, [])
-# 		var next_weights: Array = weights_snapshot.get(next_layer_idx, [])
-# 
-# 		var current_layer_deltas: Array[float] = compute_layer_deltas(
-# 			l_idx,
-# 			target,
-# 			layer_outputs[l_idx],
-# 			layer_weighted_sums[l_idx],
-# 			activations[l_idx],
-# 			loss_type,
-# 			next_deltas,
-# 			next_weights
-# 		)
-# 
-# 		deltas[l_idx] = current_layer_deltas
-# 		var prev_layer_idx = _get_previous_layer_index(l_idx, weights.keys())
-# 		update_layer_weights(weights[l_idx], current_layer_deltas, layer_outputs[prev_layer_idx], lr, l_idx)
 
 
 ## Calculates deltas for both output and hidden layers.
@@ -390,8 +310,8 @@ func _compute_output_loss_error(output_values: Array, target: Array, loss_type: 
 # --- Incremental training flow ---
 
 ## Dispatches the smallest unit of incremental training for the current phase.
-## "load_sample" exists only to let the UI swap input labels between a completed
-## backpropagation pass and the next forward pass.
+## Visual phases exist only to let the UI swap input labels, compare outputs with
+## targets, and send errors back before real backward computation starts.
 func _advance_one_neuron() -> bool:
 	if _is_training_finished():
 		return false
@@ -401,6 +321,10 @@ func _advance_one_neuron() -> bool:
 			return _advance_load_sample()
 		"forward":
 			return _advance_forward_neuron()
+		"compare_outputs":
+			return _advance_compare_outputs()
+		"return_errors":
+			return _advance_return_errors()
 		"backward":
 			return _advance_backward_neuron()
 		_:
@@ -416,13 +340,15 @@ func _advance_forward_neuron() -> bool:
 		return false
 
 	if not _is_completing_training and not _input_values_entered_for_current_sample:
-		SignalsObserver.nn_eval_data_enter_network.emit()
+		SignalsObserver.nn_eval_data_enter_network.emit("input")
 		_input_values_entered_for_current_sample = true
 
 	_prepare_forward_cache(layer_idx)
 
 	var neuron_output: float = _cached_a_values[_current_neuron_cursor]
 	SignalsObserver.forward_step_completed.emit(layer_idx, _current_neuron_cursor, neuron_output)
+	if layer_idx == -1:
+		_emit_output_eval_data(_current_neuron_cursor, neuron_output)
 
 	_current_neuron_cursor += 1
 	if _current_neuron_cursor >= _cached_a_values.size():
@@ -434,9 +360,8 @@ func _advance_forward_neuron() -> bool:
 		_clear_layer_cache()
 
 		if _current_layer_cursor >= _sorted_layer_indices.size():
-			_current_phase = "backward"
+			_current_phase = "compare_outputs"
 			_current_layer_cursor = 0
-			_backprop_weights_snapshot = _weights.duplicate(true)
 
 	return true
 
@@ -492,7 +417,7 @@ func _finish_current_sample() -> void:
 
 	if _current_data_idx >= _train_data.size():
 		_current_phase = "finished"
-		SignalsObserver.clear_nn_eval_data.emit()
+		_clear_all_eval_data()
 		SignalsObserver.nn_train_finished.emit()
 		print("[LOG] NN training completed")
 		return
@@ -510,13 +435,43 @@ func _finish_current_sample() -> void:
 func _advance_load_sample() -> bool:
 	if _current_data_idx < 0 or _current_data_idx >= _train_data.size():
 		_current_phase = "finished"
-		SignalsObserver.clear_nn_eval_data.emit()
+		_clear_all_eval_data()
 		return false
 
 	_prepare_current_sample()
 	if not _is_completing_training:
 		_emit_current_eval_data(true)
+		_emit_current_expected_data(false)
+		SignalsObserver.clear_nn_eval_data.emit("output")
 
+	return true
+
+
+## Starts the visual comparison step between forward and backward.
+## Output labels leave to the right, while expected labels become the error
+## values that the backward pass will consume.
+func _advance_compare_outputs() -> bool:
+	if _is_completing_training:
+		_current_phase = "return_errors"
+		return true
+
+	SignalsObserver.nn_eval_data_output_leave.emit("output")
+	SignalsObserver.nn_eval_data_expected_to_error.emit("expected", _get_output_error_values())
+	_current_phase = "return_errors"
+	return true
+
+
+## Starts the visual error-return step and then arms the real backward phase.
+## Backpropagation still computes its cache normally when the first backward
+## neuron is reached.
+func _advance_return_errors() -> bool:
+	if not _is_completing_training:
+		SignalsObserver.nn_eval_data_error_return.emit("expected")
+
+	_current_phase = "backward"
+	_current_layer_cursor = 0
+	_current_neuron_cursor = 0
+	_backprop_weights_snapshot = _weights.duplicate(true)
 	return true
 
 
@@ -561,7 +516,7 @@ func _extract_target_data(row: Dictionary) -> Array:
 ## setup_nn_eval_data.
 func _emit_current_eval_data(animate_appear: bool) -> void:
 	if _current_data_idx < 0 or _current_data_idx >= _train_data.size():
-		SignalsObserver.clear_nn_eval_data.emit()
+		_clear_all_eval_data()
 		return
 
 	var row: Dictionary = _train_data[_current_data_idx]
@@ -569,7 +524,53 @@ func _emit_current_eval_data(animate_appear: bool) -> void:
 	for attr in _train_attributes:
 		eval_values[attr] = row.get(attr, "")
 
-	SignalsObserver.add_change_eval_data.emit(eval_values, animate_appear)
+	SignalsObserver.add_change_eval_data.emit("input", eval_values, animate_appear)
+
+
+## Emits the target values for the current sample into the Expected column.
+## These are the values the output layer is compared against after forward.
+func _emit_current_expected_data(animate_appear: bool) -> void:
+	var eval_values: Dictionary = {}
+	for output_idx in range(_current_target_data.size()):
+		eval_values[str(output_idx)] = _current_target_data[output_idx]
+
+	SignalsObserver.add_change_eval_data.emit("expected", eval_values, animate_appear)
+
+
+## Emits one output neuron value and keeps previously emitted output values
+## visible, matching the one-neuron-at-a-time stepping behavior.
+func _emit_output_eval_data(output_neuron_idx: int, output_value: float) -> void:
+	if _is_completing_training:
+		return
+
+	_current_output_values[str(output_neuron_idx)] = output_value
+	SignalsObserver.add_change_eval_data.emit("output", _current_output_values, false)
+
+
+## Computes the visible error values shown between forward and backward.
+## The same delta calculation as backpropagation is used so the displayed values
+## match what is about to travel backward through the network.
+func _get_output_error_values() -> Dictionary:
+	var output_errors: Dictionary = {}
+	if not layer_outputs.has(-1) or not layer_weighted_sums.has(-1):
+		return output_errors
+
+	var deltas: Array = compute_layer_deltas(
+		-1,
+		_current_target_data,
+		layer_outputs[-1],
+		layer_weighted_sums[-1],
+		_activations[-1],
+		_loss_type,
+		[],
+		[],
+		false
+	)
+
+	for output_idx in range(deltas.size()):
+		output_errors[str(output_idx)] = deltas[output_idx]
+
+	return output_errors
 
 
 func _prepare_forward_cache(layer_idx: int) -> void:
@@ -671,7 +672,81 @@ func _reset_runtime_state() -> void:
 	_current_input_data = []
 	_current_target_data = []
 	_input_values_entered_for_current_sample = false
+	_current_output_values.clear()
 	_clear_layer_cache()
+
+
+## Builds stable keys for output/expected visual labels. They are stringified
+## neuron indices so regression and classification outputs share the same path.
+func _get_output_value_keys() -> Array[String]:
+	var output_keys: Array[String] = []
+	var output_neurons: int = 0
+	if _weights.has(-1):
+		output_neurons = _weights[-1].size()
+
+	for output_idx in range(output_neurons):
+		output_keys.append(str(output_idx))
+
+	return output_keys
+
+
+## Clears every visual data column used by the network.
+func _clear_all_eval_data() -> void:
+	SignalsObserver.clear_nn_eval_data.emit("input")
+	SignalsObserver.clear_nn_eval_data.emit("output")
+	SignalsObserver.clear_nn_eval_data.emit("expected")
+
+
+## True for state-machine phases that exist only to drive eval-data animations.
+func _is_visual_transition_phase() -> bool:
+	return _current_phase == "load_sample" or _current_phase == "compare_outputs" or _current_phase == "return_errors"
+
+
+## True when the next forward advance will trigger the input-value "enter
+## network" animation. Only Next Step waits for it; manual buttons still advance
+## one operation per click.
+func _should_wait_for_input_enter_on_next_advance() -> bool:
+	return _current_phase == "forward" and not _input_values_entered_for_current_sample and not _is_completing_training
+
+
+## Makes Next Step wait for visual animations, while Next Neuron and Next Layer
+## can continue to advance one visual phase per click.
+func _wait_for_visual_transition_if_needed(phase_before: String, should_wait_for_input_enter: bool) -> void:
+	if phase_before == "load_sample":
+		await _wait_for_eval_animation("input", "appear")
+		await _wait_between_next_step_animations()
+		return
+
+	if should_wait_for_input_enter:
+		await _wait_for_eval_animation("input", "enter_network")
+		await _wait_between_next_step_animations()
+		return
+
+	match phase_before:
+		"compare_outputs":
+			await _wait_for_eval_animation("expected", "expected_to_error")
+			await _wait_between_next_step_animations()
+		"return_errors":
+			await _wait_for_eval_animation("expected", "error_return")
+			await _wait_between_next_step_animations()
+
+
+## Waits for a role-specific animation-complete signal emitted by the visual
+## container. Signals for other roles or animation names are ignored.
+func _wait_for_eval_animation(container_role: String, animation_name: String) -> void:
+	while true:
+		var finished_info: Array = await SignalsObserver.nn_eval_data_animation_finished
+		if finished_info.size() >= 2 and finished_info[0] == container_role and finished_info[1] == animation_name:
+			return
+
+
+## Adds breathing room between automatic Next Step animations. This delay is not
+## used by Next Neuron or Next Layer, keeping manual stepping responsive.
+func _wait_between_next_step_animations() -> void:
+	if Constants.NN_EVAL_DATA_NEXT_STEP_DELAY <= 0.0:
+		return
+
+	await get_tree().create_timer(Constants.NN_EVAL_DATA_NEXT_STEP_DELAY).timeout
 
 
 ## Pushes trained weights and biases back into Variables.nn after each update.
@@ -700,12 +775,14 @@ func _is_training_finished() -> bool:
 
 
 ## Returns the active layer id for computational phases.
-## load_sample reports layer 0 because that visual step belongs to the input
-## side of the network and should stop navigation before forward resumes.
+## Visual phases report the layer they conceptually belong to: load_sample to the
+## input layer, and comparison/error-return to the output layer.
 func _get_current_layer_idx() -> int:
 	match _current_phase:
 		"load_sample":
 			return 0
+		"compare_outputs", "return_errors":
+			return -1
 		"forward":
 			if _current_layer_cursor >= 0 and _current_layer_cursor < _sorted_layer_indices.size():
 				return _sorted_layer_indices[_current_layer_cursor]

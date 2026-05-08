@@ -75,10 +75,14 @@ signal forward_step_completed(layer_idx, neuron_idx, output_value)
 signal backward_step_completed(layer_idx, neuron_idx, delta_value)
 signal weight_updated(layer_idx, neuron_idx, weight_idx, new_value)
 signal nn_train_finished
-signal setup_nn_eval_data(input_attributes: Array[String])
-signal add_change_eval_data(dict_of_data: Dictionary, animate_appear: bool)
-signal nn_eval_data_enter_network
-signal clear_nn_eval_data
+signal setup_nn_eval_data(container_role: String, value_keys: Array[String])
+signal add_change_eval_data(container_role: String, dict_of_data: Dictionary, animate_appear: bool)
+signal nn_eval_data_enter_network(container_role: String)
+signal nn_eval_data_output_leave(container_role: String)
+signal nn_eval_data_expected_to_error(container_role: String, dict_of_data: Dictionary)
+signal nn_eval_data_error_return(container_role: String)
+signal nn_eval_data_animation_finished(container_role: String, animation_name: String)
+signal clear_nn_eval_data(container_role: String)
 
 # panel algorithm nn
 signal train_nn_next_neuron(neuron_id: int, layer_id: int)

@@ -16,6 +16,12 @@ layout_mode = 2
 [node name="NnEvalDataContainer" parent="." unique_id=962423117 instance=ExtResource("3_sqehu")]
 layout_mode = 2
 
+[node name="NnEvalDataContainerOut" parent="." unique_id=1637676540 instance=ExtResource("3_sqehu")]
+layout_mode = 2
+
+[node name="NnEvalDataContainerExpected" parent="." unique_id=1521335992 instance=ExtResource("3_sqehu")]
+layout_mode = 2
+
 [node name="Layers" type="HBoxContainer" parent="." unique_id=2044067605]
 layout_mode = 2
 theme_override_constants/separation = 125
