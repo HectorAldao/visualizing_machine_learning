@@ -72,6 +72,7 @@ const NN_EVAL_DATA_APPEAR_TIME: float = 0.25
 const NN_EVAL_DATA_APPEAR_FADE_TIME: float = 0.2
 const NN_EVAL_DATA_MOVE_FADE_TIME: float = 0.35
 const NN_EVAL_DATA_EXPECTED_FADE_TIME: float = 0.25
-const NN_EVAL_DATA_NEXT_STEP_DELAY: float = 0.25
+const NN_EVAL_DATA_NEXT_STEP_DELAY: float = 0.5
+const NN_EVAL_DATA_TITLE_GAP: float = 18.0
 
 const NN_LEARNINGRATE: float = 0.001

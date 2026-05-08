@@ -9,6 +9,9 @@ var _pending_values: Dictionary = {}
 var _pending_animate: bool = false
 var _is_configuring: bool = false
 var _container_role: String = "input"
+var _title_label: Label
+
+@export var _title: String = ""
 
 
 ## Wires the container to the NN training signals. The container does not ask
@@ -16,6 +19,7 @@ var _container_role: String = "input"
 ## messages routed through SignalsObserver.
 func _ready() -> void:
 	_container_role = _get_container_role()
+	_create_title_label()
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	SignalsObserver.setup_nn_eval_data.connect(_on_setup_nn_eval_data)
 	SignalsObserver.add_change_eval_data.connect(_on_change_eval_data)
@@ -186,26 +190,109 @@ func _refresh_positions_deferred() -> void:
 	call_deferred("_refresh_positions")
 
 
-## Places every visual value beside the neuron associated with its role.
-## Input values live left of layer 0, output values right of the output layer,
-## and expected/error values right of the output-value column.
+## Places every visual value on the stable x column established by the title.
+## The title itself is positioned relative to the network, while the eval-data
+## labels reuse the title's left edge and only follow their neurons vertically.
 func _refresh_positions() -> void:
+	if _title_label == null:
+		return
+
+	_refresh_title_position()
+	var column_global_x: float = _title_label.global_position.x
+
 	for eval_data in _eval_data_by_attr.values():
 		if not is_instance_valid(eval_data) or eval_data.target_neuron == null:
 			continue
 
 		var neuron_rect: Rect2 = eval_data.target_neuron.get_global_rect()
 		var home_position: Vector2 = neuron_rect.position
-		match _container_role:
-			"output":
-				home_position.x += neuron_rect.size.x + Constants.NN_EVAL_DATA_GAP
-			"expected":
-				home_position.x = _get_expected_global_x(eval_data)
-			_:
-				home_position.x -= eval_data.size.x + Constants.NN_EVAL_DATA_GAP
+		home_position.x = column_global_x
 		home_position.y += (neuron_rect.size.y - eval_data.size.y) / 2.0
 		eval_data.global_position = home_position
 		eval_data.set_home_position(eval_data.position)
+
+
+## Creates the column title label once. It stays outside _eval_data_by_attr so
+## rebuilding sample labels never deletes the column anchor.
+func _create_title_label() -> void:
+	_title_label = Label.new()
+	_title_label.name = "Title"
+	_title_label.text = _get_resolved_title()
+	_title_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_title_label)
+	_title_label.reset_size()
+
+
+## Resolves the title from the exported value, falling back to the node role so
+## duplicated containers remain readable even if the scene override is missing.
+func _get_resolved_title() -> String:
+	if not _title.is_empty():
+		return _title
+
+	match _container_role:
+		"output":
+			return "Out"
+		"expected":
+			return "Expected"
+		_:
+			return "Input"
+
+
+## Positions the title and therefore establishes the column x used by all values.
+func _refresh_title_position() -> void:
+	_title_label.text = _get_resolved_title()
+	_title_label.reset_size()
+
+	var target_bounds: Rect2 = _get_target_layer_bounds()
+	var title_position: Vector2 = Vector2(_get_title_global_x(target_bounds), target_bounds.position.y - _title_label.size.y - Constants.NN_EVAL_DATA_TITLE_GAP)
+	_title_label.global_position = title_position
+
+
+## Calculates the stable title x position for each role.
+## Expected uses Out's title edge instead of Out's current values, preventing
+## output text width changes from pushing the expected/error column around.
+func _get_title_global_x(target_bounds: Rect2) -> float:
+	match _container_role:
+		"output":
+			return target_bounds.end.x + Constants.NN_EVAL_DATA_GAP
+		"expected":
+			return _get_expected_title_global_x(target_bounds)
+		_:
+			return target_bounds.position.x - _title_label.size.x - Constants.NN_EVAL_DATA_GAP
+
+
+## Places Expected to the right of the Out title when that sibling exists.
+func _get_expected_title_global_x(target_bounds: Rect2) -> float:
+	var output_container: Control = get_node_or_null("../NnEvalDataContainerOut")
+	if output_container and output_container.has_method("get_title_global_right"):
+		var output_title_right: float = output_container.get_title_global_right()
+		if output_title_right > 0.0:
+			return output_title_right + Constants.NN_EVAL_DATA_GAP
+
+	return target_bounds.end.x + Constants.NN_EVAL_DATA_EXPECTED_GAP
+
+
+## Returns the rendered bounds of the target layer. Child neuron bounds are used
+## because the VBoxContainer can lag behind while the network is being rebuilt.
+func _get_target_layer_bounds() -> Rect2:
+	var target_layer: Layer = _get_target_layer()
+	if target_layer == null:
+		return Rect2(global_position, Vector2.ZERO)
+
+	var bounds: Rect2 = target_layer.get_global_rect()
+	var has_child_bounds: bool = false
+	for child in target_layer.get_children():
+		if not (child is Control):
+			continue
+
+		var child_rect: Rect2 = child.get_global_rect()
+		if not has_child_bounds:
+			bounds = child_rect
+			has_child_bounds = true
+		else:
+			bounds = bounds.merge(child_rect)
+
+	return bounds
 
 
 ## Maps scene node names to visual roles. This lets the same packed scene be
@@ -233,36 +320,23 @@ func _get_target_layer() -> Layer:
 	return null
 
 
-## Calculates the expected/error column x position from the output-value label
-## with the same key when possible, keeping Expected visually to the right of Out.
-func _get_expected_global_x(eval_data: NnEvalData) -> float:
-	var output_container: Control = get_node_or_null("../NnEvalDataContainerOut")
-	if output_container and output_container.has_method("get_eval_data_global_right"):
-		var output_right: float = output_container.get_eval_data_global_right(eval_data.atr_name)
-		if output_right > 0.0:
-			return output_right + Constants.NN_EVAL_DATA_GAP
-
-	var neuron_rect: Rect2 = eval_data.target_neuron.get_global_rect()
-	return neuron_rect.position.x + neuron_rect.size.x + Constants.NN_EVAL_DATA_EXPECTED_GAP
-
-
-## Returns the right edge of a label for sibling containers that need to align
-## themselves relative to this column.
-func get_eval_data_global_right(attr_name: String) -> float:
-	if not _eval_data_by_attr.has(attr_name):
+## Returns the title right edge, used by Expected to establish a stable sibling
+## column independent of Out value widths.
+func get_title_global_right() -> float:
+	if _title_label == null:
 		return 0.0
 
-	var eval_data: NnEvalData = _eval_data_by_attr[attr_name]
-	if not is_instance_valid(eval_data):
-		return 0.0
-
-	return eval_data.get_global_rect().end.x
+	_refresh_title_position()
+	return _title_label.get_global_rect().end.x
 
 
 ## Removes labels from a previous training setup before pairing role keys with
 ## the current target layer again.
 func _clear_children() -> void:
 	for child in get_children():
+		if child == _title_label:
+			continue
+
 		remove_child(child)
 		child.queue_free()
 	_eval_data_by_attr.clear()
