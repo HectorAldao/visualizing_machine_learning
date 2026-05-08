@@ -1,0 +1,97 @@
+# nombre 
+
+Héctor 
+
+# apellidos 
+
+Aldao Amoedo 
+
+# DNI 
+
+DNI 
+
+# teléfono 
+
+Teléfono...? 
+
+# Títulos en galego castellano e inglés 
+
+Visualizando a aprendizaxe máquina: da abstracción ao entendemento.  
+
+Visualizando el aprendizaje máquina: de la abstracción al entendimiento.  
+
+Visualizing machine learning: from abstraction to understanding.  
+
+# Tutores 
+
+Alejandro Rodríguez Arias 
+
+Samuel Magaz Romero 
+
+# Tipo de proyecto 
+
+    [x] Clásico de enxeñería  
+
+    [  ] De desenvolvemento en investigación 
+
+# Breve descripción 
+
+La inteligencia artificial constituye una de las áreas más destacadas en la actualidad dentro de las ciencias de la computación. Cuenta con aplicaciones en múltiples ámbitos como la medicina, la industria o los servicios digitales. Sin embargo, su entendimiento presenta una dificultad significativa debido a la necesidad de comprender conceptos avanzados de matemáticas, programación y lógica computacional. 
+
+Esto hace que desarrollar una intuición sobre las bases que fundamentan los algoritmos más avanzados sea complejo, problema que se ve agravado por la falta de herramientas que permitan visualizar de forma clara e interactiva cómo operan estos modelos. Esta situación es incluso más palpable en los sistemas de “caja negra”, en los que no es sencillo comprender de dónde se extraen los resultados. 
+
+Por ello, este proyecto propone el desarrollo de una aplicación educativa que facilite la comprensión de dos algoritmos fundacionales en sus respectivas ramas de la inteligencia artificial: el árbol de decisión y la red neuronal. La herramienta empleará representaciones visuales e interactivas de ambos modelos, complementadas con explicaciones sobre sus procesos de entrenamiento e inferencia, reduciendo así la barrera de entrada a esta disciplina y acercándola a perfiles no expertos. 
+
+# Objetivos concretos 
+
+    Realizar un estudio conceptual de los algoritmos de inteligencia artificial seleccionados. Tanto para el árbol como para la red neuronal, entender su  implementación a bajo nivel y sus parámetros de configuración. 
+
+    Desarrollar  una aplicación educativa que permita visualizar de forma interactiva el paso a paso del entrenamiento e inferencia de los dos algoritmos propuestos acompañándolo con texto informativo sobre los procesos que se están llevando a cabo. 
+
+    Desplegar en web pública de la aplicación para facilitar su uso y diseminación como recurso de aprendizaje de los algoritmos propuestos. 
+
+    A nivel formativo, adquirir conocimientos sobre el desarrollo de interfaces gráficas, el despliegue de aplicaciones web y profundizar en el funcionamiento de los algoritmos estudiados. 
+
+# Método de trabajo 
+
+Se seguirá una metodología ágil inspirada en Scrum, adaptada al contexto académico del proyecto. El desarrollo se organizará en iteraciones o sprints semanales, en las que se definirán objetivos concretos a partir de un backlog de tareas previamente establecido. Al final de cada sprint, se realizarán revisiones con los directores del proyecto, quienes proporcionarán orientación y validarán los avances realizados.  
+
+# Fases principales 
+
+Investigación de los requisitos técnicos del proyecto para la decisión de los recursos software a utilizar, recurriendo al desarrollo de prototipos iniciales para determinar si la herramienta seleccionada cumple con lo necesario. 
+
+Estudio del estado del arte sobre aplicaciones educativas en el campo de la informática.  
+
+Estudio de los algoritmos y análisis de aquellos pasos que dificultan su comprensión. 
+
+Desarrollo de la primera versión de la aplicación que permita la visualización del entrenamiento e inferencia de un árbol de decisión, incluyendo análisis, desarrollo y validación de su funcionamiento y resultados.  
+
+Desarrollo de la segunda versión de la aplicación que permita la creación de una arquitectura de red neuronal densa personalizada y la visualización del entrenamiento e inferencia de la misma, incluyendo análisis, desarrollo y validación de su funcionamiento y resultados.  
+
+Despliegue web. 
+
+Durante todas las fases se escribirá la memoria del proyecto. 
+
+# Materiales y medios 
+
+Ordenador personal. 
+
+Herramienta software para la generación de interfaces o entornos dinámicos. 
+
+Lenguajes de programación asociados a la herramienta seleccionada. 
+
+Github. 
+
+Referencias en la literatura para la revisión de los algoritmos. 
+
+Microsoft Teams. 
+
+# Modalidad 
+
+    [  ] Traballo resultante oferta centro  
+
+    [x] Traballo a proposta do alumno  
+
+    [  ] Traballo en colaboración con entidade externa  
+
+    [  ] Traballo en coordinación con outros traballos 
