@@ -82,7 +82,7 @@ func _get_layer_neuron_count(layer_id: int) -> int:
 	return Variables.nn.nn_tmp_dict[layer_id].size()
 
 
-func _get_sorted_layer_indices(keys: Array[int]) -> Array[int]:
+func _get_sorted_layer_indices(keys: Array) -> Array[int]:
 	var hidden_layers: Array[int] = []
 	for key in keys:
 		if key > 0:

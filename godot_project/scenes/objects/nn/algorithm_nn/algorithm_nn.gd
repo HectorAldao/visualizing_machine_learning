@@ -48,6 +48,12 @@ var _current_neuron_cursor: int = 0
 var _current_input_data: Array = []
 var _current_target_data: Array = []
 var _backprop_weights_snapshot: Dictionary = {}
+# True only while "Complete training" drains all remaining samples. Visual
+# sample-loading steps are skipped while this flag is active.
+var _is_completing_training: bool = false
+# Prevents the input-value labels from playing the "enter network" animation more
+# than once for the same sample.
+var _input_values_entered_for_current_sample: bool = false
 
 var _cached_phase: String = ""
 var _cached_layer_idx: int = 0
@@ -77,7 +83,10 @@ func _ready() -> void:
 # 	perform_backward_propagation(weights, activations, target_data, learning_rate, loss_type)
 
 
-## Prepares the variables for the training
+## Prepares the variables for the training.
+## This is also the entry point for the visual input-data flow: it asks the
+## NnEvalDataContainer to create one label per input attribute, prepares sample
+## 0, and emits that sample without the "appear from left" animation.
 func configure_training(
 	train_data: Array[Dictionary],
 	train_attributes: Array[String],
@@ -102,21 +111,35 @@ func configure_training(
 	_reversed_layer_indices.reverse()
 	_current_data_idx = 0
 	_current_phase = "idle"
+	_is_completing_training = false
 	_reset_runtime_state()
 
 	if _train_data.is_empty() or _target_attributes.is_empty():
 		_current_phase = "finished"
+		SignalsObserver.clear_nn_eval_data.emit()
 		return
 
+	SignalsObserver.setup_nn_eval_data.emit(_train_attributes)
 	_prepare_current_sample()
+	_emit_current_eval_data(false)
 
 
+## Advances exactly one neuron-sized operation in the current phase.
+## If the algorithm is waiting on load_sample, this button consumes that visual
+## sample-change step before forward propagation continues.
 func train_next_neuron(_neuron_id: int = -1, _layer_id: int = -9999) -> void:
 	_advance_one_neuron()
 
 
+## Advances until the current layer changes.
+## The load_sample phase is treated as its own stop, so layer-level navigation
+## still pauses to show the next row entering the input layer.
 func train_next_layer(_layer_id: int = -9999) -> void:
 	if _is_training_finished():
+		return
+
+	if _current_phase == "load_sample":
+		_advance_one_neuron()
 		return
 
 	var phase_before: String = _current_phase
@@ -127,8 +150,15 @@ func train_next_layer(_layer_id: int = -9999) -> void:
 			break
 
 
+## Advances one full training row.
+## When the previous row has just finished backpropagation, load_sample is the
+## next step and only changes the visible input values.
 func train_next_step() -> void:
 	if _is_training_finished():
+		return
+
+	if _current_phase == "load_sample":
+		_advance_one_neuron()
 		return
 
 	var data_before: int = _current_data_idx
@@ -138,10 +168,14 @@ func train_next_step() -> void:
 			break
 
 
+## Finishes all remaining training work without emitting intermediate
+## load_sample animations. The visual labels are cleared when the final row ends.
 func train_complete() -> void:
+	_is_completing_training = true
 	while not _is_training_finished():
 		if not _advance_one_neuron():
 			break
+	_is_completing_training = false
 
 
 # --- Forward methods ---
@@ -355,11 +389,16 @@ func _compute_output_loss_error(output_values: Array, target: Array, loss_type: 
 
 # --- Incremental training flow ---
 
+## Dispatches the smallest unit of incremental training for the current phase.
+## "load_sample" exists only to let the UI swap input labels between a completed
+## backpropagation pass and the next forward pass.
 func _advance_one_neuron() -> bool:
 	if _is_training_finished():
 		return false
 
 	match _current_phase:
+		"load_sample":
+			return _advance_load_sample()
 		"forward":
 			return _advance_forward_neuron()
 		"backward":
@@ -368,10 +407,17 @@ func _advance_one_neuron() -> bool:
 			return false
 
 
+## Computes and emits one forward neuron result.
+## On the first forward neuron of a row, it also tells NnEvalData labels to move
+## right and fade, representing the sample entering the network.
 func _advance_forward_neuron() -> bool:
 	var layer_idx: int = _get_current_layer_idx()
 	if layer_idx == -9999:
 		return false
+
+	if not _is_completing_training and not _input_values_entered_for_current_sample:
+		SignalsObserver.nn_eval_data_enter_network.emit()
+		_input_values_entered_for_current_sample = true
 
 	_prepare_forward_cache(layer_idx)
 
@@ -395,6 +441,8 @@ func _advance_forward_neuron() -> bool:
 	return true
 
 
+## Computes and applies one backward neuron update, then finishes the sample when
+## all reversed layers have been processed.
 func _advance_backward_neuron() -> bool:
 	var layer_idx: int = _get_current_layer_idx()
 	if layer_idx == -9999:
@@ -419,6 +467,8 @@ func _advance_backward_neuron() -> bool:
 	return true
 
 
+## Loads _current_data_idx into the runtime caches used by forward/backward.
+## layer_outputs[0] is where later weight updates read the original input values.
 func _prepare_current_sample() -> void:
 	_reset_runtime_state()
 
@@ -430,22 +480,49 @@ func _prepare_current_sample() -> void:
 	_current_input_data = _extract_input_data(row)
 	_current_target_data = _extract_target_data(row)
 	layer_outputs[0] = _current_input_data.duplicate(true)
+	_input_values_entered_for_current_sample = false
 	_current_phase = "forward"
 
 
+## Moves the state machine from the completed row to either finished,
+## load_sample, or the next row directly when Complete training is draining.
 func _finish_current_sample() -> void:
 	_sync_weights_with_variables()
 	_current_data_idx += 1
 
 	if _current_data_idx >= _train_data.size():
 		_current_phase = "finished"
+		SignalsObserver.clear_nn_eval_data.emit()
 		SignalsObserver.nn_train_finished.emit()
 		print("[LOG] NN training completed")
 		return
 
+	if _is_completing_training:
+		_prepare_current_sample()
+	else:
+		_current_phase = "load_sample"
+		_reset_runtime_state()
+
+
+## Consumes the visual-only gap between rows.
+## It prepares the next sample for computation and emits its input values with
+## the "appear from left" animation before any forward neuron is evaluated.
+func _advance_load_sample() -> bool:
+	if _current_data_idx < 0 or _current_data_idx >= _train_data.size():
+		_current_phase = "finished"
+		SignalsObserver.clear_nn_eval_data.emit()
+		return false
+
 	_prepare_current_sample()
+	if not _is_completing_training:
+		_emit_current_eval_data(true)
+
+	return true
 
 
+## Extracts the ordered numeric inputs from a raw dataset row.
+## The same _train_attributes order is used by _emit_current_eval_data, which
+## keeps computation values and visual labels aligned.
 func _extract_input_data(row: Dictionary) -> Array:
 	var input_data: Array = []
 	for attr in _train_attributes:
@@ -453,6 +530,9 @@ func _extract_input_data(row: Dictionary) -> Array:
 	return input_data
 
 
+## Extracts the expected output for the current row.
+## Regression targets are read directly; classification targets are converted to
+## one-hot vectors matching the output layer size.
 func _extract_target_data(row: Dictionary) -> Array:
 	var output_neurons: int = 1
 	if _weights.has(-1):
@@ -474,6 +554,22 @@ func _extract_target_data(row: Dictionary) -> Array:
 		target_data[class_idx] = 1.0
 
 	return target_data
+
+
+## Converts the current raw row into the dictionary consumed by NnEvalData.
+## The keys are the input attribute names, matching the labels created during
+## setup_nn_eval_data.
+func _emit_current_eval_data(animate_appear: bool) -> void:
+	if _current_data_idx < 0 or _current_data_idx >= _train_data.size():
+		SignalsObserver.clear_nn_eval_data.emit()
+		return
+
+	var row: Dictionary = _train_data[_current_data_idx]
+	var eval_values: Dictionary = {}
+	for attr in _train_attributes:
+		eval_values[attr] = row.get(attr, "")
+
+	SignalsObserver.add_change_eval_data.emit(eval_values, animate_appear)
 
 
 func _prepare_forward_cache(layer_idx: int) -> void:
@@ -554,10 +650,7 @@ func _update_neuron_weights(layer_idx: int, neuron_idx: int, neuron_delta: float
 		SignalsObserver.weight_updated.emit(layer_idx, neuron_idx, weight_idx, neuron_weights[weight_idx])
 
 	_update_neuron_bias(layer_idx, neuron_idx, neuron_delta)
-	Variables.nn.nn_tmp_dict = _weights
-	Variables.nn.nn_dict = _weights.duplicate(true)
-	Variables.nn.nn_bias_tmp_dict = _biases
-	Variables.nn.nn_bias_dict = _biases.duplicate(true)
+	_sync_weights_with_variables()
 
 
 func _clear_layer_cache() -> void:
@@ -577,22 +670,42 @@ func _reset_runtime_state() -> void:
 	_current_neuron_cursor = 0
 	_current_input_data = []
 	_current_target_data = []
+	_input_values_entered_for_current_sample = false
 	_clear_layer_cache()
 
 
+## Pushes trained weights and biases back into Variables.nn after each update.
+## NeuralNetworkLogial stores typed dictionaries, so the generic training
+## dictionaries are converted before assignment.
 func _sync_weights_with_variables() -> void:
-	Variables.nn.nn_tmp_dict = _weights
-	Variables.nn.nn_dict = _weights.duplicate(true)
-	Variables.nn.nn_bias_tmp_dict = _biases
-	Variables.nn.nn_bias_dict = _biases.duplicate(true)
+	Variables.nn.nn_tmp_dict = _to_typed_layer_array_dict(_weights)
+	Variables.nn.nn_dict = _to_typed_layer_array_dict(_weights)
+	Variables.nn.nn_bias_tmp_dict = _to_typed_layer_array_dict(_biases)
+	Variables.nn.nn_bias_dict = _to_typed_layer_array_dict(_biases)
+
+
+## Rebuilds a Dictionary[int, Array] from the untyped dictionaries used inside
+## AlgorithmNn, keeping Godot 4.6 typed assignments valid.
+func _to_typed_layer_array_dict(source: Dictionary) -> Dictionary[int, Array]:
+	var typed_dict: Dictionary[int, Array] = {}
+	for layer_idx in source.keys():
+		var layer_value: Array = source[layer_idx]
+		typed_dict[int(layer_idx)] = layer_value.duplicate(true)
+
+	return typed_dict
 
 
 func _is_training_finished() -> bool:
 	return _current_phase == "finished" or _train_data.is_empty()
 
 
+## Returns the active layer id for computational phases.
+## load_sample reports layer 0 because that visual step belongs to the input
+## side of the network and should stop navigation before forward resumes.
 func _get_current_layer_idx() -> int:
 	match _current_phase:
+		"load_sample":
+			return 0
 		"forward":
 			if _current_layer_cursor >= 0 and _current_layer_cursor < _sorted_layer_indices.size():
 				return _sorted_layer_indices[_current_layer_cursor]
@@ -774,7 +887,7 @@ func _apply_softmax_backprop(activated_values: Array, upstream_gradients: Array,
 
 # --- Helpe logic for dictionary keys ---
 
-func _get_sorted_layer_indices(keys: Array[int]) -> Array[int]:
+func _get_sorted_layer_indices(keys: Array) -> Array[int]:
 	var hidden: Array[int] = []
 	for k in keys:
 		if k > 0:
