@@ -45,8 +45,8 @@ func _on_neuron_text_changed(layer_id: int, neuron_id: int, new_text: String) ->
 
 
 func _apply_cached_text() -> void:
-	if SignalsObserver.has_nn_neuron_text(_layer_id, _id):
-		_on_neuron_text_changed(_layer_id, _id, SignalsObserver.get_nn_neuron_text(_layer_id, _id))
+	if has_nn_neuron_text(_layer_id, _id):
+		_on_neuron_text_changed(_layer_id, _id, get_nn_neuron_text(_layer_id, _id))
 
 
 func _set_evaluated(is_evaluated: bool) -> void:
@@ -57,3 +57,17 @@ func _set_evaluated(is_evaluated: bool) -> void:
 
 func _reset_evaluated_scale() -> void:
 	_set_evaluated(false)
+
+
+func has_nn_neuron_text(layer_id: int, neuron_id: int) -> bool:
+	if not Variables.nn_layer_neuron_texts.has(layer_id):
+		return false
+
+	return neuron_id >= 0 and neuron_id < Variables.nn_layer_neuron_texts[layer_id].size()
+
+
+func get_nn_neuron_text(layer_id: int, neuron_id: int) -> String:
+	if not has_nn_neuron_text(layer_id, neuron_id):
+		return ""
+
+	return str(Variables.nn_layer_neuron_texts[layer_id][neuron_id])

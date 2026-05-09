@@ -17,7 +17,7 @@ func _ready() -> void:
 	$VBoxContainer/NextLayerButton.pressed.connect(_on_next_layer_pressed)
 	$VBoxContainer/NextStepButton.pressed.connect(func(): SignalsObserver.train_nn_next_step.emit())
 	$VBoxContainer/CompleteTrainButton.pressed.connect(func(): SignalsObserver.train_nn_complete.emit())
-	$VBoxContainer/TestButton.pressed.connect(func(): SignalsObserver.test_nn_start.emit())
+	$VBoxContainer/TestButton.pressed.connect(func(): SignalsObserver.inference_nn_start.emit())
 
 
 func _on_next_neuron_pressed() -> void:

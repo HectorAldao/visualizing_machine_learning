@@ -39,7 +39,7 @@ func _ready() -> void:
 	SignalsObserver.save_nn.connect(_on_save_nn_pressed)
 
 	# Start the inference mode
-	SignalsObserver.test_nn_start.connect(_on_start_nn_inferece)
+	SignalsObserver.inference_nn_start.connect(_on_start_nn_inferece)
 	
 	create_nn_menu.visible = true
 	dataset_selecion_menu.visible = true
@@ -204,7 +204,7 @@ func update_neuron_texts_for_layer(texts: Array[String], layer_id: int) -> void:
 		while labels_to_apply.size() < expected_neurons:
 			labels_to_apply.append("Σ")
 
-	SignalsObserver.set_nn_layer_neuron_texts(layer_id, labels_to_apply)
+	set_nn_layer_neuron_texts(layer_id, labels_to_apply)
 
 
 func _get_expected_neuron_count(layer_id: int) -> int:
@@ -264,3 +264,12 @@ func _on_save_nn_pressed() -> void:
 func _on_start_nn_inferece() -> void:
 	
 	panel_algorithm_nn.visible = false
+
+
+func set_nn_layer_neuron_texts(layer_id: int, texts: Array[String]) -> void:
+	var cached_texts: Array[String] = texts.duplicate()
+	Variables.nn_layer_neuron_texts[layer_id] = cached_texts
+	print("[LOG] SignalsObserver cached %d neuron texts for layer %d" % [cached_texts.size(), layer_id])
+
+	for neuron_id in range(cached_texts.size()):
+		SignalsObserver.nn_neuron_text_changed.emit(layer_id, neuron_id, cached_texts[neuron_id])
