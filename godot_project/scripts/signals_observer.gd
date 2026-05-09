@@ -23,6 +23,7 @@ signal reload_nn
 signal train_nn
 signal update_nn_layer(layer_id: int)
 signal establish_nn_dset_restrictions(restrictions: Dictionary[int, int])
+signal prepare_nn_inference_dataset_selection(attrs: Array[String], target_attrs: Array[String])
 
 # nn
 signal add_layer
@@ -50,6 +51,8 @@ signal forward_step_completed(layer_idx, neuron_idx, output_value)
 signal backward_step_completed(layer_idx, neuron_idx, delta_value)
 signal weight_updated(layer_idx, neuron_idx, weight_idx, new_value)
 signal nn_train_finished
+signal nn_inference_ready
+signal nn_inference_finished
 signal setup_nn_eval_data(container_role: String, value_keys: Array[String])
 signal add_change_eval_data(container_role: String, dict_of_data: Dictionary, animate_appear: bool)
 signal nn_eval_data_enter_network(container_role: String)

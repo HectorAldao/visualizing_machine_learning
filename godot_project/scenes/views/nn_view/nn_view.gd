@@ -186,6 +186,11 @@ func _on_dataset_selected(data:Array[Dictionary], attrs: Array[String], target_a
 	update_neuron_texts_for_layer(train_attributtes, 0)
 	update_neuron_texts_for_layer(_get_output_neuron_texts(), -1)
 
+	if state == "inference_nn":
+		_configure_algorithm_inference()
+		panel_algorithm_nn.visible = true
+		SignalsObserver.nn_inference_ready.emit()
+
 	pass
 
 
@@ -257,13 +262,29 @@ func _configure_algorithm_training() -> void:
 		loss_type
 	)
 
+
+func _configure_algorithm_inference() -> void:
+	if algorithm == null or train_data.is_empty() or train_attributtes.is_empty():
+		return
+
+	algorithm.configure_inference(
+		train_data,
+		train_attributtes,
+		train_target_attributes,
+		Variables.nn.nn_tmp_dict,
+		Variables.nn.nn_bias_tmp_dict,
+		Variables.nn.nn_func_dict
+	)
+
 func _on_save_nn_pressed() -> void:
 	panel_export_format.visible = not panel_export_format.visible
 
 
 func _on_start_nn_inferece() -> void:
-	
+	state = "inference_nn"
 	panel_algorithm_nn.visible = false
+	panel_trainin_nn.visible = false
+	SignalsObserver.prepare_nn_inference_dataset_selection.emit(train_attributtes, train_target_attributes)
 
 
 func set_nn_layer_neuron_texts(layer_id: int, texts: Array[String]) -> void:

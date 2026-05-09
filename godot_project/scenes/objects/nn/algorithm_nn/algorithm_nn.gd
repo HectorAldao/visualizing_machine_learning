@@ -51,6 +51,7 @@ var _backprop_weights_snapshot: Dictionary = {}
 # True only while "Complete training" drains all remaining samples. Visual
 # sample-loading steps are skipped while this flag is active.
 var _is_completing_training: bool = false
+var _is_inference_mode: bool = false
 # Prevents the input-value labels from playing the "enter network" animation more
 # than once for the same sample.
 var _input_values_entered_for_current_sample: bool = false
@@ -86,7 +87,8 @@ func configure_training(
 	biases: Dictionary,
 	activations: Dictionary,
 	learning_rate: float,
-	loss_type: int = Constants.LOSS_FUNCS.mse
+	loss_type: int = Constants.LOSS_FUNCS.mse,
+	inference_mode: bool = false
 ) -> void:
 
 	_train_data = train_data.duplicate(true)
@@ -97,6 +99,7 @@ func configure_training(
 	_activations = activations
 	_learning_rate = learning_rate
 	_loss_type = loss_type
+	_is_inference_mode = inference_mode
 	_sorted_layer_indices = _get_sorted_layer_indices(_weights.keys())
 	_reversed_layer_indices = _sorted_layer_indices.duplicate()
 	_reversed_layer_indices.reverse()
@@ -105,7 +108,7 @@ func configure_training(
 	_is_completing_training = false
 	_reset_runtime_state()
 
-	if _train_data.is_empty() or _target_attributes.is_empty():
+	if _train_data.is_empty() or (not _is_inference_mode and _target_attributes.is_empty()):
 		_current_phase = "finished"
 		_clear_all_eval_data()
 		return
@@ -117,6 +120,27 @@ func configure_training(
 	_emit_current_eval_data(false)
 	_emit_current_expected_data(false)
 	SignalsObserver.clear_nn_eval_data.emit("output")
+
+
+func configure_inference(
+	inference_data: Array[Dictionary],
+	inference_attributes: Array[String],
+	target_attributes: Array[String],
+	weights: Dictionary,
+	biases: Dictionary,
+	activations: Dictionary
+) -> void:
+	configure_training(
+		inference_data,
+		inference_attributes,
+		target_attributes,
+		weights,
+		biases,
+		activations,
+		0.0,
+		Constants.LOSS_FUNCS.mse,
+		true
+	)
 
 
 ## Advances exactly one neuron-sized operation in the current phase.
@@ -360,6 +384,9 @@ func _advance_forward_neuron() -> bool:
 		_clear_layer_cache()
 
 		if _current_layer_cursor >= _sorted_layer_indices.size():
+			if _is_inference_mode:
+				_finish_current_sample()
+				return true
 			_current_phase = "compare_outputs"
 			_current_layer_cursor = 0
 
@@ -412,14 +439,19 @@ func _prepare_current_sample() -> void:
 ## Moves the state machine from the completed row to either finished,
 ## load_sample, or the next row directly when Complete training is draining.
 func _finish_current_sample() -> void:
-	_sync_weights_with_variables()
+	if not _is_inference_mode:
+		_sync_weights_with_variables()
 	_current_data_idx += 1
 
 	if _current_data_idx >= _train_data.size():
 		_current_phase = "finished"
 		_clear_all_eval_data()
-		SignalsObserver.nn_train_finished.emit()
-		print("[LOG] NN training completed")
+		if _is_inference_mode:
+			SignalsObserver.nn_inference_finished.emit()
+			print("[LOG] NN inference completed")
+		else:
+			SignalsObserver.nn_train_finished.emit()
+			print("[LOG] NN training completed")
 		return
 
 	if _is_completing_training:

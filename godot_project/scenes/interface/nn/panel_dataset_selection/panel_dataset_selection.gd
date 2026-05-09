@@ -57,6 +57,9 @@ var csv_column_types: Dictionary = {}
 var csv_raw_data: Array[Dictionary] = []
 var _web_csv_callback: Variant
 var _web_nn_callback: Variant
+var _is_selecting_inference_dataset: bool = false
+var _required_inference_attrs: Array[String] = []
+var _required_inference_target_attrs: Array[String] = []
 
 
 func _ready() -> void:
@@ -69,13 +72,44 @@ func _ready() -> void:
 
 	SignalsObserver.train_nn.connect(_on_nn_train_started)
 	SignalsObserver.load_nn.connect(_load_network)
+	SignalsObserver.prepare_nn_inference_dataset_selection.connect(show_for_inference)
 
 func _on_entrenar_button_pressed():
+	if _is_selecting_inference_dataset and not _validate_inference_dataset_structure():
+		return
+
 	SignalsObserver.dataset_selected_nn.emit(datast_info, attrs_info, target_attrs_info, nn_restrictions)
 	visible = false
 
 func _on_nn_train_started():
+	_is_selecting_inference_dataset = false
 	visible = false
+
+
+func show_for_inference(required_attrs: Array[String], required_target_attrs: Array[String]) -> void:
+	restart_dataset_selection()
+	_is_selecting_inference_dataset = true
+	_required_inference_attrs = required_attrs.duplicate()
+	_required_inference_target_attrs = required_target_attrs.duplicate()
+	entrenar_button.text = "Cargar Dataset"
+	visible = true
+	await get_tree().process_frame
+	position = (get_parent_area_size() - size) / 2
+
+
+func restart_dataset_selection() -> void:
+	selected_option = ""
+	datast_info = []
+	attrs_info = []
+	target_attrs_info = []
+	act_func_restriction = 0
+	nn_restrictions = {}
+	class_decoder_map = {}
+	_reset_csv_target_selector()
+	informative_text.text = "Aún no se ha seleccionado dataset"
+	informative_text.label_settings.font_color = color_good
+	entrenar_button.text = "Seleccionar Dataset"
+	entrenar_button.disabled = true
 
 
 func _load_network() -> void:
@@ -612,6 +646,50 @@ func _on_target_check_toggled(_button_pressed: bool) -> void:
 		informative_text.text = _build_dataset_summary_text(csv_display_name, attrs_info.size(), target_info)
 	informative_text.label_settings.font_color = color_good
 	entrenar_button.disabled = false
+
+
+func _validate_inference_dataset_structure() -> bool:
+	var missing_attrs: Array[String] = _get_missing_names(_required_inference_attrs, attrs_info)
+	if not missing_attrs.is_empty():
+		informative_text.text = "El dataset de inferencia no tiene estos atributos de entrada: %s" % ", ".join(missing_attrs)
+		informative_text.label_settings.font_color = color_error
+		return false
+
+	var extra_attrs: Array[String] = _get_missing_names(attrs_info, _required_inference_attrs)
+	if not extra_attrs.is_empty():
+		informative_text.text = "El dataset de inferencia tiene atributos de entrada extra: %s" % ", ".join(extra_attrs)
+		informative_text.label_settings.font_color = color_error
+		return false
+	if attrs_info != _required_inference_attrs:
+		informative_text.text = "El orden de los atributos de entrada no coincide con el usado al entrenar."
+		informative_text.label_settings.font_color = color_error
+		return false
+
+	var missing_targets: Array[String] = _get_missing_names(_required_inference_target_attrs, target_attrs_info)
+	if not missing_targets.is_empty():
+		informative_text.text = "El dataset de inferencia no tiene estas salidas esperadas: %s" % ", ".join(missing_targets)
+		informative_text.label_settings.font_color = color_error
+		return false
+
+	var extra_targets: Array[String] = _get_missing_names(target_attrs_info, _required_inference_target_attrs)
+	if not extra_targets.is_empty():
+		informative_text.text = "El dataset de inferencia tiene salidas esperadas extra: %s" % ", ".join(extra_targets)
+		informative_text.label_settings.font_color = color_error
+		return false
+	if target_attrs_info != _required_inference_target_attrs:
+		informative_text.text = "El orden de las salidas esperadas no coincide con el usado al entrenar."
+		informative_text.label_settings.font_color = color_error
+		return false
+
+	return true
+
+
+func _get_missing_names(required_names: Array[String], available_names: Array[String]) -> Array[String]:
+	var missing_names: Array[String] = []
+	for required_name in required_names:
+		if not available_names.has(required_name):
+			missing_names.append(required_name)
+	return missing_names
 
 
 func _get_selected_target_columns() -> Array[String]:

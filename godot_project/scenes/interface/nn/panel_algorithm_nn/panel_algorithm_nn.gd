@@ -9,9 +9,11 @@ var _sorted_layer_indices: Array[int] = []
 func _ready() -> void:
 
 	SignalsObserver.train_nn.connect(_reset_training_cursor)
+	SignalsObserver.nn_inference_ready.connect(_on_nn_inference_ready)
 
 	# Nn train finished
 	SignalsObserver.nn_train_finished.connect(_on_nn_train_finished)
+	SignalsObserver.nn_inference_finished.connect(_on_nn_train_finished)
 
 	$VBoxContainer/NextNeuronButton.pressed.connect(_on_next_neuron_pressed)
 	$VBoxContainer/NextLayerButton.pressed.connect(_on_next_layer_pressed)
@@ -101,3 +103,12 @@ func _on_nn_train_finished() -> void:
 	$VBoxContainer/NextStepButton.disabled = true
 	$VBoxContainer/CompleteTrainButton.disabled = true
 	$VBoxContainer/TestButton.disabled = false
+
+
+func _on_nn_inference_ready() -> void:
+	_reset_training_cursor()
+	$VBoxContainer/NextNeuronButton.disabled = false
+	$VBoxContainer/NextLayerButton.disabled = false
+	$VBoxContainer/NextStepButton.disabled = false
+	$VBoxContainer/CompleteTrainButton.disabled = false
+	$VBoxContainer/TestButton.disabled = true
