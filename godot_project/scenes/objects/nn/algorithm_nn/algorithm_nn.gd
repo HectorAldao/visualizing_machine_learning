@@ -371,6 +371,7 @@ func _advance_forward_neuron() -> bool:
 
 	var neuron_output: float = _cached_a_values[_current_neuron_cursor]
 	SignalsObserver.forward_step_completed.emit(layer_idx, _current_neuron_cursor, neuron_output)
+	SignalsObserver.nn_resalted_neuron_forward.emit(_current_neuron_cursor, layer_idx, _current_input_data.duplicate(true), neuron_output)
 	if layer_idx == -1:
 		_emit_output_eval_data(_current_neuron_cursor, neuron_output)
 
@@ -404,6 +405,7 @@ func _advance_backward_neuron() -> bool:
 
 	var delta: float = _cached_deltas[_current_neuron_cursor]
 	SignalsObserver.backward_step_completed.emit(layer_idx, _current_neuron_cursor, delta)
+	SignalsObserver.nn_resalted_neuron_backward.emit(_current_neuron_cursor, layer_idx, delta)
 	_store_current_delta(layer_idx, _current_neuron_cursor, delta)
 	_update_neuron_weights(layer_idx, _current_neuron_cursor, delta)
 

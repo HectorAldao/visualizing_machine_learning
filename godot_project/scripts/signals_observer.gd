@@ -70,6 +70,8 @@ signal train_nn_complete
 signal inference_nn_start
 
 # window_nn
+signal nn_resalted_neuron_forward(neuron_id: int, layer_id: int, input_values: Array, output_value: float)
+signal nn_resalted_neuron_backward(neuron_id: int, layer_id: int, delta_value: float)
 
 # panel training nn
 signal save_nn
