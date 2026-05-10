@@ -1,0 +1,44 @@
+[gd_resource type="Theme" format=3 uid="uid://b5ecvrwlunl4u"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vu6l5"]
+content_margin_left = 6.0
+content_margin_top = 3.0
+content_margin_right = 6.0
+content_margin_bottom = 3.0
+bg_color = Color(0.9517718, 0, 0.25614318, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.019607844, 0.003921569, 0.019607844, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 3
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_es76u"]
+bg_color = Color(0, 0, 0, 0.4392157)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0, 0, 0, 0.4392157)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rjgu6"]
+bg_color = Color(0.3372549, 0.7058824, 0.9137255, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vxwtt"]
+bg_color = Color(0, 0.44705883, 0.69803923, 1)
+
+[resource]
+Button/colors/font_color = Color(0, 0, 0, 1)
+Button/constants/h_separation = 4
+Button/font_sizes/font_size = 24
+Button/styles/normal = SubResource("StyleBoxFlat_vu6l5")
+PanelContainer/styles/panel = SubResource("StyleBoxFlat_es76u")
+PopupMenu/colors/font_color = Color(0.019607844, 0.003921569, 0.019607844, 1)
+PopupMenu/colors/font_disabled_color = Color(0.23753911, 0.23753914, 0.23753911, 1)
+PopupMenu/colors/font_hover_color = Color(0.019607844, 0.003921569, 0.019607844, 1)
+PopupMenu/styles/hover = SubResource("StyleBoxFlat_rjgu6")
+PopupMenu/styles/panel = SubResource("StyleBoxFlat_vxwtt")
+VBoxContainer/constants/separation = 20

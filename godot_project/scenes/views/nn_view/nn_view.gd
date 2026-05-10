@@ -7,6 +7,7 @@ extends Control
 @onready var panel_trainin_nn: PanelContainer = $PanelTrainingNn
 @onready var panel_export_format: PanelContainer = $PanelExportFormat
 @onready var window_nn: WindowNn = $WindowNn
+@onready var nn: NeuralNetwork = $NeuralNetwork
 
 var state: String = "create_nn"  # Other values: train_nn, evaluate_nn
 
@@ -41,8 +42,10 @@ func _ready() -> void:
 	# Start the inference mode
 	SignalsObserver.inference_nn_start.connect(_on_start_nn_inferece)
 	
-	create_nn_menu.visible = true
+	# Just make visible the dataset selection menu menu
 	dataset_selecion_menu.visible = true
+	create_nn_menu.visible = false
+	nn.visible = false
 	panel_algorithm_nn.visible = false
 	panel_trainin_nn.visible = false
 	panel_export_format.visible = false
@@ -191,7 +194,9 @@ func _on_dataset_selected(data:Array[Dictionary], attrs: Array[String], target_a
 		panel_algorithm_nn.visible = true
 		SignalsObserver.nn_inference_ready.emit()
 
-	pass
+	else:
+		create_nn_menu.visible = true
+		nn.visible = true
 
 
 func update_neuron_texts_for_layer(texts: Array[String], layer_id: int) -> void:

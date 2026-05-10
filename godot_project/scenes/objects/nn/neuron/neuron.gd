@@ -4,18 +4,18 @@ var _id: int = -2
 var _layer_id: int = -2
 
 
-var _normal_scale: Vector2 = Vector2.ONE
+var _normal_theme: Theme
+var _resalted_theme: Theme = preload(Constants.THEMES.resalted_neuron)
 
 
 func _ready() -> void:
-	_normal_scale = scale
-	pivot_offset = size / 2.0
+	_normal_theme = theme
 	pressed.connect(_on_pressed)
 	SignalsObserver.forward_step_completed.connect(_on_training_step_completed)
 	SignalsObserver.backward_step_completed.connect(_on_training_step_completed)
-	SignalsObserver.train_nn.connect(_reset_evaluated_scale)
-	SignalsObserver.train_nn_next_step.connect(_reset_evaluated_scale)
-	SignalsObserver.train_nn_complete.connect(_reset_evaluated_scale)
+	SignalsObserver.train_nn.connect(_reset_evaluated_theme)
+	SignalsObserver.train_nn_next_step.connect(_reset_evaluated_theme)
+	SignalsObserver.train_nn_complete.connect(_reset_evaluated_theme)
 	SignalsObserver.nn_neuron_text_changed.connect(_on_neuron_text_changed)
 	_apply_cached_text()
 
@@ -50,12 +50,12 @@ func _apply_cached_text() -> void:
 
 
 func _set_evaluated(is_evaluated: bool) -> void:
-	var target_scale: Vector2 = Constants.NEURON_EVALUATED_SCALE if is_evaluated else _normal_scale
-	if scale != target_scale:
-		scale = target_scale
+	var target_theme: Theme = _resalted_theme if is_evaluated else _normal_theme
+	if theme != target_theme:
+		theme = target_theme
 
 
-func _reset_evaluated_scale() -> void:
+func _reset_evaluated_theme() -> void:
 	_set_evaluated(false)
 
 

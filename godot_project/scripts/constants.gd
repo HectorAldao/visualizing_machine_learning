@@ -28,7 +28,8 @@ const SCENES: Dictionary[String, String] = {
 const THEMES: Dictionary[String, String] = {
 	"leaf": "uid://vanr6vum3qcu",
 	"noleaf": "uid://cmsv2q8q35lvy",
-	"nodedefault": "uid://dxluxv1xceiqb"
+	"nodedefault": "uid://dxluxv1xceiqb",
+	"resalted_neuron": "uid://b5ecvrwlunl4u"
 }
 
 const REFCOUNTS: Dictionary[String, String] = {
@@ -59,8 +60,6 @@ const NN_CONNECTION_VARIANCE: float = 0.5
 const NN_CONECTION_SCALE: float = 20
 const NN_CONECTION_BIAS: float = 0
 const NN_MAX_WIDTH: float = 5
-
-const NEURON_EVALUATED_SCALE: Vector2 = Vector2(1.25, 1.25)
 
 const NN_EVAL_DATA_DISPLAY_DECIMALS: int = 3
 const NN_EVAL_DATA_GAP: float = 24.0

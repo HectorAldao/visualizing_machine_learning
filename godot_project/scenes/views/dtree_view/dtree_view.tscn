@@ -102,4 +102,4 @@ grow_vertical = 2
 [node name="ControllerDTree" parent="." unique_id=387693380 instance=ExtResource("5_pxc03")]
 
 [node name="Window" parent="." unique_id=734547246 instance=ExtResource("6_txrwr")]
-position = Vector2i(835, 200)
+position = Vector2i(317, 36)
