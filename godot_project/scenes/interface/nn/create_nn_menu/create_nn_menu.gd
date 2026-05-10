@@ -89,11 +89,13 @@ func _on_text_changed(which: HBoxContainer) -> void:
 
 			num_of_wanted_layers = _check_wanted(num_of_wanted_layers, textedit, 1, 0)
 			Variables.nn.set_layer_neuron_count_tmp(0, num_of_wanted_layers)
+			_update_nn()
 
 		"NeuronsOut":
 
 			num_of_wanted_layers = _check_wanted(num_of_wanted_layers, textedit, 1, -1)
 			Variables.nn.set_layer_neuron_count_tmp(-1, num_of_wanted_layers)
+			_update_nn()
 
 		"Layers":
 
@@ -158,6 +160,7 @@ func _on_text_changed(which: HBoxContainer) -> void:
 				print("[LOG] The number of neurons to wich the text changed its the same")  #debug
 
 			Variables.nn.set_hidden_layer_count_tmp(num_of_wanted_layers)
+			_update_nn()
 	
 
 func _check_wanted(wanted: int, txtedt: TextEdit, minimum: int, is_in_or_out: int = 1) -> int:
@@ -218,6 +221,7 @@ func _on_minus_pressed(which: HBoxContainer) -> void:
 
 func _on_output_activation_selected(activation_func_id: int) -> void:
 	Variables.nn.set_layer_activation_tmp(-1, activation_func_id)
+	_update_nn()
 
 
 func _on_restrictions_set(nn_restr: Dictionary[int, int]) -> void:
@@ -243,4 +247,4 @@ func _on_restrictions_set(nn_restr: Dictionary[int, int]) -> void:
 	SignalsObserver.reload_nn.emit.call_deferred()
 
 func _update_nn() -> void:
-	pass
+	SignalsObserver.reload_nn.emit.call_deferred()

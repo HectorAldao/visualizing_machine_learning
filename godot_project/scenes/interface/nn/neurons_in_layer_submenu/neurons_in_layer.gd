@@ -69,6 +69,7 @@ func _on_text_changed() -> void:
 
 	if nn_logic.nn_tmp_dict.has(neuron_id):
 		nn_logic.set_layer_neuron_count_tmp(neuron_id, num_of_wanted_neurons)
+		_update_nn()
 
 
 func _check_wanted(wanted: int, txtedt: TextEdit, minimum: int) -> int:
@@ -88,3 +89,8 @@ func _check_wanted(wanted: int, txtedt: TextEdit, minimum: int) -> int:
 
 func _on_activation_selected(activation_func_id: int) -> void:
 	Variables.nn.set_layer_activation_tmp(neuron_id, activation_func_id)
+	_update_nn()
+
+
+func _update_nn() -> void:
+	SignalsObserver.reload_nn.emit.call_deferred()
