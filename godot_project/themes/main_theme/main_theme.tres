@@ -17,7 +17,7 @@ corner_radius_bottom_right = 10
 corner_radius_bottom_left = 3
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_es76u"]
-bg_color = Color(0, 0, 0, 0.4392157)
+bg_color = Color(0, 0, 0, 0.7058824)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3

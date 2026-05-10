@@ -5,12 +5,13 @@
 [ext_resource type="PackedScene" uid="uid://e7nvan78e0pf" path="res://scenes/interface/nn/neurons_in_layer_submenu/neurons_in_layer.tscn" id="3_e6v37"]
 
 [node name="CreateNnMenu" type="PanelContainer" unique_id=677229503]
-offset_right = 491.0
-offset_bottom = 573.0
+offset_right = 612.0
+offset_bottom = 621.0
 script = ExtResource("1_hvrol")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=2054348601]
 layout_mode = 2
+theme_override_constants/separation = 15
 
 [node name="LoadButton" type="Button" parent="VBoxContainer" unique_id=614732159]
 layout_mode = 2
