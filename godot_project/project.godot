@@ -25,6 +25,7 @@ config/icon="res://icon.svg"
 SignalsObserver="*uid://bysvvf3nfu5lt"
 Constants="*uid://o843gprkd6mi"
 Variables="*uid://pwn8yqm5sg38"
+ConfigVariables="*uid://x7ugbi8js0fw"
 
 [gui]
 

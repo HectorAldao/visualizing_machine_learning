@@ -3,6 +3,7 @@ class_name WindowNn extends Window
 
 @onready var text0: Label = %Label0
 @onready var text_formula: Label = %LabelFormula
+@onready var latexformula: LatexFormula = %LatexFormula
 @onready var text1: Label = %Label1
 
 
@@ -29,7 +30,7 @@ func _ready() -> void:
 ## Changes the text in the window when a neuron is pressed
 func set_neuron_info(neuron_id: int, layer_id: int) -> void:
 
-	text_formula.text = ""
+	_reset_formula()
 
 	var bias: float = 0.0
 
@@ -52,7 +53,8 @@ func set_neuron_info(neuron_id: int, layer_id: int) -> void:
 
 func set_resalted_neuron_info_forward(neuron_id: int, layer_id: int, input_array: Array, neuron_output: float) -> void:
 
-	text_formula.text = ""
+
+	_reset_formula()
 
 	var neuron_bias: float = 0.0
 
@@ -67,15 +69,21 @@ func set_resalted_neuron_info_forward(neuron_id: int, layer_id: int, input_array
 	if Variables.nn.nn_dict.has(layer_id) and neuron_id < Variables.nn.nn_dict[layer_id].size():
 		neuron_weights = Variables.nn.nn_dict[layer_id][neuron_id]
 
-	var formula: String = _formula_forward_formatter(neuron_weights, input_array, neuron_bias, neuron_output, layer_id)
+	var formula: String
 
+	if ConfigVariables.use_latex:
+		formula = _latex_forward_formatter(neuron_weights, input_array, neuron_bias, neuron_output, layer_id)
+		latexformula.request_formula(formula)
+
+	else:
+		formula = _formula_forward_formatter(neuron_weights, input_array, neuron_bias, neuron_output, layer_id)
+		text_formula.text = formula
 
 	var dic_of_info: Dictionary = {
 		"output": "%0.3f" % neuron_output
 	}
 
 	text0.text = template_texts.neuron_resalted[0]
-	text_formula.text = formula
 	text1.text = template_texts.neuron_resalted[1].format(dic_of_info)
 
 
@@ -116,7 +124,7 @@ func _clean_lists(dict: Dictionary) -> void:
 ## Takes all the info about how the neuron
 ## and transforms it into a latex-processable
 ## String to feed the text_formula
-func _latex_formatter(weights: Array, inputs: Array, bias: float, output: float, layer_id: int) -> String:
+func _latex_forward_formatter(weights: Array, inputs: Array, bias: float, output: float, layer_id: int) -> String:
 
 	var weighted_terms: Array[String] = []
 	var weighted_sum: float = bias
@@ -205,3 +213,11 @@ func _activation_latex_name(activation_type: int) -> String:
 			return "softmax"
 		_:
 			return "identity"
+
+
+func _reset_formula() -> void:
+
+	if ConfigVariables.use_latex:
+		latexformula.reset_sprite()
+	else:
+		text_formula.text = ""
