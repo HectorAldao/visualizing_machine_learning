@@ -26,11 +26,13 @@ unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 3
 
-[node name="Control" type="Control" parent="ScrollContainer/VBoxContainer" unique_id=920349812]
+[node name="MarginContainer" type="MarginContainer" parent="ScrollContainer/VBoxContainer" unique_id=1510223626]
 layout_mode = 2
 
-[node name="LatexFormula" parent="ScrollContainer/VBoxContainer/Control" unique_id=42571569 instance=ExtResource("2_f5hif")]
+[node name="LatexFormula" parent="ScrollContainer/VBoxContainer/MarginContainer" unique_id=42571569 instance=ExtResource("2_f5hif")]
 unique_name_in_owner = true
+position = Vector2(0, 20)
+formula = ""
 
 [node name="LabelFormula" type="Label" parent="ScrollContainer/VBoxContainer" unique_id=670583864]
 unique_name_in_owner = true

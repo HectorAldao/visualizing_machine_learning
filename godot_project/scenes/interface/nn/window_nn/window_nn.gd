@@ -18,6 +18,10 @@ const template_texts: Dictionary[String, Array] = {
 		"La operación que calcula la salida de la neurona es:",
 		"Su salida es {output}"
 		],
+	"neuron_backward_resalted": [
+		"La operación que calcula el error que vuelve por esta neurona es:",
+		"Su delta es {delta}"
+		],
 	}
 
 func _ready() -> void:
@@ -87,8 +91,24 @@ func set_resalted_neuron_info_forward(neuron_id: int, layer_id: int, input_array
 	text1.text = template_texts.neuron_resalted[1].format(dic_of_info)
 
 
-func set_resalted_neuron_info_backward(neuron_id: int, layer_id: int, delta_value: float) -> void:
-	pass
+func set_resalted_neuron_info_backward(_neuron_id: int, layer_id: int, backward_info: Dictionary) -> void:
+
+	_reset_formula()
+
+	var formula: String
+	if ConfigVariables.use_latex:
+		formula = _latex_backward_formatter(backward_info, layer_id)
+		latexformula.request_formula(formula)
+	else:
+		formula = _formula_backward_formatter(backward_info, layer_id)
+		text_formula.text = formula
+
+	var dic_of_info: Dictionary = {
+		"delta": "%0.3f" % float(backward_info.get("delta", 0.0))
+	}
+
+	text0.text = template_texts.neuron_backward_resalted[0]
+	text1.text = template_texts.neuron_backward_resalted[1].format(dic_of_info)
 
 # --- Helpers ---
 
@@ -196,6 +216,164 @@ func _formula_forward_formatter(weights: Array, inputs: Array, bias: float, outp
 		activation_text,
 		_format_latex_number(output)
 	]
+
+
+func _latex_backward_formatter(backward_info: Dictionary, _layer_id: int) -> String:
+	var delta: float = float(backward_info.get("delta", 0.0))
+	var z_value: float = float(backward_info.get("z", 0.0))
+	var output_value: float = float(backward_info.get("output", 0.0))
+	var target_value: float = float(backward_info.get("target", 0.0))
+	var upstream_gradient: float = float(backward_info.get("upstream_gradient", 0.0))
+	var activation_type: int = int(backward_info.get("activation_type", Constants.ACT_FUNCS.identity))
+	var loss_type: int = int(backward_info.get("loss_type", Constants.LOSS_FUNCS.mse))
+	var is_output_layer: bool = bool(backward_info.get("is_output_layer", false))
+
+	if is_output_layer and activation_type == Constants.ACT_FUNCS.softmax and loss_type == Constants.LOSS_FUNCS.coss_entr:
+		return "\\begin{aligned} \\delta_i &= \\frac{\\partial L}{\\partial z_i} = \\sum_k \\frac{\\partial L}{\\partial a_k}\\frac{\\partial a_k}{\\partial z_i} \\\\ &= \\sum_k \\left(-\\frac{y_k}{a_k}\\right)a_k(\\mathbf{1}_{k=i}-a_i) \\\\ &\\approx a_i - y_i = %s - %s = %s \\end{aligned}" % [
+			_format_latex_number(output_value),
+			_format_latex_number(target_value),
+			_format_latex_number(delta)
+		]
+
+	var activation_derivative_value: float = _activation_derivative_value(z_value, activation_type)
+	var activation_derivative_text: String = _activation_derivative_latex_text(activation_type, z_value, output_value)
+	if is_output_layer:
+		return "\\begin{aligned} \\delta &= \\frac{\\partial L}{\\partial a}\\frac{\\partial a}{\\partial z} \\\\ \\frac{\\partial L}{\\partial a} &= %s = %s \\\\ \\frac{\\partial a}{\\partial z} &= %s = %s \\\\ \\delta &\\approx %s \\cdot %s = %s \\end{aligned}" % [
+			_loss_derivative_latex_text(loss_type, output_value, target_value),
+			_format_latex_number(upstream_gradient),
+			activation_derivative_text,
+			_format_latex_number(activation_derivative_value),
+			_format_latex_number(upstream_gradient),
+			_format_latex_number(activation_derivative_value),
+			_format_latex_number(delta)
+		]
+
+	return "\\begin{aligned} g &= %s = %s \\\\ \\delta &= g\\frac{\\partial a}{\\partial z} \\\\ \\frac{\\partial a}{\\partial z} &= %s = %s \\\\ \\delta &\\approx %s \\cdot %s = %s \\end{aligned}" % [
+		_hidden_upstream_latex_text(backward_info),
+		_format_latex_number(upstream_gradient),
+		activation_derivative_text,
+		_format_latex_number(activation_derivative_value),
+		_format_latex_number(upstream_gradient),
+		_format_latex_number(activation_derivative_value),
+		_format_latex_number(delta)
+	]
+
+
+func _formula_backward_formatter(backward_info: Dictionary, _layer_id: int) -> String:
+	var delta: float = float(backward_info.get("delta", 0.0))
+	var z_value: float = float(backward_info.get("z", 0.0))
+	var output_value: float = float(backward_info.get("output", 0.0))
+	var target_value: float = float(backward_info.get("target", 0.0))
+	var upstream_gradient: float = float(backward_info.get("upstream_gradient", 0.0))
+	var activation_type: int = int(backward_info.get("activation_type", Constants.ACT_FUNCS.identity))
+	var loss_type: int = int(backward_info.get("loss_type", Constants.LOSS_FUNCS.mse))
+	var is_output_layer: bool = bool(backward_info.get("is_output_layer", false))
+
+	if is_output_layer and activation_type == Constants.ACT_FUNCS.softmax and loss_type == Constants.LOSS_FUNCS.coss_entr:
+		return "δ_i = ∂L/∂z_i = Σ_k(∂L/∂a_k × ∂a_k/∂z_i)\n= Σ_k((-y_k / a_k) × a_k(1 si k=i, si no 0 - a_i))\n≈ a_i - y_i = %s - %s = %s" % [
+			_format_latex_number(output_value),
+			_format_latex_number(target_value),
+			_format_latex_number(delta)
+		]
+
+	var activation_derivative_value: float = _activation_derivative_value(z_value, activation_type)
+	var activation_derivative_text: String = _activation_derivative_text(activation_type, z_value, output_value)
+	if is_output_layer:
+		return "δ = ∂L/∂a × ∂a/∂z\n∂L/∂a = %s = %s\n∂a/∂z = %s = %s\nδ ≈ %s × %s = %s" % [
+			_loss_derivative_text(loss_type, output_value, target_value),
+			_format_latex_number(upstream_gradient),
+			activation_derivative_text,
+			_format_latex_number(activation_derivative_value),
+			_format_latex_number(upstream_gradient),
+			_format_latex_number(activation_derivative_value),
+			_format_latex_number(delta)
+		]
+
+	return "g = %s = %s\nδ = g × ∂a/∂z\n∂a/∂z = %s = %s\nδ ≈ %s × %s = %s" % [
+		_hidden_upstream_text(backward_info),
+		_format_latex_number(upstream_gradient),
+		activation_derivative_text,
+		_format_latex_number(activation_derivative_value),
+		_format_latex_number(upstream_gradient),
+		_format_latex_number(activation_derivative_value),
+		_format_latex_number(delta)
+	]
+
+
+func _hidden_upstream_text(backward_info: Dictionary) -> String:
+	var next_deltas: Array = backward_info.get("next_deltas", [])
+	var next_weights: Array = backward_info.get("next_weights", [])
+	var terms: Array[String] = []
+
+	for next_neuron_idx in range(next_deltas.size()):
+		if next_neuron_idx >= next_weights.size():
+			continue
+		var next_neuron_weights: Array = next_weights[next_neuron_idx]
+		var neuron_id: int = int(backward_info.get("neuron_id", -1))
+		if neuron_id < 0 or neuron_id >= next_neuron_weights.size():
+			continue
+		terms.append("(%s × %s)" % [_format_latex_number(float(next_neuron_weights[neuron_id])), _format_latex_number(float(next_deltas[next_neuron_idx]))])
+
+	if terms.is_empty():
+		return "0"
+	return " + ".join(terms)
+
+
+func _hidden_upstream_latex_text(backward_info: Dictionary) -> String:
+	return _hidden_upstream_text(backward_info).replace("×", "\\cdot")
+
+
+func _activation_derivative_value(z_value: float, activation_type: int) -> float:
+	match activation_type:
+		Constants.ACT_FUNCS.relu:
+			return 1.0 if z_value > 0.0 else 0.0
+		Constants.ACT_FUNCS.sigmoid:
+			var sigmoid_value: float = 1.0 / (1.0 + exp(-z_value))
+			return sigmoid_value * (1.0 - sigmoid_value)
+		Constants.ACT_FUNCS.softmax:
+			return 1.0
+		_:
+			return 1.0
+
+
+func _activation_derivative_text(activation_type: int, z_value: float, output_value: float) -> String:
+	match activation_type:
+		Constants.ACT_FUNCS.relu:
+			return "ReLU'(z) = 1 si z > 0, si no 0; z = %s" % _format_latex_number(z_value)
+		Constants.ACT_FUNCS.sigmoid:
+			return "sigmoid'(z) = sigmoid(z) × (1 - sigmoid(z)) = %s × (1 - %s)" % [_format_latex_number(output_value), _format_latex_number(output_value)]
+		Constants.ACT_FUNCS.softmax:
+			return "Jacobian(softmax): ∂a_i/∂z_j = a_i(1 si i=j, si no 0 - a_j)"
+		_:
+			return "identity'(z) = 1"
+
+
+func _activation_derivative_latex_text(activation_type: int, z_value: float, output_value: float) -> String:
+	match activation_type:
+		Constants.ACT_FUNCS.relu:
+			return "\\operatorname{ReLU}'(z)=\\begin{cases}1,&z>0\\\\0,&z\\le 0\\end{cases},\\ z=%s" % _format_latex_number(z_value)
+		Constants.ACT_FUNCS.sigmoid:
+			return "\\sigma'(z)=\\sigma(z)(1-\\sigma(z))=%s(1-%s)" % [_format_latex_number(output_value), _format_latex_number(output_value)]
+		Constants.ACT_FUNCS.softmax:
+			return "\\frac{\\partial a_i}{\\partial z_j}=a_i(\\mathbf{1}_{i=j}-a_j)"
+		_:
+			return "1"
+
+
+func _loss_derivative_text(loss_type: int, output_value: float, target_value: float) -> String:
+	match loss_type:
+		Constants.LOSS_FUNCS.coss_entr:
+			return "-y / a = -%s / %s" % [_format_latex_number(target_value), _format_latex_number(output_value)]
+		_:
+			return "a - y = %s - %s" % [_format_latex_number(output_value), _format_latex_number(target_value)]
+
+
+func _loss_derivative_latex_text(loss_type: int, output_value: float, target_value: float) -> String:
+	match loss_type:
+		Constants.LOSS_FUNCS.coss_entr:
+			return "-\\frac{y}{a}=-\\frac{%s}{%s}" % [_format_latex_number(target_value), _format_latex_number(output_value)]
+		_:
+			return "a-y=%s-%s" % [_format_latex_number(output_value), _format_latex_number(target_value)]
 
 
 func _format_latex_number(value: float) -> String:

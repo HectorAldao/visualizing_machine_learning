@@ -404,8 +404,9 @@ func _advance_backward_neuron() -> bool:
 	_prepare_backward_cache(layer_idx)
 
 	var delta: float = _cached_deltas[_current_neuron_cursor]
+	var backward_info: Dictionary = _get_backward_neuron_info(layer_idx, _current_neuron_cursor, delta)
 	SignalsObserver.backward_step_completed.emit(layer_idx, _current_neuron_cursor, delta)
-	SignalsObserver.nn_resalted_neuron_backward.emit(_current_neuron_cursor, layer_idx, delta)
+	SignalsObserver.nn_resalted_neuron_backward.emit(_current_neuron_cursor, layer_idx, backward_info)
 	_store_current_delta(layer_idx, _current_neuron_cursor, delta)
 	_update_neuron_weights(layer_idx, _current_neuron_cursor, delta)
 
@@ -419,6 +420,51 @@ func _advance_backward_neuron() -> bool:
 			_finish_current_sample()
 
 	return true
+
+
+func _get_backward_neuron_info(layer_idx: int, neuron_idx: int, delta: float) -> Dictionary:
+	var z_values: Array = layer_weighted_sums.get(layer_idx, [])
+	var output_values: Array = layer_outputs.get(layer_idx, [])
+	var next_layer_idx: int = _get_next_layer_index(layer_idx, _sorted_layer_indices)
+	var next_deltas: Array = layer_deltas.get(next_layer_idx, [])
+	var next_weights: Array = _backprop_weights_snapshot.get(next_layer_idx, [])
+	var activation_type: int = _activations.get(layer_idx, Constants.ACT_FUNCS.identity)
+	var output_value: float = 0.0
+	var z_value: float = 0.0
+	var target_value: float = 0.0
+	var upstream_gradient: float = 0.0
+
+	if neuron_idx >= 0 and neuron_idx < output_values.size():
+		output_value = float(output_values[neuron_idx])
+	if neuron_idx >= 0 and neuron_idx < z_values.size():
+		z_value = float(z_values[neuron_idx])
+	if neuron_idx >= 0 and neuron_idx < _current_target_data.size():
+		target_value = float(_current_target_data[neuron_idx])
+
+	if layer_idx == -1:
+		var output_errors: Array[float] = _compute_output_loss_error(output_values, _current_target_data, _loss_type)
+		if neuron_idx >= 0 and neuron_idx < output_errors.size():
+			upstream_gradient = output_errors[neuron_idx]
+	else:
+		for next_neuron_idx in range(next_deltas.size()):
+			if next_neuron_idx < next_weights.size() and neuron_idx < next_weights[next_neuron_idx].size():
+				upstream_gradient += float(next_weights[next_neuron_idx][neuron_idx]) * float(next_deltas[next_neuron_idx])
+
+	return {
+		"neuron_id": neuron_idx,
+		"delta": delta,
+		"z": z_value,
+		"output": output_value,
+		"outputs": output_values.duplicate(true),
+		"target": target_value,
+		"targets": _current_target_data.duplicate(true),
+		"upstream_gradient": upstream_gradient,
+		"activation_type": activation_type,
+		"loss_type": _loss_type,
+		"is_output_layer": layer_idx == -1,
+		"next_deltas": next_deltas.duplicate(true),
+		"next_weights": next_weights.duplicate(true),
+	}
 
 
 ## Loads _current_data_idx into the runtime caches used by forward/backward.
