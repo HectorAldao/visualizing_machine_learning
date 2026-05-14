@@ -1,4 +1,4 @@
-class_name LatexFormula extends Sprite2D
+class_name LatexFormula extends TextureRect
 
 @export var formula: String = ""
 var text_color: Color = Color.WHITE
@@ -43,8 +43,8 @@ func request_formula(latex_string: String) -> void:
 func reset_sprite() -> void:
 	formula = ""
 	texture = null
-	centered = true
-	offset = Vector2.ZERO
+	#centered = true
+	#offset = Vector2.ZERO
 
 
 func _on_request_completed(_result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
@@ -67,7 +67,7 @@ func _on_request_completed(_result: int, response_code: int, _headers: PackedStr
 	
 	if err == OK:
 		texture = ImageTexture.create_from_image(image)
-		centered = false
-		offset.y = -texture.get_height() / 2.0
+		#centered = false
+		#offset.y = -texture.get_height() / 2.0
 	else:
 		push_error("LatexFormula: Error al parsear SVG. Verifica si el SVG es válido.")

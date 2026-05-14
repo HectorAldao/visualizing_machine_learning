@@ -2,8 +2,10 @@
 
 [ext_resource type="Script" uid="uid://cb68bfbl08gva" path="res://scenes/latex_formula/latex_formula.gd" id="1_rqu7v"]
 
-[node name="LatexFormula" type="Sprite2D" unique_id=42571569]
+[node name="TextureRect" type="TextureRect" unique_id=188241687]
+offset_right = 40.0
+offset_bottom = 40.0
+stretch_mode = 2
 script = ExtResource("1_rqu7v")
-formula = "x + y"
 
 [node name="HTTPRequest" type="HTTPRequest" parent="." unique_id=252654150]
