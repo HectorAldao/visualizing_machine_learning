@@ -5,6 +5,7 @@
 
 [node name="Window" type="Window" unique_id=734547246]
 oversampling_override = 1.0
+title = "Texto Informativo"
 position = Vector2i(20, 150)
 size = Vector2i(300, 350)
 script = ExtResource("1_i8vyb")
