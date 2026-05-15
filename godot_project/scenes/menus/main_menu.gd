@@ -2,8 +2,8 @@ extends Control
 
 
 # For the menu
-@export var max_width: float = 720.0
-@export var horizontal_margin: float = 24.0
+@export var max_width: float = 600.0
+@export var horizontal_margin: float = 0
 
 @onready var dtree_button: Button = %DTreeButton
 @onready var nn_button: Button = %NeuralNetworkButton
@@ -80,10 +80,23 @@ func _update_text(algorithm: int) -> void:
 	text_label.text = dict_of_text[algorithm][1]
 
 
-func _update_size() -> void:
+#func _update_size() -> void:
+#
+#	var viewport_size: Vector2 = get_viewport_rect().size
+#	var available_width: float = viewport_size.x - horizontal_margin * 2.0
+#	var available_height: float = viewport_size.y - horizontal_margin * 2.0
+#	panelcontainer.custom_minimum_size.x = min(max_width, available_width)
+#	panelcontainer.custom_minimum_size.y = available_height
 
-	var viewport_size: Vector2 = get_viewport_rect().size
-	var available_width: float = viewport_size.x - horizontal_margin * 2.0
-	var available_height: float = viewport_size.y - horizontal_margin * 2.0
-	panelcontainer.custom_minimum_size.x = min(max_width, available_width)
-	panelcontainer.custom_minimum_size.y = available_height
+func _update_size() -> void:
+	var viewport: Viewport = get_viewport()
+	var visible_size: Vector2 = viewport.get_visible_rect().size
+	var window_size: Vector2 = Vector2(get_window().size)
+	var canvas_scale: float = min(
+		window_size.x / visible_size.x,
+		window_size.y / visible_size.y
+	)
+	var available_width_px: float = window_size.x - horizontal_margin * 2.0
+	var available_height_px: float = window_size.y - horizontal_margin * 2.0
+	panelcontainer.custom_minimum_size.x = min(max_width, available_width_px) / canvas_scale
+	panelcontainer.custom_minimum_size.y = available_height_px / canvas_scale
