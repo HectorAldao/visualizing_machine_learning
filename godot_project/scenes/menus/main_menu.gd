@@ -50,7 +50,7 @@ func _update_panel() -> void:
 		1:
 			start_button.disabled = false
 		2:
-			pass
+			start_button.disabled = false
 		_:
 			return
 
