@@ -2,6 +2,15 @@
 
 [ext_resource type="Script" uid="uid://cfirevud3ti3f" path="res://scenes/menus/main_menu.gd" id="1_8gy84"]
 
+[sub_resource type="LabelSettings" id="LabelSettings_xqga4"]
+font_size = 35
+
+[sub_resource type="LabelSettings" id="LabelSettings_ovrgc"]
+font_size = 20
+
+[sub_resource type="LabelSettings" id="LabelSettings_2o76q"]
+font_size = 30
+
 [node name="MainMenu" type="Control" unique_id=807388]
 layout_mode = 3
 anchors_preset = 15
@@ -11,26 +20,81 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_8gy84")
 
+[node name="Label" type="Label" parent="." unique_id=201382217]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -309.0
+offset_top = 37.0
+offset_right = 309.0
+offset_bottom = 86.0
+grow_horizontal = 2
+text = "Visualizando el
+aprendizaje máquina"
+label_settings = SubResource("LabelSettings_xqga4")
+horizontal_alignment = 1
+
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1578589725]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -107.5
-offset_top = -50.0
-offset_right = 107.5
-offset_bottom = 50.0
-grow_horizontal = 2
-grow_vertical = 2
+offset_left = 39.0
+offset_top = 161.0
+offset_right = 366.0
+offset_bottom = 369.0
+
+[node name="Label" type="Label" parent="VBoxContainer" unique_id=1452108106]
+layout_mode = 2
+text = "Selecciona el algoritmo a explorar"
+label_settings = SubResource("LabelSettings_ovrgc")
+horizontal_alignment = 1
 
 [node name="DTreeButton" type="Button" parent="VBoxContainer" unique_id=514394525]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 70)
 layout_mode = 2
 text = "Árbol de Decision"
 
 [node name="NeuralNetworkButton" type="Button" parent="VBoxContainer" unique_id=994976548]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 70)
 layout_mode = 2
 text = "Red Neuronal"
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=876910558]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -392.0
+offset_top = -471.0
+offset_right = -40.0
+offset_bottom = -39.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer" unique_id=1461954276]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="TitleLabel" type="Label" parent="PanelContainer/VBoxContainer" unique_id=1851289427]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Información sobre el algoritmo"
+label_settings = SubResource("LabelSettings_2o76q")
+autowrap_mode = 3
+
+[node name="TextLabel" type="Label" parent="PanelContainer/VBoxContainer" unique_id=616165297]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 0
+text = "Preseleccione uno de los algoritmos para saber más información antes de empezar"
+autowrap_mode = 3
+
+[node name="StartButton" type="Button" parent="PanelContainer" unique_id=1424195084]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+text = "Comenzar"
