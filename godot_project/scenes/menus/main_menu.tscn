@@ -1,15 +1,22 @@
 [gd_scene format=3 uid="uid://j220721ca3np"]
 
 [ext_resource type="Script" uid="uid://cfirevud3ti3f" path="res://scenes/menus/main_menu.gd" id="1_8gy84"]
+[ext_resource type="PackedScene" uid="uid://c8awyfuu7i3ih" path="res://scenes/interface/scroll_container/scroll_container.tscn" id="2_ovrgc"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2o76q"]
+bg_color = Color(0, 0, 0, 0)
+
+[sub_resource type="Theme" id="Theme_6bivr"]
+PanelContainer/styles/panel = SubResource("StyleBoxFlat_2o76q")
 
 [sub_resource type="LabelSettings" id="LabelSettings_xqga4"]
-font_size = 35
+font_size = 40
 
 [sub_resource type="LabelSettings" id="LabelSettings_ovrgc"]
-font_size = 20
+font_size = 35
 
 [sub_resource type="LabelSettings" id="LabelSettings_2o76q"]
-font_size = 30
+font_size = 35
 
 [node name="MainMenu" type="Control" unique_id=807388]
 layout_mode = 3
@@ -20,81 +27,89 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_8gy84")
 
-[node name="Label" type="Label" parent="." unique_id=201382217]
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=2019448492]
 layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -309.0
-offset_top = 37.0
-offset_right = 309.0
-offset_bottom = 86.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="CenterContainer" type="CenterContainer" parent="MarginContainer" unique_id=1435902856]
+layout_mode = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer/CenterContainer" unique_id=1816542396]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(575, 1000)
+layout_mode = 2
+theme = SubResource("Theme_6bivr")
+
+[node name="ScrollContainer" parent="MarginContainer/CenterContainer/PanelContainer" unique_id=1226361611 instance=ExtResource("2_ovrgc")]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/CenterContainer/PanelContainer/ScrollContainer" unique_id=1982867266]
+layout_mode = 2
+
+[node name="MainLabel" type="Label" parent="MarginContainer/CenterContainer/PanelContainer/ScrollContainer/VBoxContainer" unique_id=201382217]
+layout_mode = 2
 text = "Visualizando el
 aprendizaje máquina"
 label_settings = SubResource("LabelSettings_xqga4")
 horizontal_alignment = 1
+autowrap_mode = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1578589725]
-layout_mode = 1
-offset_left = 39.0
-offset_top = 161.0
-offset_right = 366.0
-offset_bottom = 369.0
+[node name="VBoxContainerMenu" type="VBoxContainer" parent="MarginContainer/CenterContainer/PanelContainer/ScrollContainer/VBoxContainer" unique_id=1578589725]
+layout_mode = 2
+size_flags_vertical = 4
 
-[node name="Label" type="Label" parent="VBoxContainer" unique_id=1452108106]
+[node name="OptionsLabel" type="Label" parent="MarginContainer/CenterContainer/PanelContainer/ScrollContainer/VBoxContainer/VBoxContainerMenu" unique_id=1452108106]
 layout_mode = 2
 text = "Selecciona el algoritmo a explorar"
 label_settings = SubResource("LabelSettings_ovrgc")
 horizontal_alignment = 1
 
-[node name="DTreeButton" type="Button" parent="VBoxContainer" unique_id=514394525]
+[node name="DTreeButton" type="Button" parent="MarginContainer/CenterContainer/PanelContainer/ScrollContainer/VBoxContainer/VBoxContainerMenu" unique_id=514394525]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 70)
 layout_mode = 2
 text = "Árbol de Decision"
 
-[node name="NeuralNetworkButton" type="Button" parent="VBoxContainer" unique_id=994976548]
+[node name="NeuralNetworkButton" type="Button" parent="MarginContainer/CenterContainer/PanelContainer/ScrollContainer/VBoxContainer/VBoxContainerMenu" unique_id=994976548]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 70)
 layout_mode = 2
 text = "Red Neuronal"
 
-[node name="PanelContainer" type="PanelContainer" parent="." unique_id=876910558]
-layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -392.0
-offset_top = -471.0
-offset_right = -40.0
-offset_bottom = -39.0
-grow_horizontal = 0
-grow_vertical = 0
+[node name="StartButton" type="Button" parent="MarginContainer/CenterContainer/PanelContainer/ScrollContainer/VBoxContainer" unique_id=1424195084]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+text = "Comenzar"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer" unique_id=1461954276]
+[node name="PanelContainerMenu" type="PanelContainer" parent="MarginContainer/CenterContainer/PanelContainer/ScrollContainer/VBoxContainer" unique_id=876910558]
+custom_minimum_size = Vector2(0, 400)
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/CenterContainer/PanelContainer/ScrollContainer/VBoxContainer/PanelContainerMenu" unique_id=1461954276]
 layout_mode = 2
 size_flags_vertical = 0
 
-[node name="TitleLabel" type="Label" parent="PanelContainer/VBoxContainer" unique_id=1851289427]
+[node name="TitleLabel" type="Label" parent="MarginContainer/CenterContainer/PanelContainer/ScrollContainer/VBoxContainer/PanelContainerMenu/VBoxContainer" unique_id=1851289427]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Información sobre el algoritmo"
 label_settings = SubResource("LabelSettings_2o76q")
 autowrap_mode = 3
 
-[node name="TextLabel" type="Label" parent="PanelContainer/VBoxContainer" unique_id=616165297]
+[node name="TextLabel" type="Label" parent="MarginContainer/CenterContainer/PanelContainer/ScrollContainer/VBoxContainer/PanelContainerMenu/VBoxContainer" unique_id=616165297]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 0
 text = "Preseleccione uno de los algoritmos para saber más información antes de empezar"
 autowrap_mode = 3
-
-[node name="StartButton" type="Button" parent="PanelContainer" unique_id=1424195084]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 8
-text = "Comenzar"

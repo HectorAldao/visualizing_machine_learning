@@ -1,12 +1,18 @@
 extends Control
 
 
+# For the menu
+@export var max_width: float = 720.0
+@export var horizontal_margin: float = 24.0
+
 @onready var dtree_button: Button = %DTreeButton
 @onready var nn_button: Button = %NeuralNetworkButton
 @onready var start_button: Button = %StartButton
 
 @onready var title_label: Label = %TitleLabel
 @onready var text_label: Label = %TextLabel
+
+@onready var panelcontainer: PanelContainer = %PanelContainer
 
 
 var selected_algorithm: int = 0:
@@ -22,6 +28,9 @@ func _ready() -> void:
 	start_button.pressed.connect(_on_start_button_pressed)
 
 	start_button.disabled = true
+
+	get_viewport().size_changed.connect(_update_size)
+	_update_size()
 
 
 
@@ -69,3 +78,12 @@ func _update_text(algorithm: int) -> void:
 	
 	title_label.text = dict_of_text[algorithm][0]
 	text_label.text = dict_of_text[algorithm][1]
+
+
+func _update_size() -> void:
+
+	var viewport_size: Vector2 = get_viewport_rect().size
+	var available_width: float = viewport_size.x - horizontal_margin * 2.0
+	var available_height: float = viewport_size.y - horizontal_margin * 2.0
+	panelcontainer.custom_minimum_size.x = min(max_width, available_width)
+	panelcontainer.custom_minimum_size.y = available_height
