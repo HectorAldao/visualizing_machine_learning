@@ -10,10 +10,10 @@ bg_color = Color(0, 0, 0, 0)
 PanelContainer/styles/panel = SubResource("StyleBoxFlat_2o76q")
 
 [sub_resource type="LabelSettings" id="LabelSettings_xqga4"]
-font_size = 40
+font_size = 60
 
 [sub_resource type="LabelSettings" id="LabelSettings_ovrgc"]
-font_size = 35
+font_size = 40
 
 [sub_resource type="LabelSettings" id="LabelSettings_2o76q"]
 font_size = 35
@@ -44,7 +44,7 @@ layout_mode = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="MarginContainer/CenterContainer" unique_id=1816542396]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(575, 1000)
+custom_minimum_size = Vector2(675, 1000)
 layout_mode = 2
 theme = SubResource("Theme_6bivr")
 
@@ -77,16 +77,19 @@ horizontal_alignment = 1
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 70)
 layout_mode = 2
+theme_override_font_sizes/font_size = 35
 text = "Árbol de Decision"
 
 [node name="NeuralNetworkButton" type="Button" parent="MarginContainer/CenterContainer/PanelContainer/ScrollContainer/VBoxContainer/VBoxContainerMenu" unique_id=994976548]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 70)
 layout_mode = 2
+theme_override_font_sizes/font_size = 35
 text = "Red Neuronal"
 
 [node name="StartButton" type="Button" parent="MarginContainer/CenterContainer/PanelContainer/ScrollContainer/VBoxContainer" unique_id=1424195084]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 50)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 8
@@ -106,6 +109,7 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Información sobre el algoritmo"
 label_settings = SubResource("LabelSettings_2o76q")
+horizontal_alignment = 1
 autowrap_mode = 3
 
 [node name="TextLabel" type="Label" parent="MarginContainer/CenterContainer/PanelContainer/ScrollContainer/VBoxContainer/PanelContainerMenu/VBoxContainer" unique_id=616165297]

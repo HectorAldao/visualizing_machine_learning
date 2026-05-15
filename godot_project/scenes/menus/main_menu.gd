@@ -2,7 +2,7 @@ extends Control
 
 
 # For the menu
-@export var max_width: float = 600.0
+@export var max_width: float = 700.0
 @export var horizontal_margin: float = 0
 
 @onready var dtree_button: Button = %DTreeButton
