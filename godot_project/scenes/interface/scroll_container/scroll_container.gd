@@ -3,6 +3,9 @@ extends ScrollContainer
 
 @export var is_horizontal: bool = false
 @export var scroll_speed: int = 30
+@export_range(0.1, 1) var zoom_speed: float = 0.2
+@export var max_zoom: float = 3.
+@export var min_zoom: float = 0.1
 
 var is_middle_mouse_dragging: bool = false
 var last_mouse_position: Vector2 = Vector2.ZERO
@@ -39,6 +42,22 @@ func _input(event: InputEvent) -> void:
 				is_middle_mouse_dragging = false
 
 			get_viewport().set_input_as_handled()
+
+		# Zoom
+		elif event.pressed and event.ctrl_pressed:
+			# Save the diference frame to frame
+			var delta = 0
+			
+			# Determine direction
+			if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+				delta = zoom_speed
+			elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+				delta = -zoom_speed
+
+			# Apply zoom
+			if delta != 0:
+				delta = min(max_zoom, min(min_zoom, delta))
+				get_tree().root.content_scale_factor += delta
 		
 		# Move scroll container view
 		elif event.pressed and not event.ctrl_pressed:
