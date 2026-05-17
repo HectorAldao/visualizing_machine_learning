@@ -26,7 +26,7 @@ J.~Armstrong, M.~Williams, and R.~Virding, \emph{Concurrent Programming in Erlan
 
 \bibitem[Hébert(2013)]{ErlangWebBook}
 \BIBentryALTinterwordspacing
-F.~Hébert, ``\BIBforeignlanguage{galician}{Learn you some erlang for great good!}'' 2013, \dataacceso{} \today. [En liña]. Dispoñible en: \url{https://learnyousomeerlang.com/}
+F.~Hébert, ``\BIBforeignlanguage{galician}{Learn you some erlang for great good!}'' 2013, \dataacceso{} \today. [En línea]. Disponible en: \url{https://learnyousomeerlang.com/}
 \BIBentrySTDinterwordspacing
 
 \end{thebibliography}
