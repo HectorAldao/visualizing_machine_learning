@@ -90,13 +90,18 @@ func _update_text(algorithm: int) -> void:
 
 func _update_size() -> void:
 	var viewport: Viewport = get_viewport()
-	var visible_size: Vector2 = viewport.get_visible_rect().size
 	var window_size: Vector2 = Vector2(get_window().size)
-	var canvas_scale: float = min(
-		window_size.x / visible_size.x,
-		window_size.y / visible_size.y
-	)
-	var available_width_px: float = window_size.x - horizontal_margin * 2.0
-	var available_height_px: float = window_size.y - horizontal_margin * 2.0
-	panelcontainer.custom_minimum_size.x = min(max_width, available_width_px) / canvas_scale
-	panelcontainer.custom_minimum_size.y = available_height_px / canvas_scale
+	var display_scale: float = DisplayServer.screen_get_scale()
+	if display_scale <= 0.0:
+		display_scale = 1.0
+
+	var canvas_scale: Vector2 = viewport.get_stretch_transform().get_scale() / display_scale
+	if canvas_scale.x <= 0.0 or canvas_scale.y <= 0.0:
+		var visible_size: Vector2 = viewport.get_visible_rect().size
+		canvas_scale = (window_size / display_scale) / visible_size
+
+	var visual_window_size: Vector2 = window_size / display_scale
+	var available_width: float = maxf(0.0, visual_window_size.x - horizontal_margin * 2.0)
+	var available_height: float = maxf(0.0, visual_window_size.y - horizontal_margin * 2.0)
+	panelcontainer.custom_minimum_size.x = min(max_width, available_width) / canvas_scale.x
+	panelcontainer.custom_minimum_size.y = available_height / canvas_scale.y
