@@ -28,8 +28,9 @@ autowrap_mode = 3
 
 [node name="LatexFormula" parent="ScrollContainer/VBoxContainer" unique_id=42571569 instance=ExtResource("2_f5hif")]
 unique_name_in_owner = true
-position = Vector2(0, 63)
-formula = ""
+layout_mode = 2
+svg_font_size = 4.0
+svg_padding = 1.0
 
 [node name="LabelFormula" type="Label" parent="ScrollContainer/VBoxContainer" unique_id=670583864]
 unique_name_in_owner = true
