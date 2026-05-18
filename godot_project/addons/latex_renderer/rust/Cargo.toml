@@ -8,12 +8,13 @@ rust-version = "1.94"
 crate-type = ["cdylib"]
 
 [features]
-default = []
+default = ["threads"]
+threads = ["godot/experimental-threads"]
 web = ["godot/experimental-wasm"]
 nothreads = ["web", "godot/experimental-wasm-nothreads"]
 
 [dependencies]
-godot = { version = "0.5.2", features = ["api-4-6", "experimental-threads"] }
+godot = { version = "0.5.2", features = ["api-4-6"] }
 ratex-parser = "0.1.8"
 ratex-layout = "0.1.8"
 ratex-svg = { version = "0.1.8", features = ["embed-fonts"] }

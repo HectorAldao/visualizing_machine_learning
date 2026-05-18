@@ -72,7 +72,7 @@ cp target/wasm32-unknown-emscripten/debug/latex_renderer.wasm ../bin/web/debug/l
 Build the single-threaded fallback side module:
 
 ```sh
-cargo +nightly build -Zbuild-std --target wasm32-unknown-emscripten --features nothreads
+cargo +nightly build -Zbuild-std --target wasm32-unknown-emscripten --no-default-features --features nothreads
 cp target/wasm32-unknown-emscripten/debug/latex_renderer.wasm ../bin/web/debug/latex_renderer.wasm
 ```
 
