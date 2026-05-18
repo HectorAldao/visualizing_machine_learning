@@ -1,0 +1,21 @@
+[configuration]
+entry_symbol = "gdext_rust_init"
+compatibility_minimum = "4.3"
+reloadable = true
+
+[libraries]
+linux.debug.x86_64 = "res://addons/latex_renderer/bin/linux/liblatex_renderer.debug.x86_64.so"
+linux.release.x86_64 = "res://addons/latex_renderer/bin/linux/liblatex_renderer.release.x86_64.so"
+
+windows.debug.x86_64 = "res://addons/latex_renderer/bin/windows/latex_renderer.debug.x86_64.dll"
+windows.release.x86_64 = "res://addons/latex_renderer/bin/windows/latex_renderer.release.x86_64.dll"
+
+macos.debug.x86_64 = "res://addons/latex_renderer/bin/macos/liblatex_renderer.debug.x86_64.dylib"
+macos.release.x86_64 = "res://addons/latex_renderer/bin/macos/liblatex_renderer.release.x86_64.dylib"
+macos.debug.arm64 = "res://addons/latex_renderer/bin/macos/liblatex_renderer.debug.arm64.dylib"
+macos.release.arm64 = "res://addons/latex_renderer/bin/macos/liblatex_renderer.release.arm64.dylib"
+
+web.debug.threads.wasm32 = "res://addons/latex_renderer/bin/web/debug/latex_renderer.threads.wasm"
+web.release.threads.wasm32 = "res://addons/latex_renderer/bin/web/release/latex_renderer.threads.wasm"
+web.debug.wasm32 = "res://addons/latex_renderer/bin/web/debug/latex_renderer.wasm"
+web.release.wasm32 = "res://addons/latex_renderer/bin/web/release/latex_renderer.wasm"

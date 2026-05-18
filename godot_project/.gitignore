@@ -3,4 +3,11 @@
 /android/
 session.vim
 .codex
-addons
+/addons/*
+!/addons/latex_renderer/
+!/addons/latex_renderer/**
+/addons/latex_renderer/rust/target/
+/addons/latex_renderer/bin/**/*.dll
+/addons/latex_renderer/bin/**/*.dylib
+/addons/latex_renderer/bin/**/*.so
+/addons/latex_renderer/bin/**/*.wasm
