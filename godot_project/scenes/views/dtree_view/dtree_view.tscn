@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://dy3l4lsa0srpr" path="res://scenes/objects/dtree/dtree.tscn" id="4_dtree"]
 [ext_resource type="PackedScene" uid="uid://5h4ba5ys8aml" path="res://scenes/controllers/controller_dtree/controller_dtree.tscn" id="5_pxc03"]
 [ext_resource type="PackedScene" uid="uid://dbkhkmbjedndu" path="res://scenes/interface/navigation_menu/navigation_menu.tscn" id="6_6eshh"]
+[ext_resource type="Texture2D" uid="uid://b2p5prwiiqq1k" path="res://assets/three_lines_menu/three_lines_menu_mini.png" id="6_jj56m"]
 [ext_resource type="PackedScene" uid="uid://cjchbdmq0sym5" path="res://scenes/interface/dtree/window/window.tscn" id="6_txrwr"]
 [ext_resource type="PackedScene" uid="uid://dpmw4sgwtmh4y" path="res://scenes/interface/dtree/panel_dataset_selection/panel_dataset_selection.tscn" id="7_6eshh"]
 
@@ -81,7 +82,7 @@ custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 size_flags_horizontal = 0
 theme_override_font_sizes/font_size = 32
-text = "☰"
+icon = ExtResource("6_jj56m")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="ScrollContainer2/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1235568254]
 layout_mode = 2
