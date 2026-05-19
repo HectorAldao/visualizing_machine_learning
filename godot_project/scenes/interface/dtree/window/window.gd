@@ -1,10 +1,10 @@
 extends PanelContainer
 
 
-@onready var vboxcontainer: VBoxContainer= $ScrollContainer/VBoxContainer
-@onready var label0: Label = $ScrollContainer/VBoxContainer/Label0
-@onready var label1: Label = $ScrollContainer/VBoxContainer/Label1
-@onready var scroll_container: ScrollContainer = $ScrollContainer
+@onready var vboxcontainer: VBoxContainer= $ScrollContainerV2/VBoxContainer
+@onready var label0: Label = $ScrollContainerV2/VBoxContainer/Label0
+@onready var label1: Label = $ScrollContainerV2/VBoxContainer/Label1
+@onready var scroll_container: ScrollContainer = $ScrollContainerV2
 
 # Scroll variables
 @export var scroll_speed: int = 30
