@@ -1,4 +1,4 @@
-class_name ScrollContainer2 extends ScrollContainer
+class_name ScrollContainerV2 extends ScrollContainer
 
 
 @export var is_horizontal: bool = false

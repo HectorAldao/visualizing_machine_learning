@@ -3,19 +3,13 @@
 [ext_resource type="Script" uid="uid://cfkexclmkwmr0" path="res://scenes/interface/dtree/window/window.gd" id="1_i8vyb"]
 [ext_resource type="PackedScene" uid="uid://pycmc75uwvq0" path="res://scenes/charts/bars_chart/bars_chart.tscn" id="2_q1qms"]
 
-[node name="Window" type="Window" unique_id=734547246]
-oversampling_override = 1.0
-title = "Texto Informativo"
-position = Vector2i(20, 150)
-size = Vector2i(300, 350)
+[node name="Window" type="PanelContainer" unique_id=1994973381]
+offset_right = 20.0
+offset_bottom = 20.0
 script = ExtResource("1_i8vyb")
 
 [node name="ScrollContainer" type="ScrollContainer" parent="." unique_id=1442106336]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="ScrollContainer" unique_id=64018849]
 layout_mode = 2

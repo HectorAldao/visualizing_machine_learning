@@ -1,18 +1,18 @@
 extends Control
 
 
-@export var manual_dtree_button: Button
-@export var algorithmic_dtree_button: Button
+#@export var manual_dtree_button: Button
+#@export var algorithmic_dtree_button: Button
 
 const controller_dtree_scene: String = Constants.SCENES.controller_dtree
 
 
 @onready var scroll_container_dtree: ScrollContainer =      %ScrollContainerDTree
 # @onready var dtree_selection_panel : CenterContainer =      %DTreeSelectionPanel
-@onready var dtree_alg_menu:         Control =              %DTreeMenu
+@onready var center_container_dtree_alg_menu:         CenterContainer =              %CenterContainerDTreeMenu
 @onready var dtree:                  DTreeLogical =         %DTree
 @onready var dtree_controller:       ControllerDTree =      %ControllerDTree
-@onready var window:                 Window =               %Window
+@onready var window:                 PanelContainer =               %Window
 @onready var dataset_selection:      PanelContainer =       %PanelDatasetSelection
 
 var algorithm:        AlgorithmDTree
@@ -34,18 +34,18 @@ var last_mouse_position: Vector2 = Vector2.ZERO
 func _ready():
 	
 	# Connect the signals of the buttons to the respective mode of creation
-	manual_dtree_button.      pressed.connect(_on_manual_dtree_button_pressed)
-	algorithmic_dtree_button. pressed.connect(_on_algorithmic_dtree_button_pressed)
+	#manual_dtree_button.      pressed.connect(_on_manual_dtree_button_pressed)
+	#algorithmic_dtree_button. pressed.connect(_on_algorithmic_dtree_button_pressed)
 	
 	# Make the ui elements invisible but the selecion panel
 	# dtree_selection_panel. visible = true
-	scroll_container_dtree.      visible = false
-	dtree_alg_menu.        visible = false
+	scroll_container_dtree.visible = false
+	center_container_dtree_alg_menu.        visible = false
 	window.                visible = false
 	dataset_selection.     visible = false
 	
-	window.position.x = 830
-	window.position.y = 150
+	#window.position.x = 830
+	#window.position.y = 150
 
 	_on_algorithmic_dtree_button_pressed()
 
@@ -54,7 +54,7 @@ func _on_manual_dtree_button_pressed():
 	# Cange visibility
 	# dtree_selection_panel. visible = false
 	scroll_container_dtree.      visible = true
-	dtree_alg_menu.        visible = true
+	center_container_dtree_alg_menu.        visible = true
 
 	# Set mode
 	current_mode = "manual"
@@ -70,7 +70,7 @@ func _on_algorithmic_dtree_button_pressed():
 	# Cange visibility
 	# dtree_selection_panel. visible = false
 	dataset_selection.     visible = true
-	scroll_container_dtree.      visible = false
+	scroll_container_dtree.visible = false
 	window.                visible = false
 	
 	

@@ -9,7 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://cjchbdmq0sym5" path="res://scenes/interface/dtree/window/window.tscn" id="6_txrwr"]
 [ext_resource type="PackedScene" uid="uid://dpmw4sgwtmh4y" path="res://scenes/interface/dtree/panel_dataset_selection/panel_dataset_selection.tscn" id="7_6eshh"]
 
-[node name="DTreeView" type="Control" unique_id=998695186 node_paths=PackedStringArray("manual_dtree_button", "algorithmic_dtree_button")]
+[node name="DTreeView" type="Control" unique_id=998695186]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -18,8 +18,6 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_dgy5s")
-manual_dtree_button = NodePath("DTreeSelectionPanel/VBoxContainer/ManualDTreeButton")
-algorithmic_dtree_button = NodePath("DTreeSelectionPanel/VBoxContainer/AlgorithmDTreeButton")
 
 [node name="ScrollContainer2" type="ScrollContainer" parent="." unique_id=1200803367]
 layout_mode = 1
@@ -28,6 +26,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 script = ExtResource("2_jj56m")
 metadata/_custom_type_script = "uid://cyinp2iohgy8b"
 
@@ -40,93 +39,82 @@ theme_override_constants/margin_top = 15
 theme_override_constants/margin_right = 15
 theme_override_constants/margin_bottom = 15
 
-[node name="DTreeMenu" type="Control" parent="." unique_id=1402860866]
+[node name="VBoxContainer" type="VBoxContainer" parent="ScrollContainer2/MarginContainer" unique_id=452340565]
+layout_mode = 2
+
+[node name="Window" parent="ScrollContainer2/MarginContainer/VBoxContainer" unique_id=734547246 instance=ExtResource("6_txrwr")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="ScrollContainer2/MarginContainer/VBoxContainer" unique_id=144245595]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PanelDatasetSelection" parent="ScrollContainer2/MarginContainer/VBoxContainer/PanelContainer" unique_id=1243987596 instance=ExtResource("7_6eshh")]
 unique_name_in_owner = true
 visible = false
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_right = 40.0
-offset_bottom = 40.0
-grow_horizontal = 0
-
-[node name="LoadButton" parent="DTreeMenu" unique_id=1669110000 instance=ExtResource("2_r3aum")]
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -201.0
-offset_top = 51.0
-offset_right = -49.0
-offset_bottom = 91.0
-grow_horizontal = 0
-
-[node name="SaveButton" parent="DTreeMenu" unique_id=1475524492 instance=ExtResource("2_vrs4k")]
-layout_mode = 0
-offset_left = -180.0
-offset_top = 10.0
-offset_right = -9.0
-offset_bottom = 50.0
-
-[node name="DTreeSelectionPanel" type="CenterContainer" parent="." unique_id=1864047881]
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="DTreeSelectionPanel" unique_id=1039186326]
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 
-[node name="Label" type="Label" parent="DTreeSelectionPanel/VBoxContainer" unique_id=1366255730]
-layout_mode = 2
-text = "Seleccione cómo crear el Árbol"
-horizontal_alignment = 1
-
-[node name="ManualDTreeButton" type="Button" parent="DTreeSelectionPanel/VBoxContainer" unique_id=816561624]
-layout_mode = 2
-text = "Manualmente"
-
-[node name="AlgorithmDTreeButton" type="Button" parent="DTreeSelectionPanel/VBoxContainer" unique_id=1519209007]
-layout_mode = 2
-text = "Algoritmicamente"
-
-[node name="ScrollContainerDTree" type="ScrollContainer" parent="." unique_id=470241471]
+[node name="ScrollContainerDTree" type="ScrollContainer" parent="ScrollContainer2/MarginContainer/VBoxContainer/PanelContainer" unique_id=364608930]
 unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
+layout_mode = 2
+script = ExtResource("2_jj56m")
+metadata/_custom_type_script = "uid://cyinp2iohgy8b"
 
-[node name="DTree" parent="ScrollContainerDTree" unique_id=229777749 instance=ExtResource("4_dtree")]
+[node name="DTree" parent="ScrollContainer2/MarginContainer/VBoxContainer/PanelContainer/ScrollContainerDTree" unique_id=229777749 instance=ExtResource("4_dtree")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="PanelDatasetSelection" parent="." unique_id=1243987596 instance=ExtResource("7_6eshh")]
+[node name="HBoxContainer" type="HBoxContainer" parent="ScrollContainer2/MarginContainer/VBoxContainer" unique_id=1496934532]
+layout_mode = 2
+
+[node name="OpenMenuButton" type="Button" parent="ScrollContainer2/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1881736420]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 32
+text = "☰"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ScrollContainer2/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1235568254]
+layout_mode = 2
+size_flags_horizontal = 10
+
+[node name="NextButton" type="Button" parent="ScrollContainer2/MarginContainer/VBoxContainer/HBoxContainer/HBoxContainer" unique_id=1539470029]
 unique_name_in_owner = true
-visible = false
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -162.0
-offset_top = -189.5
-offset_right = 162.0
-offset_bottom = 189.5
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 2
+text = "Siguiente paso"
+
+[node name="PrevButton" type="Button" parent="ScrollContainer2/MarginContainer/VBoxContainer/HBoxContainer/HBoxContainer" unique_id=1487121556]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Paso previo"
+
+[node name="EvaluateButton" type="Button" parent="ScrollContainer2/MarginContainer/VBoxContainer/HBoxContainer/HBoxContainer" unique_id=301837110]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Evaluar"
+
+[node name="DropButton" type="Button" parent="ScrollContainer2/MarginContainer/VBoxContainer/HBoxContainer/HBoxContainer" unique_id=1803294434]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Evaluar dato"
+
+[node name="CenterContainerDTreeMenu" type="CenterContainer" parent="ScrollContainer2/MarginContainer" unique_id=589420541]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="DTreeMenu" type="VBoxContainer" parent="ScrollContainer2/MarginContainer/CenterContainerDTreeMenu" unique_id=598297246]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="LoadButton" parent="ScrollContainer2/MarginContainer/CenterContainerDTreeMenu/DTreeMenu" unique_id=1669110000 instance=ExtResource("2_r3aum")]
+layout_mode = 2
+
+[node name="SaveButton" parent="ScrollContainer2/MarginContainer/CenterContainerDTreeMenu/DTreeMenu" unique_id=1475524492 instance=ExtResource("2_vrs4k")]
+layout_mode = 2
 
 [node name="ControllerDTree" parent="." unique_id=387693380 instance=ExtResource("5_pxc03")]
 unique_name_in_owner = true
-
-[node name="Window" parent="." unique_id=734547246 instance=ExtResource("6_txrwr")]
-unique_name_in_owner = true
-position = Vector2i(317, 36)
