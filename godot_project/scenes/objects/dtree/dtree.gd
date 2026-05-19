@@ -23,6 +23,12 @@ var mode: String = "manual"  # Mode: "manual" or "automatic"
 @onready var edges_container : Control = $ConectionContainer
 
 
+func _ready() -> void:
+	mouse_filter = Control.MOUSE_FILTER_PASS
+	nodes_container.mouse_filter = Control.MOUSE_FILTER_PASS
+	edges_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+
 
 func set_mode(p_mode: String) -> void:
 	mode = p_mode

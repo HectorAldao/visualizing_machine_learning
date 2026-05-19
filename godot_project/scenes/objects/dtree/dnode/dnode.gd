@@ -37,6 +37,8 @@ signal change_child_requested(type_of_change: String)
 
 
 func _ready():
+	mouse_filter = Control.MOUSE_FILTER_PASS
+
 	# Fade in from transparent
 	modulate.a = 0.0
 	var tween := create_tween()
@@ -52,7 +54,6 @@ func _ready():
 		theme = noleaf_theme
 
 	if not was_created_by_algorithm:
-		mouse_filter = Control.MOUSE_FILTER_PASS
 		gui_input.connect(_on_gui_input)
 	
 	mouse_entered.connect(_on_mouse_entered)

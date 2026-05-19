@@ -20,10 +20,11 @@ var last_pinch_distance: float = 0.0
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
+	mouse_filter = Control.MOUSE_FILTER_STOP
+	mouse_force_pass_scroll_events = false
 
 
-func _input(event: InputEvent) -> void:
+func _gui_input(event: InputEvent) -> void:
 	# Handle mouse motion for middle mouse dragging
 	if event is InputEventMouseMotion and is_middle_mouse_dragging:
 		# The scroll aplied is going to be the dif frame to frame of
@@ -34,7 +35,7 @@ func _input(event: InputEvent) -> void:
 
 		# The new position is saved and the input is set as handled
 		last_mouse_position = event.position
-		get_viewport().set_input_as_handled()
+		accept_event()
 
 	if event is InputEventScreenTouch:
 		_handle_screen_touch(event)
@@ -52,12 +53,12 @@ func _input(event: InputEvent) -> void:
 			else:
 				is_middle_mouse_dragging = false
 
-			get_viewport().set_input_as_handled()
+			accept_event()
 
 		# Zoom
 		elif event.pressed and event.ctrl_pressed:
 			# Save the diference frame to frame
-			var delta = 0
+			var delta: float = 0.0
 			
 			# Determine direction
 			if event.button_index == MOUSE_BUTTON_WHEEL_UP:
@@ -68,11 +69,12 @@ func _input(event: InputEvent) -> void:
 			# Apply zoom
 			if delta != 0:
 				_apply_zoom_delta(delta)
+				accept_event()
 		
 		# Move scroll container view
 		elif event.pressed and not event.ctrl_pressed:
 			# Save the diference frame to frame
-			var delta = 0
+			var delta: int = 0
 			
 			# Determine direction
 			if event.button_index == MOUSE_BUTTON_WHEEL_UP:
@@ -95,7 +97,7 @@ func _input(event: InputEvent) -> void:
 						scroll_vertical += delta
 				
 				# Optional: do not pass the input to lower nodes
-				get_viewport().set_input_as_handled()
+				accept_event()
 
 
 func _handle_screen_touch(event: InputEventScreenTouch) -> void:
@@ -112,7 +114,7 @@ func _handle_screen_touch(event: InputEventScreenTouch) -> void:
 		elif touch_positions.size() == 2:
 			is_touch_dragging = false
 			last_pinch_distance = _get_pinch_distance()
-			get_viewport().set_input_as_handled()
+			accept_event()
 
 		return
 
@@ -127,7 +129,7 @@ func _handle_screen_touch(event: InputEventScreenTouch) -> void:
 		last_touch_position = remaining_position
 
 	if was_touch_gesture:
-		get_viewport().set_input_as_handled()
+		accept_event()
 
 
 func _handle_screen_drag(event: InputEventScreenDrag) -> void:
@@ -140,13 +142,13 @@ func _handle_screen_drag(event: InputEventScreenDrag) -> void:
 
 			is_touch_dragging = true
 			last_touch_position = event.position
-			get_viewport().set_input_as_handled()
+			accept_event()
 			return
 
 		var delta_position = event.position - last_touch_position
 		_apply_drag_scroll(delta_position)
 		last_touch_position = event.position
-		get_viewport().set_input_as_handled()
+		accept_event()
 		return
 
 	if touch_positions.size() == 2:
@@ -157,7 +159,7 @@ func _handle_screen_drag(event: InputEventScreenDrag) -> void:
 			_apply_zoom_delta(delta)
 
 		last_pinch_distance = current_pinch_distance
-		get_viewport().set_input_as_handled()
+		accept_event()
 
 
 func _apply_drag_scroll(delta_position: Vector2) -> void:

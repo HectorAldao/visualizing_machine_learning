@@ -51,7 +51,10 @@ En este caso '{etiqueta_mayoritaria}'."]
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
+	mouse_filter = Control.MOUSE_FILTER_STOP
+	scroll_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	scroll_container.mouse_force_pass_scroll_events = false
+	_ignore_mouse_input_for_window_content()
 
 
 func update_current_text(details_dict: Dictionary) -> void:
@@ -72,11 +75,13 @@ func update_current_text(details_dict: Dictionary) -> void:
 		"internal":
 			label0.text = template_texts[tipo_de_nodo][0].format(details_dict)
 			vboxcontainer.add_child(BarsChart.newone("Entropía por atributo", plot_data))
+			call_deferred("_ignore_mouse_input_for_window_content")
 			vboxcontainer.move_child(label1, -1)
 			label1.text = template_texts[tipo_de_nodo][1].format(details_dict)
 		"internal_multi_atribute":
 			label0.text = template_texts[tipo_de_nodo][0].format(details_dict)
 			vboxcontainer.add_child(BarsChart.newone("Entropía por atributo", plot_data))
+			call_deferred("_ignore_mouse_input_for_window_content")
 			vboxcontainer.move_child(label1, -1)
 			label1.text = template_texts[tipo_de_nodo][1].format(details_dict)
 		"leaf":
@@ -115,8 +120,21 @@ func _clean_lists(dict: Dictionary) -> void:
 			dict[key] = concatenation
 
 
+func _ignore_mouse_input_for_window_content() -> void:
+	_set_mouse_filter_recursive(scroll_container, Control.MOUSE_FILTER_IGNORE)
+	mouse_filter = Control.MOUSE_FILTER_STOP
+
+
+func _set_mouse_filter_recursive(node: Node, filter: Control.MouseFilter) -> void:
+	if node is Control:
+		node.mouse_filter = filter
+
+	for child in node.get_children():
+		_set_mouse_filter_recursive(child, filter)
+
+
 # How to move the ScrollContainer
-func _input(event):
+func _gui_input(event: InputEvent) -> void:
 	# Handle mouse motion for middle mouse dragging
 	if event is InputEventMouseMotion and is_middle_mouse_dragging:
 		# The scroll aplied is going to be the dif frame to frame of
@@ -129,7 +147,7 @@ func _input(event):
 
 		# The new position is saved and the input is set as handled
 		last_mouse_position = event.position
-		get_viewport().set_input_as_handled()
+		accept_event()
 	
 	# If there is a mouse event
 	if event is InputEventMouseButton:
@@ -141,12 +159,12 @@ func _input(event):
 			else:
 				is_middle_mouse_dragging = false
 
-			get_viewport().set_input_as_handled()
+			accept_event()
 		
 		# Move scroll container view
 		elif event.pressed and not event.ctrl_pressed:
 			# Save the diference frame to frame
-			var delta = 0
+			var delta: int = 0
 			
 			# Determine direction
 			if event.button_index == MOUSE_BUTTON_WHEEL_UP:
@@ -163,4 +181,4 @@ func _input(event):
 					scroll_container.scroll_vertical += delta
 				
 				# Optional: do not pass the input to lower nodes
-				get_viewport().set_input_as_handled()
+				accept_event()
