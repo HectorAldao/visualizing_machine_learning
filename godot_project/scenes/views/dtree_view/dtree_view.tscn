@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dr3bg1sj3y1nu"]
 
 [ext_resource type="Script" uid="uid://u1e4uao6pucs" path="res://scenes/views/dtree_view/dtree_view.gd" id="1_dgy5s"]
+[ext_resource type="Script" uid="uid://cyinp2iohgy8b" path="res://scenes/interface/scroll_container/scroll_container.gd" id="2_jj56m"]
 [ext_resource type="PackedScene" uid="uid://0y5oidrn5nxd" path="res://scenes/interface/dtree/load_button/load_button.tscn" id="2_r3aum"]
 [ext_resource type="PackedScene" uid="uid://bbvvlbyvwjc5" path="res://scenes/interface/dtree/save_button/save_button.tscn" id="2_vrs4k"]
 [ext_resource type="PackedScene" uid="uid://dy3l4lsa0srpr" path="res://scenes/objects/dtree/dtree.tscn" id="4_dtree"]
@@ -20,7 +21,27 @@ script = ExtResource("1_dgy5s")
 manual_dtree_button = NodePath("DTreeSelectionPanel/VBoxContainer/ManualDTreeButton")
 algorithmic_dtree_button = NodePath("DTreeSelectionPanel/VBoxContainer/AlgorithmDTreeButton")
 
+[node name="ScrollContainer2" type="ScrollContainer" parent="." unique_id=1200803367]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_jj56m")
+metadata/_custom_type_script = "uid://cyinp2iohgy8b"
+
+[node name="MarginContainer" type="MarginContainer" parent="ScrollContainer2" unique_id=1445273675]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
 [node name="DTreeMenu" type="Control" parent="." unique_id=1402860866]
+unique_name_in_owner = true
 visible = false
 layout_mode = 1
 anchors_preset = 1
@@ -73,7 +94,8 @@ text = "Manualmente"
 layout_mode = 2
 text = "Algoritmicamente"
 
-[node name="ScrollContainer" type="ScrollContainer" parent="." unique_id=470241471]
+[node name="ScrollContainerDTree" type="ScrollContainer" parent="." unique_id=470241471]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -82,10 +104,12 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="DTree" parent="ScrollContainer" unique_id=229777749 instance=ExtResource("4_dtree")]
+[node name="DTree" parent="ScrollContainerDTree" unique_id=229777749 instance=ExtResource("4_dtree")]
+unique_name_in_owner = true
 layout_mode = 2
 
 [node name="PanelDatasetSelection" parent="." unique_id=1243987596 instance=ExtResource("7_6eshh")]
+unique_name_in_owner = true
 visible = false
 layout_mode = 1
 anchors_preset = 8
@@ -101,6 +125,8 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="ControllerDTree" parent="." unique_id=387693380 instance=ExtResource("5_pxc03")]
+unique_name_in_owner = true
 
 [node name="Window" parent="." unique_id=734547246 instance=ExtResource("6_txrwr")]
+unique_name_in_owner = true
 position = Vector2i(317, 36)
