@@ -1,1 +1,38 @@
 extra/
+
+# LaTeX build artifacts generated under memoria/.
+# Keep source files (.tex, .bib, .sty, images, README, final PDFs, etc.) trackable.
+memoria/**/*.aux
+memoria/**/*.bbl
+memoria/**/*.bcf
+memoria/**/*.blg
+memoria/**/*.fdb_latexmk
+memoria/**/*.fls
+memoria/**/*.lof
+memoria/**/*.log
+memoria/**/*.lot
+memoria/**/*.out
+memoria/**/*.run.xml
+memoria/**/*.synctex.gz
+memoria/**/*.toc
+memoria/**/*.xdv
+
+# Glossaries, acronyms and index artifacts.
+memoria/**/*.acn
+memoria/**/*.acr
+memoria/**/*.alg
+memoria/**/*.glg
+memoria/**/*.glo
+memoria/**/*.gls
+memoria/**/*.glsdefs
+memoria/**/*.ilg
+memoria/**/*.ind
+memoria/**/*.ist
+
+# Miscellaneous generated files from TeX engines/editors.
+memoria/**/*.idx
+memoria/**/*.nav
+memoria/**/*.snm
+memoria/**/*.vrb
+memoria/**/*.tmp
+memoria/**/*.bak
