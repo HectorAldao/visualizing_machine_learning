@@ -63,7 +63,12 @@ layout_mode = 2
 script = ExtResource("2_jj56m")
 metadata/_custom_type_script = "uid://cyinp2iohgy8b"
 
-[node name="DTree" parent="ScrollContainer2/MarginContainer/VBoxContainer/PanelContainer/ScrollContainerDTree" unique_id=229777749 instance=ExtResource("4_dtree")]
+[node name="CenterContainer" type="CenterContainer" parent="ScrollContainer2/MarginContainer/VBoxContainer/PanelContainer/ScrollContainerDTree" unique_id=1948912999]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="DTree" parent="ScrollContainer2/MarginContainer/VBoxContainer/PanelContainer/ScrollContainerDTree/CenterContainer" unique_id=229777749 instance=ExtResource("4_dtree")]
 unique_name_in_owner = true
 layout_mode = 2
 
