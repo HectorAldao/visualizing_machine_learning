@@ -1,4 +1,4 @@
-extends Window
+extends PanelContainer
 
 
 @onready var vboxcontainer: VBoxContainer= $ScrollContainer/VBoxContainer

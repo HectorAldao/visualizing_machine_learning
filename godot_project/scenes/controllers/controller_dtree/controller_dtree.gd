@@ -9,7 +9,7 @@ const panel_algorithm_dtree_scene: String = Constants.SCENES.panel_algorithm_dtr
 const dnode_scene: String = Constants.SCENES.dnode
 
 var dtree: DTreeLogical
-var window: Window
+var window: PanelContainer
 var view: Control  # Reference to the main view for UI elements
 var next_node_id: int = 0
 var mode: String = "manual"
@@ -29,7 +29,7 @@ var attributes: Array[String]
 
 
 
-func initialize(p_tree: DTreeLogical, p_window: Window, p_mode: String, p_view: Control = null) -> void:
+func initialize(p_tree: DTreeLogical, p_window: PanelContainer, p_mode: String, p_view: Control = null) -> void:
 	dtree = p_tree
 	window = p_window
 	view = p_view if p_view != null else p_tree
@@ -137,28 +137,33 @@ func _setup_automatic_mode() -> void:
 	panel_dataset_selection = view.get_node("PanelDatasetSelection")
 	
 	# Add UI for automatic mode
-	panel_algorithm_dtree = preload(panel_algorithm_dtree_scene).instantiate()
-	view.add_child(panel_algorithm_dtree)
-	panel_algorithm_dtree.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	#panel_algorithm_dtree = preload(panel_algorithm_dtree_scene).instantiate()
+	#view.add_child(panel_algorithm_dtree)
+	#panel_algorithm_dtree.set_anchors_preset(Control.PRESET_TOP_LEFT)
 
-	next_step_button     = panel_algorithm_dtree.get_node("VBoxContainer/NextButton")
-	previous_step_button = panel_algorithm_dtree.get_node("VBoxContainer/PrevButton")
-	evaluate_button      = panel_algorithm_dtree.get_node("VBoxContainer/EvaluateButton")
-	detail_button        = panel_algorithm_dtree.get_node("VBoxContainer/DetailButton")
-	drop_button          = panel_algorithm_dtree.get_node("VBoxContainer/DropButton")
+	#next_step_button     = panel_algorithm_dtree.get_node("VBoxContainer/NextButton")
+	#previous_step_button = panel_algorithm_dtree.get_node("VBoxContainer/PrevButton")
+	#evaluate_button      = panel_algorithm_dtree.get_node("VBoxContainer/EvaluateButton")
+	#detail_button        = panel_algorithm_dtree.get_node("VBoxContainer/DetailButton")
+	#drop_button          = panel_algorithm_dtree.get_node("VBoxContainer/DropButton")
+	next_step_button     = %NextButton
+	previous_step_button = %PrevButton
+	evaluate_button      = %EvaluateButton
+	#detail_button        = panel_algorithm_dtree.get_node("VBoxContainer/DetailButton")
+	drop_button          = %DropButton
 
 	next_step_button.pressed.connect(_on_step_button_pressed)
 	previous_step_button.pressed.connect(_on_previous_step_button_pressed)
 	evaluate_button.pressed.connect(_on_evaluate_button_pressed)
 	if not SignalsObserver.dataset_selected.is_connected(_on_dataset_selected_pressed):
 		SignalsObserver.dataset_selected.connect(_on_dataset_selected_pressed)
-	detail_button.pressed.connect(_on_detail_button_pressed)
+	# detail_button.pressed.connect(_on_detail_button_pressed)
 	drop_button.pressed.connect(_on_drop_button_pressed)
 
 	next_step_button.     visible = false
 	previous_step_button. visible = false
 	evaluate_button.      visible = false
-	detail_button.        visible = false
+	# detail_button.        visible = false
 	drop_button.          visible = false
 
 	if algorithm:

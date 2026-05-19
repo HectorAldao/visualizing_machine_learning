@@ -1,19 +1,19 @@
 extends Control
 
 
-@export var manual_dtree_button: Button
-@export var algorithmic_dtree_button: Button
+#@export var manual_dtree_button: Button
+#@export var algorithmic_dtree_button: Button
 
 const controller_dtree_scene: String = Constants.SCENES.controller_dtree
 
 
-@onready var scroll_container:      ScrollContainer =      $ScrollContainer
-@onready var dtree_selection_panel: CenterContainer =      $DTreeSelectionPanel
-@onready var dtree_alg_menu:        Control =              $DTreeMenu
-@onready var dtree:                 DTreeLogical =         $ScrollContainer/DTree
-@onready var dtree_controller:      ControllerDTree =      $ControllerDTree
-@onready var window:                Window =               $Window
-@onready var dataset_selection:     PanelContainer =       $PanelDatasetSelection
+@onready var scroll_container_dtree: ScrollContainer =      %ScrollContainerDTree
+# @onready var dtree_selection_panel : CenterContainer =      %DTreeSelectionPanel
+@onready var center_container_dtree_alg_menu:         CenterContainer =              %CenterContainerDTreeMenu
+@onready var dtree:                  DTreeLogical =         %DTree
+@onready var dtree_controller:       ControllerDTree =      %ControllerDTree
+@onready var window:                 PanelContainer =               %Window
+@onready var dataset_selection:      PanelContainer =       %PanelDatasetSelection
 
 var algorithm:        AlgorithmDTree
 var current_mode:     String = ""
@@ -34,26 +34,27 @@ var last_mouse_position: Vector2 = Vector2.ZERO
 func _ready():
 	
 	# Connect the signals of the buttons to the respective mode of creation
-	manual_dtree_button.      pressed.connect(_on_manual_dtree_button_pressed)
-	algorithmic_dtree_button. pressed.connect(_on_algorithmic_dtree_button_pressed)
+	#manual_dtree_button.      pressed.connect(_on_manual_dtree_button_pressed)
+	#algorithmic_dtree_button. pressed.connect(_on_algorithmic_dtree_button_pressed)
 	
 	# Make the ui elements invisible but the selecion panel
-	dtree_selection_panel. visible = true
-	scroll_container.      visible = false
-	dtree_alg_menu.        visible = false
+	# dtree_selection_panel. visible = true
+	scroll_container_dtree.visible = false
+	center_container_dtree_alg_menu.        visible = false
 	window.                visible = false
 	dataset_selection.     visible = false
 	
-	window.position.x = 830
-	window.position.y = 150
-	
+	#window.position.x = 830
+	#window.position.y = 150
+
+	_on_algorithmic_dtree_button_pressed()
 
 
 func _on_manual_dtree_button_pressed():
 	# Cange visibility
-	dtree_selection_panel. visible = false
-	scroll_container.      visible = true
-	dtree_alg_menu.        visible = true
+	# dtree_selection_panel. visible = false
+	scroll_container_dtree.      visible = true
+	center_container_dtree_alg_menu.        visible = true
 
 	# Set mode
 	current_mode = "manual"
@@ -67,9 +68,9 @@ func _on_manual_dtree_button_pressed():
 
 func _on_algorithmic_dtree_button_pressed():
 	# Cange visibility
-	dtree_selection_panel. visible = false
+	# dtree_selection_panel. visible = false
 	dataset_selection.     visible = true
-	scroll_container.      visible = false
+	scroll_container_dtree.visible = false
 	window.                visible = false
 	
 	
@@ -90,7 +91,7 @@ func _on_algorithmic_dtree_button_pressed():
 	await SignalsObserver.dataset_selected
 
 	# Once the dataset is selected and training starts, show the tree and detail window
-	scroll_container.visible = true
+	scroll_container_dtree.visible = true
 	window.visible = true
 
 # How to move the ScrollContainer
@@ -102,8 +103,8 @@ func _input(event):
 		var delta_position = event.position - last_mouse_position
 
 		# The diff is aplied
-		scroll_container.scroll_horizontal -= int(delta_position.x)
-		scroll_container.scroll_vertical -= int(delta_position.y)
+		scroll_container_dtree.scroll_horizontal -= int(delta_position.x)
+		scroll_container_dtree.scroll_vertical -= int(delta_position.y)
 
 		# The new position is saved and the input is set as handled
 		last_mouse_position = event.position
@@ -136,9 +137,9 @@ func _input(event):
 			if delta != 0:
 				# Check Shift for horizontal scrolling
 				if event.shift_pressed:
-					scroll_container.scroll_horizontal += delta
+					scroll_container_dtree.scroll_horizontal += delta
 				else:
-					scroll_container.scroll_vertical += delta
+					scroll_container_dtree.scroll_vertical += delta
 				
 				# Optional: do not pass the input to lower nodes
 				get_viewport().set_input_as_handled()

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cyinp2iohgy8b" path="res://scenes/interface/scroll_container/scroll_container.gd" id="1_6avq8"]
 
-[node name="ScrollContainer" type="ScrollContainer" unique_id=1226361611]
+[node name="ScrollContainerV2" type="ScrollContainer" unique_id=1226361611]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
