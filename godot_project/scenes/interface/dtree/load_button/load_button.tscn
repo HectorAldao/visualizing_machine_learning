@@ -5,6 +5,6 @@
 [node name="LoadButton" type="Button" unique_id=527153130]
 offset_right = 152.0
 offset_bottom = 40.0
-text = "Cargar Arbol"
+text = "Cargar "
 script = ExtResource("1_ll7xa")
 dtree_scene = "uid://dy3l4lsa0srpr"

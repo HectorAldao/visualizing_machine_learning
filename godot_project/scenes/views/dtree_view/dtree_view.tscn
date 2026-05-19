@@ -2,10 +2,9 @@
 
 [ext_resource type="Script" uid="uid://u1e4uao6pucs" path="res://scenes/views/dtree_view/dtree_view.gd" id="1_dgy5s"]
 [ext_resource type="Script" uid="uid://cyinp2iohgy8b" path="res://scenes/interface/scroll_container/scroll_container.gd" id="2_jj56m"]
-[ext_resource type="PackedScene" uid="uid://0y5oidrn5nxd" path="res://scenes/interface/dtree/load_button/load_button.tscn" id="2_r3aum"]
-[ext_resource type="PackedScene" uid="uid://bbvvlbyvwjc5" path="res://scenes/interface/dtree/save_button/save_button.tscn" id="2_vrs4k"]
 [ext_resource type="PackedScene" uid="uid://dy3l4lsa0srpr" path="res://scenes/objects/dtree/dtree.tscn" id="4_dtree"]
 [ext_resource type="PackedScene" uid="uid://5h4ba5ys8aml" path="res://scenes/controllers/controller_dtree/controller_dtree.tscn" id="5_pxc03"]
+[ext_resource type="PackedScene" uid="uid://dbkhkmbjedndu" path="res://scenes/interface/navigation_menu/navigation_menu.tscn" id="6_6eshh"]
 [ext_resource type="PackedScene" uid="uid://cjchbdmq0sym5" path="res://scenes/interface/dtree/window/window.tscn" id="6_txrwr"]
 [ext_resource type="PackedScene" uid="uid://dpmw4sgwtmh4y" path="res://scenes/interface/dtree/panel_dataset_selection/panel_dataset_selection.tscn" id="7_6eshh"]
 
@@ -71,7 +70,8 @@ layout_mode = 2
 [node name="HBoxContainer" type="HBoxContainer" parent="ScrollContainer2/MarginContainer/VBoxContainer" unique_id=1496934532]
 layout_mode = 2
 
-[node name="OpenMenuButton" type="Button" parent="ScrollContainer2/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1881736420]
+[node name="MenuButton" type="Button" parent="ScrollContainer2/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1881736420]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 size_flags_horizontal = 0
@@ -102,19 +102,10 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Evaluar dato"
 
-[node name="CenterContainerDTreeMenu" type="CenterContainer" parent="ScrollContainer2/MarginContainer" unique_id=589420541]
+[node name="DTreeMenu" parent="ScrollContainer2/MarginContainer" unique_id=1092818417 instance=ExtResource("6_6eshh")]
 unique_name_in_owner = true
 layout_mode = 2
-
-[node name="DTreeMenu" type="VBoxContainer" parent="ScrollContainer2/MarginContainer/CenterContainerDTreeMenu" unique_id=598297246]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="LoadButton" parent="ScrollContainer2/MarginContainer/CenterContainerDTreeMenu/DTreeMenu" unique_id=1669110000 instance=ExtResource("2_r3aum")]
-layout_mode = 2
-
-[node name="SaveButton" parent="ScrollContainer2/MarginContainer/CenterContainerDTreeMenu/DTreeMenu" unique_id=1475524492 instance=ExtResource("2_vrs4k")]
-layout_mode = 2
+algorithm_name = "Árbol"
 
 [node name="ControllerDTree" parent="." unique_id=387693380 instance=ExtResource("5_pxc03")]
 unique_name_in_owner = true

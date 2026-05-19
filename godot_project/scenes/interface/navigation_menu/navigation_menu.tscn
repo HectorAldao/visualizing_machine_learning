@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://dbkhkmbjedndu"]
+
+[ext_resource type="PackedScene" uid="uid://0y5oidrn5nxd" path="res://scenes/interface/dtree/load_button/load_button.tscn" id="1_3in3q"]
+[ext_resource type="Script" uid="uid://brcse1qv2cf2i" path="res://scenes/interface/navigation_menu/navigation_menu.gd" id="1_6rl54"]
+[ext_resource type="PackedScene" uid="uid://bbvvlbyvwjc5" path="res://scenes/interface/dtree/save_button/save_button.tscn" id="2_6rl54"]
+
+[node name="DTreeMenu" type="PanelContainer" unique_id=1092818417]
+size_flags_horizontal = 0
+size_flags_vertical = 4
+script = ExtResource("1_6rl54")
+
+[node name="HBoxContainer" type="VBoxContainer" parent="." unique_id=1701690650]
+layout_mode = 2
+
+[node name="HomeButton" type="Button" parent="HBoxContainer" unique_id=1473925291]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Menu Principal"
+
+[node name="LoadButton" parent="HBoxContainer" unique_id=527153130 instance=ExtResource("1_3in3q")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="SaveButton" parent="HBoxContainer" unique_id=1475524492 instance=ExtResource("2_6rl54")]
+unique_name_in_owner = true
+layout_mode = 2

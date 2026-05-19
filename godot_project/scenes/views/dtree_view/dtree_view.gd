@@ -9,10 +9,10 @@ const controller_dtree_scene: String = Constants.SCENES.controller_dtree
 
 @onready var scroll_container_dtree: ScrollContainer =      %ScrollContainerDTree
 # @onready var dtree_selection_panel : CenterContainer =      %DTreeSelectionPanel
-@onready var center_container_dtree_alg_menu:         CenterContainer =              %CenterContainerDTreeMenu
+@onready var dtree_menu:             Control =      %DTreeMenu
 @onready var dtree:                  DTreeLogical =         %DTree
 @onready var dtree_controller:       ControllerDTree =      %ControllerDTree
-@onready var window:                 PanelContainer =               %Window
+@onready var window:                 PanelContainer =       %Window
 @onready var dataset_selection:      PanelContainer =       %PanelDatasetSelection
 
 var algorithm:        AlgorithmDTree
@@ -35,7 +35,7 @@ func _ready():
 	# Make the ui elements invisible but the selecion panel
 	# dtree_selection_panel. visible = true
 	scroll_container_dtree.visible = false
-	center_container_dtree_alg_menu.        visible = false
+	dtree_menu.        visible = false
 	window.                visible = false
 	dataset_selection.     visible = false
 	
@@ -44,12 +44,14 @@ func _ready():
 
 	_on_algorithmic_dtree_button_pressed()
 
+	%MenuButton.pressed.connect(func(): dtree_menu.visible = not dtree_menu.visible)
+
 
 func _on_manual_dtree_button_pressed():
 	# Cange visibility
 	# dtree_selection_panel. visible = false
 	scroll_container_dtree.      visible = true
-	center_container_dtree_alg_menu.        visible = true
+	dtree_menu.        visible = true
 
 	# Set mode
 	current_mode = "manual"

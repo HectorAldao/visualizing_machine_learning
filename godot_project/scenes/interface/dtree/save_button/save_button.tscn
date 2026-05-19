@@ -5,5 +5,5 @@
 [node name="SaveButton" type="Button" unique_id=1475524492]
 offset_right = 171.0
 offset_bottom = 40.0
-text = "Guardar Arbol"
+text = "Guardar "
 script = ExtResource("1_slsja")
