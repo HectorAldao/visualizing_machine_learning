@@ -1,5 +1,6 @@
 extends PanelContainer
 
+@export var font_size: int = 20
 
 @onready var vboxcontainer: VBoxContainer= $ScrollContainerV2/VBoxContainer
 @onready var label0: Label = $ScrollContainerV2/VBoxContainer/Label0
@@ -55,6 +56,9 @@ func _ready() -> void:
 	scroll_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	scroll_container.mouse_force_pass_scroll_events = false
 	_ignore_mouse_input_for_window_content()
+	
+	label0.add_theme_font_size_override("font_size", font_size)
+	label1.add_theme_font_size_override("font_size", font_size)
 
 
 func update_current_text(details_dict: Dictionary) -> void:

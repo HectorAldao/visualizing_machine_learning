@@ -134,7 +134,7 @@ func _remove_subtree_and_self(node_id: int) -> void:
 func _setup_automatic_mode() -> void:
 
 	#panel_dataset_selection = get_parent().get_node("PanelDatasetSelection")  #debug
-	panel_dataset_selection = view.get_node("PanelDatasetSelection")
+	panel_dataset_selection = %PanelDatasetSelection
 	
 	# Add UI for automatic mode
 	#panel_algorithm_dtree = preload(panel_algorithm_dtree_scene).instantiate()
