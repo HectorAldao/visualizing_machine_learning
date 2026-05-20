@@ -1,6 +1,98 @@
 \chapter{Estado de la cuestión}
 \label{chap:estado_de_la_cuestion}
 
-\lettrine{L}{as} aplicaciones educativas
+\lettrine{E}{l} aprendizaje profundo se apoya en conceptos matemáticos y computacionales que no son siempre fáciles de visualizar: funciones de activación, pesos, sesgos, propagación hacia delante, retropropagación, gradientes...
+Esta dificultad ha dado lugar a recursos educativos que intentan hacer más entendible el comportamiento de las redes neuronales mediante explicaciones visuales o simulaciones interactivas.
+En el contexto de este trabajo, resultan especialmente relevantes las herramientas orientadas a comprender su proceso de aprendizaje.
 
-\cite{SandersonNeuralNetworks}
+%El análisis del estado de la cuestión se centra, por tanto, en aplicaciones y recursos educativos relacionados con redes neuronales y aprendizaje profundo.
+%No se consideran aquí referencias de carácter general o ajenas a este dominio, como las relativas a programación concurrente, por no contribuir directamente al estudio de herramientas para aprender y entender el deep learning.
+
+\section{Recursos audiovisuales explicativos}
+\label{sec:sota_recursos_audiovisuales}
+
+El recurso divulgativo más conocidos para introducir las redes neuronales es la serie de Grant Sanderson ``Neural networks'' \cite{SandersonNeuralNetworksYoutube}, publicada en el canal de Youtube 3Blue1Brown.
+Este proyecto tiene una página web \cite{SandersonNeuralNetworks}, cuya principal aportación pedagógica es la posibilidad de ¿?fedellar¿? con una red neuronal entrenada con el MNIST \cite{MNIST}.
+Permite ver en tiempo real como esta reacciona a los cambios en el dato de entrada, que es una ¿?pizarra¿? en la que cada pixel corresponde con una neurona de la capa de entrada.
+
+Este tipo de recurso resulta valioso para el desarrollo de intuición, porque reduce la barrera de entrada matemática y proporciona vista superficial del funcionamiento de una red.
+
+Sin embargo, su formato es fundamentalmente expositivo.
+En la página web dos de las diez lecciones tienen un componente interactivo.
+Y este siempre está orientado a la relación entre el input y el output de una red ya entrenada.
+% Ejemplo de frase separada por punto
+% El estudiante observa una explicación apoyada en recursos visuales, no se sale del MNIST ni experimenta de forma directa con la arquitectura del modelo.
+El estudiante observa una explicación apoyada en recursos visuales. No se sale del MNIST ni experimenta de forma directa con la arquitectura del modelo.
+Por ello, aunque es adecuado para motivar y contextualizar el problema, no cubre por completo la necesidad de aprendizaje activo que requiere entender el efecto de cada decisión de diseño en el comportamiento de una red neuronal.
+
+\section{Simuladores interactivos de redes neuronales}
+\label{sec:sota_simuladores_interactivos}
+
+Frente al formato audiovisual, existen herramientas que permiten manipular redes neuronales en tiempo real.
+Un ejemplo es ``A Neural Network Playground'', desarrollado por Daniel Smilkov y Shan Carter y publicado por TensorFlow~\cite{TensorFlowPlayground}.
+Esta aplicación permite configurar una red neuronal sencilla desde el navegador, seleccionar conjuntos de datos sintéticos, modificar hiperparámetros y observar cómo evoluciona la frontera de decisión durante el entrenamiento.
+
+%La relevancia de ... reside en
+Lo intereante de TensorFlow Playground es que conecta elementos normalmente tratados de forma abstracta con consecuencias observables.
+Cambiar el número de capas, el número de neuronas, la tasa de aprendizaje, la regularización o las características de entrada altera de manera visible el proceso de ajuste.
+Esto facilita que el estudiante relacione conceptos como sobreajuste, generalización o convergencia con resultados palpables.
+
+No obstante, la herramienta se centra principalmente en la frontera de decisión y en la pérdida, pero no profundiza de forma detallada en operaciones internas como el cálculo de gradientes o la propagación de errores capa a capa.
+
+\section{Visualización de modelos generativos}
+\label{sec:sota_modelos_generativos}
+
+Otra línea relevante son las aplicaciones educativas centradas en arquitecturas específicas.
+``GAN Lab'', desarrollado por Minsuk Kahng, Nikhil Thorat, Polo Chau, Fernanda Viégas y Martin Wattenberg, permite experimentar en el navegador con redes generativas adversarias~\cite{GANLab}.
+Este tipo de modelo introduce una dinámica de aprendizaje distinta a la de una red supervisada clásica, ya que enfrenta dos redes: un generador, que intenta producir muestras plausibles, y un discriminador, que intenta distinguir entre datos reales y generados.
+
+La aportación principal de GAN Lab es hacer visual una interacción compleja como la de un par de redes adversarias.
+La herramienta permite observar cómo cambian las distribuciones generadas durante el entrenamiento y cómo la competencia entre generador y discriminador afecta al resultado.
+Desde el punto de vista educativo, esto resulta útil para explicar que no todos los modelos de aprendizaje profundo optimizan el mismo tipo de objetivo ni aprenden bajo el mismo esquema.
+
+Su limitación principal es que presupone una base de conocimiento mayor que la requerida para una introducción a las redes neuronales.
+Para comprender correctamente una GAN es necesario haber asimilado previamente ideas como función de pérdida, optimización, representación interna, entrenamiento iterativo...
+En consecuencia, GAN Lab es una herramienta valiosa para una fase posterior del aprendizaje, pero no sustituye a una aplicación centrada en los fundamentos de una red neuronal básica.
+
+%\section{Plataformas educativas generalistas}
+%\label{sec:sota_plataformas_generalistas}
+%
+%Además de herramientas específicas, existen plataformas educativas generalistas que incluyen contenidos relacionados con matemáticas, informática e inteligencia artificial.
+%Brilliant se presenta como una plataforma basada en aprendizaje activo mediante problemas interactivos~\cite{Brilliant}.
+%Su enfoque es distinto al de un simulador especializado: organiza el aprendizaje en lecciones y ejercicios progresivos, orientados a que el estudiante construya conocimiento resolviendo tareas.
+%
+%Este tipo de plataforma aporta estructura curricular, secuenciación de contenidos y evaluación inmediata, elementos importantes en un proceso formativo.
+%Sin embargo, al tratarse de una plataforma amplia, su objetivo no es necesariamente mostrar con detalle el funcionamiento interno de un modelo concreto ni permitir una exploración libre de sus mecanismos.
+%En el caso del aprendizaje profundo, una plataforma generalista puede ser útil como complemento, pero no cubre por sí sola la necesidad de visualizar de forma específica cómo una red procesa datos, ajusta parámetros y transforma sus salidas durante el entrenamiento.
+
+\section{Simuladores interactivos de árboles de decisión}
+\label{sec:sota_arboles_decision}
+
+En el ámbito de los algoritmos de aprendizaje automático más clásicos, existen propuestas para ilustrar el ¿?legendario¿? árbol de decisión.
+La herramienta web interactiva sobre árboles de decisión de Interactive Machine Learning~\cite{InteractiveDecisionTrees} permite al usuario construir y observar el proceso de división de un conjunto de datos en tiempo real.
+
+Sin embargo, la web referenciada resulta algo tosca al uso, y no aporta explicaciones profundas.
+Solo muestra los valores de métricas que no se explican.
+Un estudiante no podría acudir a este recurso en busca de ¿?conocimiento útil¿?.
+
+¿?Y no parece haber más aplicaciones por el estilo¿?.
+
+
+
+\section{Oportunidades de mejora}
+\label{sec:sota_comparacion}
+
+%Las herramientas analizadas muestran diferentes aproximaciones educativas.
+%Los recursos audiovisuales, como el material de 3Blue1Brown~\cite{SandersonNeuralNetworks}, destacan por exponer el funcionamiento ¿?por debajo¿? de los modelos.
+%Los simuladores interactivos, como TensorFlow Playground~\cite{TensorFlowPlayground}, permiten experimentar con parámetros y observar consecuencias inmediatas.
+%Por su parte, los visualizadores de algoritmos clásicos, como la herramienta interactiva de árboles de decisión~\cite{InteractiveDecisionTrees}, ilustran de forma explícita cómo las reglas de partición alteran dinámicamente las fronteras en el espacio de características.
+%Y las aplicaciones especializadas, como GAN Lab~\cite{GANLab}, profundizan en arquitecturas concretas y muestran dinámicas avanzadas.
+%Finalmente, plataformas como Brilliant~\cite{Brilliant} aportan una experiencia de aprendizaje estructurada, aunque menos centrada en la inspección interna de modelos concretos.
+
+Desde la perspectiva de este proyecto la principal oportunidad se encuentra en combinar las fortalezas de estos recursos.
+Una herramienta educativa eficaz debería mantener la claridad visual de los recursos divulgativos, así como su profundización en las base matemática, incorporar la manipulación directa de los simuladores y ofrecer suficiente rigor técnico como para que lo que se presenta al usuario se correspondan con el funcionamiento real del algoritmo.
+
+Además, debería evitar que la interacción se limite a modificar hiperparámetros globales: para entender una red neuronal resulta especialmente útil poder observar el flujo de datos, la contribución de los pesos, el efecto del entrenamiento sobre cada componente del modelo...
+
+%En resumen, el estado actual muestra que existen recursos sólidos para introducir y visualizar aspectos parciales del aprendizaje profundo, pero también que hay margen para herramientas centradas en explicar de manera interactiva y rigurosa los mecanismos internos de modelos fundamentales.
+%Esta carencia justifica el desarrollo de aplicaciones educativas que permitan pasar de una comprensión meramente intuitiva a una comprensión operativa del aprendizaje en redes neuronales.

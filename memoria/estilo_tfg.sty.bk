@@ -104,7 +104,7 @@
 
 \usepackage{libertine}
 
-\usepackage[galician,calc]{datetime2}
+%\usepackage[galician,calc]{datetime2}
 \usepackage{fancyhdr}
 \usepackage{IEEEtrantools}
 \usepackage{listings}
@@ -226,7 +226,7 @@
 % opcións relación de acrónimos e glosario %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\usepackage[toc,acronym,translate=false]{glossaries}
+\usepackage[toc,acronym]{glossaries}
 \makeglossaries
 \input{bibliografia/acronimos}
 \input{bibliografia/glosario}

@@ -1,4 +1,5 @@
 extra/
+tmp/
 
 # LaTeX build artifacts generated under memoria/.
 # Keep source files (.tex, .bib, .sty, images, README, final PDFs, etc.) trackable.
