@@ -1,2 +1,84 @@
 \chapter{Herramientas y técnicas}
 \label{chap:herramientas_y_tecnicas}
+
+\lettrine{E}{l} desarrollo de este trabajo se apoya en un conjunto de herramientas orientadas a construir una aplicación educativa, interactiva y ejecutable desde el navegador.
+La elección tecnológica no se limitó a criterios de implementación, sino que también tuvo en cuenta la naturaleza del problema: explicar modelos de aprendizaje automático mediante visualizaciones dinámicas, animaciones y ejemplos manipulables por el usuario.
+En consecuencia, se priorizaron tecnologías que facilitasen la construcción de interfaces interactivas, la validación de los algoritmos implementados y el despliegue web del resultado final.
+
+\section{Godot como motor de desarrollo}
+\label{sec:herramientas_godot}
+
+La herramienta principal empleada fue Godot, un motor de desarrollo libre y multiplataforma orientado a la creación de aplicaciones interactivas y videojuegos~\cite{GodotEngine}.
+Aunque su uso más habitual se asocia al desarrollo de videojuegos, sus características también resultan adecuadas para una aplicación educativa como la desarrollada en este trabajo.
+El proyecto requiere presentar información visual, responder a acciones del usuario, animar procesos paso a paso y mantener una estructura clara entre los distintos elementos de la interfaz.
+Estas necesidades encajan de forma natural con el modelo de escenas, nodos y señales que propone Godot~\cite{GodotDocs}.
+
+La organización en escenas permitió separar componentes de la aplicación con responsabilidades distintas, como las vistas de entrenamiento, los paneles explicativos, las representaciones gráficas y los controles de interacción.
+Este enfoque favorece una estructura modular en la que cada parte de la interfaz puede desarrollarse, probarse y reutilizarse con menor acoplamiento.
+Además, el sistema de señales facilita la comunicación entre elementos de la aplicación sin imponer dependencias directas innecesarias, lo que resulta útil en un entorno en el que las acciones del usuario deben provocar cambios visuales y actualizaciones del estado interno de los modelos.
+
+De forma adicional, la manera en que Godot organiza las interfaces mediante nodos resulta compatible con las representaciones habituales de los algoritmos tratados.
+Un árbol de decisión puede mostrarse como una estructura jerárquica de nodos conectados, mientras que una red neuronal puede representarse mediante capas, neuronas y conexiones.
+Esta correspondencia conceptual ayuda a trasladar las estructuras internas del algoritmo a elementos visuales manipulables dentro de la aplicación.
+
+Otro motivo importante para escoger Godot fue su capacidad de exportación a web.
+El motor permite generar una versión HTML5 de la aplicación~\cite{GodotWebExport}, lo que evita exigir al usuario una instalación local y facilita el acceso desde un navegador.
+Esta característica es especialmente relevante en un proyecto con finalidad educativa, ya que reduce la fricción de uso y permite distribuir la herramienta como una aplicación web estática.
+
+\section{Lenguajes de programación empleados}
+\label{sec:herramientas_lenguajes}
+
+El desarrollo combina varios lenguajes, cada uno empleado en una parte concreta del proyecto.
+La lógica principal de la aplicación se implementó dentro del propio entorno de Godot, utilizando GDScript para construir las visualizaciones, gestionar la interacción y ejecutar las implementaciones didácticas de los algoritmos.
+Junto a ello, Python, Rust y JavaScript se emplearon como tecnologías de apoyo para resolver necesidades específicas que no formaban parte del núcleo de la aplicación.
+
+
+\subsection{GDScript como base del proyecto}
+
+GDScript es el lenguaje oficial que se usa en Godot %~\cite{GDScript}.
+Habilita la interacción entre los nodos, así como es escribir la lógica que mueve el programa.
+La implmentación de los algoritmos de aprendizaje automática en este lenguaje habilitó la obtención de los resultados parciales de cada paso de los algoritmos para hacer explicaciones detalladas ¿?a conveniencia¿?.
+
+
+\subsection{Python para validación de resultados}
+\label{subsec:herramientas_python}
+
+Python se utilizó para contrastar el comportamiento de las implementaciones realizadas en la aplicación~\cite{Python}.
+La finalidad de este uso no fue sustituir la lógica implementada en Godot, sino disponer de un entorno externo con bibliotecas consolidadas que sirviesen como referencia.
+En particular, se compararon resultados producidos por la aplicación con los obtenidos mediante implementaciones estándar de árboles de decisión y redes neuronales en bibliotecas como scikit-learn~\cite{ScikitLearn} y PyTorch~\cite{PyTorch} respectivamente.
+
+Esto ¿?ayuda / ayudó¿? a detectar errores tanto en la implementación del algoritmo como en cómo estos estaban conectados con la información que devolvía la interfaz.
+El uso concreto de Python en este proceso se detalla en la Sección ¿?.
+
+\subsection{Rust para generación de fórmulas}
+\label{subsec:herramientas_rust}
+
+Rust se empleó para desarrollar un plugin para Godot destinado a generar fórmulas matemáticas de forma dinámica en tiempo de ejecución~\cite{RustLanguage}.
+¿?Esta necesidad aparece porque la aplicación no solo muestra resultados numéricos, sino que también debe explicar los cálculos que conducen a ellos.¿? %debería dejarse esto para la Sección?
+Para ello se utilizó la biblioteca Ratex~\cite{Ratex}, que permite generar representaciones en LaTeX a partir de expresiones construidas durante la ejecución.
+
+La elección de Rust se justifica tanto por su ¿?famosa¿? velocidad como por su integracíon con Godot.
+En este proyecto, el complemento se compila a WebAssembly para poder utilizarlo en la versión web de la aplicación~\cite{WebAssembly}.
+De este modo, la generación de fórmulas puede integrarse en el despliegue web sin depender de componentes nativos específicos de una plataforma.
+El desarrollo de este plugin y su integración con la aplicación se explican en la Sección ¿?.
+
+\subsection{JavaScript para integración con el navegador}
+\label{subsec:herramientas_javascript}
+
+JavaScript se utilizó en una parte concreta de la aplicación relacionada con la interacción con el navegador~\cite{MDNJavaScript}.
+Su función principal fue permitir que el usuario cargase sus propios ficheros CSV, de forma que la herramienta no quedase limitada únicamente a conjuntos de datos predefinidos.
+Esta funcionalidad resulta importante desde el punto de vista educativo, porque permite experimentar con datos distintos y observar cómo cambian las decisiones del árbol o el comportamiento de la red en función de la entrada utilizada.
+De forma nativa, Godot habilita la carga de datos desde el sistema en el que se ejecuta, pero por el funcionamiento de lo navegadores modernos esta característica se ve restringida en el export a HTML5, lo que hizo necesario este ¿?bridge¿?.
+La parte concreta desarrollada en JavaScript se describe en la Sección ¿?.
+
+\section{Control de versiones y despliegue}
+\label{sec:herramientas_control_versiones_despliegue}
+
+Para la gestión del código fuente se utilizó Git, el sistema de control de versiones distribuido por excelencia~\cite{ProGit}.
+Su uso permitió mantener un registro de los cambios y trabajar de forma incremental.
+%En un trabajo con varias partes diferenciadas, como la implementación de algoritmos, la interfaz, los recursos visuales, las pruebas de validación y la memoria, el control de versiones reduce el riesgo de pérdida de información y facilita revisar la evolución de cada componente.
+
+El repositorio se alojó en GitHub, lo que proporcionó almacenamiento remoto y una copia accesible del proyecto.
+Además, se utilizó GitHub Pages para publicar la versión web de la aplicación~\cite{GitHubPages}.
+Este servicio permite desplegar sitios estáticos directamente desde un repositorio, por lo que encaja con la exportación web generada por Godot.
+La combinación de Godot y GitHub Pages permitió que el resultado final pudiese consultarse desde el navegador sin infraestructura de servidor adicional.
