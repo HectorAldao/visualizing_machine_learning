@@ -36,7 +36,12 @@ custom_minimum_size = Vector2(150, 250)
 layout_mode = 2
 text = "Frutas"
 
-[node name="Button2" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=500426794]
+[node name="Button2" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=1757483707]
+custom_minimum_size = Vector2(150, 250)
+layout_mode = 2
+text = "Tenis"
+
+[node name="Button0" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=500426794]
 custom_minimum_size = Vector2(150, 250)
 layout_mode = 2
 text = "Cargar

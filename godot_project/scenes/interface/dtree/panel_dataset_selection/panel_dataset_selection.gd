@@ -12,18 +12,51 @@ extends PanelContainer
 
 const posible_y_column_names: Array[String] = ["class", "Class", "y", "Y", "label", "Label"]
 const DICT_OF_DATASETS: Dictionary = \
-	{"Frutas":
+		{"Frutas": [
 		[
-			[
+			# Instancias originales
 			{"color": "red", "shape": "round", "size": "big", "class": "apple"},
 			{"color": "green", "shape": "round", "size": "big", "class": "apple"},
 			{"color": "yellow", "shape": "long", "size": "medium", "class": "banana"},
 			{"color": "green", "shape": "long", "size": "medium", "class": "banana"},
 			{"color": "orange", "shape": "round", "size": "medium", "class": "orange"},
-			],
-			["color", "shape", "size"]
-		]
-	}
+			
+			# Nuevas instancias con características superpuestas (generan nodos hoja impuros)
+			{"color": "red", "shape": "round", "size": "big", "class": "pomegranate"}, # Colisiona con apple
+			{"color": "orange", "shape": "round", "size": "medium", "class": "tangerine"}, # Colisiona con orange
+			{"color": "green", "shape": "long", "size": "medium", "class": "cucumber"}, # Colisiona con green banana
+			
+			# Otras frutas para dar más volumen
+			{"color": "red", "shape": "round", "size": "small", "class": "cherry"},
+			{"color": "red", "shape": "round", "size": "small", "class": "cranberry"}, # Colisiona con cherry
+			{"color": "purple", "shape": "round", "size": "small", "class": "grape"},
+			{"color": "green", "shape": "round", "size": "small", "class": "grape"},
+			{"color": "yellow", "shape": "round", "size": "medium", "class": "lemon"},
+			{"color": "green", "shape": "round", "size": "medium", "class": "lime"}
+		],
+		["color", "shape", "size"]
+	],
+	
+	"Tenis": [
+		[
+			{"outlook": "sunny", "temperature": "hot", "humidity": "high", "wind": "weak", "class": "no"},
+			{"outlook": "sunny", "temperature": "hot", "humidity": "high", "wind": "strong", "class": "no"},
+			{"outlook": "overcast", "temperature": "hot", "humidity": "high", "wind": "weak", "class": "yes"},
+			{"outlook": "rain", "temperature": "mild", "humidity": "high", "wind": "weak", "class": "yes"},
+			{"outlook": "rain", "temperature": "cool", "humidity": "normal", "wind": "weak", "class": "yes"},
+			{"outlook": "rain", "temperature": "cool", "humidity": "normal", "wind": "strong", "class": "no"},
+			{"outlook": "overcast", "temperature": "cool", "humidity": "normal", "wind": "strong", "class": "yes"},
+			{"outlook": "sunny", "temperature": "mild", "humidity": "high", "wind": "weak", "class": "no"},
+			{"outlook": "sunny", "temperature": "cool", "humidity": "normal", "wind": "weak", "class": "yes"},
+			{"outlook": "rain", "temperature": "mild", "humidity": "normal", "wind": "weak", "class": "yes"},
+			{"outlook": "sunny", "temperature": "mild", "humidity": "normal", "wind": "strong", "class": "yes"},
+			{"outlook": "overcast", "temperature": "mild", "humidity": "high", "wind": "strong", "class": "yes"},
+			{"outlook": "overcast", "temperature": "hot", "humidity": "normal", "wind": "weak", "class": "yes"},
+			{"outlook": "rain", "temperature": "mild", "humidity": "high", "wind": "strong", "class": "no"}
+		],
+		["outlook", "temperature", "humidity", "wind"]
+	]
+}
 
 
 var selected_option: String

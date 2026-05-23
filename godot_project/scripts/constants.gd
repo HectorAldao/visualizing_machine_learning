@@ -3,6 +3,7 @@ extends Node
 const SCENES: Dictionary[String, String] = {
 	"main_menu": "uid://j220721ca3np",
 	"dtree_view": "uid://dr3bg1sj3y1nu",
+	"dtree_view_horizontal": "uid://cvqcgrjho60gm",
 	"dtree": "uid://ci7giiq21giw1",
 	"algorithm_dtree": "uid://tg5i3lmvlt3s",
 	"controller_dtree": "uid://5h4ba5ys8aml",

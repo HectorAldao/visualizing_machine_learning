@@ -45,7 +45,10 @@ func _on_nn_button_pressed() -> void:
 func _on_start_button_pressed() -> void:
 	match selected_algorithm:
 		1:
-			get_tree().change_scene_to_file(Constants.SCENES.dtree_view)
+			if _is_horizontal():
+				get_tree().change_scene_to_file(Constants.SCENES.dtree_view_horizontal)
+			else:
+				get_tree().change_scene_to_file(Constants.SCENES.dtree_view)
 		2:
 			get_tree().change_scene_to_file(Constants.SCENES.nn_view)
 		_:
@@ -105,3 +108,9 @@ func _update_size() -> void:
 	var available_height: float = maxf(0.0, visual_window_size.y - horizontal_margin * 2.0)
 	panelcontainer.custom_minimum_size.x = min(max_width, available_width) / canvas_scale.x
 	panelcontainer.custom_minimum_size.y = available_height / canvas_scale.y
+
+
+## Check if the screen is in vertical or horizontal
+func _is_horizontal() -> bool:
+	var window_size: Vector2 = get_window().size
+	return window_size.x >= window_size.y

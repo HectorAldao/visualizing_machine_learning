@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://dy3l4lsa0srpr" path="res://scenes/objects/dtree/dtree.tscn" id="4_dtree"]
 [ext_resource type="PackedScene" uid="uid://5h4ba5ys8aml" path="res://scenes/controllers/controller_dtree/controller_dtree.tscn" id="5_pxc03"]
 [ext_resource type="PackedScene" uid="uid://dbkhkmbjedndu" path="res://scenes/interface/navigation_menu/navigation_menu.tscn" id="6_6eshh"]
-[ext_resource type="Texture2D" uid="uid://b2p5prwiiqq1k" path="res://assets/three_lines_menu/three_lines_menu_mini.png" id="6_jj56m"]
+[ext_resource type="Texture2D" uid="uid://cvwnxn6ptgdkd" path="res://assets/three_lines_menu/three_lines_menu_mini_black.png" id="6_jj56m"]
 [ext_resource type="PackedScene" uid="uid://cjchbdmq0sym5" path="res://scenes/interface/dtree/window/window.tscn" id="6_txrwr"]
 [ext_resource type="PackedScene" uid="uid://dpmw4sgwtmh4y" path="res://scenes/interface/dtree/panel_dataset_selection/panel_dataset_selection.tscn" id="7_6eshh"]
 
@@ -34,22 +34,24 @@ metadata/_custom_type_script = "uid://cyinp2iohgy8b"
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/margin_left = 15
-theme_override_constants/margin_top = 15
-theme_override_constants/margin_right = 15
-theme_override_constants/margin_bottom = 15
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
 
 [node name="VBoxContainer" type="VBoxContainer" parent="ScrollContainer2/MarginContainer" unique_id=452340565]
 layout_mode = 2
+theme_override_constants/separation = 10
 
 [node name="Window" parent="ScrollContainer2/MarginContainer/VBoxContainer" unique_id=734547246 instance=ExtResource("6_txrwr")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 200)
 layout_mode = 2
+size_flags_vertical = 3
 
 [node name="PanelContainer" type="PanelContainer" parent="ScrollContainer2/MarginContainer/VBoxContainer" unique_id=144245595]
 layout_mode = 2
 size_flags_vertical = 3
+size_flags_stretch_ratio = 2.0
 
 [node name="PanelDatasetSelection" parent="ScrollContainer2/MarginContainer/VBoxContainer/PanelContainer" unique_id=1243987596 instance=ExtResource("7_6eshh")]
 unique_name_in_owner = true
