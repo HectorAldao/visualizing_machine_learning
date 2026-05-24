@@ -41,12 +41,27 @@ Las ramas que se crean a partir de '{mejor_atributo}' son:
 Por lo tanto, para este conjunto de datos solo podemos asumir que los futuros datos que lleugen a esta rama tendrán la misma etiqueta: {lista_etiquetas}"],
 
 	"leaf_mayority":
-["Han bajado {numero_de_datos} datos por esta rama.
+	["Han bajado {numero_de_datos} datos por esta rama.
 Pero no quedan atributos sin recorrer para estos datos, es decir, todos los atributos han sido valorados para clasificar los datos.
 Por lo que solo queda ver qué etiquetas tienen los datos resultantes.",
 "Si todos tienen la misma etiqueta, perfecto, había datos repetidos o muy similares entre los datos, pero todos estos los clasificamos igual.
 Si hay varias etiquetas, pues los atributos escogidos no sirven para diferenciar a la perfección todos los casos de nuestro conjunto de datos. Pero hay que seleccioniar una etiqueta para este nodo hoja, por lo que se escoje la etiqueta mayoritaria.
-En este caso '{etiqueta_mayoritaria}'."]
+En este caso '{etiqueta_mayoritaria}'."],
+
+	"leaf_majority":
+	["Han bajado {numero_de_datos} datos por esta rama.
+Pero no quedan atributos sin recorrer para estos datos, es decir, todos los atributos han sido valorados para clasificar los datos.
+Por lo que solo queda ver qué etiquetas tienen los datos resultantes.",
+"Si todos tienen la misma etiqueta, perfecto, había datos repetidos o muy similares entre los datos, pero todos estos los clasificamos igual.
+Si hay varias etiquetas, pues los atributos escogidos no sirven para diferenciar a la perfección todos los casos de nuestro conjunto de datos. Pero hay que seleccioniar una etiqueta para este nodo hoja, por lo que se escoje la etiqueta mayoritaria.
+En este caso '{etiqueta_mayoritaria}'."],
+
+	"node_partition":
+	["Este nodo es un nodo {tipo_visual_de_nodo}.
+Por esta partición han bajado {numero_de_datos} datos{texto_rama}.
+La pureza de este nodo es {pureza_nodo}: {numero_etiqueta_mayoritaria} de {numero_de_datos} datos tienen la etiqueta mayoritaria '{etiqueta_mayoritaria}'.
+Las etiquetas que llegan a este nodo son {lista_etiquetas}.",
+"{texto_decision_nodo}"]
 }
 
 
@@ -59,13 +74,16 @@ func _ready() -> void:
 	
 	label0.add_theme_font_size_override("font_size", font_size)
 	label1.add_theme_font_size_override("font_size", font_size)
+	if not SignalsObserver.dtree_node_selected.is_connected(update_node_partition_text):
+		SignalsObserver.dtree_node_selected.connect(update_node_partition_text)
 
 
 func update_current_text(details_dict: Dictionary) -> void:
+	details_dict = details_dict.duplicate(true)
 	
-	var plot_data: Dictionary[String, float]
+	var plot_data: Dictionary[String, float] = {}
 	
-	if typeof(details_dict["lista_ganancias"]) == TYPE_DICTIONARY:
+	if details_dict.has("lista_ganancias") and typeof(details_dict["lista_ganancias"]) == TYPE_DICTIONARY:
 		plot_data = details_dict["lista_ganancias"]
 	
 	_clean_lists(details_dict)
@@ -94,6 +112,45 @@ func update_current_text(details_dict: Dictionary) -> void:
 		"leaf_mayority":
 			label0.text = template_texts[tipo_de_nodo][0].format(details_dict)
 			label1.text = ""
+		"leaf_majority":
+			label0.text = template_texts[tipo_de_nodo][0].format(details_dict)
+			label1.text = template_texts[tipo_de_nodo][1].format(details_dict)
+
+
+func update_node_partition_text(details_dict: Dictionary) -> void:
+	details_dict = details_dict.duplicate(true)
+	_prepare_partition_details(details_dict)
+	_clean_lists(details_dict)
+
+	var chart = vboxcontainer.get_node_or_null("BarsChart")
+	if chart:
+		vboxcontainer.remove_child(chart)
+
+	label0.text = template_texts["node_partition"][0].format(details_dict)
+	label1.text = template_texts["node_partition"][1].format(details_dict)
+
+
+func _prepare_partition_details(details_dict: Dictionary) -> void:
+	var tipo_de_nodo: String = details_dict.get("tipo_de_nodo", "")
+	var is_leaf_node: bool = bool(details_dict.get("is_leaf", tipo_de_nodo.begins_with("leaf")))
+	details_dict["tipo_visual_de_nodo"] = "hoja" if is_leaf_node else "spine (interno)"
+
+	var branch_value = details_dict.get("valor_rama", details_dict.get("branch_value", null))
+	details_dict["texto_rama"] = "" if branch_value == null else " desde la rama '%s'" % str(branch_value)
+
+	if not details_dict.has("pureza_nodo"):
+		details_dict["pureza_nodo"] = "sin datos"
+	if not details_dict.has("numero_etiqueta_mayoritaria"):
+		details_dict["numero_etiqueta_mayoritaria"] = 0
+	if not details_dict.has("etiqueta_mayoritaria"):
+		details_dict["etiqueta_mayoritaria"] = details_dict.get("label", "")
+	if not details_dict.has("lista_etiquetas"):
+		details_dict["lista_etiquetas"] = []
+
+	if is_leaf_node:
+		details_dict["texto_decision_nodo"] = "Como es hoja, la partición termina aquí y el nodo predice la etiqueta '%s'." % str(details_dict.get("label", details_dict.get("etiqueta_mayoritaria", "")))
+	else:
+		details_dict["texto_decision_nodo"] = "Como es spine, la partición continúa dividiendo por el atributo '%s'. Sus ramas posibles son: %s." % [str(details_dict.get("attribute", details_dict.get("mejor_atributo", ""))), str(details_dict.get("lista_ramas_mejor_atributo", ""))]
 
 
 ## For each value on the input Dictionary that is an Array[String], it will

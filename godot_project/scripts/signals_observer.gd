@@ -6,6 +6,10 @@ extends Node
 @warning_ignore_start("unused_signal")
 
 
+# dtree
+signal dtree_node_selected(details: Dictionary)
+
+
 
 signal dataset_selected(data:Array[Dictionary], attrs: Array[String])
 signal dataset_selected_nn(data:Array[Dictionary], attrs: Array[String], target_attrs: Array[String], nn_restrictions: Dictionary[int, int])

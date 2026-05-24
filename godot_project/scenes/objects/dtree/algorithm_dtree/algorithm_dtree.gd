@@ -98,6 +98,7 @@ func previous_step() -> void:
 # Huge function: decide the node #
 
 func _build_node_step(context: Dictionary) -> void:
+	details = {}
 
 	var data: Array = context["data"]
 	var attributes: Array = context["attributes"]
@@ -107,10 +108,20 @@ func _build_node_step(context: Dictionary) -> void:
 	
 	# Get the list of ground truth
 	var labels = _get_labels(data)
+	var label_counts := _get_label_counts(labels)
+	var majority_label := _majority_class(labels)
+	var majority_count: int = int(label_counts.get(majority_label, 0))
+	var purity := 0.0 if labels.is_empty() else float(majority_count) / float(labels.size())
 	
 	details["lista_etiquetas"] = labels
 	details["numero_de_datos"] = data.size()
 	details["lista_atributos"] = attributes
+	details["valor_rama"] = branch_value
+	details["conteo_etiquetas"] = label_counts
+	details["etiqueta_mayoritaria"] = majority_label
+	details["pureza_nodo"] = "%.2f%%" % (purity * 100.0)
+	details["pureza_nodo_valor"] = purity
+	details["numero_etiqueta_mayoritaria"] = majority_count
 	
 	# Get the set of labels
 	var unique_labels: Array = _get_unique_labels(labels)
@@ -131,10 +142,7 @@ func _build_node_step(context: Dictionary) -> void:
 	# Check if no attributes left
 	if attributes.is_empty():
 		# If there is no atribute left, pick the majority class
-		var majority_label = _majority_class(labels)
-		
 		details["tipo_de_nodo"] = "leaf_majority"
-		details["etiqueta_mayoritaria"] = majority_label
 		
 		add_node_requested.emit(parent_id, branch_value, "", majority_label, true, [], "")
 		return
@@ -341,6 +349,15 @@ func _majority_class(labels: Array) -> String:
 			max_label = label
 	
 	return max_label
+
+
+func _get_label_counts(labels: Array) -> Dictionary:
+	var counts: Dictionary = {}
+	for label in labels:
+		if not counts.has(label):
+			counts[label] = 0
+		counts[label] += 1
+	return counts
 
 
 func _entropy(labels: Array) -> float:

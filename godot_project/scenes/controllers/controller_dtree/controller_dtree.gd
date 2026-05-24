@@ -218,6 +218,7 @@ func _create_root_for_algorithm(attribute: String, label: String, is_leaf: bool,
 	dnode.text = label if is_leaf else attribute
 	dnode.is_leaf = is_leaf
 	dnode.information_variable_value = info_value
+	dnode.partition_details = algorithm.details.duplicate(true) if algorithm else {}
 
 	# No popup menu if is not manual
 	dnode.was_created_by_algorithm = true
@@ -245,6 +246,7 @@ func _add_child_node_for_algorithm(parent_id: int, branch_value, attribute: Stri
 			child.is_leaf                  = is_leaf
 			child.is_pending               = false
 			child.information_variable_value = info_value
+			child.partition_details = algorithm.details.duplicate(true) if algorithm else {}
 			child.apply_theme_animated(child.leaf_theme if is_leaf else child.noleaf_theme, label if is_leaf else attribute)
 			return id
 	
@@ -263,6 +265,7 @@ func _add_child_node_for_algorithm(parent_id: int, branch_value, attribute: Stri
 	dnode.branch_value = branch_value
 	dnode.was_created_by_algorithm = true
 	dnode.information_variable_value = info_value
+	dnode.partition_details = algorithm.details.duplicate(true) if algorithm else {}
 	
 	dtree.nodes_dict[new_id] = dnode
 	dtree.nodes_container.add_child(dnode)

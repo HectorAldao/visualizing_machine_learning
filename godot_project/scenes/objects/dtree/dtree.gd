@@ -216,4 +216,5 @@ func restore_node_as_pending(node_id: int) -> void:
 	dnode.is_leaf = false
 	dnode.is_pending = true
 	dnode.information_variable_value = ""
+	dnode.partition_details = {}
 	dnode.apply_theme_animated(dnode.pending_theme, "...")

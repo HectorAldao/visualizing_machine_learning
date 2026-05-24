@@ -25,6 +25,7 @@ var label: String = ""      # Class label (if leaf)
 var is_leaf: bool = false   # Whether this is a leaf node
 var branch_value = null     # The value this node represents from parent's split
 var information_variable_value: String = ""
+var partition_details: Dictionary = {}
 
 # For the algorithmic mode
 var was_created_by_algorithm: bool = false
@@ -56,8 +57,7 @@ func _ready():
 	if not was_created_by_algorithm:
 		gui_input.connect(_on_gui_input)
 	
-	mouse_entered.connect(_on_mouse_entered)
-	mouse_exited.connect(_on_mouse_exited)
+	pressed.connect(_on_pressed)
 
 
 func _on_gui_input(event: InputEvent):
@@ -98,9 +98,22 @@ func apply_theme_animated(new_theme: Theme, new_text: String = text) -> void:
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 
 
-func _on_mouse_entered():
-	text = information_variable_value
+func _on_pressed() -> void:
+	var details := partition_details.duplicate(true)
+	if details.is_empty():
+		details = {
+			"tipo_de_nodo": "leaf" if is_leaf else "internal",
+			"numero_de_datos": 0,
+			"lista_etiquetas": [label] if label else [],
+			"lista_atributos": [attribute] if attribute else [],
+			"pureza_nodo": "sin datos",
+			"etiqueta_mayoritaria": label,
+			"valor_rama": branch_value,
+		}
 
-
-func _on_mouse_exited():
-	text = attribute if attribute else label
+	details["node_id"] = id
+	details["branch_value"] = branch_value
+	details["attribute"] = attribute
+	details["label"] = label
+	details["is_leaf"] = is_leaf
+	SignalsObserver.dtree_node_selected.emit(details)
