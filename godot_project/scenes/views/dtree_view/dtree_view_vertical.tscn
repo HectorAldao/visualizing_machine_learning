@@ -53,13 +53,6 @@ layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 2.0
 
-[node name="PanelDatasetSelection" parent="ScrollContainer2/MarginContainer/VBoxContainer/PanelContainer" unique_id=1243987596 instance=ExtResource("7_6eshh")]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-
 [node name="ScrollContainerDTree" type="ScrollContainer" parent="ScrollContainer2/MarginContainer/VBoxContainer/PanelContainer" unique_id=364608930]
 unique_name_in_owner = true
 layout_mode = 2
@@ -74,6 +67,13 @@ size_flags_vertical = 3
 [node name="DTree" parent="ScrollContainer2/MarginContainer/VBoxContainer/PanelContainer/ScrollContainerDTree/CenterContainer" unique_id=229777749 instance=ExtResource("4_dtree")]
 unique_name_in_owner = true
 layout_mode = 2
+
+[node name="PanelDatasetSelection" parent="ScrollContainer2/MarginContainer/VBoxContainer/PanelContainer/ScrollContainerDTree/CenterContainer" unique_id=1243987596 instance=ExtResource("7_6eshh")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 
 [node name="HBoxContainer" type="HBoxContainer" parent="ScrollContainer2/MarginContainer/VBoxContainer" unique_id=1496934532]
 layout_mode = 2
