@@ -196,6 +196,7 @@ func _on_dataset_selected_pressed(datast: Array[Dictionary], attrs: Array[String
 			
 	else:
 
+		dtree.visible = true
 		drop_button.visible = true
 		SignalsObserver.start_evaluation.emit(datast)
 
