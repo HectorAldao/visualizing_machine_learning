@@ -26,6 +26,7 @@ var detail_button:           Button
 var drop_button:             Button
 var data: Array[Dictionary]
 var attributes: Array[String]
+var eval_data_container: EvalDataContainer
 
 
 
@@ -198,7 +199,7 @@ func _on_dataset_selected_pressed(datast: Array[Dictionary], attrs: Array[String
 
 		dtree.visible = true
 		drop_button.visible = true
-		SignalsObserver.start_evaluation.emit(datast)
+		_start_evaluation(datast)
 
 		#next_step_button.        visible = false
 		#previous_step_button.    visible = false
@@ -338,6 +339,19 @@ func _on_evaluate_button_pressed() -> void:
 
 	# Here is where there must be a signal "evaluate"
 	panel_dataset_selection. visible = true
+
+
+func _start_evaluation(dataset_to_evaluate: Array[Dictionary]) -> void:
+	if is_instance_valid(eval_data_container):
+		eval_data_container.queue_free()
+
+	var array_of_evaldatas: Array[EvalData] = []
+	for d in dataset_to_evaluate:
+		array_of_evaldatas.append(EvalData.newone(d))
+
+	eval_data_container = EvalDataContainer.newone(dtree, array_of_evaldatas)
+	dtree.nodes_container.add_child(eval_data_container)
+	eval_data_container.position = Vector2.ZERO
 
 
 func _on_detail_button_pressed() -> void:

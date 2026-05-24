@@ -44,11 +44,6 @@ var last_created_node_id: int = -1
 var label_column: String
 
 
-func _ready() -> void:
-	SignalsObserver.start_evaluation.connect(_evaluate_dtree)
-	#SignalsObserver.drop_data.connect()
-
-
 # Buttons related functions #
 
 func start_training(data: Array[Dictionary], attributes: Array[String], dtree: DTreeLogical) -> void:
@@ -438,22 +433,3 @@ func register_placeholder_node_ids(branch_to_id: Dictionary) -> void:
 			var bv = context.get("branch_value", null)
 			if branch_to_id.has(bv):
 				context["node_id"] = branch_to_id[bv]
-
-
-
-# ---------------- Evaluation ---------------- #
-
-
-func _evaluate_dtree(dataset_to_evaluate: Array[Dictionary]) -> void:
-
-	var array_of_evaldatas: Array[EvalData]
-	for d in dataset_to_evaluate:
-		array_of_evaldatas.append(EvalData.newone(d))
-
-	var current_scene: Node = get_tree().current_scene
-	current_scene.add_child(EvalDataContainer.newone(dtree_ref, array_of_evaldatas))
-
-
-	#for n in dataset_to_evaluate.size():
-	#	pass
-	#pass
