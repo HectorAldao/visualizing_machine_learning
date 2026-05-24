@@ -165,6 +165,7 @@ func _setup_automatic_mode() -> void:
 	evaluate_button.      visible = false
 	# detail_button.        visible = false
 	drop_button.          visible = false
+	#panel_dataset_selection. visible = true
 
 	if algorithm:
 
@@ -332,6 +333,7 @@ func _on_evaluate_button_pressed() -> void:
 	next_step_button.     visible = false
 	previous_step_button. visible = false
 	evaluate_button.      visible = false
+	dtree.                visible = false
 
 	# Here is where there must be a signal "evaluate"
 	panel_dataset_selection. visible = true

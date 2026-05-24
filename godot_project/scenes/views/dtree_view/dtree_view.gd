@@ -34,7 +34,7 @@ func _ready():
 	
 	# Make the ui elements invisible but the selecion panel
 	# dtree_selection_panel. visible = true
-	scroll_container_dtree.visible = false
+	#scroll_container_dtree.visible = false
 	dtree_menu.        visible = false
 	window.                visible = false
 	dataset_selection.     visible = false
@@ -67,7 +67,7 @@ func _on_algorithmic_dtree_button_pressed():
 	# Cange visibility
 	# dtree_selection_panel. visible = false
 	dataset_selection.     visible = true
-	scroll_container_dtree.visible = false
+	#scroll_container_dtree.visible = false
 	window.                visible = false
 	
 	
