@@ -3,9 +3,11 @@ class_name EvalDataContainer extends Node2D
 
 #var dtree: DTreeLogical
 var data: Array[EvalData]
-var nodes: Dictionary[int, Dictionary]  # keys() = "position", "attribute", "label", "branch"
+var nodes: Dictionary[int, Dictionary]  # keys() = "position", "size", "attribute", "label", "branch", "data_count"
 
 const DROP_TWEEN_DURATION: float = 0.35
+const LEAF_DATA_MARGIN: float = 12.0
+const LEAF_DATA_SPACING: float = 28.0
 
 
 #func _init(new_dtree: DTreeLogical = null, new_data: Array[EvalData] = []) -> void:
@@ -40,11 +42,13 @@ static func newone(new_dtree: DTreeLogical, new_data: Array[EvalData]) -> EvalDa
 		var dnode: DNode = dtree_nodes[n]
 		evaldatacontainer.nodes[n] = {
 			"position": dnode.position,
+			"size": dnode.size,
 			"depth": dnode.depth,
 			"attribute": dnode.attribute,
 			"label": dnode.label,
 			"branch": dnode.branch_value,
-			"parent_id": dnode.parent_id
+			"parent_id": dnode.parent_id,
+			"data_count": 0
 		}
 	
 	return evaldatacontainer
@@ -85,14 +89,16 @@ func _drop_one_data() -> void:
 			return
 
 		var current_node: Dictionary = nodes[current_node_id]
-		var current_position: Vector2 = current_node.get("position", evaldata.position)
+		var data_count: int = int(current_node.get("data_count", 0))
+		var node_label: String = str(current_node.get("label", ""))
+		var current_position: Vector2 = _get_evaldata_target_position(current_node, evaldata.position, data_count)
+		current_node["data_count"] = data_count + 1
 		var tween := create_tween()
 		tween.tween_property(evaldata, "position", current_position, DROP_TWEEN_DURATION) \
 			.set_trans(Tween.TRANS_SINE) \
 			.set_ease(Tween.EASE_IN_OUT)
 		await tween.finished
 
-		var node_label: String = str(current_node.get("label", ""))
 		if node_label != "":
 			return
 
@@ -115,3 +121,13 @@ func _drop_one_data() -> void:
 			return
 
 		current_node_id = next_node_id
+
+
+func _get_evaldata_target_position(node_info: Dictionary, fallback_position: Vector2, stack_index: int) -> Vector2:
+	var node_position: Vector2 = node_info.get("position", fallback_position)
+	var node_label: String = str(node_info.get("label", ""))
+	if node_label == "":
+		return node_position
+
+	var node_size: Vector2 = node_info.get("size", Vector2.ZERO)
+	return node_position + Vector2(node_size.x * 0.5, node_size.y + LEAF_DATA_MARGIN + stack_index * LEAF_DATA_SPACING)
