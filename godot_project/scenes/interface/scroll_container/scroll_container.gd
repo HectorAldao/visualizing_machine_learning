@@ -6,7 +6,7 @@ class_name ScrollContainerV2 extends ScrollContainer
 @export_range(0.1, 1) var zoom_speed: float = 0.2
 @export var max_zoom: float = 3.
 @export var min_zoom: float = 0.1
-@export var touch_drag_deadzone: float = 12.0
+@export var touch_drag_deadzone: float = 5.0
 @export var pinch_zoom_pixels_per_step: float = 100.0
 
 var is_middle_mouse_dragging: bool = false
