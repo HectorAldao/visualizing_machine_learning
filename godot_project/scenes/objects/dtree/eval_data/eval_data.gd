@@ -53,7 +53,7 @@ func _on_pressed() -> void:
 
 
 func _get_selection_details() -> Dictionary:
-	var characteristics := data_dict.duplicate(true)
+	var characteristics: Dictionary = data_dict.duplicate(true)
 	var label_value: Variant = ""
 
 	if label_column != "" and characteristics.has(label_column):
@@ -69,11 +69,11 @@ func _get_selection_details() -> Dictionary:
 
 
 func _apply_label_color() -> void:
-	var label_name := _get_label_name()
-	var hash_value := _hash_string(label_name)
+	var label_name: String = _get_label_name()
+	var hash_value: int = _hash_string(label_name)
 	label_color = _get_color_for_label(label_name)
 	label_hex_color = label_color.to_html(false)
-	var saturated_border_color := Color.from_hsv(label_color.h, 1.0, label_color.v, label_color.a)
+	var saturated_border_color: Color = Color.from_hsv(label_color.h, 1.0, label_color.v, label_color.a)
 
 	begin_bulk_theme_override()
 	_add_button_style_override(&"normal", label_color, saturated_border_color, hash_value)
@@ -90,30 +90,30 @@ func _get_label_name() -> String:
 
 
 func _get_color_for_label(label_name: String) -> Color:
-	var hash_value := _hash_string(label_name)
-	var color_name := str(data_dict.get("color", "")).strip_edges().to_lower()
+	var hash_value: int = _hash_string(label_name)
+	var color_name: String = str(data_dict.get("color", "")).strip_edges().to_lower()
 
 	if WHITE_COLOR_NAMES.has(color_name):
-		var white_saturation := _hash_to_range(hash_value, 8, 0.0, 0.08)
-		var white_value := _hash_to_range(hash_value, 16, 0.88, 1.0)
+		var white_saturation: float = _hash_to_range(hash_value, 8, 0.0, 0.08)
+		var white_value: float = _hash_to_range(hash_value, 16, 0.88, 1.0)
 		return Color.from_hsv(_hash_to_unit(hash_value), white_saturation, white_value)
 
 	if BLACK_COLOR_NAMES.has(color_name):
-		var black_saturation := _hash_to_range(hash_value, 8, 0.0, 0.12)
-		var black_value := _hash_to_range(hash_value, 16, 0.04, 0.16)
+		var black_saturation: float = _hash_to_range(hash_value, 8, 0.0, 0.12)
+		var black_value: float = _hash_to_range(hash_value, 16, 0.04, 0.16)
 		return Color.from_hsv(_hash_to_unit(hash_value), black_saturation, black_value)
 
-	var hue := _hash_to_unit(hash_value)
+	var hue: float = _hash_to_unit(hash_value)
 	if LABEL_COLOR_NAMES.has(color_name):
 		hue = _wrap_unit(float(LABEL_COLOR_NAMES[color_name]) + _hash_to_range(hash_value, 0, -HUE_WINDOW, HUE_WINDOW))
 
-	var saturation := _hash_to_range(hash_value, 8, SATURATION_MIN, SATURATION_MAX)
-	var value := _hash_to_range(hash_value, 16, VALUE_MIN, VALUE_MAX)
+	var saturation: float = _hash_to_range(hash_value, 8, SATURATION_MIN, SATURATION_MAX)
+	var value: float = _hash_to_range(hash_value, 16, VALUE_MIN, VALUE_MAX)
 	return Color.from_hsv(hue, saturation, value)
 
 
 func _add_button_style_override(style_name: StringName, color: Color, border_color: Color, hash_value: int) -> void:
-	var stylebox := _get_base_button_stylebox()
+	var stylebox: StyleBoxFlat = _get_base_button_stylebox()
 	stylebox.bg_color = color
 	_apply_label_shape_variation(stylebox, border_color, hash_value)
 	add_theme_stylebox_override(style_name, stylebox)
@@ -145,31 +145,31 @@ func _apply_label_shape_variation(stylebox: StyleBoxFlat, border_color: Color, h
 
 
 func _get_base_button_stylebox() -> StyleBoxFlat:
-	var stylebox := get_theme_stylebox(&"normal", &"Button")
+	var stylebox: StyleBox = get_theme_stylebox(&"normal", &"Button")
 	if stylebox is StyleBoxFlat:
 		return stylebox.duplicate() as StyleBoxFlat
 
-	var fallback := StyleBoxFlat.new()
+	var fallback: StyleBoxFlat = StyleBoxFlat.new()
 	fallback.set_corner_radius_all(10)
 	fallback.set_border_width_all(1)
 	fallback.border_color = Color(0.019607844, 0.003921569, 0.019607844)
 	return fallback
 
 
-static func _hash_string(text: String) -> int:
-	var hash := 2166136261
-	for i in range(text.length()):
-		hash = int(hash ^ text.unicode_at(i))
-		hash = int((hash * 16777619) & 0xffffffff)
-	return hash
+static func _hash_string(text_to_hash: String) -> int:
+	var hash_num: int = 2166136261
+	for i in range(text_to_hash.length()):
+		hash_num = int(hash_num ^ text_to_hash.unicode_at(i))
+		hash_num = int((hash_num * 16777619) & 0xffffffff)
+	return hash_num
 
 
-static func _hash_to_unit(hash: int, shift: int = 0) -> float:
-	return float((hash >> shift) & 0xff) / 255.0
+static func _hash_to_unit(hash_num: int, shift: int = 0) -> float:
+	return float((hash_num >> shift) & 0xff) / 255.0
 
 
-static func _hash_to_range(hash: int, shift: int, min_value: float, max_value: float) -> float:
-	return lerpf(min_value, max_value, _hash_to_unit(hash, shift))
+static func _hash_to_range(hash_num: int, shift: int, min_value: float, max_value: float) -> float:
+	return lerpf(min_value, max_value, _hash_to_unit(hash_num, shift))
 
 
 static func _wrap_unit(value: float) -> float:
