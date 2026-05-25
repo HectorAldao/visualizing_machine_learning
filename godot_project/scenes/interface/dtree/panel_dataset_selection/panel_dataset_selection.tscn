@@ -17,50 +17,57 @@ script = ExtResource("2_av435")
 color_good = Color(0, 0.54901963, 0, 1)
 color_error = Color(0.6666667, 0, 0, 1)
 
-[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1778102435]
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1778102435]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer" unique_id=1051428529]
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer" unique_id=1338782591]
+layout_mode = 2
+
+[node name="TitleDatasetSelectionDtree" type="Label" parent="HBoxContainer/VBoxContainer" unique_id=1051428529]
 layout_mode = 2
 text = "Seleccione dataset"
 label_settings = SubResource("LabelSettings_cevo3")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer" unique_id=86943782]
+[node name="DatasetsDtreeHBoxContainer" type="HBoxContainer" parent="HBoxContainer/VBoxContainer" unique_id=86943782]
+unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Button1" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=571021806]
+[node name="Button1" type="Button" parent="HBoxContainer/VBoxContainer/DatasetsDtreeHBoxContainer" unique_id=571021806]
 custom_minimum_size = Vector2(150, 250)
 layout_mode = 2
 text = "Frutas"
 
-[node name="Button2" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=1757483707]
+[node name="Button2" type="Button" parent="HBoxContainer/VBoxContainer/DatasetsDtreeHBoxContainer" unique_id=1757483707]
 custom_minimum_size = Vector2(150, 250)
 layout_mode = 2
 text = "Tenis"
 
-[node name="Button0" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=500426794]
+[node name="Button0" type="Button" parent="HBoxContainer/VBoxContainer/DatasetsDtreeHBoxContainer" unique_id=500426794]
 custom_minimum_size = Vector2(150, 250)
 layout_mode = 2
 text = "Cargar
 Csv"
 
-[node name="ScrollContainer" parent="VBoxContainer" unique_id=1226361611 instance=ExtResource("3_as08i")]
-custom_minimum_size = Vector2(0, 51.91)
-layout_mode = 2
-is_horizontal = true
-
-[node name="TargetSelector" type="HBoxContainer" parent="VBoxContainer/ScrollContainer" unique_id=309352907]
-layout_mode = 2
-
-[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer" unique_id=1205582973]
+[node name="PanelContainer" type="PanelContainer" parent="HBoxContainer/VBoxContainer" unique_id=1205582973]
 layout_mode = 2
 theme_override_styles/panel = ExtResource("1_cevo3")
 
-[node name="Label" type="Label" parent="VBoxContainer/PanelContainer" unique_id=656760516]
+[node name="InformativeTextDtree" type="Label" parent="HBoxContainer/VBoxContainer/PanelContainer" unique_id=656760516]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Aún no se ha seleccionado dataset"
 label_settings = SubResource("LabelSettings_av435")
 
-[node name="Button" type="Button" parent="VBoxContainer" unique_id=1479662911]
+[node name="SelectDatasetDtreeButton" type="Button" parent="HBoxContainer/VBoxContainer" unique_id=1479662911]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Seleccionar Dataset"
+
+[node name="TargetScrollContainerDtree" parent="HBoxContainer" unique_id=1226361611 instance=ExtResource("3_as08i")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+
+[node name="TargetSelectorDtree" type="VBoxContainer" parent="HBoxContainer/TargetScrollContainerDtree" unique_id=309352907]
+unique_name_in_owner = true
+layout_mode = 2

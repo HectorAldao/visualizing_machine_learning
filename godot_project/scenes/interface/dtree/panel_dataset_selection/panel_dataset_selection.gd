@@ -5,12 +5,13 @@ extends PanelContainer
 @export var color_error: Color
 
 
-@onready var hboxcontainer: HBoxContainer = $VBoxContainer/HBoxContainer
-@onready var entrenar_button: Button = $VBoxContainer/Button
-@onready var informative_text: Label = $VBoxContainer/PanelContainer/Label
+@onready var hboxcontainer: HBoxContainer = %DatasetsDtreeHBoxContainer
+@onready var entrenar_button: Button = %SelectDatasetDtreeButton
+@onready var informative_text: Label = %InformativeTextDtree
+@onready var target_selector: VBoxContainer = %TargetSelectorDtree
+@onready var target_scroll_container: ScrollContainerV2 = %TargetScrollContainerDtree
 
 
-const posible_y_column_names: Array[String] = ["class", "Class", "y", "Y", "label", "Label"]
 const DICT_OF_DATASETS: Dictionary = \
 		{"Frutas": [
 		[
@@ -64,12 +65,17 @@ const DICT_OF_DATASETS: Dictionary = \
 var selected_option: String
 var datast_info: Array[Dictionary]
 var attrs_info: Array[String]
+var target_attrs_info: Array[String]
+var csv_display_name: String = ""
+var csv_headers: Array[String] = []
+var csv_raw_data: Array[Dictionary] = []
 var _web_csv_callback: Variant
 
 
 func _ready() -> void:
 
 	entrenar_button.disabled = true
+	target_scroll_container.visible = false
 	entrenar_button.pressed.connect(_on_entrenar_button_pressed)
 
 	for button: Button in hboxcontainer.get_children():
@@ -91,12 +97,15 @@ func _on_button_pressed(option: String):
 func _on_dataset_selected():
 	match selected_option:
 		"Cargar\nCsv":
+			_reset_csv_target_selector()
 			_load_csv()
 		_:
+			_reset_csv_target_selector()
 			informative_text.text = "Se seleccionó el dataset %s " % selected_option
 			informative_text.label_settings.font_color = color_good
 			datast_info = safe_get_array_of_dicts(DICT_OF_DATASETS[selected_option][0])
 			attrs_info = safe_get_array_of_strings(DICT_OF_DATASETS[selected_option][1])
+			target_attrs_info = _get_target_attrs_from_inputs(datast_info, attrs_info)
 			entrenar_button.disabled = false
 
 
@@ -197,12 +206,16 @@ func _on_web_csv_loaded(args: Array) -> void:
 
 	file.store_string(csv_text)
 	file.close()
-	_parse_csv(temp_path)
+	var display_name := "dataset.csv"
+	if args.size() >= 2 and not str(args[1]).is_empty():
+		display_name = str(args[1])
+
+	_parse_csv(temp_path, display_name)
 
 
 ## Checks if the csv selected has the correct format
 ## and parses it to the corresponding file type
-func _parse_csv(file_path):
+func _parse_csv(file_path: String, display_name: String = ""):
 	var file = FileAccess.open(file_path, FileAccess.READ)
 
 	if file == null:
@@ -214,6 +227,12 @@ func _parse_csv(file_path):
 
 	# Get columns
 	var headers = safe_get_array_of_strings(file.get_csv_line() as Array)
+	if headers.size() < 2:
+		file.close()
+		informative_text.text = "El CSV debe tener al menos dos columnas."
+		informative_text.label_settings.font_color = color_error
+		entrenar_button.disabled = true
+		return
 
 	var data_array: Array[Dictionary] = []
 
@@ -234,16 +253,112 @@ func _parse_csv(file_path):
 
 	file.close()
 
-	for col_name in posible_y_column_names:
-		if headers.has(col_name):
-			headers.erase(col_name)
-			break  # Ensuring that only one column is deleted
+	if data_array.is_empty():
+		informative_text.text = "El dataset no contiene filas."
+		informative_text.label_settings.font_color = color_error
+		entrenar_button.disabled = true
+		return
 
-	informative_text.text = "CSV cargado correctamente: %d datos" % data_array.size()
+	if display_name.is_empty():
+		display_name = file_path.get_file()
+
+	csv_raw_data = data_array
+	csv_headers = headers
+	csv_display_name = display_name
+	_show_csv_target_selector(csv_headers)
+
+
+func _reset_csv_target_selector() -> void:
+	target_scroll_container.visible = false
+	for child in target_selector.get_children():
+		target_selector.remove_child(child)
+		child.queue_free()
+
+	csv_display_name = ""
+	csv_headers = []
+	csv_raw_data = []
+	target_attrs_info = []
+	entrenar_button.disabled = true
+
+
+func _show_csv_target_selector(headers: Array[String]) -> void:
+	target_scroll_container.visible = true
+	for child in target_selector.get_children():
+		target_selector.remove_child(child)
+		child.queue_free()
+
+	var select_target_variable_label: Label = Label.new()
+	select_target_variable_label.text = "Seleccione Variable Objetivo"
+	target_selector.add_child(select_target_variable_label)
+
+	for header in headers:
+		var check_button := CheckButton.new()
+		check_button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		check_button.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		check_button.text = header
+		check_button.toggled.connect(_on_target_check_toggled.bind(check_button))
+		target_selector.add_child(check_button)
+
+	informative_text.text = "Seleccione Variable Objetivo"
 	informative_text.label_settings.font_color = color_good
-	datast_info = data_array
-	attrs_info = headers
+	entrenar_button.disabled = true
+
+
+func _on_target_check_toggled(button_pressed: bool, toggled_button: CheckButton) -> void:
+	if button_pressed:
+		for child in target_selector.get_children():
+			if child is CheckButton and child != toggled_button:
+				child.set_pressed_no_signal(false)
+
+	var selected_targets: Array[String] = _get_selected_target_columns()
+	if selected_targets.is_empty():
+		informative_text.text = "Seleccione Variable Objetivo"
+		informative_text.label_settings.font_color = color_good
+		entrenar_button.disabled = true
+		return
+
+	var input_attrs := _get_input_attrs_from_targets(csv_headers, selected_targets)
+	if input_attrs.is_empty():
+		informative_text.text = "Debe quedar al menos un atributo de entrada."
+		informative_text.label_settings.font_color = color_error
+		entrenar_button.disabled = true
+		return
+
+	datast_info = safe_get_array_of_dicts(csv_raw_data)
+	attrs_info = input_attrs
+	target_attrs_info = selected_targets
+	informative_text.text = "CSV cargado correctamente: %s\n%d datos" % [csv_display_name, datast_info.size()]
+	informative_text.label_settings.font_color = color_good
 	entrenar_button.disabled = false
+
+
+func _get_selected_target_columns() -> Array[String]:
+	var selected_targets: Array[String] = []
+	for child in target_selector.get_children():
+		if child is CheckButton and child.button_pressed:
+			selected_targets.append(child.text)
+	return selected_targets
+
+
+func _get_input_attrs_from_targets(headers: Array[String], target_cols: Array[String]) -> Array[String]:
+	var input_attrs: Array[String] = []
+	for header in headers:
+		if not target_cols.has(header):
+			input_attrs.append(header)
+	return input_attrs
+
+
+func _get_target_attrs_from_inputs(data_array: Array[Dictionary], input_attrs: Array[String]) -> Array[String]:
+	var target_attrs: Array[String] = []
+	if data_array.is_empty():
+		return target_attrs
+
+	for key in data_array[0].keys():
+		var key_text := str(key)
+		if not input_attrs.has(key_text):
+			target_attrs.append(key_text)
+
+	return target_attrs
 
 
 ## Takes an Array and ensures that it is returned as and Array[Dictionay]
@@ -257,7 +372,7 @@ func safe_get_array_of_dicts(data: Array) -> Array[Dictionary]:
 	if data is Array:
 		for item in data:
 			if item is Dictionary:
-				result.append(item)
+				result.append(item.duplicate(true))
 			else:
 				print("An element on the so called \"Array of Dictionary\" isn't a Dictionary: {item}")
 
