@@ -64,8 +64,7 @@ Las etiquetas que llegan a este nodo son {lista_etiquetas}.",
 "{texto_decision_nodo}"],
 
 	"eval_data":
-	["Has seleccionado un dato de evaluación.
-Su etiqueta real es '{etiqueta}'.",
+	["La etiqueta real es '{etiqueta}'.",
 "Sus características son:
 {caracteristicas}"]
 }

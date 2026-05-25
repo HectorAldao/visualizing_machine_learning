@@ -70,14 +70,16 @@ func _get_selection_details() -> Dictionary:
 
 func _apply_label_color() -> void:
 	var label_name := _get_label_name()
+	var hash_value := _hash_string(label_name)
 	label_color = _get_color_for_label(label_name)
 	label_hex_color = label_color.to_html(false)
+	var saturated_border_color := Color.from_hsv(label_color.h, 1.0, label_color.v, label_color.a)
 
 	begin_bulk_theme_override()
-	_add_button_style_override(&"normal", label_color)
-	_add_button_style_override(&"hover", label_color.lightened(0.12))
-	_add_button_style_override(&"pressed", label_color.darkened(0.12))
-	_add_button_style_override(&"hover_pressed", label_color.darkened(0.06))
+	_add_button_style_override(&"normal", label_color, saturated_border_color, hash_value)
+	_add_button_style_override(&"hover", label_color.lightened(0.12), saturated_border_color, hash_value)
+	_add_button_style_override(&"pressed", label_color.darkened(0.12), saturated_border_color, hash_value)
+	_add_button_style_override(&"hover_pressed", label_color.darkened(0.06), saturated_border_color, hash_value)
 	end_bulk_theme_override()
 
 
@@ -110,10 +112,36 @@ func _get_color_for_label(label_name: String) -> Color:
 	return Color.from_hsv(hue, saturation, value)
 
 
-func _add_button_style_override(style_name: StringName, color: Color) -> void:
+func _add_button_style_override(style_name: StringName, color: Color, border_color: Color, hash_value: int) -> void:
 	var stylebox := _get_base_button_stylebox()
 	stylebox.bg_color = color
+	_apply_label_shape_variation(stylebox, border_color, hash_value)
 	add_theme_stylebox_override(style_name, stylebox)
+
+
+func _apply_label_shape_variation(stylebox: StyleBoxFlat, border_color: Color, hash_value: int) -> void:
+	stylebox.border_color = border_color
+	stylebox.corner_detail = 1 + int((hash_value >> 24) % 3)
+
+	match int((hash_value >> 26) % 4):
+		0:
+			stylebox.corner_radius_top_left = 25
+		1:
+			stylebox.corner_radius_top_right = 25
+		2:
+			stylebox.corner_radius_bottom_left = 25
+		3:
+			stylebox.corner_radius_bottom_right = 25
+
+	match int((hash_value >> 28) % 4):
+		0:
+			stylebox.expand_margin_top = 3.0
+		1:
+			stylebox.expand_margin_right = 3.0
+		2:
+			stylebox.expand_margin_bottom = 3.0
+		3:
+			stylebox.expand_margin_left = 3.0
 
 
 func _get_base_button_stylebox() -> StyleBoxFlat:
