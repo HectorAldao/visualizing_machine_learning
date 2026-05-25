@@ -6,11 +6,11 @@ var label_column: String
 var label_color: Color
 var label_hex_color: String
 
-const SATURATION_MIN: float = 1.0 / 3.0
-const SATURATION_MAX: float = 2.0 / 3.0
-const VALUE_MIN: float = 1.0 / 3.0
-const VALUE_MAX: float = 2.0 / 3.0
-const HUE_WINDOW: float = 1.0 / 18.0
+const SATURATION_MIN: float = 1.75 / 3.0
+const SATURATION_MAX: float = 2.75 / 3.0
+const VALUE_MIN: float = 1.75 / 3.0
+const VALUE_MAX: float = 2.75 / 3.0
+const HUE_WINDOW: float = 2.0 / 18.0
 const LABEL_COLOR_NAMES: Dictionary = {
 	"red": 0.0,
 	"rojo": 0.0,
