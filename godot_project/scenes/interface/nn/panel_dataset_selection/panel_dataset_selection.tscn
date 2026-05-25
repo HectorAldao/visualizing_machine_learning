@@ -13,8 +13,8 @@ font_size = 18
 offset_right = 392.0
 offset_bottom = 439.0
 script = ExtResource("1_omw0a")
-color_good = Color(0, 0.54901963, 0, 1)
-color_error = Color(0.6666667, 0, 0, 1)
+color_good = Color(0.40784314, 0.75686276, 0.49803922, 1)
+color_error = Color(0.8352941, 0.34901962, 0.29803923, 1)
 
 [node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=337586797]
 layout_mode = 2

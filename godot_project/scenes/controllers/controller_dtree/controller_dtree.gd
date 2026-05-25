@@ -341,7 +341,13 @@ func _on_evaluate_button_pressed() -> void:
 	dtree.                visible = false
 
 	# Here is where there must be a signal "evaluate"
-	panel_dataset_selection. visible = true
+	var target_attrs: Array[String] = []
+	if algorithm and not algorithm.label_column.is_empty():
+		target_attrs.append(algorithm.label_column)
+	if panel_dataset_selection.has_method("show_for_inference"):
+		panel_dataset_selection.show_for_inference(attributes, target_attrs)
+	else:
+		panel_dataset_selection.visible = true
 
 
 func _start_evaluation(dataset_to_evaluate: Array[Dictionary]) -> void:
