@@ -8,6 +8,7 @@ extends Node
 
 # dtree
 signal dtree_node_selected(details: Dictionary)
+signal dtree_eval_data_selected(details: Dictionary)
 
 
 

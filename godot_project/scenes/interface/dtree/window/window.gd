@@ -61,7 +61,13 @@ En este caso '{etiqueta_mayoritaria}'."],
 Por esta partición han bajado {numero_de_datos} datos{texto_rama}.
 La pureza de este nodo es {pureza_nodo}: {numero_etiqueta_mayoritaria} de {numero_de_datos} datos tienen la etiqueta mayoritaria '{etiqueta_mayoritaria}'.
 Las etiquetas que llegan a este nodo son {lista_etiquetas}.",
-"{texto_decision_nodo}"]
+"{texto_decision_nodo}"],
+
+	"eval_data":
+	["Has seleccionado un dato de evaluación.
+Su etiqueta real es '{etiqueta}'.",
+"Sus características son:
+{caracteristicas}"]
 }
 
 
@@ -76,6 +82,8 @@ func _ready() -> void:
 	label1.add_theme_font_size_override("font_size", font_size)
 	if not SignalsObserver.dtree_node_selected.is_connected(update_node_partition_text):
 		SignalsObserver.dtree_node_selected.connect(update_node_partition_text)
+	if not SignalsObserver.dtree_eval_data_selected.is_connected(update_eval_data_text):
+		SignalsObserver.dtree_eval_data_selected.connect(update_eval_data_text)
 
 
 func update_current_text(details_dict: Dictionary) -> void:
@@ -128,6 +136,18 @@ func update_node_partition_text(details_dict: Dictionary) -> void:
 
 	label0.text = template_texts["node_partition"][0].format(details_dict)
 	label1.text = template_texts["node_partition"][1].format(details_dict)
+
+
+func update_eval_data_text(details_dict: Dictionary) -> void:
+	details_dict = details_dict.duplicate(true)
+	_clean_lists(details_dict)
+
+	var chart = vboxcontainer.get_node_or_null("BarsChart")
+	if chart:
+		vboxcontainer.remove_child(chart)
+
+	label0.text = template_texts["eval_data"][0].format(details_dict)
+	label1.text = template_texts["eval_data"][1].format(details_dict)
 
 
 func _prepare_partition_details(details_dict: Dictionary) -> void:

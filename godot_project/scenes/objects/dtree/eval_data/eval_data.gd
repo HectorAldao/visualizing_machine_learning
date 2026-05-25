@@ -39,8 +39,33 @@ static func newone(data_dictionary: Dictionary, new_label_column: String = "") -
 	return evaldata
 
 
+func _ready() -> void:
+	if not pressed.is_connected(_on_pressed):
+		pressed.connect(_on_pressed)
+
+
 func get_label_hex_color() -> String:
 	return label_hex_color
+
+
+func _on_pressed() -> void:
+	SignalsObserver.dtree_eval_data_selected.emit(_get_selection_details())
+
+
+func _get_selection_details() -> Dictionary:
+	var characteristics := data_dict.duplicate(true)
+	var label_value: Variant = ""
+
+	if label_column != "" and characteristics.has(label_column):
+		label_value = characteristics[label_column]
+		characteristics.erase(label_column)
+	else:
+		label_value = _get_label_name()
+
+	return {
+		"etiqueta": str(label_value),
+		"caracteristicas": characteristics,
+	}
 
 
 func _apply_label_color() -> void:

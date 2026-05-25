@@ -4,7 +4,7 @@
 [ext_resource type="Theme" uid="uid://bod5xl2f1kix4" path="res://themes/eval_data_theme/eval_data_theme.tres" id="2_7blmg"]
 
 [node name="EvalData" type="Button" unique_id=603986633]
-custom_minimum_size = Vector2(20, 20)
+custom_minimum_size = Vector2(25, 25)
 offset_right = 20.0
 offset_bottom = 20.0
 theme = ExtResource("2_7blmg")
