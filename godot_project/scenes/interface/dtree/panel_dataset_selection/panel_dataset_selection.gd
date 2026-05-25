@@ -16,6 +16,8 @@ const DICT_OF_DATASETS: Dictionary = \
 		[
 			# Instancias originales
 			{"color": "red", "shape": "round", "size": "big", "class": "apple"},
+			{"color": "red", "shape": "round", "size": "big", "class": "apple"},
+			{"color": "red", "shape": "round", "size": "big", "class": "apple"},
 			{"color": "green", "shape": "round", "size": "big", "class": "apple"},
 			{"color": "yellow", "shape": "long", "size": "medium", "class": "banana"},
 			{"color": "green", "shape": "long", "size": "medium", "class": "banana"},
