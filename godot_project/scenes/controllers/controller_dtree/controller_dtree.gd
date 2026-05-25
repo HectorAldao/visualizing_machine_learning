@@ -356,7 +356,7 @@ func _start_evaluation(dataset_to_evaluate: Array[Dictionary]) -> void:
 
 	var array_of_evaldatas: Array[EvalData] = []
 	for d in dataset_to_evaluate:
-		array_of_evaldatas.append(EvalData.newone(d))
+		array_of_evaldatas.append(EvalData.newone(d, algorithm.label_column))
 
 	eval_data_container = EvalDataContainer.newone(dtree, array_of_evaldatas)
 	dtree.nodes_container.add_child(eval_data_container)
