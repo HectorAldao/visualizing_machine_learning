@@ -5,10 +5,11 @@ extends PanelContainer
 @export var color_error: Color
 
 
-@onready var hboxcontainer: HBoxContainer = $VBoxContainer/HBoxContainer
-@onready var entrenar_button: Button = $VBoxContainer/Button
-@onready var informative_text: Label = $VBoxContainer/PanelContainer/Label
-@onready var target_selector: HBoxContainer = $VBoxContainer/ScrollContainer/TargetSelector
+@onready var hboxcontainer: HBoxContainer = %DatasetsNnHBoxContainer
+@onready var entrenar_button: Button = %SelectDatasetNnButton
+@onready var informative_text: Label = %InformativeTextNn
+@onready var target_selector: VBoxContainer = %TargetSelectorNn
+@onready var target_scroll_container: ScrollContainerV2 = %TargetScrollContainerNn
 
 
 const DICT_OF_DATASETS: Dictionary = {
@@ -65,6 +66,7 @@ var _required_inference_target_attrs: Array[String] = []
 func _ready() -> void:
 
 	entrenar_button.disabled = true
+	target_scroll_container.visible = false
 	entrenar_button.pressed.connect(_on_entrenar_button_pressed)
 
 	for button: Button in hboxcontainer.get_children():
@@ -574,6 +576,7 @@ func _infer_column_types(data_array: Array[Dictionary], columns: Array[String]) 
 
 
 func _reset_csv_target_selector() -> void:
+	target_scroll_container.visible = false
 	for child in target_selector.get_children():
 		target_selector.remove_child(child)
 		child.queue_free()
@@ -589,15 +592,21 @@ func _reset_csv_target_selector() -> void:
 
 
 func _show_csv_target_selector(headers: Array[String]) -> void:
+	target_scroll_container.visible = true
 	for child in target_selector.get_children():
 		target_selector.remove_child(child)
 		child.queue_free()
 
 	csv_headers = headers.duplicate()
 	csv_column_types = _infer_column_types(csv_raw_data, csv_headers)
-
+	
+	var select_target_variable_label: Label = Label.new()
+	select_target_variable_label.text = "Seleccione Variable/s objetivo"
+	target_selector.add_child(select_target_variable_label)
 	for header in csv_headers:
 		var check_button := CheckButton.new()
+		check_button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		check_button.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		check_button.text = header
 		check_button.toggled.connect(_on_target_check_toggled)
 		target_selector.add_child(check_button)

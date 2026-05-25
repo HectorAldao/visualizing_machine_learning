@@ -10,54 +10,65 @@ font_size = 18
 [sub_resource type="LabelSettings" id="LabelSettings_e84v4"]
 
 [node name="PanelDatasetSelection" type="PanelContainer" unique_id=18738779]
+offset_right = 392.0
+offset_bottom = 439.0
 script = ExtResource("1_omw0a")
 color_good = Color(0, 0.54901963, 0, 1)
 color_error = Color(0.6666667, 0, 0, 1)
 
-[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=396635310]
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=337586797]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer" unique_id=56945098]
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer" unique_id=396635310]
+layout_mode = 2
+
+[node name="TitleDatasetSelectionNn" type="Label" parent="HBoxContainer/VBoxContainer" unique_id=56945098]
 layout_mode = 2
 text = "Seleccione dataset"
 label_settings = SubResource("LabelSettings_djbkb")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer" unique_id=2143523499]
+[node name="DatasetsNnHBoxContainer" type="HBoxContainer" parent="HBoxContainer/VBoxContainer" unique_id=2143523499]
+unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 
-[node name="Button1" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=770400233]
+[node name="Button1" type="Button" parent="HBoxContainer/VBoxContainer/DatasetsNnHBoxContainer" unique_id=770400233]
 custom_minimum_size = Vector2(120, 250)
 layout_mode = 2
 text = "EnemyAI"
 
-[node name="Button3" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=223743171]
+[node name="Button3" type="Button" parent="HBoxContainer/VBoxContainer/DatasetsNnHBoxContainer" unique_id=223743171]
 custom_minimum_size = Vector2(120, 250)
 layout_mode = 2
 text = "Cultivos"
 
-[node name="Button0" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=577351967]
+[node name="Button0" type="Button" parent="HBoxContainer/VBoxContainer/DatasetsNnHBoxContainer" unique_id=577351967]
 custom_minimum_size = Vector2(120, 250)
 layout_mode = 2
 text = "Cargar
 Csv"
 
-[node name="ScrollContainer" parent="VBoxContainer" unique_id=1226361611 instance=ExtResource("2_djbkb")]
-custom_minimum_size = Vector2(0, 51.91)
-layout_mode = 2
-is_horizontal = true
-
-[node name="TargetSelector" type="HBoxContainer" parent="VBoxContainer/ScrollContainer" unique_id=709835528]
-layout_mode = 2
-
-[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer" unique_id=1748401210]
+[node name="PanelContainer" type="PanelContainer" parent="HBoxContainer/VBoxContainer" unique_id=1748401210]
 layout_mode = 2
 theme_override_styles/panel = ExtResource("2_vqiwo")
 
-[node name="Label" type="Label" parent="VBoxContainer/PanelContainer" unique_id=1941738268]
+[node name="InformativeTextNn" type="Label" parent="HBoxContainer/VBoxContainer/PanelContainer" unique_id=1941738268]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Aún no se ha seleccionado dataset"
 label_settings = SubResource("LabelSettings_e84v4")
 
-[node name="Button" type="Button" parent="VBoxContainer" unique_id=181250148]
+[node name="SelectDatasetNnButton" type="Button" parent="HBoxContainer/VBoxContainer" unique_id=181250148]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Seleccionar Dataset"
+
+[node name="TargetScrollContainerNn" parent="HBoxContainer" unique_id=1226361611 instance=ExtResource("2_djbkb")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+
+[node name="TargetSelectorNn" type="VBoxContainer" parent="HBoxContainer/TargetScrollContainerNn" unique_id=1479466481]
+unique_name_in_owner = true
+layout_mode = 2

@@ -2,6 +2,7 @@
 
 [ext_resource type="StyleBox" uid="uid://cx6vv3aydlb2v" path="res://themes/default_panel_container_stylebox/default_panel_container_stylebox.tres" id="1_cevo3"]
 [ext_resource type="Script" uid="uid://22cw3hlh71pk" path="res://scenes/interface/dtree/panel_dataset_selection/panel_dataset_selection.gd" id="2_av435"]
+[ext_resource type="PackedScene" uid="uid://c8awyfuu7i3ih" path="res://scenes/interface/scroll_container/scroll_container.tscn" id="3_as08i"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_cevo3"]
 font_size = 18
@@ -24,10 +25,6 @@ layout_mode = 2
 text = "Seleccione dataset"
 label_settings = SubResource("LabelSettings_cevo3")
 
-[node name="OptionButton" type="OptionButton" parent="VBoxContainer" unique_id=1849636017]
-visible = false
-layout_mode = 2
-
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer" unique_id=86943782]
 layout_mode = 2
 
@@ -46,6 +43,14 @@ custom_minimum_size = Vector2(150, 250)
 layout_mode = 2
 text = "Cargar
 Csv"
+
+[node name="ScrollContainer" parent="VBoxContainer" unique_id=1226361611 instance=ExtResource("3_as08i")]
+custom_minimum_size = Vector2(0, 51.91)
+layout_mode = 2
+is_horizontal = true
+
+[node name="TargetSelector" type="HBoxContainer" parent="VBoxContainer/ScrollContainer" unique_id=309352907]
+layout_mode = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="VBoxContainer" unique_id=1205582973]
 layout_mode = 2
