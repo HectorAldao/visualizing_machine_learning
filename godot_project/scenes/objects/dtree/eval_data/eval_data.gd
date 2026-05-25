@@ -1,4 +1,4 @@
-class_name EvalData extends Node2D
+class_name EvalData extends Button
 
 
 var data_dict: Dictionary

@@ -1,4 +1,4 @@
-class_name EvalDataContainer extends Node2D
+class_name EvalDataContainer extends Control
 
 
 #var dtree: DTreeLogical
@@ -63,10 +63,12 @@ func _drop_one_data() -> void:
 
 	# Get a data do drop and add it to the scene as child
 	var evaldata: EvalData = data.pop_front()
-	add_child(evaldata)
-
 	if evaldata == null:
 		return
+
+	add_child(evaldata)
+	evaldata.reset_size()
+
 	if nodes.is_empty():
 		return
 
@@ -91,13 +93,15 @@ func _drop_one_data() -> void:
 		var current_node: Dictionary = nodes[current_node_id]
 		var data_count: int = int(current_node.get("data_count", 0))
 		var node_label: String = str(current_node.get("label", ""))
-		var current_position: Vector2 = _get_evaldata_target_position(current_node, evaldata.position, data_count)
+		var current_center: Vector2 = _get_evaldata_target_center(current_node, _get_evaldata_center(evaldata), data_count)
+		var current_position: Vector2 = _get_evaldata_position_from_center(evaldata, current_center)
 		current_node["data_count"] = data_count + 1
 		var tween := create_tween()
 		tween.tween_property(evaldata, "position", current_position, DROP_TWEEN_DURATION) \
 			.set_trans(Tween.TRANS_SINE) \
 			.set_ease(Tween.EASE_IN_OUT)
 		await tween.finished
+		_expand_scroll_to_include_evaldata(evaldata)
 
 		if node_label != "":
 			return
@@ -123,11 +127,36 @@ func _drop_one_data() -> void:
 		current_node_id = next_node_id
 
 
-func _get_evaldata_target_position(node_info: Dictionary, fallback_position: Vector2, stack_index: int) -> Vector2:
-	var node_position: Vector2 = node_info.get("position", fallback_position)
+func _get_evaldata_target_center(node_info: Dictionary, fallback_center: Vector2, stack_index: int) -> Vector2:
+	var node_position: Vector2 = node_info.get("position", fallback_center)
 	var node_label: String = str(node_info.get("label", ""))
 	if node_label == "":
 		return node_position
 
 	var node_size: Vector2 = node_info.get("size", Vector2.ZERO)
 	return node_position + Vector2(node_size.x * 0.5, node_size.y + LEAF_DATA_MARGIN + stack_index * LEAF_DATA_SPACING)
+
+
+func _get_evaldata_center(evaldata: EvalData) -> Vector2:
+	return evaldata.position + evaldata.size * 0.5
+
+
+func _get_evaldata_position_from_center(evaldata: EvalData, center: Vector2) -> Vector2:
+	return center - evaldata.size * 0.5
+
+
+func _expand_scroll_to_include_evaldata(evaldata: EvalData) -> void:
+	var dtree := _get_dtree()
+	if dtree == null or not dtree.has_method("expand_canvas_to_include_rect"):
+		return
+
+	dtree.expand_canvas_to_include_rect(Rect2(evaldata.position, evaldata.size))
+
+
+func _get_dtree() -> DTreeLogical:
+	var current := get_parent()
+	while current != null:
+		if current is DTreeLogical:
+			return current
+		current = current.get_parent()
+	return null

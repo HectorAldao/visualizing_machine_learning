@@ -2,5 +2,5 @@
 
 [ext_resource type="Script" uid="uid://bqp25yafo2nts" path="res://scenes/objects/dtree/eval_data_container/eval_data_container.gd" id="1_qvin8"]
 
-[node name="EvalDataContainer" type="Node2D" unique_id=243254374]
+[node name="EvalDataContainer" type="Control" unique_id=243254374]
 script = ExtResource("1_qvin8")

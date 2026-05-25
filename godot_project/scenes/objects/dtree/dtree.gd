@@ -106,6 +106,16 @@ func update_canvas_size_and_center() -> void:
 		scroll_container.set_deferred("scroll_vertical", target_v)
 
 
+func expand_canvas_to_include_rect(local_rect: Rect2, margin: float = 100.0) -> void:
+	var required_size := Vector2(
+		max(custom_minimum_size.x, local_rect.position.x + local_rect.size.x + margin),
+		max(custom_minimum_size.y, local_rect.position.y + local_rect.size.y + margin)
+	)
+
+	if required_size != custom_minimum_size:
+		custom_minimum_size = required_size
+
+
 func _apply_positions() -> void:
 	print("_apply_positions called")
 	var min_x = INF
