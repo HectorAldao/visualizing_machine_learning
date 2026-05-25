@@ -67,8 +67,8 @@ Las etiquetas que llegan a este nodo son {lista_etiquetas}.",
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	mouse_filter = Control.MOUSE_FILTER_STOP
-	scroll_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	scroll_container.mouse_filter = Control.MOUSE_FILTER_STOP
 	scroll_container.mouse_force_pass_scroll_events = false
 	_ignore_mouse_input_for_window_content()
 	
@@ -182,8 +182,10 @@ func _clean_lists(dict: Dictionary) -> void:
 
 
 func _ignore_mouse_input_for_window_content() -> void:
-	_set_mouse_filter_recursive(scroll_container, Control.MOUSE_FILTER_IGNORE)
-	mouse_filter = Control.MOUSE_FILTER_STOP
+	for child in scroll_container.get_children():
+		_set_mouse_filter_recursive(child, Control.MOUSE_FILTER_IGNORE)
+	scroll_container.mouse_filter = Control.MOUSE_FILTER_STOP
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
 func _set_mouse_filter_recursive(node: Node, filter: Control.MouseFilter) -> void:
