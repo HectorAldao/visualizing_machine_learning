@@ -4,6 +4,9 @@ class_name EvalDataContainer extends Control
 #var dtree: DTreeLogical
 var data: Array[EvalData]
 var nodes: Dictionary[int, Dictionary]  # keys() = "position", "size", "attribute", "label", "branch", "data_count"
+var active_evaldata: EvalData = null
+var active_node_id: int = -1
+var is_drop_tween_running: bool = false
 
 const DROP_TWEEN_DURATION: float = 0.35
 const LEAF_DATA_MARGIN: float = 12.0
@@ -56,75 +59,103 @@ static func newone(new_dtree: DTreeLogical, new_data: Array[EvalData]) -> EvalDa
 
 func _drop_one_data() -> void:
 
-	# If all the data was droped, inform and do nothing
-	if data.is_empty():
-		SignalsObserver.all_data_droped.emit()
+	if is_drop_tween_running:
 		return
-
-	# Get a data do drop and add it to the scene as child
-	var evaldata: EvalData = data.pop_front()
-	if evaldata == null:
-		return
-
-	add_child(evaldata)
-	evaldata.reset_size()
 
 	if nodes.is_empty():
 		return
 
+	if active_evaldata == null:
+		# If all the data was droped, inform and do nothing
+		if data.is_empty():
+			SignalsObserver.all_data_droped.emit()
+			return
 
-	# Check if there is root
-	var root_id: int = -1
+		var root_id: int = _get_root_id()
+		if root_id == -1:
+			return
+
+		# Get a data do drop and add it to the scene as child
+		active_evaldata = data.pop_front()
+		if active_evaldata == null:
+			return
+
+		add_child(active_evaldata)
+		active_evaldata.reset_size()
+		active_node_id = root_id
+		await _move_active_evaldata_to_node(active_node_id)
+		_clear_active_evaldata_if_path_ended()
+		return
+
+	var next_node_id: int = _get_next_node_id(active_node_id, active_evaldata)
+	if next_node_id == -1:
+		_clear_active_evaldata()
+		return
+
+	active_node_id = next_node_id
+	await _move_active_evaldata_to_node(active_node_id)
+	_clear_active_evaldata_if_path_ended()
+
+
+func _get_root_id() -> int:
 	for node_id in nodes.keys():
 		var node_info: Dictionary = nodes[node_id]
 		if int(node_info.get("depth", 0)) == 0:
-			root_id = int(node_id)
-			break
+			return int(node_id)
+	return -1
 
-	if root_id == -1:
+
+func _move_active_evaldata_to_node(node_id: int) -> void:
+	if active_evaldata == null or not nodes.has(node_id):
 		return
 
-	# Explore the tree to determine the path
-	var current_node_id: int = root_id
-	while true:
-		if not nodes.has(current_node_id):
-			return
+	var current_node: Dictionary = nodes[node_id]
+	var data_count: int = int(current_node.get("data_count", 0))
+	var current_center: Vector2 = _get_evaldata_target_center(current_node, _get_evaldata_center(active_evaldata), data_count)
+	var current_position: Vector2 = _get_evaldata_position_from_center(active_evaldata, current_center)
+	current_node["data_count"] = data_count + 1
+	is_drop_tween_running = true
+	var tween := create_tween()
+	tween.tween_property(active_evaldata, "position", current_position, DROP_TWEEN_DURATION) \
+		.set_trans(Tween.TRANS_SINE) \
+		.set_ease(Tween.EASE_IN_OUT)
+	await tween.finished
+	is_drop_tween_running = false
+	_expand_scroll_to_include_evaldata(active_evaldata)
 
-		var current_node: Dictionary = nodes[current_node_id]
-		var data_count: int = int(current_node.get("data_count", 0))
-		var node_label: String = str(current_node.get("label", ""))
-		var current_center: Vector2 = _get_evaldata_target_center(current_node, _get_evaldata_center(evaldata), data_count)
-		var current_position: Vector2 = _get_evaldata_position_from_center(evaldata, current_center)
-		current_node["data_count"] = data_count + 1
-		var tween := create_tween()
-		tween.tween_property(evaldata, "position", current_position, DROP_TWEEN_DURATION) \
-			.set_trans(Tween.TRANS_SINE) \
-			.set_ease(Tween.EASE_IN_OUT)
-		await tween.finished
-		_expand_scroll_to_include_evaldata(evaldata)
 
-		if node_label != "":
-			return
+func _get_next_node_id(current_node_id: int, evaldata: EvalData) -> int:
+	if evaldata == null or not nodes.has(current_node_id):
+		return -1
 
-		var node_attribute: String = str(current_node.get("attribute", ""))
-		if node_attribute == "" or not evaldata.data_dict.has(node_attribute):
-			return
+	var current_node: Dictionary = nodes[current_node_id]
+	var node_label: String = str(current_node.get("label", ""))
+	if node_label != "":
+		return -1
 
-		var desired_branch_value = evaldata.data_dict[node_attribute]
-		var next_node_id: int = -1
+	var node_attribute: String = str(current_node.get("attribute", ""))
+	if node_attribute == "" or not evaldata.data_dict.has(node_attribute):
+		return -1
 
-		for candidate_id in nodes.keys():
-			var candidate_node: Dictionary = nodes[candidate_id]
-			if int(candidate_node.get("parent_id", -1)) != current_node_id:
-				continue
-			if candidate_node.get("branch", null) == desired_branch_value:
-				next_node_id = int(candidate_id)
-				break
+	var desired_branch_value = evaldata.data_dict[node_attribute]
+	for candidate_id in nodes.keys():
+		var candidate_node: Dictionary = nodes[candidate_id]
+		if int(candidate_node.get("parent_id", -1)) != current_node_id:
+			continue
+		if candidate_node.get("branch", null) == desired_branch_value:
+			return int(candidate_id)
 
-		if next_node_id == -1:
-			return
+	return -1
 
-		current_node_id = next_node_id
+
+func _clear_active_evaldata_if_path_ended() -> void:
+	if _get_next_node_id(active_node_id, active_evaldata) == -1:
+		_clear_active_evaldata()
+
+
+func _clear_active_evaldata() -> void:
+	active_evaldata = null
+	active_node_id = -1
 
 
 func _get_evaldata_target_center(node_info: Dictionary, fallback_center: Vector2, stack_index: int) -> Vector2:
