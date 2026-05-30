@@ -11,6 +11,8 @@ extends PanelContainer
 @export var scroll_speed: int = 30
 var is_middle_mouse_dragging: bool = false
 var last_mouse_position: Vector2 = Vector2.ZERO
+var current_evaldata_instance_id: int = -1
+var current_evaldata_text: String = ""
 
 
 
@@ -66,7 +68,30 @@ Las etiquetas que llegan a este nodo son {lista_etiquetas}.",
 	"eval_data":
 	["La etiqueta real es '{etiqueta}'.",
 "Sus características son:
-{caracteristicas}"]
+{caracteristicas}"],
+
+	"eval_data_current":
+	["El dato siendo evaluado tiene la etiqueta '{etiqueta}', y sus atributos son:
+{caracteristicas}"],
+
+	"eval_node_root":
+	["El dato entra por el nodo raíz.
+Este nodo divide usando el atributo '{atributo_division}'.
+En el dato actual, '{atributo_division}' vale '{valor_atributo}', así que bajará por la rama '{valor_atributo}'."],
+
+	"eval_node_spine":
+	["El dato llega a un nodo spine.
+Este nodo divide usando el atributo '{atributo_division}'.
+Como en el dato actual '{atributo_division}' vale '{valor_atributo}', el dato continuará por la rama '{valor_atributo}'."],
+
+	"eval_node_leaf_correct":
+	["El dato llega a un nodo hoja que clasifica como '{etiqueta_nodo}'.
+La etiqueta real del dato también es '{etiqueta_real}', así que la clasificación es correcta."],
+
+	"eval_node_leaf_wrong":
+	["El dato llega a un nodo hoja que clasifica como '{etiqueta_nodo}', pero su etiqueta real es '{etiqueta_real}'.
+Por lo tanto, la clasificación es incorrecta.
+{explicacion_error_clasificacion}"]
 }
 
 
@@ -83,6 +108,8 @@ func _ready() -> void:
 		SignalsObserver.dtree_node_selected.connect(update_node_partition_text)
 	if not SignalsObserver.dtree_eval_data_selected.is_connected(update_eval_data_text):
 		SignalsObserver.dtree_eval_data_selected.connect(update_eval_data_text)
+	if not SignalsObserver.dtree_eval_data_advanced.is_connected(update_eval_data_advanced_text):
+		SignalsObserver.dtree_eval_data_advanced.connect(update_eval_data_advanced_text)
 
 
 func update_current_text(details_dict: Dictionary) -> void:
@@ -147,6 +174,62 @@ func update_eval_data_text(details_dict: Dictionary) -> void:
 
 	label0.text = template_texts["eval_data"][0].format(details_dict)
 	label1.text = template_texts["eval_data"][1].format(details_dict)
+
+
+func update_eval_data_advanced_text(node_type: int, eval_data_info: Dictionary, node_info: Dictionary) -> void:
+	var chart = vboxcontainer.get_node_or_null("BarsChart")
+	if chart:
+		vboxcontainer.remove_child(chart)
+
+	var data_details: Dictionary = eval_data_info.duplicate(true)
+	var evaldata_instance_id: int = int(data_details.get("evaldata_instance_id", -1))
+	_clean_lists(data_details)
+	var evaldata_text: String = template_texts["eval_data_current"][0].format(data_details)
+	if current_evaldata_instance_id != evaldata_instance_id or label0.text != current_evaldata_text:
+		current_evaldata_instance_id = evaldata_instance_id
+		current_evaldata_text = evaldata_text
+		label0.text = evaldata_text
+
+	var node_details: Dictionary = node_info.duplicate(true)
+	_prepare_eval_node_details(node_type, eval_data_info, node_details)
+	_clean_lists(node_details)
+
+	match node_type:
+		Constants.DNODES.root:
+			label1.text = template_texts["eval_node_root"][0].format(node_details)
+		Constants.DNODES.spine:
+			label1.text = template_texts["eval_node_spine"][0].format(node_details)
+		Constants.DNODES.hoja:
+			if bool(node_details.get("clasificacion_correcta", false)):
+				label1.text = template_texts["eval_node_leaf_correct"][0].format(node_details)
+			else:
+				label1.text = template_texts["eval_node_leaf_wrong"][0].format(node_details)
+
+
+func _prepare_eval_node_details(node_type: int, eval_data_info: Dictionary, node_details: Dictionary) -> void:
+	if not node_details.has("atributo_division"):
+		node_details["atributo_division"] = node_details.get("attribute", "")
+	if not node_details.has("etiqueta_nodo"):
+		node_details["etiqueta_nodo"] = node_details.get("label", "")
+	if node_details.get("valor_atributo", null) == null:
+		node_details["valor_atributo"] = "sin valor"
+
+	if node_type != Constants.DNODES.hoja:
+		return
+
+	var etiqueta_real: String = str(eval_data_info.get("etiqueta", ""))
+	var etiqueta_nodo: String = str(node_details.get("etiqueta_nodo", ""))
+	node_details["etiqueta_real"] = etiqueta_real
+	node_details["clasificacion_correcta"] = etiqueta_real == etiqueta_nodo
+
+	if bool(node_details["clasificacion_correcta"]):
+		return
+
+	var pureza: float = float(node_details.get("pureza_nodo_valor", 0.0))
+	if pureza >= 1.0:
+		node_details["explicacion_error_clasificacion"] = "Este nodo es completamente puro: en los datos de entrenamiento que llegaron aquí todas las muestras tenían la etiqueta '%s'. Si este dato tiene otra etiqueta, significa que en los datos de entrenamiento no había ninguna muestra como esta." % etiqueta_nodo
+	else:
+		node_details["explicacion_error_clasificacion"] = "Este nodo no era completamente puro. Durante el entrenamiento llegaron muestras con distintas etiquetas, pero la etiqueta real '%s' no consiguió suficientes muestras como para superar a la etiqueta ganadora '%s'." % [etiqueta_real, etiqueta_nodo]
 
 
 func _prepare_partition_details(details_dict: Dictionary) -> void:

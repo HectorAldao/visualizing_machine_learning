@@ -44,6 +44,7 @@ static func newone(new_dtree: DTreeLogical, new_data: Array[EvalData]) -> EvalDa
 	var dtree_nodes: Dictionary = new_dtree.nodes_dict
 	for n in dtree_nodes:
 		var dnode: DNode = dtree_nodes[n]
+		var partition_details: Dictionary = dnode.partition_details.duplicate(true)
 		evaldatacontainer.nodes[n] = {
 			"position": dnode.position,
 			"size": dnode.size,
@@ -52,7 +53,16 @@ static func newone(new_dtree: DTreeLogical, new_data: Array[EvalData]) -> EvalDa
 			"label": dnode.label,
 			"branch": dnode.branch_value,
 			"parent_id": dnode.parent_id,
-			"data_count": 0
+			"data_count": 0,
+			"partition_details": partition_details,
+			"tipo_de_nodo": partition_details.get("tipo_de_nodo", ""),
+			"numero_de_datos": partition_details.get("numero_de_datos", 0),
+			"lista_etiquetas": partition_details.get("lista_etiquetas", []),
+			"conteo_etiquetas": partition_details.get("conteo_etiquetas", {}),
+			"etiqueta_mayoritaria": partition_details.get("etiqueta_mayoritaria", dnode.label),
+			"pureza_nodo": partition_details.get("pureza_nodo", "sin datos"),
+			"pureza_nodo_valor": partition_details.get("pureza_nodo_valor", 0.0),
+			"numero_etiqueta_mayoritaria": partition_details.get("numero_etiqueta_mayoritaria", 0),
 		}
 	
 	return evaldatacontainer
@@ -113,6 +123,7 @@ func _queue_evaldata_move_to_node(evaldata: EvalData, node_id: int) -> void:
 		return
 
 	var current_node: Dictionary = nodes[node_id]
+	_emit_evaldata_advanced(evaldata, node_id, current_node)
 	var data_count: int = int(current_node.get("data_count", 0))
 	var current_center: Vector2 = _get_evaldata_target_center(current_node, _get_evaldata_center(evaldata), data_count)
 	var current_position: Vector2 = _get_evaldata_position_from_center(evaldata, current_center)
@@ -152,6 +163,67 @@ func _play_next_queued_evaldata_move(evaldata: EvalData) -> void:
 func _on_evaldata_tween_finished(evaldata: EvalData) -> void:
 	evaldata_tweens.erase(evaldata)
 	_play_next_queued_evaldata_move(evaldata)
+
+
+func _emit_evaldata_advanced(evaldata: EvalData, node_id: int, node_info: Dictionary) -> void:
+	var node_type: int = _get_eval_node_type(node_info)
+	SignalsObserver.dtree_eval_data_advanced.emit(
+		node_type,
+		_get_evaldata_info(evaldata),
+		_get_eval_node_info(node_id, node_type, node_info, evaldata)
+	)
+
+
+func _get_eval_node_type(node_info: Dictionary) -> int:
+	if str(node_info.get("label", "")) != "":
+		return Constants.DNODES.hoja
+	if int(node_info.get("depth", 0)) == 0:
+		return Constants.DNODES.root
+	return Constants.DNODES.spine
+
+
+func _get_evaldata_info(evaldata: EvalData) -> Dictionary:
+	var characteristics: Dictionary = evaldata.data_dict.duplicate(true)
+	var label_value: Variant = ""
+
+	if evaldata.label_column != "" and characteristics.has(evaldata.label_column):
+		label_value = characteristics[evaldata.label_column]
+		characteristics.erase(evaldata.label_column)
+	else:
+		label_value = str(evaldata.data_dict)
+
+	return {
+		"evaldata_instance_id": evaldata.get_instance_id(),
+		"etiqueta": str(label_value),
+		"caracteristicas": characteristics,
+		"datos": evaldata.data_dict.duplicate(true),
+		"label_column": evaldata.label_column,
+	}
+
+
+func _get_eval_node_info(node_id: int, node_type: int, node_info: Dictionary, evaldata: EvalData) -> Dictionary:
+	var details: Dictionary = node_info.get("partition_details", {}).duplicate(true)
+	var node_attribute: String = str(node_info.get("attribute", ""))
+	var node_label: String = str(node_info.get("label", ""))
+	var attribute_value = null if node_attribute == "" else evaldata.data_dict.get(node_attribute, null)
+
+	details["node_id"] = node_id
+	details["tipo_nodo"] = node_type
+	details["atributo_division"] = node_attribute
+	details["etiqueta_nodo"] = node_label
+	details["valor_atributo"] = attribute_value
+	details["valor_rama"] = node_info.get("branch", null)
+	details["depth"] = int(node_info.get("depth", 0))
+	details["attribute"] = node_attribute
+	details["label"] = node_label
+	details["pureza_nodo"] = node_info.get("pureza_nodo", details.get("pureza_nodo", "sin datos"))
+	details["pureza_nodo_valor"] = node_info.get("pureza_nodo_valor", details.get("pureza_nodo_valor", 0.0))
+	details["numero_de_datos"] = node_info.get("numero_de_datos", details.get("numero_de_datos", 0))
+	details["numero_etiqueta_mayoritaria"] = node_info.get("numero_etiqueta_mayoritaria", details.get("numero_etiqueta_mayoritaria", 0))
+	details["etiqueta_mayoritaria"] = node_info.get("etiqueta_mayoritaria", details.get("etiqueta_mayoritaria", node_label))
+	details["lista_etiquetas"] = node_info.get("lista_etiquetas", details.get("lista_etiquetas", []))
+	details["conteo_etiquetas"] = node_info.get("conteo_etiquetas", details.get("conteo_etiquetas", {}))
+	return details
 
 
 func _get_next_node_id(current_node_id: int, evaldata: EvalData) -> int:

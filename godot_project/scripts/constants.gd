@@ -42,6 +42,12 @@ const NN_LIMITS: Dictionary[String, int] = {
 	"max_neurons" = 6,
 }
 
+const DNODES: Dictionary[String, int] = {
+	"root": 0,
+	"spine": 1,
+	"hoja": 2,
+}
+
 const ACT_FUNCS: Dictionary[String, int] = {
 	"relu": 0,
 	"sigmoid": 1,
