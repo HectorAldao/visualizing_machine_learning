@@ -6,7 +6,8 @@ var data: Array[EvalData]
 var nodes: Dictionary[int, Dictionary]  # keys() = "position", "size", "attribute", "label", "branch", "data_count"
 var active_evaldata: EvalData = null
 var active_node_id: int = -1
-var is_drop_tween_running: bool = false
+var evaldata_tweens: Dictionary = {}
+var evaldata_move_queues: Dictionary = {}
 
 const DROP_TWEEN_DURATION: float = 0.35
 const LEAF_DATA_MARGIN: float = 12.0
@@ -59,41 +60,43 @@ static func newone(new_dtree: DTreeLogical, new_data: Array[EvalData]) -> EvalDa
 
 func _drop_one_data() -> void:
 
-	if is_drop_tween_running:
-		return
-
 	if nodes.is_empty():
 		return
 
 	if active_evaldata == null:
-		# If all the data was droped, inform and do nothing
-		if data.is_empty():
-			SignalsObserver.all_data_droped.emit()
-			return
-
-		var root_id: int = _get_root_id()
-		if root_id == -1:
-			return
-
-		# Get a data do drop and add it to the scene as child
-		active_evaldata = data.pop_front()
-		if active_evaldata == null:
-			return
-
-		add_child(active_evaldata)
-		active_evaldata.reset_size()
-		active_node_id = root_id
-		await _move_active_evaldata_to_node(active_node_id)
-		_clear_active_evaldata_if_path_ended()
+		_start_next_evaldata()
 		return
 
 	var next_node_id: int = _get_next_node_id(active_node_id, active_evaldata)
 	if next_node_id == -1:
 		_clear_active_evaldata()
+		_start_next_evaldata()
 		return
 
 	active_node_id = next_node_id
-	await _move_active_evaldata_to_node(active_node_id)
+	_queue_evaldata_move_to_node(active_evaldata, active_node_id)
+	_clear_active_evaldata_if_path_ended()
+
+
+func _start_next_evaldata() -> void:
+	# If all the data was droped, inform and do nothing
+	if data.is_empty():
+		SignalsObserver.all_data_droped.emit()
+		return
+
+	var root_id: int = _get_root_id()
+	if root_id == -1:
+		return
+
+	# Get a data do drop and add it to the scene as child
+	active_evaldata = data.pop_front()
+	if active_evaldata == null:
+		return
+
+	add_child(active_evaldata)
+	active_evaldata.reset_size()
+	active_node_id = root_id
+	_queue_evaldata_move_to_node(active_evaldata, active_node_id)
 	_clear_active_evaldata_if_path_ended()
 
 
@@ -105,23 +108,50 @@ func _get_root_id() -> int:
 	return -1
 
 
-func _move_active_evaldata_to_node(node_id: int) -> void:
-	if active_evaldata == null or not nodes.has(node_id):
+func _queue_evaldata_move_to_node(evaldata: EvalData, node_id: int) -> void:
+	if evaldata == null or not nodes.has(node_id):
 		return
 
 	var current_node: Dictionary = nodes[node_id]
 	var data_count: int = int(current_node.get("data_count", 0))
-	var current_center: Vector2 = _get_evaldata_target_center(current_node, _get_evaldata_center(active_evaldata), data_count)
-	var current_position: Vector2 = _get_evaldata_position_from_center(active_evaldata, current_center)
+	var current_center: Vector2 = _get_evaldata_target_center(current_node, _get_evaldata_center(evaldata), data_count)
+	var current_position: Vector2 = _get_evaldata_position_from_center(evaldata, current_center)
 	current_node["data_count"] = data_count + 1
-	is_drop_tween_running = true
-	var tween := create_tween()
-	tween.tween_property(active_evaldata, "position", current_position, DROP_TWEEN_DURATION) \
+	var move_queue: Array = evaldata_move_queues.get(evaldata, [])
+	move_queue.append(current_position)
+	evaldata_move_queues[evaldata] = move_queue
+	_play_next_queued_evaldata_move(evaldata)
+
+
+func _play_next_queued_evaldata_move(evaldata: EvalData) -> void:
+	if evaldata == null:
+		return
+
+	if evaldata_tweens.has(evaldata):
+		var active_tween: Tween = evaldata_tweens[evaldata]
+		if active_tween != null and active_tween.is_valid() and active_tween.is_running():
+			return
+
+	var move_queue: Array = evaldata_move_queues.get(evaldata, [])
+	if move_queue.is_empty():
+		evaldata_tweens.erase(evaldata)
+		evaldata_move_queues.erase(evaldata)
+		return
+
+	var next_position: Vector2 = move_queue.pop_front()
+	evaldata_move_queues[evaldata] = move_queue
+	var tween: Tween = create_tween().bind_node(self)
+	evaldata_tweens[evaldata] = tween
+	tween.tween_property(evaldata, "position", next_position, DROP_TWEEN_DURATION) \
 		.set_trans(Tween.TRANS_SINE) \
 		.set_ease(Tween.EASE_IN_OUT)
-	await tween.finished
-	is_drop_tween_running = false
-	_expand_scroll_to_include_evaldata(active_evaldata)
+	tween.tween_callback(_expand_scroll_to_include_evaldata.bind(evaldata))
+	tween.finished.connect(_on_evaldata_tween_finished.bind(evaldata))
+
+
+func _on_evaldata_tween_finished(evaldata: EvalData) -> void:
+	evaldata_tweens.erase(evaldata)
+	_play_next_queued_evaldata_move(evaldata)
 
 
 func _get_next_node_id(current_node_id: int, evaldata: EvalData) -> int:
