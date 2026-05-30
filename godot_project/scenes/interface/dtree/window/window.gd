@@ -167,7 +167,7 @@ func _prepare_partition_details(details_dict: Dictionary) -> void:
 		details_dict["lista_etiquetas"] = []
 
 	if is_leaf_node:
-		details_dict["texto_decision_nodo"] = "Como es hoja, la partición termina aquí y el nodo predice la etiqueta '%s'." % str(details_dict.get("label", details_dict.get("etiqueta_mayoritaria", "")))
+		details_dict["texto_decision_nodo"] = "Como es hoja, la partición termina aquí y el nodo clasifica con la etiqueta '%s'." % str(details_dict.get("label", details_dict.get("etiqueta_mayoritaria", "")))
 	else:
 		details_dict["texto_decision_nodo"] = "Como es spine, la partición continúa dividiendo por el atributo '%s'. Sus ramas posibles son: %s." % [str(details_dict.get("attribute", details_dict.get("mejor_atributo", ""))), str(details_dict.get("lista_ramas_mejor_atributo", ""))]
 
