@@ -11,12 +11,19 @@ PanelContainer/styles/panel = SubResource("StyleBoxFlat_2o76q")
 
 [sub_resource type="LabelSettings" id="LabelSettings_xqga4"]
 font_size = 60
+font_color = Color(0, 0, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_ovrgc"]
 font_size = 40
+font_color = Color(0, 0, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_2o76q"]
 font_size = 35
+font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_6bivr"]
+font_size = 30
+font_color = Color(0, 0, 0, 1)
 
 [node name="MainMenu" type="Control" unique_id=807388]
 layout_mode = 3
@@ -114,4 +121,5 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 0
 text = "Preseleccione uno de los algoritmos para saber más información antes de empezar"
+label_settings = SubResource("LabelSettings_6bivr")
 autowrap_mode = 3
