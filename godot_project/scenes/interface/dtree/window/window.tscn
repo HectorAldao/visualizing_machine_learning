@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://cfkexclmkwmr0" path="res://scenes/interface/dtree/window/window.gd" id="1_i8vyb"]
 [ext_resource type="Script" uid="uid://cyinp2iohgy8b" path="res://scenes/interface/scroll_container/scroll_container.gd" id="2_1s5jb"]
 [ext_resource type="PackedScene" uid="uid://pycmc75uwvq0" path="res://scenes/charts/bars_chart/bars_chart.tscn" id="2_q1qms"]
+[ext_resource type="Script" uid="uid://cb68bfbl08gva" path="res://scenes/latex_formula/latex_formula.gd" id="3_d3a3b"]
 
 [node name="Window" type="PanelContainer" unique_id=1994973381]
 offset_right = 20.0
@@ -22,6 +23,15 @@ size_flags_horizontal = 3
 layout_mode = 2
 text = "Presiona el botón \"Siguiente\""
 autowrap_mode = 3
+
+[node name="LatexFormula" type="TextureRect" parent="ScrollContainerV2/VBoxContainer" unique_id=868714523]
+layout_mode = 2
+stretch_mode = 2
+script = ExtResource("3_d3a3b")
+resolution_scale = 5.0
+svg_font_size = 1.0
+svg_padding = 1.0
+metadata/_custom_type_script = "uid://cb68bfbl08gva"
 
 [node name="BarsChart" parent="ScrollContainerV2/VBoxContainer" unique_id=600360616 instance=ExtResource("2_q1qms")]
 visible = false

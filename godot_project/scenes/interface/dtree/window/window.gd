@@ -4,6 +4,7 @@ extends PanelContainer
 
 @onready var vboxcontainer: VBoxContainer= $ScrollContainerV2/VBoxContainer
 @onready var label0: Label = $ScrollContainerV2/VBoxContainer/Label0
+@onready var latexformula: LatexFormula = $ScrollContainerV2/VBoxContainer/LatexFormula
 @onready var label1: Label = $ScrollContainerV2/VBoxContainer/Label1
 @onready var scroll_container: ScrollContainer = $ScrollContainerV2
 
@@ -15,12 +16,15 @@ var current_evaldata_instance_id: int = -1
 var current_evaldata_text: String = ""
 
 
+const ENTROPY_FORMULA: String = "\\begin{aligned}H(S) &: \\text{entropía de la etiqueta S}\\\\c &: \\text{numero de etiquetas distintas}\\\\p_i &: \\text{proporcion de datos con la etiqueta } i\\\\H(S) &= -\\sum_{i=1}^{c} p_i\\log_2(p_i)\\end{aligned}"
+
+
 
 const template_texts: Dictionary[String, Array] = {
 	"internal" :
 ["Han bajado {numero_de_datos} datos por esta rama.
 Estos {numero_de_datos} datos tenían las etiquetas {lista_etiquetas}.
-En base a estas etiquetas se calcula la entropía de cada atributo de los datos.
+La entropía se calcula como:
 Los datos tienen los atributos {lista_atributos}, por lo que hay que calcular {metrica_de_ganancia_de_info_1} para decidir cuál sirve para dividir los mejor.",
 #{lista_ganancias}
 "El que tiene mejor {metrica_de_ganancia_de_info_2} es '{mejor_atributo}' con {valor_metrica_mejor_atributo}.
@@ -30,7 +34,7 @@ Las ramas que se crean a partir de '{mejor_atributo}' son:
 	"internal_multi_atribute":
 ["Han bajado {numero_de_datos} datos por esta rama.
 Estos {numero_de_datos} datos tenían las etiquetas {lista_etiquetas}.
-En base a estas etiquetas se calcula la entropía de cada atributo de los datos.
+La entropía se calcula como:
 Los datos tienen los atributos {lista_atributos}, por lo que hay que calcular {metrica_de_ganancia_de_info_1} para decidir cuál sirve para dividir los mejor.",
 #{lista_ganancias}
 "Hay {n_atributos_con_ganancia_maxima} atributos con mejor {metrica_de_ganancia_de_info_2}, con un valor de {valor_metrica_mejor_atributo}.
@@ -104,6 +108,8 @@ func _ready() -> void:
 	
 	label0.add_theme_font_size_override("font_size", font_size)
 	label1.add_theme_font_size_override("font_size", font_size)
+	latexformula.request_formula(ENTROPY_FORMULA)
+	_set_entropy_formula_visible(false)
 	if not SignalsObserver.dtree_node_selected.is_connected(update_node_partition_text):
 		SignalsObserver.dtree_node_selected.connect(update_node_partition_text)
 	if not SignalsObserver.dtree_eval_data_selected.is_connected(update_eval_data_text):
@@ -129,24 +135,29 @@ func update_current_text(details_dict: Dictionary) -> void:
 	var tipo_de_nodo: String = details_dict["tipo_de_nodo"]
 	match tipo_de_nodo:
 		"internal":
+			_set_entropy_formula_visible(true)
 			label0.text = template_texts[tipo_de_nodo][0].format(details_dict)
 			vboxcontainer.add_child(BarsChart.newone("Entropía por atributo", plot_data))
 			call_deferred("_ignore_mouse_input_for_window_content")
 			vboxcontainer.move_child(label1, -1)
 			label1.text = template_texts[tipo_de_nodo][1].format(details_dict)
 		"internal_multi_atribute":
+			_set_entropy_formula_visible(true)
 			label0.text = template_texts[tipo_de_nodo][0].format(details_dict)
 			vboxcontainer.add_child(BarsChart.newone("Entropía por atributo", plot_data))
 			call_deferred("_ignore_mouse_input_for_window_content")
 			vboxcontainer.move_child(label1, -1)
 			label1.text = template_texts[tipo_de_nodo][1].format(details_dict)
 		"leaf":
+			_set_entropy_formula_visible(false)
 			label0.text = template_texts[tipo_de_nodo][0].format(details_dict)
 			label1.text = ""
 		"leaf_mayority":
+			_set_entropy_formula_visible(false)
 			label0.text = template_texts[tipo_de_nodo][0].format(details_dict)
 			label1.text = ""
 		"leaf_majority":
+			_set_entropy_formula_visible(false)
 			label0.text = template_texts[tipo_de_nodo][0].format(details_dict)
 			label1.text = template_texts[tipo_de_nodo][1].format(details_dict)
 
@@ -159,6 +170,7 @@ func update_node_partition_text(details_dict: Dictionary) -> void:
 	var chart = vboxcontainer.get_node_or_null("BarsChart")
 	if chart:
 		vboxcontainer.remove_child(chart)
+	_set_entropy_formula_visible(false)
 
 	label0.text = template_texts["node_partition"][0].format(details_dict)
 	label1.text = template_texts["node_partition"][1].format(details_dict)
@@ -171,6 +183,7 @@ func update_eval_data_text(details_dict: Dictionary) -> void:
 	var chart = vboxcontainer.get_node_or_null("BarsChart")
 	if chart:
 		vboxcontainer.remove_child(chart)
+	_set_entropy_formula_visible(false)
 
 	label0.text = template_texts["eval_data"][0].format(details_dict)
 	label1.text = template_texts["eval_data"][1].format(details_dict)
@@ -180,6 +193,7 @@ func update_eval_data_advanced_text(node_type: int, eval_data_info: Dictionary, 
 	var chart = vboxcontainer.get_node_or_null("BarsChart")
 	if chart:
 		vboxcontainer.remove_child(chart)
+	_set_entropy_formula_visible(false)
 
 	var data_details: Dictionary = eval_data_info.duplicate(true)
 	var evaldata_instance_id: int = int(data_details.get("evaldata_instance_id", -1))
@@ -288,6 +302,10 @@ func _ignore_mouse_input_for_window_content() -> void:
 		_set_mouse_filter_recursive(child, Control.MOUSE_FILTER_IGNORE)
 	scroll_container.mouse_filter = Control.MOUSE_FILTER_STOP
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+
+func _set_entropy_formula_visible(is_visible: bool) -> void:
+	latexformula.visible = is_visible
 
 
 func _set_mouse_filter_recursive(node: Node, filter: Control.MouseFilter) -> void:

@@ -57,7 +57,7 @@ fn render_svg_internal(latex: &str, font_size: f64, padding: f64) -> Result<Stri
     let display_list = to_display_list(&root);
 
     let svg_options = SvgOptions {
-        font_size: font_size.clamp(4.0, 256.0),
+        font_size: font_size.clamp(0.0, 256.0),
         padding: padding.clamp(0.0, 128.0),
         stroke_width: 1.5,
         embed_glyphs: true,

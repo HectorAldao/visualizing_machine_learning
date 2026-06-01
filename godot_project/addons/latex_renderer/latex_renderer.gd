@@ -35,9 +35,9 @@ static var _texture_cache: Dictionary = {}
 	get:
 		return formula_color
 
-@export_range(4.0, 256.0, 1.0, "or_greater") var svg_font_size: float = 40.0:
+@export_range(0.0, 256.0, 1.0, "or_greater") var svg_font_size: float = 40.0:
 	set(value):
-		var next_size := clamp(value, 4.0, 256.0)
+		var next_size := clamp(value, 0.0, 256.0)
 		if is_equal_approx(svg_font_size, next_size):
 			return
 		svg_font_size = next_size
