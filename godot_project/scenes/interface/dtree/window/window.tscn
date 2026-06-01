@@ -29,7 +29,7 @@ layout_mode = 2
 stretch_mode = 2
 script = ExtResource("3_d3a3b")
 resolution_scale = 6.0
-svg_font_size = 1.0
+svg_font_size = 20.0
 svg_padding = 1.0
 metadata/_custom_type_script = "uid://cb68bfbl08gva"
 
