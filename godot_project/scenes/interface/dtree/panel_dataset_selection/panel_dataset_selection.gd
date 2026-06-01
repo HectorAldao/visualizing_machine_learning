@@ -16,28 +16,36 @@ const DICT_OF_DATASETS: Dictionary = \
 		{"Frutas": [
 		[
 			# Instancias originales
-			{"color": "red", "shape": "round", "size": "big", "class": "apple"},
-			{"color": "red", "shape": "round", "size": "big", "class": "apple"},
-			{"color": "red", "shape": "round", "size": "big", "class": "apple"},
-			{"color": "green", "shape": "round", "size": "big", "class": "apple"},
-			{"color": "yellow", "shape": "long", "size": "medium", "class": "banana"},
-			{"color": "green", "shape": "long", "size": "medium", "class": "banana"},
-			{"color": "orange", "shape": "round", "size": "medium", "class": "orange"},
+			{"color": "rojo", "forma": "redonda", "tamaño": "mediana", "class": "manzana"},
+			{"color": "rojo", "forma": "redonda", "tamaño": "mediana", "class": "manzana"},
+			{"color": "rojo", "forma": "redonda", "tamaño": "mediana", "class": "manzana"},
+			{"color": "verde", "forma": "redonda", "tamaño": "mediana", "class": "manzana"},
+			{"color": "amarillo", "forma": "alargada", "tamaño": "mediana", "class": "plátano"},
+			#{"color": "verde", "forma": "alargada", "tamaño": "mediana", "class": "plátano"},
+			{"color": "naranja", "forma": "redonda", "tamaño": "mediana", "class": "naranja"},
 			
 			# Nuevas instancias con características superpuestas (generan nodos hoja impuros)
-			{"color": "red", "shape": "round", "size": "big", "class": "pomegranate"}, # Colisiona con apple
-			{"color": "orange", "shape": "round", "size": "medium", "class": "tangerine"}, # Colisiona con orange
-			{"color": "green", "shape": "long", "size": "medium", "class": "cucumber"}, # Colisiona con green banana
+			{"color": "rojo", "forma": "redonda", "tamaño": "grande", "class": "granada"}, # Colisiona con manzana
+			{"color": "naranja", "forma": "redonda", "tamaño": "mediana", "class": "mandarina"}, # Colisiona con orange
+			{"color": "verde", "forma": "alargada", "tamaño": "grande", "class": "pepino"}, # Colisiona con green plátano
+			{"color": "verde", "forma": "alargada", "tamaño": "grande", "class": "calabacín"}, # Colisiona con green plátano
+
+			{"color": "blanco", "forma": "redonda", "tamaño": "grande", "class": "melón"}, # Colisiona con green plátano
+			{"color": "rojo", "forma": "redonda", "tamaño": "grande", "class": "sandía"}, # Colisiona con green plátano
 			
 			# Otras frutas para dar más volumen
-			{"color": "red", "shape": "round", "size": "small", "class": "cherry"},
-			{"color": "red", "shape": "round", "size": "small", "class": "cranberry"}, # Colisiona con cherry
-			{"color": "purple", "shape": "round", "size": "small", "class": "grape"},
-			{"color": "green", "shape": "round", "size": "small", "class": "grape"},
-			{"color": "yellow", "shape": "round", "size": "medium", "class": "lemon"},
-			{"color": "green", "shape": "round", "size": "medium", "class": "lime"}
+			{"color": "rojo", "forma": "redonda", "tamaño": "pequeña", "class": "cereza"},
+			{"color": "rojo", "forma": "redonda", "tamaño": "pequeña", "class": "fresa"}, # Colisiona con cereza
+			{"color": "morado", "forma": "redonda", "tamaño": "pequeña", "class": "uva"},
+			{"color": "morado", "forma": "redonda", "tamaño": "mediana", "class": "ciruela"},
+			{"color": "morado", "forma": "redonda", "tamaño": "mediana", "class": "ciruela"},
+			{"color": "rojo", "forma": "redonda", "tamaño": "mediana", "class": "ciruela"},
+			{"color": "amarillo", "forma": "redonda", "tamaño": "mediana", "class": "ciruela"},
+			{"color": "verde", "forma": "redonda", "tamaño": "pequeña", "class": "uva"},
+			{"color": "amarillo", "forma": "redonda", "tamaño": "mediana", "class": "limón"},
+			{"color": "verde", "forma": "redonda", "tamaño": "mediana", "class": "lima"}
 		],
-		["color", "shape", "size"]
+		["color", "forma", "tamaño"]
 	],
 	
 	"Tenis": [
