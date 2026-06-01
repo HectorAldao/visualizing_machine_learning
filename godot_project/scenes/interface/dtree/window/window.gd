@@ -16,7 +16,7 @@ var current_evaldata_instance_id: int = -1
 var current_evaldata_text: String = ""
 
 
-const ENTROPY_FORMULA: String = "\\begin{aligned}H(S) &: \\text{entropía de la etiqueta S}\\\\c &: \\text{numero de etiquetas distintas}\\\\p_i &: \\text{proporcion de datos con la etiqueta } i\\\\H(S) &= -\\sum_{i=1}^{c} p_i\\log_2(p_i)\\end{aligned}"
+const ENTROPY_FORMULA: String = "\\begin{aligned}&H(S) : \\text{entropía del atributo } S\\\\&c : \\text{numero de etiquetas distintas}\\\\&p_i : \\text{proporcion de datos con la etiqueta } i\\\\&H(S) = -\\sum_{i=1}^{c} p_i\\log_2(p_i)\\end{aligned}"
 
 
 
@@ -99,7 +99,6 @@ Por lo tanto, la clasificación es incorrecta.
 }
 
 
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	scroll_container.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -116,6 +115,16 @@ func _ready() -> void:
 		SignalsObserver.dtree_eval_data_selected.connect(update_eval_data_text)
 	if not SignalsObserver.dtree_eval_data_advanced.is_connected(update_eval_data_advanced_text):
 		SignalsObserver.dtree_eval_data_advanced.connect(update_eval_data_advanced_text)
+
+	SignalsObserver.clear_window.connect(clear)
+
+
+
+## Clears all the content in the window
+func clear() -> void:
+	label0.text = ""
+	label1.text = ""
+	latexformula.reset_sprite()
 
 
 func update_current_text(details_dict: Dictionary) -> void:
@@ -304,8 +313,8 @@ func _ignore_mouse_input_for_window_content() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
-func _set_entropy_formula_visible(is_visible: bool) -> void:
-	latexformula.visible = is_visible
+func _set_entropy_formula_visible(formula_is_visible: bool) -> void:
+	latexformula.visible = formula_is_visible
 
 
 func _set_mouse_filter_recursive(node: Node, filter: Control.MouseFilter) -> void:

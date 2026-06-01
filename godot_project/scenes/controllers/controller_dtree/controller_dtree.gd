@@ -340,6 +340,8 @@ func _on_evaluate_button_pressed() -> void:
 	evaluate_button.      visible = false
 	dtree.                visible = false
 
+	SignalsObserver.clear_window.emit()
+
 	# Here is where there must be a signal "evaluate"
 	var target_attrs: Array[String] = []
 	if algorithm and not algorithm.label_column.is_empty():

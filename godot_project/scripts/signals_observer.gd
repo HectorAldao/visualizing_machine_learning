@@ -86,4 +86,7 @@ signal save_nn
 signal export_onnx
 signal export_nnef
 
+# window
+signal clear_window
+
 @warning_ignore_restore("unused_signal")
