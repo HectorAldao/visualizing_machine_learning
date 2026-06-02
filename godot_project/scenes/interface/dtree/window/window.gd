@@ -18,6 +18,8 @@ var current_evaldata_text: String = ""
 
 const ENTROPY_FORMULA: String = "\\begin{aligned}&H(S) : \\text{entropía del atributo } S\\\\&c : \\text{numero de etiquetas distintas}\\\\&p_i : \\text{proporcion de datos con la etiqueta } i\\\\&H(S) = -\\sum_{i=1}^{c} p_i\\log_2(p_i)\\end{aligned}"
 
+const ZERO_ENTROPY_EXPLANATION: String = "\n\n{texto_atributos} {verbo_entropia} entropía 0 porque, con los datos que llegan a este nodo, dividir por {texto_referencia} no reduce la incertidumbre sobre la etiqueta: las proporciones de etiquetas quedan igual o no aportan una separación útil. Por eso su valor es 0 y no ayuda a decidir mejor la clasificación."
+
 
 
 const template_texts: Dictionary[String, Array] = {
@@ -134,6 +136,7 @@ func update_current_text(details_dict: Dictionary) -> void:
 	
 	if details_dict.has("lista_ganancias") and typeof(details_dict["lista_ganancias"]) == TYPE_DICTIONARY:
 		plot_data = details_dict["lista_ganancias"]
+	var zero_entropy_explanation: String = _build_zero_entropy_explanation(plot_data)
 	
 	_clean_lists(details_dict)
 	
@@ -149,14 +152,14 @@ func update_current_text(details_dict: Dictionary) -> void:
 			vboxcontainer.add_child(BarsChart.newone("Entropía por atributo", plot_data))
 			call_deferred("_ignore_mouse_input_for_window_content")
 			vboxcontainer.move_child(label1, -1)
-			label1.text = template_texts[tipo_de_nodo][1].format(details_dict)
+			label1.text = template_texts[tipo_de_nodo][1].format(details_dict) + zero_entropy_explanation
 		"internal_multi_atribute":
 			_set_entropy_formula_visible(true)
 			label0.text = template_texts[tipo_de_nodo][0].format(details_dict)
 			vboxcontainer.add_child(BarsChart.newone("Entropía por atributo", plot_data))
 			call_deferred("_ignore_mouse_input_for_window_content")
 			vboxcontainer.move_child(label1, -1)
-			label1.text = template_texts[tipo_de_nodo][1].format(details_dict)
+			label1.text = template_texts[tipo_de_nodo][1].format(details_dict) + zero_entropy_explanation
 		"leaf":
 			_set_entropy_formula_visible(false)
 			label0.text = template_texts[tipo_de_nodo][0].format(details_dict)
@@ -276,6 +279,37 @@ func _prepare_partition_details(details_dict: Dictionary) -> void:
 		details_dict["texto_decision_nodo"] = "Como es hoja, la partición termina aquí y el nodo clasifica con la etiqueta '%s'." % str(details_dict.get("label", details_dict.get("etiqueta_mayoritaria", "")))
 	else:
 		details_dict["texto_decision_nodo"] = "Como es spine, la partición continúa dividiendo por el atributo '%s'. Sus ramas posibles son: %s." % [str(details_dict.get("attribute", details_dict.get("mejor_atributo", ""))), str(details_dict.get("lista_ramas_mejor_atributo", ""))]
+
+
+func _build_zero_entropy_explanation(plot_data: Dictionary[String, float]) -> String:
+	var zero_entropy_attributes: Array[String] = []
+	for attribute in plot_data:
+		if is_zero_approx(plot_data[attribute]):
+			zero_entropy_attributes.append(attribute)
+
+	if zero_entropy_attributes.is_empty():
+		return ""
+
+	var attributes_text: String = _format_attribute_list(zero_entropy_attributes)
+	var explanation_details: Dictionary[String, String] = {
+		"texto_atributos": "El atributo %s" % attributes_text if zero_entropy_attributes.size() == 1 else "Los atributos %s" % attributes_text,
+		"verbo_entropia": "tiene" if zero_entropy_attributes.size() == 1 else "tienen",
+		"texto_referencia": "ese atributo" if zero_entropy_attributes.size() == 1 else "esos atributos"
+	}
+	return ZERO_ENTROPY_EXPLANATION.format(explanation_details)
+
+
+func _format_attribute_list(attributes: Array[String]) -> String:
+	var attributes_text: String = ""
+	for i in range(attributes.size()):
+		var attribute_text: String = "'%s'" % attributes[i]
+		if i == 0:
+			attributes_text = attribute_text
+		elif i == attributes.size() - 1:
+			attributes_text += " y " + attribute_text
+		else:
+			attributes_text += ", " + attribute_text
+	return attributes_text
 
 
 ## For each value on the input Dictionary that is an Array[String], it will
