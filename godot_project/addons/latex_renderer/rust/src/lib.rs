@@ -78,7 +78,7 @@ fn ensure_embedded_katex_fonts() -> Result<(), String> {
 
 fn empty_svg() -> String {
     format!(
-        r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" width="1pt" height="1pt"><path d="M0 0Z" fill="{WHITE}"/></svg>"#
+        r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" width="1" height="1"><path d="M0 0Z" fill="{WHITE}"/></svg>"#
     )
 }
 
@@ -97,13 +97,19 @@ fn normalize_for_thorvg(svg: &str) -> Result<String, String> {
         let tag = &svg[start..=end];
 
         if tag.starts_with("<text") {
-            return Err("RaTeX emitted a <text> tag; embed_glyphs did not produce paths".to_string());
+            return Err(
+                "RaTeX emitted a <text> tag; embed_glyphs did not produce paths".to_string(),
+            );
         }
         if tag.starts_with("<image") {
-            return Err("RaTeX emitted a raster <image>; this renderer only accepts path SVG".to_string());
+            return Err(
+                "RaTeX emitted a raster <image>; this renderer only accepts path SVG".to_string(),
+            );
         }
 
-        if tag.starts_with("<rect ") {
+        if tag.starts_with("<svg ") {
+            out.push_str(&strip_pt_length_units(tag));
+        } else if tag.starts_with("<rect ") {
             out.push_str(&rect_tag_to_path(tag)?);
         } else if tag.starts_with("<line ") {
             out.push_str(&line_tag_to_paths(tag)?);
@@ -116,6 +122,29 @@ fn normalize_for_thorvg(svg: &str) -> Result<String, String> {
 
     out.push_str(&svg[index..]);
     Ok(force_white_paint(&out))
+}
+
+fn strip_pt_length_units(tag: &str) -> String {
+    let tag = strip_pt_length_attr(tag, "width");
+    strip_pt_length_attr(&tag, "height")
+}
+
+fn strip_pt_length_attr(tag: &str, name: &str) -> String {
+    let needle = format!(r#"{name}=""#);
+    let Some(value_start) = tag.find(&needle).map(|start| start + needle.len()) else {
+        return tag.to_string();
+    };
+    let Some(relative_end) = tag[value_start..].find('"') else {
+        return tag.to_string();
+    };
+
+    let value_end = value_start + relative_end;
+    let value = &tag[value_start..value_end];
+    let Some(number) = value.strip_suffix("pt") else {
+        return tag.to_string();
+    };
+
+    format!("{}{}{}", &tag[..value_start], number, &tag[value_end..])
 }
 
 fn rect_tag_to_path(tag: &str) -> Result<String, String> {
@@ -131,7 +160,9 @@ fn line_tag_to_paths(tag: &str) -> Result<String, String> {
     let y1 = parse_attr_f64(tag, "y1")?.unwrap_or(0.0);
     let x2 = parse_attr_f64(tag, "x2")?.unwrap_or(x1);
     let y2 = parse_attr_f64(tag, "y2")?.unwrap_or(y1);
-    let stroke_width = parse_attr_f64(tag, "stroke-width")?.unwrap_or(1.0).max(1e-6);
+    let stroke_width = parse_attr_f64(tag, "stroke-width")?
+        .unwrap_or(1.0)
+        .max(1e-6);
 
     if (y1 - y2).abs() > f64::EPSILON {
         return Ok(format!(
@@ -235,7 +266,9 @@ fn force_white_paint(svg: &str) -> String {
 }
 
 fn next_paint_attr(svg: &str, offset: usize) -> Option<(usize, &'static str)> {
-    let fill = svg[offset..].find("fill=\"").map(|pos| (offset + pos, "fill=\""));
+    let fill = svg[offset..]
+        .find("fill=\"")
+        .map(|pos| (offset + pos, "fill=\""));
     let stroke = svg[offset..]
         .find("stroke=\"")
         .map(|pos| (offset + pos, "stroke=\""));

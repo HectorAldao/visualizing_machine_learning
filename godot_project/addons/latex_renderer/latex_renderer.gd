@@ -69,6 +69,7 @@ var _active_task_ids: Array[int] = []
 
 
 func _ready() -> void:
+	_configure_texture_display()
 	self_modulate = formula_color
 	set_process(false)
 	if not formula.strip_edges().is_empty():
@@ -121,6 +122,12 @@ func reset_sprite() -> void:
 
 static func clear_cache() -> void:
 	_texture_cache.clear()
+
+
+func _configure_texture_display() -> void:
+	expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	stretch_mode = TextureRect.STRETCH_SCALE
+	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 
 
 func _request_render(skip_cache: bool = false) -> void:
@@ -194,7 +201,10 @@ func _apply_render_result(serial: int, cache_key: String, latex: String, raster_
 func _update_minimum_size(image_texture: Texture2D, raster_scale: float) -> void:
 	if not fit_control_to_formula or image_texture == null:
 		return
-	custom_minimum_size = image_texture.get_size() / max(raster_scale, 0.05)
+	var logical_size: Vector2 = image_texture.get_size() / max(raster_scale, 0.05)
+	custom_minimum_size = logical_size
+	if not (get_parent() is Container):
+		size = logical_size
 
 
 static func _build_image(latex: String, raster_scale: float, font_size: float, padding: float) -> Dictionary:
