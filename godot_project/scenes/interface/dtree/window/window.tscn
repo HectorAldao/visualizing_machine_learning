@@ -26,10 +26,11 @@ autowrap_mode = 3
 
 [node name="LatexFormula" type="TextureRect" parent="ScrollContainerV2/VBoxContainer" unique_id=868714523]
 layout_mode = 2
+size_flags_horizontal = 0
 stretch_mode = 2
 script = ExtResource("3_d3a3b")
 resolution_scale = 1.0
-svg_font_size = 25.0
+svg_font_size = 27.0
 svg_padding = 1.0
 metadata/_custom_type_script = "uid://cb68bfbl08gva"
 

@@ -69,7 +69,6 @@ var _active_task_ids: Array[int] = []
 
 
 func _ready() -> void:
-	_configure_texture_display()
 	self_modulate = formula_color
 	set_process(false)
 	if not formula.strip_edges().is_empty():
@@ -122,12 +121,6 @@ func reset_sprite() -> void:
 
 static func clear_cache() -> void:
 	_texture_cache.clear()
-
-
-func _configure_texture_display() -> void:
-	expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	stretch_mode = TextureRect.STRETCH_SCALE
-	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 
 
 func _request_render(skip_cache: bool = false) -> void:
