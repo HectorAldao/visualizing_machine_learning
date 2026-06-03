@@ -5,6 +5,7 @@
 [node name="Conexion" type="Line2D" unique_id=1680142819]
 default_color = Color(0, 0, 0, 1)
 script = ExtResource("1_h1wmp")
-font_color = Color(0, 0, 0, 1)
-line_width = 15.0
-line_color = Color(0.8352941, 0.36862746, 0, 1)
+font_size = 20
+font_color = Color(0.8932498, 0.9517148, 0.91749156, 1)
+line_width = 20.0
+line_color = Color(0.33126804, 0.14917228, 0.08017952, 1)

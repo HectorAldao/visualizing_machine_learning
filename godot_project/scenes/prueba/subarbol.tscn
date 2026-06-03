@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://88b0c2fo8dkd"]
+
+[ext_resource type="Script" uid="uid://dmyisyfkujj6p" path="res://scenes/prueba/subarbol.gd" id="1_dkxxo"]
+
+[node name="SubArbol" type="VBoxContainer" unique_id=715541791]
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_constants/separation = 100
+script = ExtResource("1_dkxxo")
+
+[node name="NodoPadre" type="Button" parent="." unique_id=250155517]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "hao ta"
+
+[node name="SubArbolesHijo" type="HBoxContainer" parent="." unique_id=1313541542]
+layout_mode = 2
+theme_override_constants/separation = 100
