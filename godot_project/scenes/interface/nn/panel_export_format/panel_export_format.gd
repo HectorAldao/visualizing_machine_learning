@@ -3,10 +3,12 @@ extends PanelContainer
 
 @onready var onnx_button: Button = $VBoxContainer/ONNXButton
 @onready var nnef_button: Button = $VBoxContainer/NNEFButton
+@onready var cross_button: Button = %PanelExportFormatCrossButton
 
 func _ready() -> void:
 	onnx_button.pressed.connect(_on_onnx_pressed)
 	nnef_button.pressed.connect(_on_nnef_pressed)
+	cross_button.pressed.connect(func(): visible = not visible)
 
 
 func _on_onnx_pressed() -> void:

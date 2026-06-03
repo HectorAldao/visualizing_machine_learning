@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://ph5tvag4oa6d"]
 
 [ext_resource type="Script" uid="uid://ct78cpvwgtkpe" path="res://scenes/interface/nn/panel_export_format/panel_export_format.gd" id="1_r1x3a"]
+[ext_resource type="Theme" uid="uid://bmmi3e4iwrcqr" path="res://themes/cross_button_theme/cross_button_theme.tres" id="2_xrejr"]
 
 [node name="PanelExportFormat" type="PanelContainer" unique_id=2111158799]
 script = ExtResource("1_r1x3a")
@@ -8,6 +9,20 @@ script = ExtResource("1_r1x3a")
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1261785436]
 layout_mode = 2
 theme_override_constants/separation = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer" unique_id=1901006683]
+layout_mode = 2
+theme_override_constants/separation = 25
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer" unique_id=1201780103]
+layout_mode = 2
+text = "Seleccione el formato en el que exportar"
+
+[node name="PanelExportFormatCrossButton" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=10345971]
+unique_name_in_owner = true
+layout_mode = 2
+theme = ExtResource("2_xrejr")
+text = "x"
 
 [node name="ONNXButton" type="Button" parent="VBoxContainer" unique_id=1496879758]
 layout_mode = 2

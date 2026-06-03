@@ -112,5 +112,6 @@ algorithm_name = "Red"
 
 [node name="PanelExportFormat" parent="ScrollContainer2/MarginContainer" unique_id=2111158799 instance=ExtResource("7_m4i3n")]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
