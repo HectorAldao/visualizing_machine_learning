@@ -49,7 +49,7 @@ func _ready() -> void:
 	panel_export_format.visible = false
 	window_nn.visible = false
 
-	_center_nn()
+	#_center_nn()
 
 
 func update_nn_view(new_state) -> void:
@@ -130,7 +130,7 @@ func _on_reload_nn() -> void:
 	Variables.nn.apply_tmp_to_main()
 
 	# Center the nn
-	_center_nn()
+	#_center_nn()
 
 
 func _on_train_nn() -> void:
@@ -142,32 +142,32 @@ func _on_train_nn() -> void:
 
 
 ## Move the nn of the view to the center
-func _center_nn() -> void:
-
-	# Idk why, but is needed to wait 2 frames for the deletion/addition
-	# of the layers/neurons for the Nn to know its size
-	# (mabye 1 frame to the modification, and 1 to change MarginContainer's size?)
-	await get_tree().process_frame
-	await get_tree().process_frame
-
-	if _is_centering:
-		return
-
-	_is_centering = true
-
-	#SignalsObserver.nn_view_want_nn_size.emit.call_deferred()
-	SignalsObserver.nn_view_want_nn_size.emit()
-
-	#await nn_size_updated
-	#print("2") #debug
-
-	var nn_center: Vector2 = (size - nn_size) / 2
-
-	SignalsObserver.nn_view_set_nn_position.emit(nn_center)
-
-	_is_centering = false
-
-	print("[LOG] Nn centered")
+#func _center_nn() -> void:
+#
+#	# Idk why, but is needed to wait 2 frames for the deletion/addition
+#	# of the layers/neurons for the Nn to know its size
+#	# (mabye 1 frame to the modification, and 1 to change MarginContainer's size?)
+#	await get_tree().process_frame
+#	await get_tree().process_frame
+#
+#	if _is_centering:
+#		return
+#
+#	_is_centering = true
+#
+#	#SignalsObserver.nn_view_want_nn_size.emit.call_deferred()
+#	SignalsObserver.nn_view_want_nn_size.emit()
+#
+#	#await nn_size_updated
+#	#print("2") #debug
+#
+#	var nn_center: Vector2 = (size - nn_size) / 2
+#
+#	SignalsObserver.nn_view_set_nn_position.emit(nn_center)
+#
+#	_is_centering = false
+#
+#	print("[LOG] Nn centered")
 
 
 func _on_set_nn_size(new_nn_size: Vector2) -> void:
