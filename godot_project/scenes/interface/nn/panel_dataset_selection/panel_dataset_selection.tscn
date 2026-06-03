@@ -58,6 +58,7 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Aún no se ha seleccionado dataset"
 label_settings = SubResource("LabelSettings_e84v4")
+autowrap_mode = 3
 
 [node name="SelectDatasetNnButton" type="Button" parent="HBoxContainer/VBoxContainer" unique_id=181250148]
 unique_name_in_owner = true
