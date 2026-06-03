@@ -3,28 +3,37 @@
 [ext_resource type="Script" uid="uid://c32l0xvmgns3s" path="res://scenes/interface/nn/panel_algorithm_nn/panel_algorithm_nn.gd" id="1_kr5pl"]
 
 [node name="PanelAlgorithmNn" type="PanelContainer" unique_id=2144642879]
+offset_left = 1018.0
+offset_right = 1038.0
+offset_bottom = 42.0
+mouse_filter = 2
 script = ExtResource("1_kr5pl")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=332046027]
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1899700451]
 layout_mode = 2
 
-[node name="NextNeuronButton" type="Button" parent="VBoxContainer" unique_id=597519075]
+[node name="NextNeuronButton" type="Button" parent="HBoxContainer" unique_id=597519075]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Siguiente neurona"
 
-[node name="NextLayerButton" type="Button" parent="VBoxContainer" unique_id=1829642143]
+[node name="NextLayerButton" type="Button" parent="HBoxContainer" unique_id=1829642143]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Siguiente capa"
 
-[node name="NextStepButton" type="Button" parent="VBoxContainer" unique_id=735567149]
+[node name="NextStepButton" type="Button" parent="HBoxContainer" unique_id=735567149]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Siguiente dato"
 
-[node name="CompleteTrainButton" type="Button" parent="VBoxContainer" unique_id=1855667876]
+[node name="CompleteTrainButton" type="Button" parent="HBoxContainer" unique_id=1855667876]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Acabar entrenamiento"
 
-[node name="TestButton" type="Button" parent="VBoxContainer" unique_id=921408889]
+[node name="TestButton" type="Button" parent="HBoxContainer" unique_id=921408889]
+unique_name_in_owner = true
 layout_mode = 2
 disabled = true
 text = "Evaluar red"

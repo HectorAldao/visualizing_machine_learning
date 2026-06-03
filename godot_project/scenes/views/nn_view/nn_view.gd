@@ -1,13 +1,12 @@
 extends Control
 
 
-@onready var panel_algorithm_nn: PanelContainer = $PanelAlgorithmNn
-@onready var create_nn_menu: PanelContainer = $CreateNnMenu
-@onready var dataset_selecion_menu: PanelContainer = $PanelDatasetSelection
-@onready var panel_trainin_nn: PanelContainer = $PanelTrainingNn
-@onready var panel_export_format: PanelContainer = $PanelExportFormat
-@onready var window_nn: WindowNn = $WindowNn
-@onready var nn: NeuralNetwork = $NeuralNetwork
+@onready var panel_algorithm_nn: PanelContainer = %PanelAlgorithmNn
+@onready var create_nn_menu: PanelContainer = %CreateNnMenu
+@onready var dataset_selecion_menu: PanelContainer = %PanelDatasetSelection
+@onready var panel_export_format: PanelContainer = %PanelExportFormat
+@onready var window_nn: WindowNn = %WindowNn
+@onready var nn: NeuralNetwork = %NeuralNetwork
 
 var state: String = "create_nn"  # Other values: train_nn, evaluate_nn
 
@@ -47,7 +46,6 @@ func _ready() -> void:
 	create_nn_menu.visible = false
 	nn.visible = false
 	panel_algorithm_nn.visible = false
-	panel_trainin_nn.visible = false
 	panel_export_format.visible = false
 	window_nn.visible = false
 
@@ -140,7 +138,6 @@ func _on_train_nn() -> void:
 	create_nn_menu.visible = false
 	panel_algorithm_nn.visible = true
 	window_nn.visible = true
-	panel_trainin_nn.visible = true
 	_configure_algorithm_training()
 
 
@@ -288,7 +285,6 @@ func _on_save_nn_pressed() -> void:
 func _on_start_nn_inferece() -> void:
 	state = "inference_nn"
 	panel_algorithm_nn.visible = false
-	panel_trainin_nn.visible = false
 	SignalsObserver.prepare_nn_inference_dataset_selection.emit(train_attributtes, train_target_attributes)
 
 

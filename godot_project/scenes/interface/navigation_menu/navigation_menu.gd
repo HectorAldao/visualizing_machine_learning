@@ -12,11 +12,13 @@ func _ready() -> void:
 	# Update the text depending on the algorithm
 	load_button.text = load_button.text + algorithm_name
 	save_button.text = save_button.text + algorithm_name
+
+	%MainMenuButton.pressed.connect(func(): visible = not visible)
 	
 	# Connect buttons
 	home_button.pressed.connect(_go_home)
 
 
-## Returns home
+## Returns to home menu
 func _go_home() -> void:
 	get_tree().change_scene_to_file(Constants.SCENES.main_menu)

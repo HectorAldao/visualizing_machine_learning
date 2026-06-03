@@ -2,42 +2,39 @@
 
 [ext_resource type="Script" uid="uid://b3kpa18i28go" path="res://scenes/interface/nn/window_nn/window_nn.gd" id="1_0ggu8"]
 [ext_resource type="PackedScene" uid="uid://c0p8glq0rsesw" path="res://scenes/latex_formula/latex_formula.tscn" id="2_f5hif"]
+[ext_resource type="Script" uid="uid://cyinp2iohgy8b" path="res://scenes/interface/scroll_container/scroll_container.gd" id="2_p1i8u"]
 
-[node name="WindowNn" type="Window" unique_id=789302501]
-oversampling_override = 1.0
-title = "Texto Informativo"
-position = Vector2i(0, 36)
-size = Vector2i(200, 200)
+[node name="WindowNn" type="PanelContainer" unique_id=225370147]
+offset_right = 20.0
+offset_bottom = 20.0
 script = ExtResource("1_0ggu8")
 
-[node name="ScrollContainer" type="ScrollContainer" parent="." unique_id=710538628]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="ScrollContainerV2" type="ScrollContainer" parent="." unique_id=19652476]
+layout_mode = 2
+script = ExtResource("2_p1i8u")
+metadata/_custom_type_script = "uid://cyinp2iohgy8b"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="ScrollContainer" unique_id=1235443485]
+[node name="VBoxContainer" type="VBoxContainer" parent="ScrollContainerV2" unique_id=1235443485]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label0" type="Label" parent="ScrollContainer/VBoxContainer" unique_id=775268905]
+[node name="Label0" type="Label" parent="ScrollContainerV2/VBoxContainer" unique_id=775268905]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 3
 
-[node name="LatexFormula" parent="ScrollContainer/VBoxContainer" unique_id=42571569 instance=ExtResource("2_f5hif")]
+[node name="LatexFormula" parent="ScrollContainerV2/VBoxContainer" unique_id=42571569 instance=ExtResource("2_f5hif")]
 unique_name_in_owner = true
 layout_mode = 2
 svg_font_size = 4.0
 svg_padding = 1.0
 
-[node name="LabelFormula" type="Label" parent="ScrollContainer/VBoxContainer" unique_id=670583864]
+[node name="LabelFormula" type="Label" parent="ScrollContainerV2/VBoxContainer" unique_id=670583864]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 3
 
-[node name="Label1" type="Label" parent="ScrollContainer/VBoxContainer" unique_id=904132594]
+[node name="Label1" type="Label" parent="ScrollContainerV2/VBoxContainer" unique_id=904132594]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 3

@@ -1,0 +1,116 @@
+[gd_scene format=3 uid="uid://cxtlfe3b8dfux"]
+
+[ext_resource type="Script" uid="uid://bpsdnq18e0na8" path="res://scenes/views/nn_view/nn_view.gd" id="1_46lxs"]
+[ext_resource type="PackedScene" uid="uid://dy4hc0eciyisw" path="res://scenes/objects/nn/nn/neural_network.tscn" id="2_6t3q3"]
+[ext_resource type="PackedScene" uid="uid://1ih4fque5qvn" path="res://scenes/interface/nn/create_nn_menu/create_nn_menu.tscn" id="3_rwpyt"]
+[ext_resource type="PackedScene" uid="uid://t7yhp2dspky0" path="res://scenes/interface/nn/panel_algorithm_nn/panel_algorithm_nn.tscn" id="4_01wm3"]
+[ext_resource type="PackedScene" uid="uid://b53esskdnv1b2" path="res://scenes/interface/nn/panel_dataset_selection/panel_dataset_selection.tscn" id="5_1f7c6"]
+[ext_resource type="Script" uid="uid://cyinp2iohgy8b" path="res://scenes/interface/scroll_container/scroll_container.gd" id="5_01wm3"]
+[ext_resource type="PackedScene" uid="uid://ph5tvag4oa6d" path="res://scenes/interface/nn/panel_export_format/panel_export_format.tscn" id="7_m4i3n"]
+[ext_resource type="PackedScene" uid="uid://c5d88cv8owt2d" path="res://scenes/interface/nn/window_nn/window_nn.tscn" id="8_lx715"]
+[ext_resource type="Texture2D" uid="uid://cvwnxn6ptgdkd" path="res://assets/three_lines_menu/three_lines_menu_mini_black.png" id="10_1f7c6"]
+[ext_resource type="PackedScene" uid="uid://dbkhkmbjedndu" path="res://scenes/interface/navigation_menu/navigation_menu.tscn" id="11_4t8cb"]
+
+[node name="NnView" type="Control" unique_id=318267333]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 4.0
+offset_bottom = 4.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_46lxs")
+
+[node name="ScrollContainer2" type="ScrollContainer" parent="." unique_id=136886343]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("5_01wm3")
+metadata/_custom_type_script = "uid://cyinp2iohgy8b"
+
+[node name="MarginContainer" type="MarginContainer" parent="ScrollContainer2" unique_id=1350779087]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ScrollContainer2/MarginContainer" unique_id=1294780891]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="ScrollContainer2/MarginContainer/VBoxContainer" unique_id=1037477102]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="PanelContainer" type="PanelContainer" parent="ScrollContainer2/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=1654555224]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.0
+
+[node name="ScrollContainerDTree" type="ScrollContainer" parent="ScrollContainer2/MarginContainer/VBoxContainer/HBoxContainer2/PanelContainer" unique_id=259990635]
+unique_name_in_owner = true
+layout_mode = 2
+script = ExtResource("5_01wm3")
+metadata/_custom_type_script = "uid://cyinp2iohgy8b"
+
+[node name="CenterContainer" type="CenterContainer" parent="ScrollContainer2/MarginContainer/VBoxContainer/HBoxContainer2/PanelContainer/ScrollContainerDTree" unique_id=2115320407]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="NeuralNetwork" parent="ScrollContainer2/MarginContainer/VBoxContainer/HBoxContainer2/PanelContainer/ScrollContainerDTree/CenterContainer" unique_id=1605831336 instance=ExtResource("2_6t3q3")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="CreateNnMenu" parent="ScrollContainer2/MarginContainer/VBoxContainer/HBoxContainer2/PanelContainer/ScrollContainerDTree/CenterContainer" unique_id=1587040215 instance=ExtResource("3_rwpyt")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="PanelDatasetSelection" parent="ScrollContainer2/MarginContainer/VBoxContainer/HBoxContainer2/PanelContainer/ScrollContainerDTree/CenterContainer" unique_id=18738779 instance=ExtResource("5_1f7c6")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="WindowNn" parent="ScrollContainer2/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=789302501 instance=ExtResource("8_lx715")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ScrollContainer2/MarginContainer/VBoxContainer" unique_id=2015541831]
+layout_mode = 2
+
+[node name="MainMenuButton" type="Button" parent="ScrollContainer2/MarginContainer/VBoxContainer/HBoxContainer" unique_id=2003733345]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 32
+icon = ExtResource("10_1f7c6")
+
+[node name="PanelAlgorithmNn" parent="ScrollContainer2/MarginContainer/VBoxContainer/HBoxContainer" unique_id=2144642879 instance=ExtResource("4_01wm3")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 10
+
+[node name="NnMenu" parent="ScrollContainer2/MarginContainer" unique_id=1092818417 instance=ExtResource("11_4t8cb")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+algorithm_name = "Red"
+
+[node name="PanelExportFormat" parent="ScrollContainer2/MarginContainer" unique_id=2111158799 instance=ExtResource("7_m4i3n")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2

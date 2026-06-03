@@ -44,7 +44,7 @@ func _ready():
 
 	_on_algorithmic_dtree_button_pressed()
 
-	%MenuButton.pressed.connect(func(): dtree_menu.visible = not dtree_menu.visible)
+	#%MainMenuButton.pressed.connect(func(): dtree_menu.visible = not dtree_menu.visible)
 
 
 func _on_manual_dtree_button_pressed():

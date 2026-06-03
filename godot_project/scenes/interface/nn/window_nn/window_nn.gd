@@ -1,4 +1,4 @@
-class_name WindowNn extends Window
+class_name WindowNn extends PanelContainer
 
 
 @onready var text0: Label = %Label0

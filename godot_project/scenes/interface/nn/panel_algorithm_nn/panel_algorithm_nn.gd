@@ -15,11 +15,11 @@ func _ready() -> void:
 	SignalsObserver.nn_train_finished.connect(_on_nn_train_finished)
 	SignalsObserver.nn_inference_finished.connect(_on_nn_train_finished)
 
-	$VBoxContainer/NextNeuronButton.pressed.connect(_on_next_neuron_pressed)
-	$VBoxContainer/NextLayerButton.pressed.connect(_on_next_layer_pressed)
-	$VBoxContainer/NextStepButton.pressed.connect(func(): SignalsObserver.train_nn_next_step.emit())
-	$VBoxContainer/CompleteTrainButton.pressed.connect(func(): SignalsObserver.train_nn_complete.emit())
-	$VBoxContainer/TestButton.pressed.connect(func(): SignalsObserver.inference_nn_start.emit())
+	%NextNeuronButton.pressed.connect(_on_next_neuron_pressed)
+	%NextLayerButton.pressed.connect(_on_next_layer_pressed)
+	%NextStepButton.pressed.connect(func(): SignalsObserver.train_nn_next_step.emit())
+	%CompleteTrainButton.pressed.connect(func(): SignalsObserver.train_nn_complete.emit())
+	%TestButton.pressed.connect(func(): SignalsObserver.inference_nn_start.emit())
 
 
 func _on_next_neuron_pressed() -> void:
@@ -98,17 +98,17 @@ func _get_sorted_layer_indices(keys: Array) -> Array[int]:
 
 
 func _on_nn_train_finished() -> void:
-	$VBoxContainer/NextNeuronButton.disabled = true
-	$VBoxContainer/NextLayerButton.disabled = true
-	$VBoxContainer/NextStepButton.disabled = true
-	$VBoxContainer/CompleteTrainButton.disabled = true
-	$VBoxContainer/TestButton.disabled = false
+	%NextNeuronButton.disabled = true
+	%NextLayerButton.disabled = true
+	%NextStepButton.disabled = true
+	%CompleteTrainButton.disabled = true
+	%TestButton.disabled = false
 
 
 func _on_nn_inference_ready() -> void:
 	_reset_training_cursor()
-	$VBoxContainer/NextNeuronButton.disabled = false
-	$VBoxContainer/NextLayerButton.disabled = false
-	$VBoxContainer/NextStepButton.disabled = false
-	$VBoxContainer/CompleteTrainButton.disabled = false
-	$VBoxContainer/TestButton.disabled = true
+	%NextNeuronButton.disabled = false
+	%NextLayerButton.disabled = false
+	%NextStepButton.disabled = false
+	%CompleteTrainButton.disabled = false
+	%TestButton.disabled = true

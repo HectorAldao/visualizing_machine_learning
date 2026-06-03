@@ -85,7 +85,7 @@ size_flags_vertical = 3
 [node name="HBoxContainer" type="HBoxContainer" parent="ScrollContainer2/MarginContainer/VBoxContainer" unique_id=1496934532]
 layout_mode = 2
 
-[node name="MenuButton" type="Button" parent="ScrollContainer2/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1881736420]
+[node name="MainMenuButton" type="Button" parent="ScrollContainer2/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1881736420]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
