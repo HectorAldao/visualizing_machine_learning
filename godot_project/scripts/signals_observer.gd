@@ -57,6 +57,7 @@ signal forward_step_completed(layer_idx, neuron_idx, output_value)
 signal backward_step_completed(layer_idx, neuron_idx, delta_value)
 signal weight_updated(layer_idx, neuron_idx, weight_idx, new_value)
 signal nn_train_finished
+signal nn_layer_resalted(layer_idx: int)
 signal nn_inference_ready
 signal nn_inference_finished
 signal setup_nn_eval_data(container_role: String, value_keys: Array[String])
@@ -78,6 +79,8 @@ signal inference_nn_start
 # window_nn
 signal nn_resalted_neuron_forward(neuron_id: int, layer_id: int, input_values: Array, output_value: float)
 signal nn_resalted_neuron_backward(neuron_id: int, layer_id: int, backward_info: Dictionary)
+signal nn_resalted_layer_forward(layer_info: Dictionary)
+signal nn_resalted_data_step(step_info: Dictionary)
 
 # panel training nn
 signal save_nn

@@ -29,6 +29,9 @@ func _ready() -> void:
 	SignalsObserver.info_neuron.connect(set_neuron_info)
 	SignalsObserver.nn_resalted_neuron_forward.connect(set_resalted_neuron_info_forward)
 	SignalsObserver.nn_resalted_neuron_backward.connect(set_resalted_neuron_info_backward)
+	SignalsObserver.nn_resalted_layer_forward.connect(set_resalted_layer_info_forward)
+	SignalsObserver.nn_resalted_data_step.connect(set_resalted_data_step_info)
+	SignalsObserver.nn_train_finished.connect(set_training_finished_info)
 
 
 ## Changes the text in the window when a neuron is pressed
@@ -110,7 +113,300 @@ func set_resalted_neuron_info_backward(_neuron_id: int, layer_id: int, backward_
 	text0.text = template_texts.neuron_backward_resalted[0]
 	text1.text = template_texts.neuron_backward_resalted[1].format(dic_of_info)
 
+
+func set_resalted_layer_info_forward(layer_info: Dictionary) -> void:
+	_reset_formula()
+
+	var layer_id: int = int(layer_info.get("layer_id", -9999))
+	var input_values: Array = layer_info.get("input_values", [])
+	var weights: Array = layer_info.get("weights", [])
+	var biases: Array = layer_info.get("biases", [])
+	var z_values: Array = layer_info.get("z_values", [])
+	var output_values: Array = layer_info.get("output_values", [])
+	var activation_type: int = int(layer_info.get("activation_type", Constants.ACT_FUNCS.identity))
+
+	var formula: String
+	if ConfigVariables.use_latex:
+		formula = _latex_layer_forward_formatter(input_values, weights, biases, z_values, output_values, activation_type)
+		latexformula.request_formula(formula)
+	else:
+		formula = _formula_layer_forward_formatter(input_values, weights, biases, z_values, output_values, activation_type)
+		text_formula.text = formula
+
+	text0.text = "Se ha ejecutado %s completa.\nLa operación agregada de la capa es:" % _layer_name_text(layer_id)
+	text1.text = "Cada neurona de una misma capa recibe el mismo vector de entrada, pero usa su propia columna de pesos. Por eso podemos juntar todos esos pesos en una matriz W: la columna 1 calcula la neurona 1, la columna 2 calcula la neurona 2, y así sucesivamente.\n\nPrimero se calcula z = x · W + b, donde x es la entrada, W son los pesos y b son los sesgos. Después se aplica la función de activación %s para obtener la salida final a de la capa." % _activation_layer_explanation(activation_type)
+
+
+func set_resalted_data_step_info(step_info: Dictionary) -> void:
+	_reset_formula()
+
+	var data_idx: int = int(step_info.get("data_idx", -1))
+	var input_values: Array = step_info.get("input_values", [])
+	var output_values: Array = step_info.get("output_values", [])
+	var target_values: Array = step_info.get("target_values", [])
+	var train_attributes: Array = step_info.get("train_attributes", [])
+	var target_attributes: Array = step_info.get("target_attributes", [])
+	var loss_type: int = int(step_info.get("loss_type", Constants.LOSS_FUNCS.mse))
+	var loss_value: float = float(step_info.get("loss_value", _compute_loss_value(output_values, target_values, loss_type)))
+
+	var formula: String
+	if ConfigVariables.use_latex:
+		formula = _latex_data_step_error_formatter(output_values, target_values, loss_type, loss_value)
+		latexformula.request_formula(formula)
+	else:
+		formula = _formula_data_step_error_formatter(output_values, target_values, loss_type, loss_value)
+		text_formula.text = formula
+
+	var data_text: String = "Se ha completado un dato de entrenamiento."
+	if data_idx >= 0:
+		data_text = "Se ha completado el dato de entrenamiento %d." % (data_idx + 1)
+
+	text0.text = "%s\nEntrada: %s\nSalida de la red: %s\nEtiqueta esperada: %s" % [
+		data_text,
+		_format_named_values(train_attributes, input_values),
+		_format_output_result(output_values),
+		_format_expected_label(target_values, target_attributes)
+	]
+	text1.text = "La red compara su salida con la etiqueta esperada usando la función de error. Ese valor resume cuánto se ha equivocado para este dato: si L es pequeño, la salida está cerca de lo esperado; si L es grande, la red todavía debe ajustar más sus pesos durante la retropropagación."
+
+
+func set_training_finished_info() -> void:
+	_reset_formula()
+	text0.text = "El entrenamiento ha acabado."
+	text1.text = "Pulse el botón 'Evaluar' para testear la red contra nuevos datos y comprobar si el entrenamiento ha funcionado."
+
 # --- Helpers ---
+
+
+func _layer_name_text(layer_id: int) -> String:
+	if layer_id == -1:
+		return "la capa de salida"
+	if layer_id > 0:
+		return "la capa oculta %d" % layer_id
+	return "la capa %d" % layer_id
+
+
+func _activation_layer_explanation(activation_type: int) -> String:
+	match activation_type:
+		Constants.ACT_FUNCS.softmax:
+			return "softmax al vector completo z; así cada salida se interpreta como una probabilidad relativa frente a las demás"
+		Constants.ACT_FUNCS.identity:
+			return "identidad, que deja z tal cual"
+		_:
+			return "%s a cada componente de z" % _activation_latex_name(activation_type)
+
+
+func _latex_layer_forward_formatter(input_values: Array, weights: Array, biases: Array, z_values: Array, output_values: Array, activation_type: int) -> String:
+	var activation_text: String = "\\mathbf{z}"
+	if activation_type != Constants.ACT_FUNCS.identity:
+		activation_text = "\\operatorname{%s}(\\mathbf{z})" % _activation_latex_name(activation_type)
+
+	var formula_lines: Array[String] = [
+		"\\mathbf{x} &= %s" % _latex_row_vector(input_values),
+		"W &= %s" % _latex_weight_matrix(weights, input_values.size()),
+		"\\mathbf{b} &= %s" % _latex_row_vector(biases),
+		"\\mathbf{z} &= \\mathbf{x}W + \\mathbf{b} = %s" % _latex_row_vector(z_values),
+		"\\mathbf{a} &= %s = %s" % [activation_text, _latex_row_vector(output_values)]
+	]
+	return "\\begin{aligned} %s \\end{aligned}" % " \\\\ ".join(formula_lines)
+
+
+func _formula_layer_forward_formatter(input_values: Array, weights: Array, biases: Array, z_values: Array, output_values: Array, activation_type: int) -> String:
+	var activation_text: String = "z"
+	if activation_type != Constants.ACT_FUNCS.identity:
+		activation_text = "%s(z)" % _activation_latex_name(activation_type)
+
+	return "x = %s\nW = %s\nb = %s\nz = x × W + b = %s\na = %s = %s" % [
+		_format_vector(input_values),
+		_format_weight_matrix(weights, input_values.size()),
+		_format_vector(biases),
+		_format_vector(z_values),
+		activation_text,
+		_format_vector(output_values)
+	]
+
+
+func _latex_data_step_error_formatter(output_values: Array, target_values: Array, loss_type: int, loss_value: float) -> String:
+	var terms_count: int = min(output_values.size(), target_values.size())
+	if terms_count <= 0:
+		return "\\begin{aligned} L &= 0 \\end{aligned}"
+
+	match loss_type:
+		Constants.LOSS_FUNCS.coss_entr:
+			var formula_lines: Array[String] = [
+				"L &= -\\sum_{i=1}^{%d} y_i \\log(a_i)" % terms_count,
+				"&= -(%s)" % _cross_entropy_terms_text(output_values, target_values, true),
+				"&= %s" % _format_latex_number(loss_value)
+			]
+			return "\\begin{aligned} %s \\end{aligned}" % " \\\\ ".join(formula_lines)
+		_:
+			var formula_lines: Array[String] = [
+				"L &= \\frac{1}{n}\\sum_{i=1}^{n}(a_i-y_i)^2,\\quad n=%d" % terms_count,
+				"&= \\frac{%s}{%d}" % [_mse_terms_text(output_values, target_values), terms_count],
+				"&= %s" % _format_latex_number(loss_value)
+			]
+			return "\\begin{aligned} %s \\end{aligned}" % " \\\\ ".join(formula_lines)
+
+
+func _formula_data_step_error_formatter(output_values: Array, target_values: Array, loss_type: int, loss_value: float) -> String:
+	var terms_count: int = min(output_values.size(), target_values.size())
+	if terms_count <= 0:
+		return "L = 0"
+
+	match loss_type:
+		Constants.LOSS_FUNCS.coss_entr:
+			return "L = -Σ_i y_i × log(a_i)\n= -(%s)\n= %s" % [
+				_cross_entropy_terms_text(output_values, target_values, false),
+				_format_latex_number(loss_value)
+			]
+		_:
+			return "L = (1 / n) × Σ_i (a_i - y_i)^2, n = %d\n= (%s) / %d\n= %s" % [
+				terms_count,
+				_mse_terms_text(output_values, target_values),
+				terms_count,
+				_format_latex_number(loss_value)
+			]
+
+
+func _format_vector(values: Array) -> String:
+	var formatted_values: Array[String] = []
+	for value in values:
+		formatted_values.append(_format_latex_number(float(value)))
+	return "[%s]" % ", ".join(formatted_values)
+
+
+func _latex_row_vector(values: Array) -> String:
+	var formatted_values: Array[String] = []
+	for value in values:
+		formatted_values.append(_format_latex_number(float(value)))
+	if formatted_values.is_empty():
+		formatted_values.append("0")
+	return "\\begin{bmatrix}%s\\end{bmatrix}" % " & ".join(formatted_values)
+
+
+func _format_weight_matrix(weights: Array, input_count: int) -> String:
+	if weights.is_empty() or input_count <= 0:
+		return "[]"
+
+	var rows: Array[String] = []
+	for input_idx in range(input_count):
+		var row_values: Array[String] = []
+		for neuron_idx in range(weights.size()):
+			var neuron_weights: Array = weights[neuron_idx]
+			row_values.append(_format_latex_number(_get_weight_value(neuron_weights, input_idx)))
+		rows.append("[%s]" % ", ".join(row_values))
+
+	return "[\n  %s\n]" % ",\n  ".join(rows)
+
+
+func _latex_weight_matrix(weights: Array, input_count: int) -> String:
+	if weights.is_empty() or input_count <= 0:
+		return "\\begin{bmatrix}0\\end{bmatrix}"
+
+	var rows: Array[String] = []
+	for input_idx in range(input_count):
+		var row_values: Array[String] = []
+		for neuron_idx in range(weights.size()):
+			var neuron_weights: Array = weights[neuron_idx]
+			row_values.append(_format_latex_number(_get_weight_value(neuron_weights, input_idx)))
+		rows.append(" & ".join(row_values))
+
+	return "\\begin{bmatrix}%s\\end{bmatrix}" % " \\\\ ".join(rows)
+
+
+func _get_weight_value(neuron_weights: Array, input_idx: int) -> float:
+	if input_idx < 0 or input_idx >= neuron_weights.size():
+		return 0.0
+	return float(neuron_weights[input_idx])
+
+
+func _format_named_values(names: Array, values: Array) -> String:
+	if values.is_empty():
+		return "[]"
+
+	var parts: Array[String] = []
+	for i in range(values.size()):
+		var value_name: String = "x%d" % (i + 1)
+		if i < names.size():
+			value_name = str(names[i])
+		parts.append("%s = %s" % [value_name, _format_latex_number(float(values[i]))])
+	return ", ".join(parts)
+
+
+func _format_output_result(output_values: Array) -> String:
+	var output_text: String = _format_vector(output_values)
+	if Variables.nn_output_class_decoder.is_empty() or output_values.size() <= 1:
+		return output_text
+
+	var predicted_idx: int = _get_max_value_index(output_values)
+	var predicted_label: String = str(Variables.nn_output_class_decoder.get(predicted_idx, "clase %d" % predicted_idx))
+	return "%s; predicción actual: '%s'" % [output_text, predicted_label]
+
+
+func _format_expected_label(target_values: Array, target_attributes: Array) -> String:
+	if target_values.is_empty():
+		return "sin etiqueta esperada"
+
+	if not Variables.nn_output_class_decoder.is_empty() and target_values.size() > 1:
+		var expected_idx: int = _get_max_value_index(target_values)
+		var expected_label: String = str(Variables.nn_output_class_decoder.get(expected_idx, "clase %d" % expected_idx))
+		return "'%s' con vector objetivo %s" % [expected_label, _format_vector(target_values)]
+
+	if target_attributes.size() == target_values.size():
+		return _format_named_values(target_attributes, target_values)
+
+	return _format_vector(target_values)
+
+
+func _get_max_value_index(values: Array) -> int:
+	if values.is_empty():
+		return -1
+
+	var max_idx: int = 0
+	var max_value: float = float(values[0])
+	for i in range(1, values.size()):
+		var current_value: float = float(values[i])
+		if current_value > max_value:
+			max_value = current_value
+			max_idx = i
+	return max_idx
+
+
+func _mse_terms_text(output_values: Array, target_values: Array) -> String:
+	var terms: Array[String] = []
+	for i in range(min(output_values.size(), target_values.size())):
+		terms.append("(%s - %s)^2" % [_format_latex_number(float(output_values[i])), _format_latex_number(float(target_values[i]))])
+	return " + ".join(terms)
+
+
+func _cross_entropy_terms_text(output_values: Array, target_values: Array, latex: bool) -> String:
+	var terms: Array[String] = []
+	for i in range(min(output_values.size(), target_values.size())):
+		if latex:
+			terms.append("%s\\log(%s)" % [_format_latex_number(float(target_values[i])), _format_latex_number(float(output_values[i]))])
+		else:
+			terms.append("%s × log(%s)" % [_format_latex_number(float(target_values[i])), _format_latex_number(float(output_values[i]))])
+	return " + ".join(terms)
+
+
+func _compute_loss_value(output_values: Array, target_values: Array, loss_type: int) -> float:
+	var terms_count: int = min(output_values.size(), target_values.size())
+	if terms_count <= 0:
+		return 0.0
+
+	match loss_type:
+		Constants.LOSS_FUNCS.coss_entr:
+			var epsilon: float = 1e-8
+			var loss_sum: float = 0.0
+			for i in range(terms_count):
+				loss_sum -= float(target_values[i]) * log(max(float(output_values[i]), epsilon))
+			return loss_sum
+		_:
+			var squared_error_sum: float = 0.0
+			for i in range(terms_count):
+				var error: float = float(output_values[i]) - float(target_values[i])
+				squared_error_sum += error * error
+			return squared_error_sum / float(terms_count)
 
 ## For each value on the input Dictionary that is an Array[String], it will
 ## change that Array for a string that concatenates each string element on

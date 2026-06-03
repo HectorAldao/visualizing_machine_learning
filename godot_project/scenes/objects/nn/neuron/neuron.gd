@@ -13,6 +13,7 @@ func _ready() -> void:
 	pressed.connect(_on_pressed)
 	SignalsObserver.forward_step_completed.connect(_on_training_step_completed)
 	SignalsObserver.backward_step_completed.connect(_on_training_step_completed)
+	SignalsObserver.nn_layer_resalted.connect(_on_layer_resalted)
 	SignalsObserver.train_nn.connect(_reset_evaluated_theme)
 	SignalsObserver.train_nn_next_step.connect(_reset_evaluated_theme)
 	SignalsObserver.train_nn_complete.connect(_reset_evaluated_theme)
@@ -34,6 +35,10 @@ func _on_pressed() -> void:
 
 func _on_training_step_completed(layer_id: int, neuron_id: int, _value: float) -> void:
 	_set_evaluated(neuron_id == _id and layer_id == _layer_id)
+
+
+func _on_layer_resalted(layer_id: int) -> void:
+	_set_evaluated(layer_id == _layer_id)
 
 
 func _on_neuron_text_changed(layer_id: int, neuron_id: int, new_text: String) -> void:

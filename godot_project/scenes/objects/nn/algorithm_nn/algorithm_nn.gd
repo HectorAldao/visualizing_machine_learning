@@ -65,6 +65,9 @@ var _cached_layer_idx: int = 0
 var _cached_z_values: Array = []
 var _cached_a_values: Array = []
 var _cached_deltas: Array = []
+var _last_completed_forward_layer_info: Dictionary = {}
+var _last_completed_backward_layer_id: int = -9999
+var _last_completed_sample_info: Dictionary = {}
 
 
 func _ready() -> void:
@@ -106,6 +109,9 @@ func configure_training(
 	_current_data_idx = 0
 	_current_phase = "idle"
 	_is_completing_training = false
+	_last_completed_forward_layer_info = {}
+	_last_completed_backward_layer_id = -9999
+	_last_completed_sample_info = {}
 	_reset_runtime_state()
 
 	if _train_data.is_empty() or (not _is_inference_mode and _target_attributes.is_empty()):
@@ -163,10 +169,18 @@ func train_next_layer(_layer_id: int = -9999) -> void:
 
 	var phase_before: String = _current_phase
 	var layer_before: int = _get_current_layer_idx()
+	_last_completed_forward_layer_info = {}
+	_last_completed_backward_layer_id = -9999
 
 	while not _is_training_finished() and _current_phase == phase_before and _get_current_layer_idx() == layer_before:
 		if not _advance_one_neuron():
 			break
+
+	if phase_before == "forward" and int(_last_completed_forward_layer_info.get("layer_id", -9999)) == layer_before:
+		SignalsObserver.nn_layer_resalted.emit(layer_before)
+		SignalsObserver.nn_resalted_layer_forward.emit(_last_completed_forward_layer_info.duplicate(true))
+	elif phase_before == "backward" and _last_completed_backward_layer_id == layer_before:
+		SignalsObserver.nn_layer_resalted.emit(layer_before)
 
 
 ## Advances one full training row.
@@ -177,6 +191,7 @@ func train_next_step() -> void:
 		return
 
 	var data_before: int = _current_data_idx
+	_last_completed_sample_info = {}
 
 	while not _is_training_finished() and _current_data_idx == data_before:
 		var phase_before: String = _current_phase
@@ -184,6 +199,9 @@ func train_next_step() -> void:
 		if not _advance_one_neuron():
 			break
 		await _wait_for_visual_transition_if_needed(phase_before, should_wait_for_input_enter)
+
+	if not _is_inference_mode and not _is_training_finished() and int(_last_completed_sample_info.get("data_idx", -1)) == data_before:
+		SignalsObserver.nn_resalted_data_step.emit(_last_completed_sample_info.duplicate(true))
 
 
 ## Finishes all remaining training work without emitting intermediate
@@ -323,6 +341,26 @@ func _compute_output_loss_error(output_values: Array, target: Array, loss_type: 
 	return output_error
 
 
+func _compute_loss_value(output_values: Array, target: Array, loss_type: int) -> float:
+	var terms_count: int = min(output_values.size(), target.size())
+	if terms_count <= 0:
+		return 0.0
+
+	match loss_type:
+		Constants.LOSS_FUNCS.coss_entr:
+			var epsilon: float = 1e-8
+			var loss_sum: float = 0.0
+			for i in range(terms_count):
+				loss_sum -= float(target[i]) * log(max(float(output_values[i]), epsilon))
+			return loss_sum
+		_:
+			var squared_error_sum: float = 0.0
+			for i in range(terms_count):
+				var error: float = float(output_values[i]) - float(target[i])
+				squared_error_sum += error * error
+			return squared_error_sum / float(terms_count)
+
+
 # func update_layer_weights(layer_weights: Array, current_layer_deltas: Array, prev_outputs: Array, lr: float, l_idx: int) -> void:
 # 	for i in range(layer_weights.size()):
 # 		for j in range(layer_weights[i].size()):
@@ -377,6 +415,7 @@ func _advance_forward_neuron() -> bool:
 
 	_current_neuron_cursor += 1
 	if _current_neuron_cursor >= _cached_a_values.size():
+		_last_completed_forward_layer_info = _get_forward_layer_info(layer_idx, _current_input_data, _cached_z_values, _cached_a_values)
 		layer_weighted_sums[layer_idx] = _cached_z_values.duplicate(true)
 		layer_outputs[layer_idx] = _cached_a_values.duplicate(true)
 		_current_input_data = _cached_a_values.duplicate(true)
@@ -412,6 +451,7 @@ func _advance_backward_neuron() -> bool:
 
 	_current_neuron_cursor += 1
 	if _current_neuron_cursor >= _cached_deltas.size():
+		_last_completed_backward_layer_id = layer_idx
 		_current_layer_cursor += 1
 		_current_neuron_cursor = 0
 		_clear_layer_cache()
@@ -467,6 +507,34 @@ func _get_backward_neuron_info(layer_idx: int, neuron_idx: int, delta: float) ->
 	}
 
 
+func _get_forward_layer_info(layer_idx: int, input_values: Array, z_values: Array, output_values: Array) -> Dictionary:
+	return {
+		"layer_id": layer_idx,
+		"input_values": input_values.duplicate(true),
+		"weights": _weights.get(layer_idx, []).duplicate(true),
+		"biases": _biases.get(layer_idx, []).duplicate(true),
+		"z_values": z_values.duplicate(true),
+		"output_values": output_values.duplicate(true),
+		"activation_type": _activations.get(layer_idx, Constants.ACT_FUNCS.identity),
+	}
+
+
+func _get_current_sample_info() -> Dictionary:
+	var output_values: Array = layer_outputs.get(-1, []).duplicate(true)
+	var target_values: Array = _current_target_data.duplicate(true)
+	return {
+		"data_idx": _current_data_idx,
+		"input_values": layer_outputs.get(0, []).duplicate(true),
+		"output_values": output_values,
+		"target_values": target_values,
+		"loss_type": _loss_type,
+		"loss_value": _compute_loss_value(output_values, target_values, _loss_type),
+		"output_activation_type": _activations.get(-1, Constants.ACT_FUNCS.identity),
+		"train_attributes": _train_attributes.duplicate(),
+		"target_attributes": _target_attributes.duplicate(),
+	}
+
+
 ## Loads _current_data_idx into the runtime caches used by forward/backward.
 ## layer_outputs[0] is where later weight updates read the original input values.
 func _prepare_current_sample() -> void:
@@ -487,6 +555,8 @@ func _prepare_current_sample() -> void:
 ## Moves the state machine from the completed row to either finished,
 ## load_sample, or the next row directly when Complete training is draining.
 func _finish_current_sample() -> void:
+	_last_completed_sample_info = _get_current_sample_info()
+
 	if not _is_inference_mode:
 		_sync_weights_with_variables()
 	_current_data_idx += 1
