@@ -10,8 +10,8 @@ var nn_bias_tmp_dict: Dictionary[int, Array] = {-1: [0.0]}
 
 
 func _init() -> void:
-	nn_tmp_dict[-1][0][0] = _random_connection_weight()
-	nn_bias_tmp_dict[-1][0] = _random_bias()
+	nn_tmp_dict[-1][0][0] = Functions.random_connection_weight()
+	nn_bias_tmp_dict[-1][0] = Functions.random_connection_weight()
 	nn_dict = nn_tmp_dict.duplicate(true)
 	nn_bias_dict = nn_bias_tmp_dict.duplicate(true)
 
@@ -173,7 +173,7 @@ func _resize_layer_matrix(current_matrix: Array, target_rows: int, target_column
 			if col_idx < source_row.size():
 				new_row[col_idx] = source_row[col_idx]
 			else:
-				new_row[col_idx] = _random_connection_weight()
+				new_row[col_idx] = Functions.random_connection_weight()
 
 		resized_matrix[row_idx] = new_row
 
@@ -190,17 +190,9 @@ func _resize_bias_vector(current_biases: Array, target_size: int) -> Array:
 		if bias_idx < current_biases.size():
 			resized_biases[bias_idx] = float(current_biases[bias_idx])
 		else:
-			resized_biases[bias_idx] = _random_bias()
+			resized_biases[bias_idx] = Functions.random_connection_weight()
 
 	return resized_biases
-
-
-func _random_connection_weight() -> float:
-	return Constants.NN_CONNECTION_RANDOM_MULT * randfn(0.0, sqrt(Constants.NN_CONNECTION_VARIANCE))
-
-
-func _random_bias() -> float:
-	return _random_connection_weight()
 
 
 func _sync_bias_dict_to_weights(target_bias_dict: Dictionary[int, Array], weight_dict: Dictionary[int, Array]) -> void:

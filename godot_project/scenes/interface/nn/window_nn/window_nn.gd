@@ -147,7 +147,7 @@ func set_resalted_data_step_info(step_info: Dictionary) -> void:
 	var train_attributes: Array = step_info.get("train_attributes", [])
 	var target_attributes: Array = step_info.get("target_attributes", [])
 	var loss_type: int = int(step_info.get("loss_type", Constants.LOSS_FUNCS.mse))
-	var loss_value: float = float(step_info.get("loss_value", _compute_loss_value(output_values, target_values, loss_type)))
+	var loss_value: float = float(step_info.get("loss_value", Functions.compute_loss_value(output_values, target_values, loss_type)))
 
 	var formula: String
 	if ConfigVariables.use_latex:
@@ -389,25 +389,6 @@ func _cross_entropy_terms_text(output_values: Array, target_values: Array, latex
 	return " + ".join(terms)
 
 
-func _compute_loss_value(output_values: Array, target_values: Array, loss_type: int) -> float:
-	var terms_count: int = min(output_values.size(), target_values.size())
-	if terms_count <= 0:
-		return 0.0
-
-	match loss_type:
-		Constants.LOSS_FUNCS.coss_entr:
-			var epsilon: float = 1e-8
-			var loss_sum: float = 0.0
-			for i in range(terms_count):
-				loss_sum -= float(target_values[i]) * log(max(float(output_values[i]), epsilon))
-			return loss_sum
-		_:
-			var squared_error_sum: float = 0.0
-			for i in range(terms_count):
-				var error: float = float(output_values[i]) - float(target_values[i])
-				squared_error_sum += error * error
-			return squared_error_sum / float(terms_count)
-
 ## For each value on the input Dictionary that is an Array[String], it will
 ## change that Array for a string that concatenates each string element on
 ## it, adding commas and the corresponding conjunction among elements  
@@ -531,7 +512,7 @@ func _latex_backward_formatter(backward_info: Dictionary, _layer_id: int) -> Str
 			_format_latex_number(delta)
 		]
 
-	var activation_derivative_value: float = _activation_derivative_value(z_value, activation_type)
+	var activation_derivative_value: float = Functions.apply_activation_derivative(z_value, activation_type)
 	var activation_derivative_text: String = _activation_derivative_latex_text(activation_type, z_value, output_value)
 	if is_output_layer:
 		return "\\begin{aligned} \\delta &= \\frac{\\partial L}{\\partial a}\\frac{\\partial a}{\\partial z} \\\\ \\frac{\\partial L}{\\partial a} &= %s = %s \\\\ \\frac{\\partial a}{\\partial z} &= %s = %s \\\\ \\delta &\\approx %s \\cdot %s = %s \\end{aligned}" % [
@@ -572,7 +553,7 @@ func _formula_backward_formatter(backward_info: Dictionary, _layer_id: int) -> S
 			_format_latex_number(delta)
 		]
 
-	var activation_derivative_value: float = _activation_derivative_value(z_value, activation_type)
+	var activation_derivative_value: float = Functions.apply_activation_derivative(z_value, activation_type)
 	var activation_derivative_text: String = _activation_derivative_text(activation_type, z_value, output_value)
 	if is_output_layer:
 		return "δ = ∂L/∂a × ∂a/∂z\n∂L/∂a = %s = %s\n∂a/∂z = %s = %s\nδ ≈ %s × %s = %s" % [
@@ -617,19 +598,6 @@ func _hidden_upstream_text(backward_info: Dictionary) -> String:
 
 func _hidden_upstream_latex_text(backward_info: Dictionary) -> String:
 	return _hidden_upstream_text(backward_info).replace("×", "\\cdot")
-
-
-func _activation_derivative_value(z_value: float, activation_type: int) -> float:
-	match activation_type:
-		Constants.ACT_FUNCS.relu:
-			return 1.0 if z_value > 0.0 else 0.0
-		Constants.ACT_FUNCS.sigmoid:
-			var sigmoid_value: float = 1.0 / (1.0 + exp(-z_value))
-			return sigmoid_value * (1.0 - sigmoid_value)
-		Constants.ACT_FUNCS.softmax:
-			return 1.0
-		_:
-			return 1.0
 
 
 func _activation_derivative_text(activation_type: int, z_value: float, output_value: float) -> String:

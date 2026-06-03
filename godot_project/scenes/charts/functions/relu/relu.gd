@@ -37,4 +37,4 @@ func _update_line() -> void:
 	points = new_points
 
 func _relu(x: float) -> float:
-	return max(0.0, x)
+	return Functions.relu(x)

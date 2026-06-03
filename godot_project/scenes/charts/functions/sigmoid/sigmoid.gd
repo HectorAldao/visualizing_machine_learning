@@ -23,7 +23,7 @@ func dibujar_funcion_sigmoide() -> void:
 		var x_input: float = lerp(rango_x_min, rango_x_max, t)
 		
 		# 3. Calcular la función Sigmoide
-		var y_output: float = 1.0 / (1.0 + exp(-inclinacion * x_input))
+		var y_output: float = Functions.sigmoid(inclinacion * x_input)
 		
 		# 4. Transformar a coordenadas locales de Godot
 		# X escala con la longitud_total

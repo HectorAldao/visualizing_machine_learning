@@ -108,7 +108,7 @@ func _build_node_step(context: Dictionary) -> void:
 	
 	# Get the list of ground truth
 	var labels = _get_labels(data)
-	var label_counts := _get_label_counts(labels)
+	var label_counts := Functions.count_values(labels)
 	var majority_label := _majority_class(labels)
 	var majority_count: int = int(label_counts.get(majority_label, 0))
 	var purity := 0.0 if labels.is_empty() else float(majority_count) / float(labels.size())
@@ -334,11 +334,7 @@ func _get_unique_labels(labels: Array) -> Array:
 
 func _majority_class(labels: Array) -> String:
 	# Count in a dictionary the amount of data with each label
-	var counts: Dictionary  = {}
-	for label in labels:
-		if not counts.has(label):
-			counts[label] = 0
-		counts[label] += 1
+	var counts: Dictionary = Functions.count_values(labels)
 	
 	# And iterate through the dictionary to get the highest
 	var max_label = ""
@@ -351,38 +347,11 @@ func _majority_class(labels: Array) -> String:
 	return max_label
 
 
-func _get_label_counts(labels: Array) -> Dictionary:
-	var counts: Dictionary = {}
-	for label in labels:
-		if not counts.has(label):
-			counts[label] = 0
-		counts[label] += 1
-	return counts
-
-
 func _entropy(labels: Array) -> float:
 	
 	details["metrica_de_ganancia_de_info_1"] = "la entropía"
 	details["metrica_de_ganancia_de_info_2"] = "entropía"
-	
-	if labels.is_empty():
-		return 0.0
-	
-	var total = labels.size()
-	var counts = {}
-	
-	for label in labels:
-		if not counts.has(label):
-			counts[label] = 0
-		counts[label] += 1
-	
-	var entropy_val = 0.0
-	for count in counts.values():
-		var p = float(count) / float(total)
-		if p > 0:
-			entropy_val -= p * log(p) / log(2)
-	
-	return entropy_val
+	return Functions.compute_entropy(labels)
 
 
 func _information_gains_for_all_atributes(attributes: Array, data) -> Dictionary[String, float]:

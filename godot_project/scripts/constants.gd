@@ -60,8 +60,12 @@ const LOSS_FUNCS: Dictionary[String, int] = {
 	"coss_entr": 1,
 }
 
+const NN_LOSS_EPSILON: float = 1e-8
+const DTREE_ENTROPY_LOG_BASE: float = 2.0
+
 const NN_REDRAW_CONECTIONS: bool = true
 
+const NN_CONNECTION_RANDOM_MEAN: float = 0.0
 const NN_CONNECTION_RANDOM_MULT: float = 0.1
 const NN_CONNECTION_VARIANCE: float = 0.5
 const NN_CONECTION_SCALE: float = 20

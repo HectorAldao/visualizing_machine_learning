@@ -241,7 +241,7 @@ func compute_layer_deltas(
 	# If its the las layer
 	if layer_idx == -1:
 		# and softmax function with coross_entropy
-		if _is_softmax_activation(act_type) and loss_type == Constants.LOSS_FUNCS.coss_entr:
+		if Functions.is_softmax_activation(act_type) and loss_type == Constants.LOSS_FUNCS.coss_entr:
 			# Initialize the array of deltas
 			var output_deltas: Array[float] = []
 			# For each neuron
@@ -267,7 +267,7 @@ func compute_layer_deltas(
 		# if its not softmax with coross_entropy
 		# just compute the difference between output and target
 		# with the corresponding loss type
-		upstream_gradients = _compute_output_loss_error(output_values, target, loss_type)
+		upstream_gradients = Functions.compute_output_loss_error(output_values, target, loss_type)
 
 	# If its not the last layer
 	else:
@@ -292,9 +292,13 @@ func compute_layer_deltas(
 
 	# Probably never its going to be needed
 	# If the act funct is softmax but the error is not coross entropy
-	if _is_softmax_activation(act_type):
-		var current_output = output_values if layer_idx == -1 else _apply_activation_values(z_values, act_type)
-		return _apply_softmax_backprop(current_output, upstream_gradients, layer_idx, emit_signals)
+	if Functions.is_softmax_activation(act_type):
+		var current_output = output_values if layer_idx == -1 else Functions.apply_activation_values(z_values, act_type)
+		var softmax_deltas: Array[float] = Functions.apply_softmax_backprop(current_output, upstream_gradients)
+		if emit_signals:
+			for i in range(softmax_deltas.size()):
+				SignalsObserver.backward_step_completed.emit(layer_idx, i, softmax_deltas[i])
+		return softmax_deltas
 
 	var deltas: Array[float] = []
 	for i in range(num_neurons):
@@ -304,61 +308,12 @@ func compute_layer_deltas(
 		# delta_i = dLoss/dActivation_i * dActivation_i/dZ_i.
 		# Those deltas are the values used later to compute weight gradients:
 		# dLoss/dWeight_i_k = delta_i * previous_layer_output_k.
-		var delta: float = upstream_gradients[i] * apply_activation_derivative(z_values[i], act_type)
+		var delta: float = upstream_gradients[i] * Functions.apply_activation_derivative(z_values[i], act_type)
 		deltas.append(delta)
 		if emit_signals:
 			SignalsObserver.backward_step_completed.emit(layer_idx, i, delta)
 
 	return deltas
-
-
-## Computes the loss based on the specified loss function
-##
-## Returns an Array of the error of each neuron
-func _compute_output_loss_error(output_values: Array, target: Array, loss_type: int) -> Array[float]:
-
-	var output_error: Array[float] = []
-	var num_neurons: int = output_values.size()
-
-	# Each loss_func calculates the loss in a different way
-	match loss_type:
-
-		# MSE
-		Constants.LOSS_FUNCS.mse:
-			for i in range(num_neurons):
-				output_error.append(output_values[i] - target[i])
-
-		# Cross entropy
-		Constants.LOSS_FUNCS.coss_entr:
-			var epsilon: float = 1e-8
-			for i in range(num_neurons):
-				var safe_output: float = max(output_values[i], epsilon)
-				output_error.append(-target[i] / safe_output)
-		_:
-			for i in range(num_neurons):
-				output_error.append(output_values[i] - target[i])
-
-	return output_error
-
-
-func _compute_loss_value(output_values: Array, target: Array, loss_type: int) -> float:
-	var terms_count: int = min(output_values.size(), target.size())
-	if terms_count <= 0:
-		return 0.0
-
-	match loss_type:
-		Constants.LOSS_FUNCS.coss_entr:
-			var epsilon: float = 1e-8
-			var loss_sum: float = 0.0
-			for i in range(terms_count):
-				loss_sum -= float(target[i]) * log(max(float(output_values[i]), epsilon))
-			return loss_sum
-		_:
-			var squared_error_sum: float = 0.0
-			for i in range(terms_count):
-				var error: float = float(output_values[i]) - float(target[i])
-				squared_error_sum += error * error
-			return squared_error_sum / float(terms_count)
 
 
 # func update_layer_weights(layer_weights: Array, current_layer_deltas: Array, prev_outputs: Array, lr: float, l_idx: int) -> void:
@@ -482,7 +437,7 @@ func _get_backward_neuron_info(layer_idx: int, neuron_idx: int, delta: float) ->
 		target_value = float(_current_target_data[neuron_idx])
 
 	if layer_idx == -1:
-		var output_errors: Array[float] = _compute_output_loss_error(output_values, _current_target_data, _loss_type)
+		var output_errors: Array[float] = Functions.compute_output_loss_error(output_values, _current_target_data, _loss_type)
 		if neuron_idx >= 0 and neuron_idx < output_errors.size():
 			upstream_gradient = output_errors[neuron_idx]
 	else:
@@ -528,7 +483,7 @@ func _get_current_sample_info() -> Dictionary:
 		"output_values": output_values,
 		"target_values": target_values,
 		"loss_type": _loss_type,
-		"loss_value": _compute_loss_value(output_values, target_values, _loss_type),
+		"loss_value": Functions.compute_loss_value(output_values, target_values, _loss_type),
 		"output_activation_type": _activations.get(-1, Constants.ACT_FUNCS.identity),
 		"train_attributes": _train_attributes.duplicate(),
 		"target_attributes": _target_attributes.duplicate(),
@@ -732,14 +687,9 @@ func _prepare_forward_cache(layer_idx: int) -> void:
 	for neuron_idx in range(layer_weights.size()):
 		var neuron_weights: Array = layer_weights[neuron_idx]
 		var neuron_bias: float = _get_neuron_bias(layer_idx, neuron_idx)
-		z_values.append(compute_weighted_sum(_current_input_data, neuron_weights, neuron_bias))
+		z_values.append(Functions.compute_weighted_sum(_current_input_data, neuron_weights, neuron_bias))
 
-	var a_values: Array = []
-	if _is_softmax_activation(_activations[layer_idx]):
-		a_values = _apply_softmax(z_values)
-	else:
-		for z in z_values:
-			a_values.append(apply_activation(z, _activations[layer_idx]))
+	var a_values: Array = Functions.apply_activation_values(z_values, _activations[layer_idx])
 
 	_cached_phase = "forward"
 	_cached_layer_idx = layer_idx
@@ -942,21 +892,6 @@ func _get_current_layer_idx() -> int:
 	return -9999
 
 
-# --- Math utilities ---
-
-## [x, y, z] * [a, b, c] = x*a + y*b + z*c
-## Interior product
-func compute_dot_product(inputs: Array, neuron_weights: Array) -> float:
-	var activation_sum: float = 0.0
-	for i in range(inputs.size()):
-		activation_sum += inputs[i] * neuron_weights[i]
-	return activation_sum
-
-
-func compute_weighted_sum(inputs: Array, neuron_weights: Array, bias: float) -> float:
-	return compute_dot_product(inputs, neuron_weights) + bias
-
-
 func _get_neuron_bias(layer_idx: int, neuron_idx: int) -> float:
 	if not _biases.has(layer_idx):
 		return 0.0
@@ -977,7 +912,7 @@ func _update_neuron_bias(layer_idx: int, neuron_idx: int, neuron_delta: float) -
 		return
 
 	while neuron_idx >= layer_biases.size():
-		layer_biases.append(_random_bias())
+		layer_biases.append(Functions.random_connection_weight())
 
 	var bias_gradient: float = neuron_delta
 	layer_biases[neuron_idx] -= _learning_rate * bias_gradient
@@ -1000,7 +935,7 @@ func _ensure_biases_match_weights(biases: Dictionary, weights: Dictionary) -> Di
 			if neuron_idx < layer_biases.size():
 				synced_layer_biases[neuron_idx] = float(layer_biases[neuron_idx])
 			else:
-				synced_layer_biases[neuron_idx] = _random_bias()
+				synced_layer_biases[neuron_idx] = Functions.random_connection_weight()
 
 		synced_biases[layer_idx] = synced_layer_biases
 
@@ -1019,97 +954,8 @@ func _create_bias_vector(size: int) -> Array:
 	var biases: Array = []
 	biases.resize(max(size, 0))
 	for i in range(biases.size()):
-		biases[i] = _random_bias()
+		biases[i] = Functions.random_connection_weight()
 	return biases
-
-
-func _random_bias() -> float:
-	return Constants.NN_CONNECTION_RANDOM_MULT * randfn(0.0, sqrt(Constants.NN_CONNECTION_VARIANCE))
-
-
-func apply_activation(x: float, type: int) -> float:
-	match type:
-		Constants.ACT_FUNCS.relu:
-			return max(0.0, x)
-		Constants.ACT_FUNCS.sigmoid:
-			return 1.0 / (1.0 + exp(-x))
-		Constants.ACT_FUNCS.softmax:
-			return x
-		_:
-			return x
-
-
-func apply_activation_derivative(x: float, type: int) -> float:
-	match type:
-		Constants.ACT_FUNCS.relu:
-			return 1.0 if x > 0 else 0.0
-		Constants.ACT_FUNCS.sigmoid:
-			var s = apply_activation(x, Constants.ACT_FUNCS.sigmoid)
-			return s * (1.0 - s)
-		Constants.ACT_FUNCS.softmax:
-			return 1.0
-		_:
-			return 1.0
-
-
-## True if the type is softmax
-func _is_softmax_activation(type: int) -> bool:
-	return type == Constants.ACT_FUNCS.softmax
-
-
-## Processes the output of a layer based on its activation function
-func _apply_activation_values(z_values: Array, activation_type: int) -> Array:
-	if activation_type == Constants.ACT_FUNCS.softmax:
-		return _apply_softmax(z_values)
-
-	var activated_values: Array = []
-	for z in z_values:
-		activated_values.append(apply_activation(z, activation_type))
-	return activated_values
-
-
-## Separated calculation of softmax because its complex enough
-## to warrant its own function
-func _apply_softmax(z_values: Array) -> Array:
-	var softmax_values: Array = []
-	softmax_values.resize(z_values.size())
-
-	if z_values.is_empty():
-		return softmax_values
-
-	var max_z: float = z_values[0]
-	for z in z_values:
-		if z > max_z:
-			max_z = z
-
-	var exponent_sum: float = 0.0
-	for z in z_values:
-		exponent_sum += exp(z - max_z)
-
-	if exponent_sum == 0.0:
-		return softmax_values
-
-	for i in range(z_values.size()):
-		softmax_values[i] = exp(z_values[i] - max_z) / exponent_sum
-
-	return softmax_values
-
-
-func _apply_softmax_backprop(activated_values: Array, upstream_gradients: Array, layer_idx: int, emit_signals: bool = true) -> Array:
-	var deltas: Array = []
-	deltas.resize(activated_values.size())
-
-	var dot_product: float = 0.0
-	for i in range(activated_values.size()):
-		dot_product += upstream_gradients[i] * activated_values[i]
-
-	for i in range(activated_values.size()):
-		var delta: float = activated_values[i] * (upstream_gradients[i] - dot_product)
-		deltas[i] = delta
-		if emit_signals:
-			SignalsObserver.backward_step_completed.emit(layer_idx, i, delta)
-
-	return deltas
 
 
 # --- Helpe logic for dictionary keys ---
