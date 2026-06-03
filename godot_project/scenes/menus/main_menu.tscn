@@ -123,3 +123,8 @@ size_flags_vertical = 0
 text = "Preseleccione uno de los algoritmos para saber más información antes de empezar"
 label_settings = SubResource("LabelSettings_6bivr")
 autowrap_mode = 3
+
+[node name="PreviewOfAlgorithm" type="TextureRect" parent="ScrollContainer/MarginContainer/CenterContainer/PanelContainer/VBoxContainer/PanelContainerMenu/VBoxContainer" unique_id=34555296]
+unique_name_in_owner = true
+layout_mode = 2
+expand_mode = 5

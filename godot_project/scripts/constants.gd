@@ -60,6 +60,11 @@ const LOSS_FUNCS: Dictionary[String, int] = {
 	"coss_entr": 1,
 }
 
+const SPRITES: Dictionary[String, String] = {
+	"dtree": "uid://c83k8f24pvcma",
+	"nn": ""
+}
+
 const NN_LOSS_EPSILON: float = 1e-8
 const DTREE_ENTROPY_LOG_BASE: float = 2.0
 const DTREE_CANVAS_MARGIN: float = 100.0

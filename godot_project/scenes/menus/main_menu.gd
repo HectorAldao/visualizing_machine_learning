@@ -11,6 +11,7 @@ extends Control
 
 @onready var title_label: Label = %TitleLabel
 @onready var text_label: Label = %TextLabel
+@onready var preview_of_algorithm: TextureRect = %PreviewOfAlgorithm
 
 @onready var panelcontainer: PanelContainer = %PanelContainer
 
@@ -61,8 +62,10 @@ func _update_panel() -> void:
 	match selected_algorithm:
 		1:
 			start_button.disabled = false
+			preview_of_algorithm.texture = load(Constants.SPRITES.dtree)
 		2:
 			start_button.disabled = false
+			preview_of_algorithm.texture = load(Constants.SPRITES.nn)
 		_:
 			return
 
