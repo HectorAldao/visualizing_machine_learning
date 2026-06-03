@@ -50,22 +50,22 @@ const DICT_OF_DATASETS: Dictionary = \
 	
 	"Tenis": [
 		[
-			{"outlook": "sunny", "temperature": "hot", "humidity": "high", "wind": "weak", "class": "no"},
-			{"outlook": "sunny", "temperature": "hot", "humidity": "high", "wind": "strong", "class": "no"},
-			{"outlook": "overcast", "temperature": "hot", "humidity": "high", "wind": "weak", "class": "yes"},
-			{"outlook": "rain", "temperature": "mild", "humidity": "high", "wind": "weak", "class": "yes"},
-			{"outlook": "rain", "temperature": "cool", "humidity": "normal", "wind": "weak", "class": "yes"},
-			{"outlook": "rain", "temperature": "cool", "humidity": "normal", "wind": "strong", "class": "no"},
-			{"outlook": "overcast", "temperature": "cool", "humidity": "normal", "wind": "strong", "class": "yes"},
-			{"outlook": "sunny", "temperature": "mild", "humidity": "high", "wind": "weak", "class": "no"},
-			{"outlook": "sunny", "temperature": "cool", "humidity": "normal", "wind": "weak", "class": "yes"},
-			{"outlook": "rain", "temperature": "mild", "humidity": "normal", "wind": "weak", "class": "yes"},
-			{"outlook": "sunny", "temperature": "mild", "humidity": "normal", "wind": "strong", "class": "yes"},
-			{"outlook": "overcast", "temperature": "mild", "humidity": "high", "wind": "strong", "class": "yes"},
-			{"outlook": "overcast", "temperature": "hot", "humidity": "normal", "wind": "weak", "class": "yes"},
-			{"outlook": "rain", "temperature": "mild", "humidity": "high", "wind": "strong", "class": "no"}
+			{"tiempo": "soleado", "temperatura": "calor", "humedad": "alta", "viento": "bajo", "clase": "no"},
+			{"tiempo": "soleado", "temperatura": "calor", "humedad": "alta", "viento": "fuerte", "clase": "no"},
+			{"tiempo": "nublado", "temperatura": "calor", "humedad": "alta", "viento": "bajo", "clase": "si"},
+			{"tiempo": "lluvia", "temperatura": "moderada", "humedad": "alta", "viento": "bajo", "clase": "si"},
+			{"tiempo": "lluvia", "temperatura": "fresco", "humedad": "normal", "viento": "bajo", "clase": "si"},
+			{"tiempo": "lluvia", "temperatura": "fresco", "humedad": "normal", "viento": "fuerte", "clase": "no"},
+			{"tiempo": "nublado", "temperatura": "fresco", "humedad": "normal", "viento": "fuerte", "clase": "si"},
+			{"tiempo": "soleado", "temperatura": "moderada", "humedad": "alta", "viento": "bajo", "clase": "no"},
+			{"tiempo": "soleado", "temperatura": "fresco", "humedad": "normal", "viento": "bajo", "clase": "si"},
+			{"tiempo": "lluvia", "temperatura": "moderada", "humedad": "normal", "viento": "bajo", "clase": "si"},
+			{"tiempo": "soleado", "temperatura": "moderada", "humedad": "normal", "viento": "fuerte", "clase": "si"},
+			{"tiempo": "nublado", "temperatura": "moderada", "humedad": "alta", "viento": "fuerte", "clase": "si"},
+			{"tiempo": "nublado", "temperatura": "calor", "humedad": "normal", "viento": "bajo", "clase": "si"},
+			{"tiempo": "lluvia", "temperatura": "moderada", "humedad": "alta", "viento": "fuerte", "clase": "no"}
 		],
-		["outlook", "temperature", "humidity", "wind"]
+		["tiempo", "temperatura", "humedad", "viento"]
 	]
 }
 
