@@ -1,11 +1,7 @@
 [gd_scene format=3 uid="uid://6ktcduu5a5qg"]
 
 [ext_resource type="Texture2D" uid="uid://d2bmtbmodybx8" path="res://assets/background/motherboard.png" id="1_iheb5"]
-[ext_resource type="Shader" uid="uid://6l8tm6en75yp" path="res://scenes/background/background.gdshader" id="1_pesyb"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_rsf5d"]
-shader = ExtResource("1_pesyb")
-shader_parameter/uv_scale = Vector2(4, 4)
+[ext_resource type="Texture2D" uid="uid://bjxcnqe1lb3px" path="res://assets/background/mother_board_2.jpg" id="2_rsf5d"]
 
 [node name="Background" type="Control" unique_id=100317907]
 z_index = -20
@@ -18,15 +14,14 @@ grow_vertical = 2
 
 [node name="TextureRect" type="TextureRect" parent="." unique_id=257061337]
 texture_repeat = 3
-material = SubResource("ShaderMaterial_rsf5d")
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("1_iheb5")
-expand_mode = 1
+texture = ExtResource("2_rsf5d")
+stretch_mode = 1
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=666489280]
 visible = false

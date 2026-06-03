@@ -106,7 +106,7 @@ func update_canvas_size_and_center() -> void:
 		scroll_container.set_deferred("scroll_vertical", target_v)
 
 
-func expand_canvas_to_include_rect(local_rect: Rect2, margin: float = 100.0) -> void:
+func expand_canvas_to_include_rect(local_rect: Rect2, margin: float = Constants.DTREE_CANVAS_MARGIN) -> void:
 	var required_size := Vector2(
 		max(custom_minimum_size.x, local_rect.position.x + local_rect.size.x + margin),
 		max(custom_minimum_size.y, local_rect.position.y + local_rect.size.y + margin)
@@ -185,7 +185,7 @@ func get_tree_bounds() -> Rect2:
 		max_x = max(max_x, p.x)
 		max_y = max(max_y, p.y)
 
-	var margin := 100.0  # margen alrededor del árbol
+	var margin := Constants.DTREE_CANVAS_MARGIN  # margen alrededor del árbol
 	var pos  := Vector2(min_x - margin, min_y - margin)
 	var tree_size := Vector2(
 		(max_x - min_x) + margin * 2.0,

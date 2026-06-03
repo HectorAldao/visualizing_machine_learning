@@ -102,6 +102,7 @@ func _on_clear_nn_eval_data(container_role: String) -> void:
 	for eval_data in _eval_data_by_attr.values():
 		if is_instance_valid(eval_data):
 			eval_data.clear_value()
+	_request_network_canvas_update()
 
 
 ## Applies a new sample dictionary to the labels.
@@ -210,6 +211,8 @@ func _refresh_positions() -> void:
 		home_position.y += (neuron_rect.size.y - eval_data.size.y) / 2.0
 		eval_data.global_position = home_position
 		eval_data.set_home_position(eval_data.position)
+
+	_request_network_canvas_update()
 
 
 ## Creates the column title label once. It stays outside _eval_data_by_attr so
@@ -328,6 +331,12 @@ func get_title_global_right() -> float:
 
 	_refresh_title_position()
 	return _title_label.get_global_rect().end.x
+
+
+func _request_network_canvas_update() -> void:
+	var neural_network: Node = get_parent()
+	if neural_network and neural_network.has_method("request_canvas_update"):
+		neural_network.request_canvas_update()
 
 
 ## Removes labels from a previous training setup before pairing role keys with
