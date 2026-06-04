@@ -103,7 +103,7 @@ func _refresh_pair_connections(pair_start_position: int) -> void:
 			_add_connection(from_neuron, to_neuron, key)
 
 
-func _add_connection(from_neuron: Neuron, to_neuron: Neuron, key: String, weight_override: Variant = null) -> void:
+func _add_connection(from_neuron: Neuron, to_neuron: Neuron, key: String, weight_override: Variant = null, show_update_indicator: bool = false) -> void:
 	var from_neuron_index: int = from_neuron._id
 	var to_layer_id: int = to_neuron._layer_id
 	
@@ -120,6 +120,8 @@ func _add_connection(from_neuron: Neuron, to_neuron: Neuron, key: String, weight
 	var connection_width: float = _get_connection_width(weight)
 
 	var connection: Conection = Conection.newone(to_neuron, from_neuron, connection_width, connection_color)
+	if show_update_indicator:
+		connection.show_update_indicator(weight >= 0.0)
 
 	add_child(connection)
 	_connections[key] = connection
@@ -140,7 +142,7 @@ func _update_connection_weight(from_neuron: Neuron, to_neuron: Neuron, key: Stri
 
 func _redraw_connection(from_neuron: Neuron, to_neuron: Neuron, key: String, weight: float) -> void:
 	_remove_connection(key, true)
-	_add_connection(from_neuron, to_neuron, key, weight)
+	_add_connection(from_neuron, to_neuron, key, weight, true)
 
 
 func _get_connection_weight(to_layer_id: int, to_neuron_id: int, from_neuron_index: int) -> Variant:

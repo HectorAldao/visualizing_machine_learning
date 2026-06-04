@@ -10,12 +10,16 @@ const scene_uid: String = Constants.SCENES.conection
 @export var text_margin: float = 10.0
 @export var line_width: float = 2.0
 @export var line_color: Color = Color.BLACK
+@export var positive_update_indicator_color: Color = Color.GREEN
+@export var negative_update_indicator_color: Color = Color.RED
 
 var _label: Label
 
 var _anim_progress : float = 0.0
 var _animating : bool = false
 var _animation_tween: Tween
+var _show_update_indicator: bool = false
+var _update_indicator_color: Color = Color.GREEN
 
 func _ready() -> void:
 	_label = Label.new()
@@ -54,6 +58,13 @@ func _process(_delta: float) -> void:
 	# Mantener la línea alineada con los nodos (sin animar)
 	points = _calc_points(1.0)
 	_update_label()
+
+
+func _draw() -> void:
+	if not (_animating and _show_update_indicator and points.size() > 0):
+		return
+
+	draw_circle(points[points.size() - 1], Constants.CONECTION_UPDATE_INDICATOR_RADIUS, _update_indicator_color, true)
 
 
 func _calc_points(p: float) -> Array:
@@ -117,6 +128,7 @@ func _calc_points(p: float) -> Array:
 func _update_from_progress() -> void:
 	points = _calc_points(_anim_progress)
 	_update_label()
+	queue_redraw()
 
 
 func play_draw_animation(duration: float = 0.5) -> void:
@@ -151,8 +163,10 @@ func _play_progress_animation(target_progress: float, target_alpha: float, durat
 func _on_draw_anim_finished() -> void:
 	_animating = false
 	_animation_tween = null
+	_show_update_indicator = false
 	points = _calc_points(1.0)
 	_update_label()
+	queue_redraw()
 
 
 func _on_destroy_anim_finished() -> void:
@@ -160,6 +174,7 @@ func _on_destroy_anim_finished() -> void:
 	_animation_tween = null
 	_anim_progress = 0.0
 	points = _calc_points(0.0)
+	queue_redraw()
 	queue_free()
 
 
@@ -207,3 +222,9 @@ func set_line_style(new_line_width: float, new_line_color: Color) -> void:
 	line_color = new_line_color
 	width = new_line_width
 	default_color = new_line_color
+
+
+func show_update_indicator(is_positive_update: bool) -> void:
+	_show_update_indicator = true
+	_update_indicator_color = positive_update_indicator_color if is_positive_update else negative_update_indicator_color
+	queue_redraw()

@@ -78,6 +78,7 @@ const NN_CONNECTION_VARIANCE: float = 0.5
 const NN_CONECTION_SCALE: float = 20
 const NN_CONECTION_BIAS: float = 0
 const NN_MAX_WIDTH: float = 5
+const CONECTION_UPDATE_INDICATOR_RADIUS: float = 8.0
 
 const NN_EVAL_DATA_DISPLAY_DECIMALS: int = 3
 const NN_EVAL_DATA_GAP: float = 24.0
