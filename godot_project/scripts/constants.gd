@@ -30,7 +30,8 @@ const THEMES: Dictionary[String, String] = {
 	"leaf": "uid://vanr6vum3qcu",
 	"noleaf": "uid://cmsv2q8q35lvy",
 	"nodedefault": "uid://dxluxv1xceiqb",
-	"resalted_neuron": "uid://b5ecvrwlunl4u"
+	"resalted_neuron": "uid://b5ecvrwlunl4u",
+	"clicked_neuron": "uid://crl6y52brsh76"
 }
 
 const REFCOUNTS: Dictionary[String, String] = {

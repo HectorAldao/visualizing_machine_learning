@@ -36,7 +36,7 @@ size_flags_vertical = 4
 [node name="Button1" type="Button" parent="HBoxContainer/VBoxContainer/DatasetsNnHBoxContainer" unique_id=770400233]
 custom_minimum_size = Vector2(120, 250)
 layout_mode = 2
-text = "EnemyAI"
+text = "Iris"
 
 [node name="Button3" type="Button" parent="HBoxContainer/VBoxContainer/DatasetsNnHBoxContainer" unique_id=223743171]
 custom_minimum_size = Vector2(120, 250)

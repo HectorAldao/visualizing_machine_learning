@@ -6,6 +6,7 @@ var _layer_id: int = -2
 
 var _normal_theme: Theme
 var _resalted_theme: Theme = preload(Constants.THEMES.resalted_neuron)
+var _clicked_theme: Theme = preload(Constants.THEMES.clicked_neuron)
 
 
 func _ready() -> void:
