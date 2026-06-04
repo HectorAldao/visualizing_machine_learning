@@ -75,10 +75,10 @@ func _update_panel() -> void:
 func _update_text(algorithm: int) -> void:
 	const dict_of_text: Dictionary[int, Array] = {
 		1: ["Árbol de decisión",
-			""
+			"El árbol de decisión se construye mediante el algoritmo ID3, creando un modelo de clasificación que divide el conjunto de datos de forma recursiva. En cada nodo de decisión, el algoritmo calcula la entropía del conjunto de datos que llega a él y evalúa la ganancia de información de cada característica categórica disponible. Selecciona el atributo que maximiza esta ganancia de información para realizar la división. El particionamiento continúa en cada rama hasta que todos los ejemplos del nodo pertenecen a la misma clase o se han agotado las características a evaluar."
 			],
 		2: ["Red neuronal",
-			""
+			"Una red neuronal feedforward aproxima funciones complejas mapeando datos a través de capas secuenciales de nodos (neuronas) interconectados. En la fase de propagación hacia adelante (forward propagation), cada nodo calcula el producto escalar de sus entradas y su vector de pesos, añade un término de sesgo (bias), y aplica una función de activación matemática para introducir no linealidad. El entrenamiento se ejecuta mediante el algoritmo de retropropagación (backpropagation): tras evaluar la predicción final mediante una función de error, se calcula el gradiente de este error propagándolo hacia atrás en la red. Finalmente, los pesos y sesgos se actualizan de forma iterativa utilizando el descenso del gradiente para minimizar el error global."
 			]
 		}
 	
