@@ -6,6 +6,11 @@
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2o76q"]
 bg_color = Color(0.19607843, 0.19607843, 0.19607843, 0.9411765)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.19607843, 0.19607843, 0.19607843, 0.9411765)
 
 [sub_resource type="Theme" id="Theme_6bivr"]
 PanelContainer/styles/panel = SubResource("StyleBoxFlat_2o76q")
