@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://b3kpa18i28go" path="res://scenes/interface/nn/window_nn/window_nn.gd" id="1_0ggu8"]
 [ext_resource type="PackedScene" uid="uid://c0p8glq0rsesw" path="res://scenes/latex_formula/latex_formula.tscn" id="2_f5hif"]
 [ext_resource type="Script" uid="uid://cyinp2iohgy8b" path="res://scenes/interface/scroll_container/scroll_container.gd" id="2_p1i8u"]
+[ext_resource type="LabelSettings" uid="uid://bo05abbvr6q32" path="res://themes/window_nn_labels/window_nn_labels.tres" id="3_tcppy"]
 
 [node name="WindowNn" type="PanelContainer" unique_id=225370147]
 offset_right = 20.0
@@ -21,6 +22,7 @@ size_flags_horizontal = 3
 [node name="Label0" type="Label" parent="ScrollContainerV2/VBoxContainer" unique_id=775268905]
 unique_name_in_owner = true
 layout_mode = 2
+label_settings = ExtResource("3_tcppy")
 autowrap_mode = 3
 
 [node name="LatexFormula" parent="ScrollContainerV2/VBoxContainer" unique_id=42571569 instance=ExtResource("2_f5hif")]
@@ -33,9 +35,11 @@ svg_padding = 1.0
 [node name="LabelFormula" type="Label" parent="ScrollContainerV2/VBoxContainer" unique_id=670583864]
 unique_name_in_owner = true
 layout_mode = 2
+label_settings = ExtResource("3_tcppy")
 autowrap_mode = 3
 
 [node name="Label1" type="Label" parent="ScrollContainerV2/VBoxContainer" unique_id=904132594]
 unique_name_in_owner = true
 layout_mode = 2
+label_settings = ExtResource("3_tcppy")
 autowrap_mode = 3

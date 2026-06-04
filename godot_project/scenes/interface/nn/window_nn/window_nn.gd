@@ -22,6 +22,22 @@ const template_texts: Dictionary[String, Array] = {
 		"La operación que calcula el error que vuelve por esta neurona es:",
 		"Su delta es {delta}"
 		],
+	"data_loaded": [
+		"Llega el dato de entrenamiento {data_number}.",
+		"La red toma este vector como entrada y lo compara más adelante con la etiqueta esperada."
+		],
+	"error_calculated": [
+		"Se calcula el error de la salida de la red.",
+		"El vector {deltas} es el error que iniciará la retropropagación en la capa de salida."
+		],
+	"error_returned": [
+		"El error se devuelve a la red para empezar el backpropagation.",
+		"A partir de este vector, cada capa calculará sus deltas y actualizará sus pesos."
+		],
+	"layer_backward_resalted": [
+		"Se ha ejecutado {layer_name} completa en backpropagation.",
+		"La capa calcula todos sus deltas a la vez y después obtiene el gradiente agregado de sus pesos."
+		],
 	}
 
 func _ready() -> void:
@@ -30,6 +46,10 @@ func _ready() -> void:
 	SignalsObserver.nn_resalted_neuron_forward.connect(set_resalted_neuron_info_forward)
 	SignalsObserver.nn_resalted_neuron_backward.connect(set_resalted_neuron_info_backward)
 	SignalsObserver.nn_resalted_layer_forward.connect(set_resalted_layer_info_forward)
+	SignalsObserver.nn_resalted_layer_backward.connect(set_resalted_layer_info_backward)
+	SignalsObserver.nn_resalted_data_loaded.connect(set_resalted_data_loaded_info)
+	SignalsObserver.nn_resalted_error_calculated.connect(set_resalted_error_calculated_info)
+	SignalsObserver.nn_resalted_error_returned.connect(set_resalted_error_returned_info)
 	SignalsObserver.nn_resalted_data_step.connect(set_resalted_data_step_info)
 	SignalsObserver.nn_train_finished.connect(set_training_finished_info)
 
@@ -135,6 +155,102 @@ func set_resalted_layer_info_forward(layer_info: Dictionary) -> void:
 
 	text0.text = "Se ha ejecutado %s completa.\nLa operación agregada de la capa es:" % _layer_name_text(layer_id)
 	text1.text = "Cada neurona de una misma capa recibe el mismo vector de entrada, pero usa su propia columna de pesos. Por eso podemos juntar todos esos pesos en una matriz W: la columna 1 calcula la neurona 1, la columna 2 calcula la neurona 2, y así sucesivamente.\n\nPrimero se calcula z = x · W + b, donde x es la entrada, W son los pesos y b son los sesgos. Después se aplica la función de activación %s para obtener la salida final a de la capa." % _activation_layer_explanation(activation_type)
+
+
+func set_resalted_layer_info_backward(layer_info: Dictionary) -> void:
+	_reset_formula()
+
+	var layer_id: int = int(layer_info.get("layer_id", -9999))
+	var formula: String
+	if ConfigVariables.use_latex:
+		formula = _latex_layer_backward_formatter(layer_info)
+		latexformula.request_formula(formula)
+	else:
+		formula = _formula_layer_backward_formatter(layer_info)
+		text_formula.text = formula
+
+	var dic_of_info: Dictionary = {
+		"layer_name": _layer_name_text(layer_id)
+	}
+	text0.text = template_texts.layer_backward_resalted[0].format(dic_of_info)
+	text1.text = template_texts.layer_backward_resalted[1]
+
+
+func set_resalted_data_loaded_info(data_info: Dictionary) -> void:
+	_reset_formula()
+
+	var input_values: Array = data_info.get("input_values", [])
+	var target_values: Array = data_info.get("target_values", [])
+	var data_idx: int = int(data_info.get("data_idx", -1))
+	var train_attributes: Array = data_info.get("train_attributes", [])
+	var target_attributes: Array = data_info.get("target_attributes", [])
+
+	var formula: String
+	if ConfigVariables.use_latex:
+		formula = _latex_data_loaded_formatter(input_values, target_values)
+		latexformula.request_formula(formula)
+	else:
+		formula = _formula_data_loaded_formatter(input_values, target_values)
+		text_formula.text = formula
+
+	var dic_of_info: Dictionary = {
+		"data_number": str(data_idx + 1) if data_idx >= 0 else "actual"
+	}
+	text0.text = "%s\nEntrada: %s\nEtiqueta esperada: %s" % [
+		template_texts.data_loaded[0].format(dic_of_info),
+		_format_named_values(train_attributes, input_values),
+		_format_expected_label(target_values, target_attributes)
+	]
+	text1.text = template_texts.data_loaded[1]
+
+
+func set_resalted_error_calculated_info(error_info: Dictionary) -> void:
+	_reset_formula()
+
+	var output_values: Array = error_info.get("output_values", [])
+	var target_values: Array = error_info.get("target_values", [])
+	var output_deltas: Array = error_info.get("output_deltas", [])
+	var target_attributes: Array = error_info.get("target_attributes", [])
+	var loss_type: int = int(error_info.get("loss_type", Constants.LOSS_FUNCS.mse))
+	var loss_value: float = float(error_info.get("loss_value", Functions.compute_loss_value(output_values, target_values, loss_type)))
+
+	var formula: String
+	if ConfigVariables.use_latex:
+		formula = _latex_error_calculation_formatter(error_info)
+		latexformula.request_formula(formula)
+	else:
+		formula = _formula_error_calculation_formatter(error_info)
+		text_formula.text = formula
+
+	var dic_of_info: Dictionary = {
+		"deltas": _format_vector(output_deltas)
+	}
+	text0.text = "%s\nSalida de la red: %s\nEtiqueta esperada: %s\nPérdida: %s" % [
+		template_texts.error_calculated[0],
+		_format_output_result(output_values),
+		_format_expected_label(target_values, target_attributes),
+		_format_latex_number(loss_value)
+	]
+	text1.text = template_texts.error_calculated[1].format(dic_of_info)
+
+
+func set_resalted_error_returned_info(error_info: Dictionary) -> void:
+	_reset_formula()
+
+	var output_deltas: Array = error_info.get("output_deltas", [])
+	var formula: String
+	if ConfigVariables.use_latex:
+		formula = _latex_error_return_formatter(error_info)
+		latexformula.request_formula(formula)
+	else:
+		formula = _formula_error_return_formatter(error_info)
+		text_formula.text = formula
+
+	text0.text = "%s\nDelta inicial: %s" % [
+		template_texts.error_returned[0],
+		_format_vector(output_deltas)
+	]
+	text1.text = template_texts.error_returned[1]
 
 
 func set_resalted_data_step_info(step_info: Dictionary) -> void:
@@ -266,6 +382,228 @@ func _formula_data_step_error_formatter(output_values: Array, target_values: Arr
 				terms_count,
 				_format_latex_number(loss_value)
 			]
+
+
+func _latex_data_loaded_formatter(input_values: Array, target_values: Array) -> String:
+	var formula_lines: Array[String] = [
+		"\\mathbf{x} &= %s" % _latex_row_vector(input_values)
+	]
+	if not target_values.is_empty():
+		formula_lines.append("\\mathbf{y} &= %s" % _latex_row_vector(target_values))
+	return "\\begin{aligned} %s \\end{aligned}" % " \\\\ ".join(formula_lines)
+
+
+func _formula_data_loaded_formatter(input_values: Array, target_values: Array) -> String:
+	var formula_lines: Array[String] = [
+		"x = %s" % _format_vector(input_values)
+	]
+	if not target_values.is_empty():
+		formula_lines.append("y = %s" % _format_vector(target_values))
+	return "\n".join(formula_lines)
+
+
+func _latex_error_calculation_formatter(error_info: Dictionary) -> String:
+	var output_values: Array = error_info.get("output_values", [])
+	var target_values: Array = error_info.get("target_values", [])
+	var output_deltas: Array = error_info.get("output_deltas", [])
+	var loss_gradients: Array = error_info.get("loss_gradients", [])
+	var output_z_values: Array = error_info.get("output_z_values", [])
+	var loss_type: int = int(error_info.get("loss_type", Constants.LOSS_FUNCS.mse))
+	var loss_value: float = float(error_info.get("loss_value", Functions.compute_loss_value(output_values, target_values, loss_type)))
+	var activation_type: int = int(error_info.get("output_activation_type", Constants.ACT_FUNCS.identity))
+	var terms_count: int = min(output_values.size(), target_values.size())
+	var formula_lines: Array[String] = []
+
+	match loss_type:
+		Constants.LOSS_FUNCS.coss_entr:
+			formula_lines.append("L &= -\\sum_{i=1}^{%d} y_i \\log(a_i)" % terms_count)
+			formula_lines.append("&= -(%s)" % _cross_entropy_terms_text(output_values, target_values, true))
+		_:
+			formula_lines.append("L &= \\frac{1}{n}\\sum_{i=1}^{n}(a_i-y_i)^2,\\quad n=%d" % terms_count)
+			formula_lines.append("&= \\frac{%s}{%d}" % [_mse_terms_text(output_values, target_values), max(terms_count, 1)])
+	formula_lines.append("&= %s" % _format_latex_number(loss_value))
+
+	if activation_type == Constants.ACT_FUNCS.softmax and loss_type == Constants.LOSS_FUNCS.coss_entr:
+		formula_lines.append("\\delta^{L} &= \\mathbf{a}^{L}-\\mathbf{y} = %s - %s = %s" % [_latex_row_vector(output_values), _latex_row_vector(target_values), _latex_row_vector(output_deltas)])
+	else:
+		formula_lines.append("\\mathbf{g}^{L} &= \\frac{\\partial L}{\\partial \\mathbf{a}^{L}} = %s" % _latex_row_vector(loss_gradients))
+		if activation_type == Constants.ACT_FUNCS.softmax:
+			formula_lines.append("\\delta^{L} &= J_{softmax}(\\mathbf{z}^{L})\\mathbf{g}^{L} = %s" % _latex_row_vector(output_deltas))
+		else:
+			formula_lines.append("f'(\\mathbf{z}^{L}) &= %s" % _latex_row_vector(_activation_derivative_values(output_z_values, activation_type)))
+			formula_lines.append("\\delta^{L} &= \\mathbf{g}^{L} \\odot f'(\\mathbf{z}^{L}) = %s" % _latex_row_vector(output_deltas))
+
+	return "\\begin{aligned} %s \\end{aligned}" % " \\\\ ".join(formula_lines)
+
+
+func _formula_error_calculation_formatter(error_info: Dictionary) -> String:
+	var output_values: Array = error_info.get("output_values", [])
+	var target_values: Array = error_info.get("target_values", [])
+	var output_deltas: Array = error_info.get("output_deltas", [])
+	var loss_gradients: Array = error_info.get("loss_gradients", [])
+	var output_z_values: Array = error_info.get("output_z_values", [])
+	var loss_type: int = int(error_info.get("loss_type", Constants.LOSS_FUNCS.mse))
+	var loss_value: float = float(error_info.get("loss_value", Functions.compute_loss_value(output_values, target_values, loss_type)))
+	var activation_type: int = int(error_info.get("output_activation_type", Constants.ACT_FUNCS.identity))
+	var terms_count: int = min(output_values.size(), target_values.size())
+	var formula_lines: Array[String] = []
+
+	match loss_type:
+		Constants.LOSS_FUNCS.coss_entr:
+			formula_lines.append("L = -Σ_i y_i × log(a_i)")
+			formula_lines.append("= -(%s)" % _cross_entropy_terms_text(output_values, target_values, false))
+		_:
+			formula_lines.append("L = (1 / n) × Σ_i (a_i - y_i)^2, n = %d" % terms_count)
+			formula_lines.append("= (%s) / %d" % [_mse_terms_text(output_values, target_values), max(terms_count, 1)])
+	formula_lines.append("= %s" % _format_latex_number(loss_value))
+
+	if activation_type == Constants.ACT_FUNCS.softmax and loss_type == Constants.LOSS_FUNCS.coss_entr:
+		formula_lines.append("δ^L = a^L - y = %s - %s = %s" % [_format_vector(output_values), _format_vector(target_values), _format_vector(output_deltas)])
+	else:
+		formula_lines.append("g^L = ∂L/∂a^L = %s" % _format_vector(loss_gradients))
+		if activation_type == Constants.ACT_FUNCS.softmax:
+			formula_lines.append("δ^L = J_softmax(z^L) × g^L = %s" % _format_vector(output_deltas))
+		else:
+			formula_lines.append("f'(z^L) = %s" % _format_vector(_activation_derivative_values(output_z_values, activation_type)))
+			formula_lines.append("δ^L = g^L ⊙ f'(z^L) = %s" % _format_vector(output_deltas))
+
+	return "\n".join(formula_lines)
+
+
+func _latex_error_return_formatter(error_info: Dictionary) -> String:
+	var output_deltas: Array = error_info.get("output_deltas", [])
+	return "\\begin{aligned} \\delta^{L} &= \\frac{\\partial L}{\\partial \\mathbf{z}^{L}} = %s \\\\ \\mathrm{inicio}\\;\\mathrm{backprop} &: \\delta^{L} \\rightarrow \\mathrm{capa}\\;\\mathrm{de}\\;\\mathrm{salida} \\end{aligned}" % _latex_row_vector(output_deltas)
+
+
+func _formula_error_return_formatter(error_info: Dictionary) -> String:
+	var output_deltas: Array = error_info.get("output_deltas", [])
+	return "δ^L = ∂L/∂z^L = %s\ninicio backprop: δ^L entra en la capa de salida" % _format_vector(output_deltas)
+
+
+func _latex_layer_backward_formatter(layer_info: Dictionary) -> String:
+	var layer_id: int = int(layer_info.get("layer_id", -9999))
+	var layer_symbol: String = _layer_symbol(layer_id)
+	var deltas: Array = layer_info.get("deltas", [])
+	var upstream_gradients: Array = layer_info.get("upstream_gradients", [])
+	var z_values: Array = layer_info.get("z_values", [])
+	var output_values: Array = layer_info.get("output_values", [])
+	var previous_outputs: Array = layer_info.get("previous_outputs", [])
+	var target_values: Array = layer_info.get("target_values", [])
+	var activation_type: int = int(layer_info.get("activation_type", Constants.ACT_FUNCS.identity))
+	var loss_type: int = int(layer_info.get("loss_type", Constants.LOSS_FUNCS.mse))
+	var is_output_layer: bool = bool(layer_info.get("is_output_layer", false))
+	var next_layer_symbol: String = _layer_symbol(int(layer_info.get("next_layer_id", -1)))
+	var learning_rate: float = float(layer_info.get("learning_rate", 0.0))
+	var gradients: Array = _compute_layer_weight_gradient_matrix(previous_outputs, deltas)
+	var formula_lines: Array[String] = []
+
+	if is_output_layer and activation_type == Constants.ACT_FUNCS.softmax and loss_type == Constants.LOSS_FUNCS.coss_entr:
+		formula_lines.append("\\delta^{%s} &= \\mathbf{a}^{%s}-\\mathbf{y} = %s - %s = %s" % [layer_symbol, layer_symbol, _latex_row_vector(output_values), _latex_row_vector(target_values), _latex_row_vector(deltas)])
+	elif is_output_layer:
+		formula_lines.append("\\mathbf{g}^{%s} &= \\frac{\\partial L}{\\partial \\mathbf{a}^{%s}} = %s" % [layer_symbol, layer_symbol, _latex_row_vector(upstream_gradients)])
+		formula_lines.append("%s" % _latex_delta_from_upstream_line(layer_symbol, z_values, activation_type, deltas))
+	else:
+		formula_lines.append("\\mathbf{g}^{%s} &= \\delta^{%s}(W^{%s})^T = %s" % [layer_symbol, next_layer_symbol, next_layer_symbol, _latex_row_vector(upstream_gradients)])
+		formula_lines.append("%s" % _latex_delta_from_upstream_line(layer_symbol, z_values, activation_type, deltas))
+
+	formula_lines.append("\\nabla W^{%s} &= (\\mathbf{a}^{%s-1})^T\\delta^{%s} = %s" % [layer_symbol, layer_symbol, layer_symbol, _latex_matrix(gradients)])
+	formula_lines.append("W^{%s} &\\leftarrow W^{%s} - \\eta\\nabla W^{%s},\\quad \\eta=%s" % [layer_symbol, layer_symbol, layer_symbol, _format_latex_number(learning_rate)])
+	return "\\begin{aligned} %s \\end{aligned}" % " \\\\ ".join(formula_lines)
+
+
+func _formula_layer_backward_formatter(layer_info: Dictionary) -> String:
+	var layer_id: int = int(layer_info.get("layer_id", -9999))
+	var layer_symbol: String = _layer_symbol(layer_id)
+	var deltas: Array = layer_info.get("deltas", [])
+	var upstream_gradients: Array = layer_info.get("upstream_gradients", [])
+	var z_values: Array = layer_info.get("z_values", [])
+	var output_values: Array = layer_info.get("output_values", [])
+	var previous_outputs: Array = layer_info.get("previous_outputs", [])
+	var target_values: Array = layer_info.get("target_values", [])
+	var activation_type: int = int(layer_info.get("activation_type", Constants.ACT_FUNCS.identity))
+	var loss_type: int = int(layer_info.get("loss_type", Constants.LOSS_FUNCS.mse))
+	var is_output_layer: bool = bool(layer_info.get("is_output_layer", false))
+	var next_layer_symbol: String = _layer_symbol(int(layer_info.get("next_layer_id", -1)))
+	var learning_rate: float = float(layer_info.get("learning_rate", 0.0))
+	var gradients: Array = _compute_layer_weight_gradient_matrix(previous_outputs, deltas)
+	var formula_lines: Array[String] = []
+
+	if is_output_layer and activation_type == Constants.ACT_FUNCS.softmax and loss_type == Constants.LOSS_FUNCS.coss_entr:
+		formula_lines.append("δ^%s = a^%s - y = %s - %s = %s" % [layer_symbol, layer_symbol, _format_vector(output_values), _format_vector(target_values), _format_vector(deltas)])
+	elif is_output_layer:
+		formula_lines.append("g^%s = ∂L/∂a^%s = %s" % [layer_symbol, layer_symbol, _format_vector(upstream_gradients)])
+		formula_lines.append(_formula_delta_from_upstream_line(layer_symbol, z_values, activation_type, deltas))
+	else:
+		formula_lines.append("g^%s = δ^%s × (W^%s)^T = %s" % [layer_symbol, next_layer_symbol, next_layer_symbol, _format_vector(upstream_gradients)])
+		formula_lines.append(_formula_delta_from_upstream_line(layer_symbol, z_values, activation_type, deltas))
+
+	formula_lines.append("∇W^%s = (a^(%s-1))^T × δ^%s = %s" % [layer_symbol, layer_symbol, layer_symbol, _format_matrix(gradients)])
+	formula_lines.append("W^%s ← W^%s - η × ∇W^%s, η = %s" % [layer_symbol, layer_symbol, layer_symbol, _format_latex_number(learning_rate)])
+	return "\n".join(formula_lines)
+
+
+func _latex_delta_from_upstream_line(layer_symbol: String, z_values: Array, activation_type: int, deltas: Array) -> String:
+	if activation_type == Constants.ACT_FUNCS.softmax:
+		return "\\delta^{%s} &= J_{softmax}(\\mathbf{z}^{%s})\\mathbf{g}^{%s} = %s" % [layer_symbol, layer_symbol, layer_symbol, _latex_row_vector(deltas)]
+
+	var derivative_values: Array = _activation_derivative_values(z_values, activation_type)
+	return "f'(\\mathbf{z}^{%s}) &= %s \\\\ \\delta^{%s} &= \\mathbf{g}^{%s} \\odot f'(\\mathbf{z}^{%s}) = %s" % [layer_symbol, _latex_row_vector(derivative_values), layer_symbol, layer_symbol, layer_symbol, _latex_row_vector(deltas)]
+
+
+func _formula_delta_from_upstream_line(layer_symbol: String, z_values: Array, activation_type: int, deltas: Array) -> String:
+	if activation_type == Constants.ACT_FUNCS.softmax:
+		return "δ^%s = J_softmax(z^%s) × g^%s = %s" % [layer_symbol, layer_symbol, layer_symbol, _format_vector(deltas)]
+
+	var derivative_values: Array = _activation_derivative_values(z_values, activation_type)
+	return "δ^%s = g^%s ⊙ f'(z^%s), f'(z^%s) = %s => δ^%s = %s" % [layer_symbol, layer_symbol, layer_symbol, layer_symbol, _format_vector(derivative_values), layer_symbol, _format_vector(deltas)]
+
+
+func _activation_derivative_values(z_values: Array, activation_type: int) -> Array:
+	var derivative_values: Array = []
+	for z_value in z_values:
+		derivative_values.append(Functions.apply_activation_derivative(float(z_value), activation_type))
+	return derivative_values
+
+
+func _compute_layer_weight_gradient_matrix(previous_outputs: Array, deltas: Array) -> Array:
+	var gradient_rows: Array = []
+	for previous_output in previous_outputs:
+		var row: Array = []
+		for delta in deltas:
+			row.append(float(previous_output) * float(delta))
+		gradient_rows.append(row)
+	return gradient_rows
+
+
+func _format_matrix(rows: Array) -> String:
+	if rows.is_empty():
+		return "[]"
+
+	var formatted_rows: Array[String] = []
+	for row in rows:
+		var row_values: Array = row
+		formatted_rows.append(_format_vector(row_values))
+	return "[\n  %s\n]" % ",\n  ".join(formatted_rows)
+
+
+func _latex_matrix(rows: Array) -> String:
+	if rows.is_empty():
+		return "\\begin{bmatrix}0\\end{bmatrix}"
+
+	var formatted_rows: Array[String] = []
+	for row in rows:
+		var row_values: Array = row
+		var formatted_values: Array[String] = []
+		for value in row_values:
+			formatted_values.append(_format_latex_number(float(value)))
+		formatted_rows.append(" & ".join(formatted_values))
+	return "\\begin{bmatrix}%s\\end{bmatrix}" % " \\\\ ".join(formatted_rows)
+
+
+func _layer_symbol(layer_id: int) -> String:
+	if layer_id == -1:
+		return "L"
+	return str(layer_id)
 
 
 func _format_vector(values: Array) -> String:

@@ -80,6 +80,10 @@ signal inference_nn_start
 signal nn_resalted_neuron_forward(neuron_id: int, layer_id: int, input_values: Array, output_value: float)
 signal nn_resalted_neuron_backward(neuron_id: int, layer_id: int, backward_info: Dictionary)
 signal nn_resalted_layer_forward(layer_info: Dictionary)
+signal nn_resalted_layer_backward(layer_info: Dictionary)
+signal nn_resalted_data_loaded(data_info: Dictionary)
+signal nn_resalted_error_calculated(error_info: Dictionary)
+signal nn_resalted_error_returned(error_info: Dictionary)
 signal nn_resalted_data_step(step_info: Dictionary)
 
 # panel training nn

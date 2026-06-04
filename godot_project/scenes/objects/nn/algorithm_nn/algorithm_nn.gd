@@ -67,6 +67,7 @@ var _cached_a_values: Array = []
 var _cached_deltas: Array = []
 var _last_completed_forward_layer_info: Dictionary = {}
 var _last_completed_backward_layer_id: int = -9999
+var _last_completed_backward_layer_info: Dictionary = {}
 var _last_completed_sample_info: Dictionary = {}
 
 
@@ -111,6 +112,7 @@ func configure_training(
 	_is_completing_training = false
 	_last_completed_forward_layer_info = {}
 	_last_completed_backward_layer_id = -9999
+	_last_completed_backward_layer_info = {}
 	_last_completed_sample_info = {}
 	_reset_runtime_state()
 
@@ -126,6 +128,7 @@ func configure_training(
 	_emit_current_eval_data(false)
 	_emit_current_expected_data(false)
 	SignalsObserver.clear_nn_eval_data.emit("output")
+	SignalsObserver.nn_resalted_data_loaded.emit(_get_data_loaded_info(false))
 
 
 func configure_inference(
@@ -171,6 +174,7 @@ func train_next_layer(_layer_id: int = -9999) -> void:
 	var layer_before: int = _get_current_layer_idx()
 	_last_completed_forward_layer_info = {}
 	_last_completed_backward_layer_id = -9999
+	_last_completed_backward_layer_info = {}
 
 	while not _is_training_finished() and _current_phase == phase_before and _get_current_layer_idx() == layer_before:
 		if not _advance_one_neuron():
@@ -181,6 +185,7 @@ func train_next_layer(_layer_id: int = -9999) -> void:
 		SignalsObserver.nn_resalted_layer_forward.emit(_last_completed_forward_layer_info.duplicate(true))
 	elif phase_before == "backward" and _last_completed_backward_layer_id == layer_before:
 		SignalsObserver.nn_layer_resalted.emit(layer_before)
+		SignalsObserver.nn_resalted_layer_backward.emit(_last_completed_backward_layer_info.duplicate(true))
 
 
 ## Advances one full training row.
@@ -407,6 +412,7 @@ func _advance_backward_neuron() -> bool:
 	_current_neuron_cursor += 1
 	if _current_neuron_cursor >= _cached_deltas.size():
 		_last_completed_backward_layer_id = layer_idx
+		_last_completed_backward_layer_info = _get_backward_layer_info(layer_idx)
 		_current_layer_cursor += 1
 		_current_neuron_cursor = 0
 		_clear_layer_cache()
@@ -490,6 +496,87 @@ func _get_current_sample_info() -> Dictionary:
 	}
 
 
+func _get_data_loaded_info(animate_appear: bool) -> Dictionary:
+	return {
+		"data_idx": _current_data_idx,
+		"input_values": _current_input_data.duplicate(true),
+		"target_values": _current_target_data.duplicate(true),
+		"train_attributes": _train_attributes.duplicate(),
+		"target_attributes": _target_attributes.duplicate(),
+		"animate_appear": animate_appear,
+	}
+
+
+func _get_error_calculation_info() -> Dictionary:
+	var output_values: Array = layer_outputs.get(-1, []).duplicate(true)
+	var target_values: Array = _current_target_data.duplicate(true)
+	return {
+		"data_idx": _current_data_idx,
+		"output_values": output_values,
+		"output_z_values": layer_weighted_sums.get(-1, []).duplicate(true),
+		"target_values": target_values,
+		"output_deltas": _get_output_delta_values(),
+		"loss_gradients": Functions.compute_output_loss_error(output_values, target_values, _loss_type),
+		"loss_type": _loss_type,
+		"loss_value": Functions.compute_loss_value(output_values, target_values, _loss_type),
+		"output_activation_type": _activations.get(-1, Constants.ACT_FUNCS.identity),
+		"target_attributes": _target_attributes.duplicate(),
+	}
+
+
+func _get_error_return_info() -> Dictionary:
+	var error_info: Dictionary = _get_error_calculation_info()
+	error_info["first_backprop_layer"] = -1
+	if not _reversed_layer_indices.is_empty():
+		error_info["first_backprop_layer"] = _reversed_layer_indices[0]
+	return error_info
+
+
+func _get_backward_layer_info(layer_idx: int) -> Dictionary:
+	var previous_layer_idx: int = _get_previous_layer_index(layer_idx, _weights.keys())
+	var next_layer_idx: int = _get_next_layer_index(layer_idx, _sorted_layer_indices)
+	return {
+		"layer_id": layer_idx,
+		"deltas": layer_deltas.get(layer_idx, []).duplicate(true),
+		"upstream_gradients": _get_layer_upstream_gradients(layer_idx),
+		"z_values": layer_weighted_sums.get(layer_idx, []).duplicate(true),
+		"output_values": layer_outputs.get(layer_idx, []).duplicate(true),
+		"previous_outputs": layer_outputs.get(previous_layer_idx, []).duplicate(true),
+		"weights": _backprop_weights_snapshot.get(layer_idx, _weights.get(layer_idx, [])).duplicate(true),
+		"biases": _biases.get(layer_idx, []).duplicate(true),
+		"activation_type": _activations.get(layer_idx, Constants.ACT_FUNCS.identity),
+		"loss_type": _loss_type,
+		"is_output_layer": layer_idx == -1,
+		"target_values": _current_target_data.duplicate(true),
+		"next_layer_id": next_layer_idx,
+		"next_deltas": layer_deltas.get(next_layer_idx, []).duplicate(true),
+		"next_weights": _backprop_weights_snapshot.get(next_layer_idx, []).duplicate(true),
+		"learning_rate": _learning_rate,
+	}
+
+
+func _get_layer_upstream_gradients(layer_idx: int) -> Array:
+	if layer_idx == -1:
+		return Functions.compute_output_loss_error(layer_outputs.get(layer_idx, []), _current_target_data, _loss_type)
+
+	var output_values: Array = layer_outputs.get(layer_idx, [])
+	var next_layer_idx: int = _get_next_layer_index(layer_idx, _sorted_layer_indices)
+	var next_deltas: Array = layer_deltas.get(next_layer_idx, [])
+	var next_weights: Array = _backprop_weights_snapshot.get(next_layer_idx, [])
+	var upstream_gradients: Array = []
+	upstream_gradients.resize(output_values.size())
+	upstream_gradients.fill(0.0)
+
+	for neuron_idx in range(output_values.size()):
+		var error_sum: float = 0.0
+		for next_neuron_idx in range(next_deltas.size()):
+			if next_neuron_idx < next_weights.size() and neuron_idx < next_weights[next_neuron_idx].size():
+				error_sum += float(next_weights[next_neuron_idx][neuron_idx]) * float(next_deltas[next_neuron_idx])
+		upstream_gradients[neuron_idx] = error_sum
+
+	return upstream_gradients
+
+
 ## Loads _current_data_idx into the runtime caches used by forward/backward.
 ## layer_outputs[0] is where later weight updates read the original input values.
 func _prepare_current_sample() -> void:
@@ -548,6 +635,7 @@ func _advance_load_sample() -> bool:
 		_emit_current_eval_data(true)
 		_emit_current_expected_data(false)
 		SignalsObserver.clear_nn_eval_data.emit("output")
+		SignalsObserver.nn_resalted_data_loaded.emit(_get_data_loaded_info(true))
 
 	return true
 
@@ -560,6 +648,7 @@ func _advance_compare_outputs() -> bool:
 		_current_phase = "return_errors"
 		return true
 
+	SignalsObserver.nn_resalted_error_calculated.emit(_get_error_calculation_info())
 	SignalsObserver.nn_eval_data_output_leave.emit("output")
 	SignalsObserver.nn_eval_data_expected_to_error.emit("expected", _get_output_error_values())
 	_current_phase = "return_errors"
@@ -571,6 +660,7 @@ func _advance_compare_outputs() -> bool:
 ## neuron is reached.
 func _advance_return_errors() -> bool:
 	if not _is_completing_training:
+		SignalsObserver.nn_resalted_error_returned.emit(_get_error_return_info())
 		SignalsObserver.nn_eval_data_error_return.emit("expected")
 
 	_current_phase = "backward"
@@ -657,25 +747,29 @@ func _emit_output_eval_data(output_neuron_idx: int, output_value: float) -> void
 ## match what is about to travel backward through the network.
 func _get_output_error_values() -> Dictionary:
 	var output_errors: Dictionary = {}
-	if not layer_outputs.has(-1) or not layer_weighted_sums.has(-1):
-		return output_errors
-
-	var deltas: Array = compute_layer_deltas(
-		-1,
-		_current_target_data,
-		layer_outputs[-1],
-		layer_weighted_sums[-1],
-		_activations[-1],
-		_loss_type,
-		[],
-		[],
-		false
-	)
+	var deltas: Array = _get_output_delta_values()
 
 	for output_idx in range(deltas.size()):
 		output_errors[str(output_idx)] = deltas[output_idx]
 
 	return output_errors
+
+
+func _get_output_delta_values() -> Array:
+	if not layer_outputs.has(-1) or not layer_weighted_sums.has(-1):
+		return []
+
+	return compute_layer_deltas(
+		-1,
+		_current_target_data,
+		layer_outputs[-1],
+		layer_weighted_sums[-1],
+		_activations.get(-1, Constants.ACT_FUNCS.identity),
+		_loss_type,
+		[],
+		[],
+		false
+	)
 
 
 func _prepare_forward_cache(layer_idx: int) -> void:
