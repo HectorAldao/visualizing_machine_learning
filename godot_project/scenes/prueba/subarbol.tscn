@@ -17,3 +17,17 @@ text = "hao ta"
 [node name="SubArbolesHijo" type="HBoxContainer" parent="." unique_id=1313541542]
 layout_mode = 2
 theme_override_constants/separation = 100
+
+[node name="SubArbol" type="VBoxContainer" parent="SubArbolesHijo" unique_id=1557460238]
+layout_mode = 2
+theme_override_constants/separation = 100
+
+[node name="NodoPadre" type="Button" parent="SubArbolesHijo/SubArbol" unique_id=1636503300]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "hao ta"
+
+[node name="SubArbolesHijo" type="HBoxContainer" parent="SubArbolesHijo/SubArbol" unique_id=2050364134]
+layout_mode = 2
+theme_override_constants/separation = 100

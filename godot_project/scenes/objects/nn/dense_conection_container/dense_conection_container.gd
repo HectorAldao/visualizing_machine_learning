@@ -162,27 +162,23 @@ func _get_connection_weight(to_layer_id: int, to_neuron_id: int, from_neuron_ind
 
 
 func _get_connection_width(weight: float) -> float:
-	# If the value is too low, the conection is going to disapear,
-	# something that may not be desired.
-	# If NN_CONECTION_BIAS = 0, it will disapear
 	var connection_width: float
 	if weight > 0:
 		connection_width = (weight + Constants.NN_CONECTION_BIAS) * Constants.NN_CONECTION_SCALE
 	else: 
 		connection_width = (-weight + Constants.NN_CONECTION_BIAS) * Constants.NN_CONECTION_SCALE
 	
-	return min(Constants.NN_MAX_WIDTH, connection_width)
+	return clamp(connection_width, Constants.NN_CONECTION_MIN_WIDTH, Constants.NN_CONECTION_MAX_WIDTH)
 
 
 func _get_connection_color(weight: float) -> Color:
 	if weight == 0:
 		return Color.BLACK
 
-	var intensity: float = clamp(abs(weight), 0.0, 1.0)
 	if weight > 0:
-		return Color.CYAN.lerp(Color.GREEN, intensity)
+		return Color.GREEN
 
-	return Color.YELLOW.lerp(Color.RED, intensity)
+	return Color.RED
 
 
 func _remove_connection(key: String, animated: bool = false) -> void:

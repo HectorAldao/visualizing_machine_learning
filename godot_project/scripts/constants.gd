@@ -77,7 +77,8 @@ const NN_CONNECTION_RANDOM_MULT: float = 0.1
 const NN_CONNECTION_VARIANCE: float = 0.5
 const NN_CONECTION_SCALE: float = 20
 const NN_CONECTION_BIAS: float = 0
-const NN_MAX_WIDTH: float = 5
+const NN_CONECTION_MIN_WIDTH: float = 1.0
+const NN_CONECTION_MAX_WIDTH: float = 5.0
 const CONECTION_UPDATE_INDICATOR_RADIUS: float = 8.0
 
 const NN_EVAL_DATA_DISPLAY_DECIMALS: int = 3
