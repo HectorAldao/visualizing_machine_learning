@@ -43,6 +43,7 @@ signal remove_neuron(layer_id: int)
 # neuron
 signal info_neuron(neuron_id: int, layer_id: int)
 signal nn_neuron_text_changed(layer_id: int, neuron_id: int, new_text: String)
+signal nn_clicked_neuron_changed(layer_id: int, neuron_id: int)
 
 # dense
 signal update_conections(layer_id: int, num_of_neurons: int)

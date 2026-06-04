@@ -1,6 +1,5 @@
 [gd_scene format=3 uid="uid://6ktcduu5a5qg"]
 
-[ext_resource type="Texture2D" uid="uid://d2bmtbmodybx8" path="res://assets/background/motherboard.png" id="1_iheb5"]
 [ext_resource type="Texture2D" uid="uid://bjxcnqe1lb3px" path="res://assets/background/mother_board_2.jpg" id="2_rsf5d"]
 
 [node name="Background" type="Control" unique_id=100317907]
@@ -22,11 +21,3 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("2_rsf5d")
 stretch_mode = 1
-
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=666489280]
-visible = false
-texture_repeat = 3
-texture = ExtResource("1_iheb5")
-centered = false
-region_enabled = true
-region_rect = Rect2(0, 0, 2000, 2000)

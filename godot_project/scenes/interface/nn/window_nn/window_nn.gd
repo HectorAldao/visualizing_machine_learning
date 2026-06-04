@@ -42,20 +42,40 @@ const template_texts: Dictionary[String, Array] = {
 
 func _ready() -> void:
 
+	SignalsObserver.train_nn.connect(_clear_clicked_neuron_window_snapshot)
+	SignalsObserver.train_nn_next_neuron.connect(_clear_clicked_neuron_window_snapshot)
+	SignalsObserver.train_nn_next_layer.connect(_clear_clicked_neuron_window_snapshot)
+	SignalsObserver.train_nn_next_step.connect(_clear_clicked_neuron_window_snapshot)
+	SignalsObserver.train_nn_complete.connect(_clear_clicked_neuron_window_snapshot)
+
 	SignalsObserver.info_neuron.connect(set_neuron_info)
+	SignalsObserver.nn_resalted_neuron_forward.connect(_clear_clicked_neuron_window_snapshot)
 	SignalsObserver.nn_resalted_neuron_forward.connect(set_resalted_neuron_info_forward)
+	SignalsObserver.nn_resalted_neuron_backward.connect(_clear_clicked_neuron_window_snapshot)
 	SignalsObserver.nn_resalted_neuron_backward.connect(set_resalted_neuron_info_backward)
+	SignalsObserver.nn_resalted_layer_forward.connect(_clear_clicked_neuron_window_snapshot)
 	SignalsObserver.nn_resalted_layer_forward.connect(set_resalted_layer_info_forward)
+	SignalsObserver.nn_resalted_layer_backward.connect(_clear_clicked_neuron_window_snapshot)
 	SignalsObserver.nn_resalted_layer_backward.connect(set_resalted_layer_info_backward)
+	SignalsObserver.nn_resalted_data_loaded.connect(_clear_clicked_neuron_window_snapshot)
 	SignalsObserver.nn_resalted_data_loaded.connect(set_resalted_data_loaded_info)
+	SignalsObserver.nn_resalted_error_calculated.connect(_clear_clicked_neuron_window_snapshot)
 	SignalsObserver.nn_resalted_error_calculated.connect(set_resalted_error_calculated_info)
+	SignalsObserver.nn_resalted_error_returned.connect(_clear_clicked_neuron_window_snapshot)
 	SignalsObserver.nn_resalted_error_returned.connect(set_resalted_error_returned_info)
+	SignalsObserver.nn_resalted_data_step.connect(_clear_clicked_neuron_window_snapshot)
 	SignalsObserver.nn_resalted_data_step.connect(set_resalted_data_step_info)
+	SignalsObserver.nn_train_finished.connect(_clear_clicked_neuron_window_snapshot)
 	SignalsObserver.nn_train_finished.connect(set_training_finished_info)
 
 
 ## Changes the text in the window when a neuron is pressed
 func set_neuron_info(neuron_id: int, layer_id: int) -> void:
+	if _should_restore_clicked_neuron_window():
+		_restore_clicked_neuron_window_snapshot()
+		return
+
+	_cache_clicked_neuron_window_snapshot()
 
 	_reset_formula()
 
@@ -290,6 +310,43 @@ func set_training_finished_info() -> void:
 	_reset_formula()
 	text0.text = "El entrenamiento ha acabado."
 	text1.text = "Pulse el botón 'Evaluar' para testear la red contra nuevos datos y comprobar si el entrenamiento ha funcionado."
+
+
+func _should_restore_clicked_neuron_window() -> bool:
+	return Variables.nn_clicked_neuron_id == -1 \
+		and Variables.nn_clicked_neuron_layer_id == -9999 \
+		and not Variables.nn_clicked_neuron_window_snapshot.is_empty()
+
+
+func _cache_clicked_neuron_window_snapshot() -> void:
+	if not Variables.nn_clicked_neuron_window_snapshot.is_empty():
+		return
+
+	Variables.nn_clicked_neuron_window_snapshot = {
+		"text0": text0.text,
+		"text_formula": text_formula.text,
+		"latex_formula": latexformula.formula,
+		"text1": text1.text,
+	}
+
+
+func _restore_clicked_neuron_window_snapshot() -> void:
+	var cached_window: Dictionary = Variables.nn_clicked_neuron_window_snapshot
+	text0.text = str(cached_window.get("text0", ""))
+	text_formula.text = str(cached_window.get("text_formula", ""))
+	text1.text = str(cached_window.get("text1", ""))
+
+	var cached_formula: String = str(cached_window.get("latex_formula", ""))
+	if cached_formula.strip_edges().is_empty():
+		latexformula.reset_sprite()
+	else:
+		latexformula.request_formula(cached_formula)
+
+	Variables.nn_clicked_neuron_window_snapshot.clear()
+
+
+func _clear_clicked_neuron_window_snapshot(_arg1 = null, _arg2 = null, _arg3 = null, _arg4 = null) -> void:
+	Variables.nn_clicked_neuron_window_snapshot.clear()
 
 # --- Helpers ---
 
