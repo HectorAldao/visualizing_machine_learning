@@ -63,7 +63,7 @@ const LOSS_FUNCS: Dictionary[String, int] = {
 
 const SPRITES: Dictionary[String, String] = {
 	"dtree": "uid://c83k8f24pvcma",
-	"nn": ""
+	"nn": "uid://bwcwlqey5yfgs"
 }
 
 const NN_LOSS_EPSILON: float = 1e-8
