@@ -59,12 +59,36 @@ Pero no están limitados a estos elementos. Siempre se puede acceder al nodo rai
 
 La primera escena que se creó fue el menú principal.
 Al ya esperar crear varios algoritmos, era una escena simple de la que había que partir.
-En ella se instanció un botón con el texto que cambiaba a la escena donde se encontraba el árbol.
-En la Figura \ref{fig:primera_version_del_main_menu} se ve el estado del menú principal, solo que un momento algo más avanzado, en el que la red neuronal también estaba en desarrollo.
+En ella se instanció un botón (un tipo de nodo característito por emitir una señal cuándo es pulsado) con el texto que cambiaba a la escena donde se encontraba el árbol.
+En la Figura \ref{fig:primera_version_del_main_menu} se ve este menú principal.
 
 \begin{figure}[hp!]
   \centering
   \includegraphics[width=0.75\textwidth]{imaxes/primera_version_del_main_menu.png}
   \caption{Versión preliminar del menú principal.}
   \label{fig:primera_version_del_main_menu}
+\end{figure}
+
+Al pulsar el botón se cambiaba de escena a una en la que se encontraba una entidad de una clase personalizada, el ``DNode''.
+Esta clase heredaba de la clase botón, pero tenía tres atributos más: ``id'', ``parent\_id'', y ``sons\_id''.
+Los primeros eran enteros, y el segundo un Array de enteros.
+Al hacerle click se desplegaba un menú con una opción: añadir nodo hijo.
+Seleccionarla hacía parecer un nuevo botón debajo del anterior, conectado por una línea.
+Esto se podía hacer cuantas veces se quisiera, y hacía que fueran apareciendo nuevos nodos hijo, que se colocaban uno al lado de otro.
+Estos siguientes botones tenían una segunda opción en el menú: eliminar nodo.
+Esto eliminaba el nodo y sus hijos.
+
+Por debajo el árbol era un diccionario.
+Las claves eran enteros, correspondientes a los ids de los DNodes, y los valores eran los propios DNodes.
+Estos eran conectados con otros nodos y colocados en pantalla en base a sus atributos de ``parent\_id'' y ``son\_id''.
+
+A mayores, en la escena había otros dos botones arriba a la derecha.
+En este momento no hacían nada, pero eran el inicio de lo que acabaría siendo la funcionalidad de cargar y guardar el árbol, descrita en la Sección ¿?.
+En la Figura \ref{fig:primera_version_arbol} se puede ver el estado de esta primera escena interactiva.
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=0.75\textwidth]{imaxes/primera_version_arbol.png}
+  \caption{Primera escena de prueba para ver el funcionamiento del árbol.}
+  \label{fig:primera_version_arbol}
 \end{figure}
