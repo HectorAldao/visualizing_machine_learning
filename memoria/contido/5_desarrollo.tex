@@ -92,3 +92,18 @@ En la Figura \ref{fig:primera_version_arbol} se puede ver el estado de esta prim
   \caption{Primera escena de prueba para ver el funcionamiento del árbol.}
   \label{fig:primera_version_arbol}
 \end{figure}
+
+
+\subsection{Export a web con GitHub Pages}
+
+Con esta versión funcional, faltaba probar a exportar a web para comprobar que Godot servía como motor de desarrollo para la aplicación web.
+En Godot, para exportar el proyecto a HTML5, hay que descargar las plantillas de exportación, las cuales proporcionan el entorno web base y un archivo HTML que contiene en su estructura el elemento ``<canvas>'', donde el motor (compilado en WebAssembly) inicializa el renderizado gráfico y captura la interactividad.
+Con un proyecto tan simple, no dió problemas.
+En la Sección ¿? se exploran más configuraciones del export a web debido a la creación del plugin para el renderizado de formulas.
+
+%%Dudas: explico cómo hice lo de GitHub Pages¿?
+%%Dudas: pongo capturas¿?
+Después se configuró desde la interfaz web de GitHub la funcionalidad de GitHub Pages.
+Para ello, accedí desde la configuración del repositorio a la ventana ``Pages'', desde la cuál se puede seleccionar una rama de publicación (para este caso se seleccionó ``main'') y una carpeta para ser la raíz de la página web (en este caso, la carpeta ``docs'', la por defecto).
+Con esta función activada, hubo que exportar el proyecto a la carpeta indicada.
+Y una vez subidos los cambios a la rama ``main'', la aplicación estaba desplegada.
