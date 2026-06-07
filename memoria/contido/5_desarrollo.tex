@@ -12,48 +12,10 @@ Al hacerlo, se mostraría un menú que permitiría añadir nuevos botones, conec
 Esto sería exportado a formato web y se desplegaría en GitHub Pages.
 
 Para iniciar este proceso, primero hizo falta hacer un análisis de la forma en la que se estructura Godot.
+Este ha sido explicado en la Sección \ref{sec:herramientas_godot}
 
 
-\subsection{Godot: el motor y sus componentes estructurales}
-
-A lo largo de esta memoria se hablará en repetidas ocasiones de dos de las principales estructuras con las que se trabaja en Godot: las escenas y los nodos.
-
-Los nodos son el elemento básico y más importante con el que se trabaja en el motor.
-Todo elemento y subelemento que vaya a estar presente en tiempo de ejecución en el programa es un nodo.
-Y cada nodo cuenta, principalmente, con una serie de atributos, métodos y señales.
-Igual que en la programación orientada a objetos, los atributos son variables o constantes y los métodos funciones.
-Las señales son disparadores de funciones.
-Cuándo son emitidas llaman a la función a la que están conectadas.
-Son una forma de conectar eventos entre diferentes nodos.
-
-Los atributos, métodos y señales de cada nodo vienen definidos por su clase.
-Godot dispone de un gran árbol de clases predefinidas que heredan atributos y métodos de sus clases padre.
-Las tres clases básicas son:
-el ``Node'', una clase vacía, la raíz del resto de nodos, que solo cuenta con los métodos mínimos para que funcione en el motor;
-el ``Node2D'', característico por contar con atributos referentes a la posición en un espacio bidimensional;
-el ``Node3D'', similar al anterior pero en un espacio tridimensional;
-y el ``Control'', pensado para los elementos de interfaz de usuario.
-Por encima de estas, el desarrollador siempre puede definir sus propias clases ampliando las ya existentes.
-%Este sistema sigue la filosifía de la programación orientada a objetos y la herencia.
-
-%%%
-
-Los nodos por sí solos son clases abstractas que no existen en el programa ejecutable final por si mismos.
-Para instanciarlos están las escenas.
-Estas son la materialización concreta del proyecto: los archivos que son guardados en disco y con los que se interactúa en el editor.
-Están formadas, como mínimo, por un nodo raiz.
-De este nodo raiz pueden colgar nodos hijo, que a su vez pueden contar con sus propios nodos hijo, y así sucesivamente.
-
-Finalmente, las escenas, como en última instancia son árboles de nodos, pueden ser instanciadas dentro de otras escenas.
-Esto habilita una modularidad total, puesto que toda estructura de nodos que sea susceptible de ser reutilizada, puede guardarse como una escena para no tener que ser recreada. 
-
-
-%%%
-
-A mayores, los nodos pueden tener asociados un script.
-Estos son código desde el que se puede interactuar, principalmente, con los atributos y métodos del nodo al que están asociados, así como con sus hijos.
-Pero no están limitados a estos elementos. Siempre se puede acceder al nodo raiz, y desde este modificar cualquier propiedad global o acceder a cualquier nodo en la escena. O mediante la creación de ``Autoloads'' en el proyecto se puede acceder a clases personalizadas en cualquier punto del código.
-
+%\subsection{Godot: el motor y sus componentes estructurales}
 
 \subsection{Primeras escenas}
 
@@ -107,3 +69,13 @@ Después se configuró desde la interfaz web de GitHub la funcionalidad de GitHu
 Para ello, accedí desde la configuración del repositorio a la ventana ``Pages'', desde la cuál se puede seleccionar una rama de publicación (para este caso se seleccionó ``main'') y una carpeta para ser la raíz de la página web (en este caso, la carpeta ``docs'', la por defecto).
 Con esta función activada, hubo que exportar el proyecto a la carpeta indicada.
 Y una vez subidos los cambios a la rama ``main'', la aplicación estaba desplegada.
+
+
+
+\section{Árbol de decisión: versión 0.2}
+
+El proyecto dejó de ser un simple mokup cuando se comenzó a trabajar en el primer algoritmo: el árbol de decisión.
+
+%%Dudas: Tengo que hablar de cosas como que primero se probó con la ventana flotante y después se pasó a la estructura fija?
+
+Para comenzar
