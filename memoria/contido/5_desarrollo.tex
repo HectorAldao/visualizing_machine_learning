@@ -176,6 +176,83 @@ Permitía comprobar que la lógica ID3 generaba nodos y ramas, y permitía obser
 A partir de aquí el problema principal dejó de ser crear nodos a mano y pasó a ser sincronizar tres niveles: el estado del algoritmo, la estructura lógica del árbol y la escena que veía el usuario.
 
 
-\subsection{Reorganización de la vista y primeros elementos explicativos}
+\subsection{Reorganización de la escena y primeros elementos explicativos}
 
-Una vez creada la primera versión automática, se reorganizó la escena del árbol para 
+Una vez creada la primera versión automática, se reorganizó la escena del árbol para reducir la complejidad.
+Se eliminó el ``DTreeCanvas'' intermedio, lo que obligó a revisar el centrado del árbol.
+En Godot, un ``ScrollContainer'' controla la posición de sus hijos, así que desplazar el propio ``DTree'' no ofrecía un resultado estable.
+La solución fue mover internamente las posiciones de los nodos.
+El método personalizado ``update\_canvas\_size\_and\_center'' quedó dentro de ``DTreeLogical'', calculando primero el rectángulo de ocupación del árbol, después el tamaño final necesario y, por último, un desplazamiento aplicado a cada nodo.
+Con este desplazamiento, el contenido del árbol quedaba centrado dentro del área de scroll.
+Después se actualizaba ``custom\_minimum\_size'' para que las barras del ``ScrollContainer'' conociesen el nuevo tamaño navegable.
+¿? En lo que se refiere a la parte de centrar el árbol, ya se explorará en la Sección ¿? cómo se acabó realizando esto, puesto que hay una manera más sencilla de hacerlo gracias a Godot. 
+
+También se tuvo en cuenta que el ``ScrollContainer'' actualiza sus barras después de una pasada de layout.
+Por ese motivo, al centrar el árbol se usó ``set\_deferred'' sobre ``scroll\_horizontal'' y ``scroll\_vertical''.
+Esta decisión evitaba que Godot limitase el desplazamiento a los valores antiguos justo después de cambiar el tamaño mínimo.
+Es un detalle pequeño, con un efecto importante para que la vista quedase centrada al crear o modificar el árbol y no apareciese desplazada a una esquina.
+
+La escena ``DTreeView'' empezó a actuar como punto de entrada del flujo de árbol.
+En ``\_ready'', una función nativa del motor que es llamada cuándo el script aparece en la escena, conectaba los botones del panel de selección, ocultaba el ``ScrollContainer'' y el menú del árbol, y solo mostraba el panel inicial.
+Al escoger modo manual, hacía visible el árbol, activaba el menú con los botones de carga y guardado, configuraba ``DTreeLogical'' en modo ``manual'' e inicializaba el controlador.
+Al escoger modo algorítmico, hacía visible el árbol y la ventana, creaba una instancia de ``AlgorithmDTree'', la añadía a la escena y entregaba esa referencia al controlador.
+La vista dejó de ser una escena pasiva y pasó a gestionar un flujo de usuario: primero elegir modo, después interactuar con el árbol.
+
+En esta misma fase se creó el autoload ``Constants''.
+Este script centralizaba identificadores de escenas y temas en dos diccionarios, ``SCENES'' y ``THEMES''.
+En vez de repetir rutas o UID en scripts distintos, el controlador, el árbol, el menú principal y las conexiones podían acudir a ``Constants.SCENES'' para instanciar escenas como ``dnode'', ``controller\_dtree'', ``panel\_algorithm\_dtree'' o ``conection''.
+En un proyecto Godot que cambia de carpetas durante el desarrollo, esta centralización reduce errores al mover escenas, porque las referencias se corrigen en un único punto y no están ligadas a la ruta del archivo en el proyecto.
+
+La representación visual de los nodos ganó una primera distinción semántica mediante temas.
+Se añadieron dos recursos ``Theme'': uno para nodos hoja y otro para nodos internos.
+El tema de hoja usaba una forma más redondeada y un color verdoso, mientras que el tema de nodo interno usaba un color rojizo y esquinas menos redondeadas.
+``DNode'' precargaba ambos temas desde ``Constants.THEMES'' y en ``\_ready'' aplicaba uno u otro según ``is\_leaf''.
+Esta separación hacía que la estructura del árbol se entendiese con menos lectura: los nodos que clasifican y los nodos que dividen los datos tenían una apariencia distinta.
+
+El mismo cambio introdujo ``was\_created\_by\_algorithm''.
+Los nodos creados por el algoritmo marcaban esta variable a ``true'', y ``DNode'' solo conectaba el menú contextual si el nodo no había sido creado por el modo automático.
+Esta decisión evitaba que el usuario modificase manualmente nodos que formaban parte de una ejecución algorítmica.
+El modo manual y el modo automático compartían la misma escena de nodo, aunque su comportamiento frente a clicks era distinto.
+Así se reutilizaba la representación visual sin permitir ediciones que rompiesen la coherencia del entrenamiento paso a paso.
+A mayores, esto habilitaría modificar el funcionamiento de los DNodes creados por ID3 al ser pulsados.
+
+El menú desde el que se controla el algoritmo también se ajustó a una interfaz más cercana al idioma de la aplicación.
+Los botones pasaron de ``Start Training'' y ``Next Step'' a ``Empezar entrenamiento'' y ``Siguiente paso''.
+Además se añadió un botón ``Detalle'', a pesar de que finalmente fue eliminado, que anticipaba la necesidad de abrir o actualizar información complementaria.
+En el controlador se añadieron señales propias, ``next\_step'' y ``detail'', de forma que el botón de siguiente emitía una señal del controlador y esta se conectaba al método ``next\_step'' del algoritmo.
+Esto desacoplaba la interfaz del algoritmo: el botón ya no llamaba directamente al objeto de entrenamiento.
+
+%El nombre del controlador también se corrigió de ``AlgDTree'' a ``ControllerDTree''. Aunque pueda parecer un cambio menor, aclara la responsabilidad de la clase. El algoritmo vive en ``AlgorithmDTree'', mientras que ``ControllerDTree'' se ocupa de conectar botones, señales, nodos visuales, árbol y ventana. Esta separación fue ganando valor en los commits posteriores, porque cada avance del algoritmo requería actualizar la escena, recalcular posiciones, refrescar la ventana o cambiar estados de botones.
+
+%%Dudas: Y si explico todos los nodos en el glosario?
+Otro cambio de esta etapa fue la creación de una ventana informativa.
+Primero se añadió directamente como un nodo ``Window'' dentro de ``DTreeView'', con un texto que mostraba el mensaje inicial ``Presiona el botón ``Empezar entrenamiento''''.
+Después se extrajo a su propia escena con su propio script.
+Esta extracción era necesaria para que la ventana tuviese su propia lógica, sus plantillas de texto y su método de actualización, sin llenar ``DTreeView'' de código explicativo.
+Esta metodología basada en que cada elemento suficientemente complejo como para requerir de un script, era desarrollado en una escena a parte.
+
+%La ventana comenzó con una posición a la derecha del árbol, cerca de ``(800, 200)'', y después se movió a ``(20, 150)'' con un tamaño de ``300 x 350''. El ajuste mantuvo la lógica y muestra una preocupación temprana por la composición de la escena. La ventana debía estar visible durante el entrenamiento y ocupar un lugar que no estorbase demasiado a la lectura del árbol. En estas primeras versiones seguía siendo una ventana flotante de Godot, bastante distinta de los paneles integrados que se adoptarían más adelante.
+
+El primer contenido de la ventana se construyó con plantillas de texto.
+En el script de la ventana se definía un diccionario ``template\_texts'' con tres casos: ``internal'', ``leaf'' y ``leaf\_mayority''.
+El texto de nodo interno explicaba cuántos datos habían llegado por la rama, qué etiquetas tenían, qué atributos quedaban, qué métrica se usaba para decidir la división, qué valores obtuvo cada atributo y qué ramas se crearían a partir del mejor atributo.
+El texto de nodo hoja explicaba el caso en el que todos los datos tenían la misma etiqueta.
+El texto de hoja por mayoría explicaba el caso en el que ya no quedaban atributos y era necesario escoger la etiqueta más frecuente.
+Para alimentar esas plantillas, en ``AlgorithmDTree'' se definió un diccionario ``details''.
+En cada paso se guardaban elementos como ``lista\_etiquetas'', ``numero\_de\_datos'', ``lista\_atributos'', ``tipo\_de\_nodo'', ``mejor\_atributo'', ``valor\_metrica\_mejor\_atributo'', ``lista\_ganancias'' y ``lista\_ramas\_mejor\_atributo''.
+El controlador llamaba a ``window.update\_current\_text(algorithm.details)'' después de crear cada nodo.
+De esta forma, la creación visual de un nodo y la explicación asociada quedaban sincronizadas.
+La primera versión de esta ventana tuvo problemas porque no todos los campos esperados por las plantillas existían en ``details'', y algunas estructuras se mostraban con formato interno de GDScript.
+Para corregirlo se completó el diccionario y se añadió un preprocesado en la propia ventana.
+La función ``\_clean\_lists'' recorría el diccionario y, cuando encontraba arrays de cadenas, los sustituía por una frase con comillas, comas y la conjunción final.
+Así una lista como ``[``color'', ``shape'' ``size'']'' pasaba a mostrarse como `` ``color'' ``shape'' y ``size'' ''
+Esta transformación era relevante porque la ventana debía ser leída por una persona, no por quien estuviese depurando estructuras de datos.
+
+También se cambió la forma de mostrar las ganancias.
+Al principio el algoritmo preparaba un diccionario ``ganancias\_info''.
+La plantilla necesitaba una representación textual, así que se generó ``lista\_ganancias'' concatenando líneas del tipo ``atributo = valor''.
+La solución todavía era básica, y más tarde se sustituiría por gráficos.
+En esta fase permitió que la ventana empezase a explicar el criterio de selección de atributo sin depender de la consola de Godot.
+Esta fue la primera conexión clara entre la matemática del algoritmo y una explicación visible dentro de la aplicación.
+
+
