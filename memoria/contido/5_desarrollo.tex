@@ -139,7 +139,23 @@ El controlador dejó de limitarse a gestionar solo la edición manual del árbol
 En modo manual seguía conectando señales de nodos y permitiendo crear o borrar ramas.
 En modo automático se mostraba un menú con botones para iniciar entrenamiento y avanzar al siguiente paso del entrenamiento, basado en el algoritmo ID3.
 Este menú se añadía sobre la vista principal y conectaba sus botones con métodos del controlador.
-La interfaz todavía era sencilla, con los Buttons ``Start Training'' y ``Next Step'', y ya introducía el flujo que se mantendría durante el desarrollo: el usuario avanza el algoritmo paso a paso desde la interfaz.
+La interfaz todavía era sencilla, con los Buttons ``Start Training'' y ``Next Step'', como se muestra en la Figura \ref{fig:dtree_view_start_next_english}.
+Con ello ya se introducía el flujo que se mantendría durante el desarrollo: el usuario avanza el algoritmo paso a paso desde la interfaz.
+
+\begin{figure}[hp!]
+  \centering
+  \begin{minipage}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{imaxes/dtree_view_start_training.png}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{imaxes/dtree_view_next_step.png}
+  \end{minipage}
+  \caption{Primer menú de control del entrenamiento algorítmico, con los botones para iniciar el entrenamiento y avanzar al siguiente paso antes de traducir la interfaz y aplicar los temas visuales definitivos.}
+  \label{fig:dtree_view_start_next_english}
+\end{figure}
 
 Para ese modo automático se creó la clase ``AlgorithmDTree''.
 Su primera responsabilidad fue implementar una versión básica de ID3 sobre datos categóricos.
@@ -198,7 +214,14 @@ La escena ``DTreeView'' empezó a actuar como punto de entrada del flujo de árb
 En ``\_ready'', una función nativa del motor que es llamada cuándo el script aparece en la escena, conectaba los botones del panel de selección, ocultaba el ``ScrollContainer'' y el menú del árbol, y solo mostraba el panel inicial.
 Al escoger modo manual, hacía visible el árbol, activaba el menú con los botones de carga y guardado, configuraba ``DTreeLogical'' en modo ``manual'' e inicializaba el controlador.
 Al escoger modo algorítmico, hacía visible el árbol y la ventana, creaba una instancia de ``AlgorithmDTree'', la añadía a la escena y entregaba esa referencia al controlador.
-La vista dejó de ser una escena pasiva y pasó a gestionar un flujo de usuario: primero elegir modo, después interactuar con el árbol.
+La vista dejó de ser una escena pasiva y pasó a gestionar un flujo de usuario: primero elegir modo, como se ve en la Figura \ref{fig:menu_manualmente_algoritmicamente}, después interactuar con el árbol.
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=0.75\textwidth]{imaxes/menu_manualmente_algoritmicamente.png}
+  \caption{Panel inicial de la escena del árbol para escoger entre creación manual y creación algorítmica.}
+  \label{fig:menu_manualmente_algoritmicamente}
+\end{figure}
 
 En esta misma fase se creó el autoload ``Constants''.
 Este script centralizaba identificadores de escenas y temas en dos diccionarios, ``SCENES'' y ``THEMES''.
@@ -223,6 +246,22 @@ Los botones pasaron de ``Start Training'' y ``Next Step'' a ``Empezar entrenamie
 Además se añadió un botón ``Detalle'', a pesar de que finalmente fue eliminado, que anticipaba la necesidad de abrir o actualizar información complementaria.
 En el controlador se añadieron señales propias, ``next\_step'' y ``detail'', de forma que el botón de siguiente emitía una señal del controlador y esta se conectaba al método ``next\_step'' del algoritmo.
 Esto desacoplaba la interfaz del algoritmo: el botón ya no llamaba directamente al objeto de entrenamiento.
+En la Figura \ref{fig:dtree_view_training_buttons_es} se puede ver esta misma interfaz tras traducir los botones y aplicar los temas visuales a los nodos del árbol.
+
+\begin{figure}[hp!]
+  \centering
+  \begin{minipage}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{imaxes/dtree_view_empezar_entrenamiento.png}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{imaxes/dtree_view_siguiente_paso.png}
+  \end{minipage}
+  \caption{Interfaz de entrenamiento del árbol tras traducir los controles. A la izquierda se muestra el botón para comenzar el entrenamiento y a la derecha el estado del árbol al avanzar con el botón de siguiente paso, con temas distintos para nodos internos y hojas.}
+  \label{fig:dtree_view_training_buttons_es}
+\end{figure}
 
 %El nombre del controlador también se corrigió de ``AlgDTree'' a ``ControllerDTree''. Aunque pueda parecer un cambio menor, aclara la responsabilidad de la clase. El algoritmo vive en ``AlgorithmDTree'', mientras que ``ControllerDTree'' se ocupa de conectar botones, señales, nodos visuales, árbol y ventana. Esta separación fue ganando valor en los commits posteriores, porque cada avance del algoritmo requería actualizar la escena, recalcular posiciones, refrescar la ventana o cambiar estados de botones.
 
@@ -232,6 +271,14 @@ Primero se añadió directamente como un nodo ``Window'' dentro de ``DTreeView''
 Después se extrajo a su propia escena con su propio script.
 Esta extracción era necesaria para que la ventana tuviese su propia lógica, sus plantillas de texto y su método de actualización, sin llenar ``DTreeView'' de código explicativo.
 Esta metodología basada en que cada elemento suficientemente complejo como para requerir de un script, era desarrollado en una escena a parte.
+En la Figura \ref{fig:dtree_view_ventana_empezar_entrenamiento} se puede ver la primera integración de esta ventana en la escena del árbol.
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=0.85\textwidth]{imaxes/dtree_view_ventana_empezar_entrenamiento.png}
+  \caption{Primera versión de la ventana informativa integrada en la vista del árbol, todavía con un mensaje inicial que indicaba al usuario que debía comenzar el entrenamiento.}
+  \label{fig:dtree_view_ventana_empezar_entrenamiento}
+\end{figure}
 
 %La ventana comenzó con una posición a la derecha del árbol, cerca de ``(800, 200)'', y después se movió a ``(20, 150)'' con un tamaño de ``300 x 350''. El ajuste mantuvo la lógica y muestra una preocupación temprana por la composición de la escena. La ventana debía estar visible durante el entrenamiento y ocupar un lugar que no estorbase demasiado a la lectura del árbol. En estas primeras versiones seguía siendo una ventana flotante de Godot, bastante distinta de los paneles integrados que se adoptarían más adelante.
 
@@ -398,4 +445,3 @@ La escena era un ``PanelContainer'', un nodo Control pensado para contener en un
 Este contaba con una Label en forma de título, dos botones grandes para ``Frutas'' y ``Csv'', un panel de texto informativo y un botón ``Entrenar''.
 Al principio el script solo guardaba la opción seleccionada y dejaba la carga de CSV como una función vacía.
 En la siguiente iteración se completó la lógica: el panel contenía ``DICT\_OF\_DATASETS'' con el dataset de frutas y sus atributos, deshabilitaba el botón de entrenamiento hasta que hubiese una selección válida, mostraba mensajes de éxito o error en colores distintos y emitía ``SignalsObserver.dataset\_selected'' con los datos y atributos cuando el Button de entrenamiento era pulsado.
-
