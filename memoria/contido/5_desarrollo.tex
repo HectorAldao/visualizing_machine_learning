@@ -76,7 +76,9 @@ El proyecto dejó de ser un simple mockup cuando se comenzó a trabajar en el pr
 
 \subsection{Primera arquitectura del árbol}
 
-Para comenzar el desarrollo del árbol de decisión, el primer objetivo fue separar la prueba visual inicial de una estructura que pudiera sostener más adelante un algoritmo real. La primera versión del árbol, descrita en la sección anterior, servía para crear nodos manualmente y para comprobar que Godot permitía representar una estructura jerárquica en una escena interactiva. A partir de ese punto se empezó a transformar esa prueba en una vista específica de árbol, con sus propias escenas, scripts y responsabilidades.
+Para comenzar el desarrollo del árbol de decisión, el primer objetivo fue separar la prueba visual inicial de una estructura que pudiera sostener más adelante un algoritmo real.
+La primera versión del árbol, descrita en la sección anterior, servía para crear nodos manualmente y para comprobar que Godot permitía representar una estructura jerárquica en una escena interactiva.
+A partir de ese punto se empezó a transformar esa prueba en una vista específica de árbol, con sus propias escenas, scripts y responsabilidades.
 
 La escena principal del proyecto quedó configurada en Godot como un menú simple, implementado como un nodo de tipo ``Control''. Este menú contenía un único botón que al pulsarse llamaba a ``change\_scene\_to\_file'' para cargar la escena del árbol. De esta manera, el menú principal podía crecer en el futuro sin mezclar su lógica con la representación del árbol.
 
@@ -255,4 +257,145 @@ La solución todavía era básica, y más tarde se sustituiría por gráficos.
 En esta fase permitió que la ventana empezase a explicar el criterio de selección de atributo sin depender de la consola de Godot.
 Esta fue la primera conexión clara entre la matemática del algoritmo y una explicación visible dentro de la aplicación.
 
+
+\subsection{Animación de la construcción del árbol}
+
+Con la construcción paso a paso funcionando, el siguiente problema fue que la aparición de nodos y ramas resultaba demasiado brusca.
+Cada pulsación añadía elementos nuevos al árbol, recalculaba posiciones y redibujaba conexiones, de modo que el usuario podía perder el hilo de qué parte acababa de aparecer.
+En última instancia se buscaba que la inferfaz fuera amigable y permitiese entender lo mejor posible el proceso.
+Por ello se añadieron animaciones a las ramas y, poco después, a los propios nodos.
+
+La escena ``Conection'' pasó de dibujar una línea completa en cada frame a mantener un progreso de animación, ``\_anim\_progress'', y un estado booleano ``\_animating''.
+En ``\_ready'' se inicializaba la conexión con progreso cero, se ocultaba la etiqueta poniendo su alfa a cero y se creaba un ``Tween'' que llevaba ``\_anim\_progress'' hasta 1.0 en medio segundo.
+En paralelo, el mismo ``Tween'' hacía aparecer la etiqueta de la rama. Durante la animación, ``\_process'' llamaba a ``\_update\_from\_progress'', que recalculaba los puntos visibles de la línea.
+
+El cálculo de puntos se concentró en ``\_calc\_points(p)''.
+Si la conexión no tenía texto, el método interpolaba directamente entre el centro del nodo padre y el centro del nodo hijo.
+Si tenía texto, la línea se dividía en dos segmentos con un hueco central reservado para la etiqueta.
+Para ello se calculaba el centro de la conexión, la dirección de la línea, el tamaño mínimo del texto y un margen.
+Después se obtenían dos puntos de corte alrededor del texto.
+En vez de dibujar de golpe los dos segmentos, la animación repartía el progreso sobre la longitud total visible.
+Con esto la rama parecía crecer desde el padre hasta el hijo, respetando el espacio ocupado por la etiqueta.
+
+Esta animación obligó a cambiar el contenedor de conexiones.
+Antes, cada redibujado eliminaba todas las conexiones y las volvía a crear.
+Ese enfoque podía servir para una escena estática.
+Con animaciones provocaba que las ramas existentes volviesen a animarse cada vez que se añadía un nodo nuevo.
+Para evitarlo, ``ConectionContainer'' empezó a guardar un diccionario ``\_connections'', usando una clave de la forma ``parentId\_childId''.
+En cada actualización se construía el conjunto de conexiones deseadas a partir de ``sons\_id''.
+Las conexiones que ya existían se conservaban, las que sobraban se eliminaban y solo se instanciaban las nuevas.
+Así, al avanzar un paso, se animaba la rama recién creada sin reiniciar el resto del árbol.
+
+Después se añadió una animación de aparición a ``DNode''.
+Cada nodo comenzaba con ``modulate.a = 0.0'' (la opacidad al mínimo) y un ``Tween'' lo llevaba a opacidad completa en 0.75 segundos con transición sinusoidal.
+Esto suavizaba tanto la creación de hojas como la creación de nodos internos.
+
+La incorporación de nodos pendientes fue un avance importante.
+Cuando el algoritmo selecciona un atributo para dividir, ya conoce los valores que darán lugar a ramas, aunque todavía no ha procesado el contenido de cada subrama.
+Esto hacía que a pesar de que que ya se supiera que un cierto atibuto sería el que dividiría el nodo actual, no se visualizaban los valores que tomaba ese atributo.
+Para representar esa situación, la señal ``add\_node\_requested'' se amplió con el parámetro ``children\_branch\_values''.
+Si el nodo creado era interno, el controlador recibía la lista de valores del atributo y ejecutaba ``\_create\_placeholder\_children''.
+Este método creaba un ``DNode'' por cada valor de rama, con ``is\_pending = true'', ``text = \"...\"'', ``branch\_value'' asignado y el tema visual de nodo pendiente.
+
+%%TODO: también hay que explicar los Themes
+
+El tema de nodo pendiente se añadió como ``nodedefault'' en ``Constants.THEMES''.
+Visualmente usaba un color distinto y una forma más redondeada, de modo que se distinguía de las hojas y de los nodos internos definitivos.
+En términos de interacción, estos placeholders indicaban que el algoritmo ya había decidido que existiría una rama.
+La decisión concreta de esa rama todavía quedaba pendiente: podía terminar en una hoja o en un nuevo atributo de división.
+La escena mostraba así un estado intermedio de la construcción, que es más fiel al proceso recursivo que una aparición instantánea de subárboles completos.
+Para que los placeholders quedasen asociados a los contextos pendientes del algoritmo, el controlador construía un diccionario ``branch\_to\_id'' con el valor de rama como clave y el identificador del placeholder como valor.
+Después llamaba a ``algorithm.register\_placeholder\_node\_ids''.
+El algoritmo recorría su ``call\_stack'' y, para cada contexto cuyo ``parent\_id'' todavía fuese ``-2'', buscaba su ``branch\_value'' en ese diccionario.
+Si lo encontraba, guardaba el identificador visual en ``node\_id''.
+De este modo, cuando más adelante se procesaba ese contexto, el controlador podía actualizar el placeholder existente en vez de crear un nodo nuevo.
+Algo después, esta actualización de placeholders también se refinó visualmente.
+En una primera versión, al resolver un placeholder se cambiaban directamente ``attribute'', ``label'', ``text'', ``is\_leaf'', ``is\_pending'' y ``theme''.
+El cambio era funcional, aunque resultaba abrupto.
+Para suavizarlo se añadió ``apply\_theme\_animated'' a ``DNode''.
+Este método hacía desaparecer el nodo, cambiaba el tema y el texto en una llamada de ``tween\_callback'', y volvía a mostrarlo.
+Así, el paso de ``...'' a un atributo o una etiqueta tenía una transición perceptible.
+
+Otro recurso temprano para explicar el cálculo fue mostrar información al pasar el cursor por un nodo.
+El algoritmo empezó a enviar un ``info\_value'' junto a la señal de creación de nodo.
+Para nodos internos, ese valor era la mejor ganancia formateada con dos decimales.
+``DNode'' incorporó ``information\_variable\_value'' y conectó ``mouse\_entered'' y ``mouse\_exited''.
+Al entrar el cursor, el texto del botón se sustituía por ese valor; al salir, volvía a mostrarse el atributo o la etiqueta.
+Esta solución de hover permitía inspeccionar valores numéricos sin llenar todos los nodos con números de forma permanente.
+El árbol seguía mostrando atributos y clases como texto principal, mientras que la métrica quedaba disponible cuando quisiese ser consultada.
+Más adelante esta idea se trasladaría hacia la ventana informativa al hacer click sobre los nodos, ya que de esta forma se habilitaba el poner una explicación del significado de lo que era ese valor, cómo se había obtenido... y no que fuera solo un número que aparecía al poner el ratón sobre él.
+
+
+\subsection{Gráficas y casos explicativos en la ventana}
+
+La ventana informativa evolucionó después de texto plano a una composición con texto, scroll y gráficos.
+El objetivo del ScrollContainer era el ya comentado en la Sección ¿?, mientras que el objetivo del gráfico de barras era plasmar visualmente qué atributo tenía mayor entropía.
+
+Así se creó la escena ``BarsChart'', implementada como un ``VBoxContainer'', y tipo nodo Control que organiza a sus hijos (también Control) verticalmente, lo que permite no tener que ordenar manualmente elementos en una interfaz cambiante.
+El script asociado a este gráfico de barras recibía un título y un diccionario ``data\_to\_plot'' que mapea strings a valores reales.
+En ``\_ready'', por cada clave del diccionario se creaba una etiqueta con el nombre del atributo, un ``ColorRect'' (un nodo Control que es un rectánculo de un solo color) cuya anchura dependía del valor del atributo en el diccionario, multiplicado por factor de escala, y una etiqueta numérica con el valor formateado a dos decimales.
+
+%%Dudas: el nombre de los nodos, siempre entre comillas?
+Para integrar la gráfica, el contenido de la ventana dejó de usar un único ``Label'' y pasó a contener un ScrollContainer con un VBoxContainer.
+Dentro de ese contenedor había dos etiquetas, ``Label0'' y ``Label1'', y una instancia de ``BarsChart''.
+Las plantillas de texto pasaron de ser cadenas únicas a arrays con dos strings: el primero sería la plantilla del Label0, y el segundo del Label1.
+En el caso de un nodo interno, la primera parte explicaba los datos y atributos disponibles, después se insertaba la gráfica y la segunda parte explicaba qué atributo había sido escogido y qué ramas se crearían.
+Esta estructura hacía que el gráfico quedase integrado en la explicación.
+
+El método ``update\_current\_text'' de la ventana empezó a tratar ``lista\_ganancias'' como un diccionario cuando era posible.
+Antes de añadir un gráfico nuevo, buscaba si ya existía un nodo ``BarsChart'' en el contenedor y lo eliminaba.
+Después añadía una nueva instancia creada con ``BarsChart.newone(``Entropía por atributo'', plot\_data)'' y recolocaba ``Label1'' al final.
+%%Dudas: esto igual se puede poner como nota a pié de página?
+Esta recolocación era necesaria por cómo ordenan los VBoxContainer a sus hijos.
+Todo nodo hijo de otro tiene un índice asociado dentro del padre, comenzando en 0.
+A la hora de organizar verticalmente a sus hijos una vez instanciados, los VBoxContainer se fijan en este índice: menor el índice, más arriba se coloca el nodo.
+Además al añadir un nuevo hijo, este se pone de último, sumando uno al valor más alto de los índices ya ocupados.
+Al eliminar el BarsChart, el Label1 pasaba a ser el segundo hijo, y al recrear el BarsChart, pasa a ser el tercero.
+Por lo que para mantener la organización de Label0 $\rightarrow$ BarsChart $\rightarrow$ Label1, había que reocolocar los nodos dentro del padre.
+%%Dudas: hará falta un gráfico explicando esto o directamente sobra que te cagas.
+
+%Al mismo tiempo, la ventana ganó su propia lógica de scroll.
+%Igual que en la vista principal, se añadieron variables para arrastre con botón central y rueda del ratón.
+%Esto era útil porque la explicación empezaba a ocupar más altura que la ventana.
+%La interfaz de detalle dejaba de ser un texto corto fijo y empezaba a comportarse como un panel de lectura, con contenido variable según el tipo de nodo y según el número de atributos.
+
+El algoritmo también se adaptó a esta representación.
+``details[``lista\_ganancias'']'' pasó a guardar directamente un ``Dictionary[String, float]''.
+Con ello ``BarsChart'' podía usar los valores numéricos reales, sin tener que interpretar una cadena previamente formateada.
+La función ``\_information\_gains\_for\_all\_atributes'' se tipó como un diccionario de cadenas a reales, reforzando la idea de que esos valores eran datos para la interfaz, no solo texto para imprimir.
+
+También se añadió un caso específico para empates entre atributos.
+Tras calcular las ganancias, el algoritmo recorría el diccionario y contaba cuántos atributos tenían el valor máximo.
+Si solo había uno, ``details[``tipo\_de\_nodo'']'' seguía siendo ``internal''.
+Si había varios, pasaba a ser ``internal\_multi\_atribute'' y se guardaba ``n\_atributos\_con\_ganancia\_maxima''.
+La ventana incorporó una plantilla para este caso, explicando que varios atributos compartían la mejor métrica y que se continuaba con uno de ellos.
+%Esta explicación era necesaria para que la elección no pareciese arbitraria cuando los datos daban varias divisiones equivalentes.
+
+La redacción de los nodos hoja también se ajustó al probar datasets más grandes.
+La plantilla inicial decía que solo había bajado un dato por la rama, algo que era cierto en el primer dataset de frutas.
+La frase dejaba de encajar en cuanto varios ejemplos con la misma clase llegaban a la misma hoja.
+El texto pasó a decir que habían bajado ``{numero\_de\_datos}'' datos con la misma etiqueta.
+Este cambio muestra cómo la explicación dependía de probar casos distintos: al ampliar los datos, aparecían frases demasiado específicas que había que generalizar.
+Este proceso iterativo de analizar casos extremos para que la explicación fuera lo más completa posible siguió a lo largo de todo el desarrollo, especialmente en los momentos en los que se añadían nuevos datasets de prueba.
+
+
+\subsection{Primer panel de selección de datasets}
+
+Hasta ese momento, los datos de entrenamiento estaban incrustados en el controlador.
+Esto facilitaba las primeras pruebas y limitaba la aplicación a un único ejemplo.
+El siguiente paso fue separar la selección de datos del arranque del entrenamiento.
+Primero se probó un segundo dataset definido también en código, con atributos ``tipo'', ``estado'' y ``tamaño'', y una etiqueta ``clase''.
+Este conjunto incluía rocas, animales y plantas, con casos puros, casos mezclados y contradicciones diseñadas para forzar ramas más profundas.
+El objetivo era comprobar que el árbol se comportaba bien cuando la columna objetivo no se llamaba ``class''.
+Para conseguirlo se añadió el atributo ``label\_column'' a ``AlgorithmDTree''.
+La función personalizada ``\_get\_labels'' dejó de acceder siempre a \texttt{row[``class'']} y pasó a leer \texttt{row[label\_column]}.
+El controlador infería esa columna buscando en las claves del primer dato aquella que no estuviese en la lista de atributos (ya que esta lista era información que se proporcionaba con el dataset).
+Esta solución todavía era simple y hacía posible entrenar con datasets que usasen nombres de etiqueta distintos, como ``clase'' o ``y''.
+Con ello el algoritmo quedaba menos acoplado al primer ejemplo de frutas.
+
+Después se creó ``PanelDatasetSelection''.
+La escena era un ``PanelContainer'', un nodo Control pensado para contener en un rectángulo a sus hijos.
+Este contaba con una Label en forma de título, dos botones grandes para ``Frutas'' y ``Csv'', un panel de texto informativo y un botón ``Entrenar''.
+Al principio el script solo guardaba la opción seleccionada y dejaba la carga de CSV como una función vacía.
+En la siguiente iteración se completó la lógica: el panel contenía ``DICT\_OF\_DATASETS'' con el dataset de frutas y sus atributos, deshabilitaba el botón de entrenamiento hasta que hubiese una selección válida, mostraba mensajes de éxito o error en colores distintos y emitía ``SignalsObserver.dataset\_selected'' con los datos y atributos cuando el Button de entrenamiento era pulsado.
 
