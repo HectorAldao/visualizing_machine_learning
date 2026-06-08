@@ -1,35 +1,44 @@
 \chapter{Estado del Arte}
 \label{chap:estado_de_la_cuestion}
 
-\lettrine{E}{l} aprendizaje profundo se apoya en conceptos matemáticos y computacionales que no siempre resultan fáciles de visualizar: funciones de activación, pesos, sesgos, propagación hacia delante, retropropagación o gradientes, entre otros.
-Esta dificultad ha motivado el desarrollo de recursos educativos orientados a hacer más comprensible el comportamiento de las redes neuronales mediante explicaciones visuales y simulaciones interactivas.
+\lettrine{L}{a} inteligencia artificial y el aprendizaje automático se apoyan en algoritmos cuyo funcionamiento interno no siempre resulta fácil de visualizar.
+Conceptos como la selección de atributos en un árbol de decisión, el cálculo de una frontera de decisión o la actualización iterativa de los parámetros de un modelo pueden resultar abstractos cuando se estudian únicamente desde una formulación teórica.
+Esta dificultad se acentúa en el aprendizaje profundo, donde intervienen elementos como funciones de activación, pesos, sesgos, propagación hacia delante, retropropagación o gradientes.
+Por ello, se han desarrollado recursos educativos orientados a hacer más comprensible el comportamiento de estos modelos mediante explicaciones visuales y simulaciones interactivas.
 En el contexto de este trabajo, resultan especialmente relevantes las herramientas que permiten comprender el proceso de aprendizaje de los modelos y la relación entre sus componentes internos.
 
 \section{Recursos audiovisuales explicativos}
 \label{sec:sota_recursos_audiovisuales}
 
-Uno de los recursos divulgativos más conocidos para introducir las redes neuronales es la serie de Grant Sanderson ``Neural networks'' \cite{SandersonNeuralNetworksYoutube}, publicada en el canal de YouTube 3Blue1Brown.
+Uno de los recursos divulgativos más conocidos para introducir las redes neuronales es la serie de Grant Sanderson ``Neural networks'' \cite{SandersonNeuralNetworksYoutube}, publicada en el \textit{canal de YouTube} 3Blue1Brown.
 Este proyecto cuenta también con una página web \cite{SandersonNeuralNetworks}, cuya principal aportación pedagógica es la posibilidad de interactuar con una red neuronal entrenada con el conjunto de datos MNIST \cite{MNIST}.
 La herramienta permite observar en tiempo real cómo la red reacciona a los cambios en el dato de entrada, representado mediante una superficie de dibujo en la que cada píxel se corresponde con una neurona de la capa de entrada.
 
 Este tipo de recurso resulta valioso para desarrollar intuición, ya que reduce la barrera de entrada matemática y proporciona una primera aproximación visual al funcionamiento de una red.
+También es adecuado para motivar y contextualizar el problema gracias a una explicación apoyada en recursos visuales claros.
+El recurso conserva un formato fundamentalmente expositivo: en la página web, dos de las diez lecciones incorporan un componente interactivo, y dicha interacción se orienta siempre a la relación entre la entrada y la salida de una red ya entrenada.
+El estudiante trabaja con una explicación limitada al conjunto MNIST y sin capacidad de experimentar de forma directa con la arquitectura del modelo.
+Por ello, el recurso no cubre por completo la necesidad de aprendizaje activo asociada a la comprensión del efecto de cada decisión de diseño en el comportamiento de una red neuronal.
 
-Su formato es fundamentalmente expositivo.
-En la página web, dos de las diez lecciones incorporan un componente interactivo.
-Dicha interacción se orienta siempre a la relación entre la entrada y la salida de una red ya entrenada.
-El estudiante observa una explicación apoyada en recursos visuales, limitada al conjunto MNIST y sin capacidad de experimentar de forma directa con la arquitectura del modelo.
-Por ello, aunque es adecuado para motivar y contextualizar el problema, no cubre por completo la necesidad de aprendizaje activo asociada a la comprensión del efecto de cada decisión de diseño en el comportamiento de una red neuronal.
-
-\section{Simuladores interactivos de redes neuronales}
+%\section{Simuladores interactivos de redes neuronales}
+\section{Simuladores interactivos}
 \label{sec:sota_simuladores_interactivos}
+
+%\textcolor{blue}{Yo le quitaría el apellido y lo dejaría como simuladores interactivos}
 
 Frente al formato audiovisual, existen herramientas que permiten manipular redes neuronales en tiempo real.
 Un ejemplo es ``A Neural Network Playground'', desarrollado por Daniel Smilkov y Shan Carter y publicado por TensorFlow~\cite{TensorFlowPlayground}.
 Esta aplicación permite configurar una red neuronal sencilla desde el navegador, seleccionar conjuntos de datos sintéticos, modificar hiperparámetros y observar cómo evoluciona la frontera de decisión durante el entrenamiento.
 
-La relevancia de TensorFlow Playground reside en que conecta elementos habitualmente tratados de forma abstracta con consecuencias observables.
-Cambiar el número de capas, el número de neuronas, la tasa de aprendizaje, la regularización o las características de entrada altera de manera visible el proceso de ajuste.
-Esto facilita que el estudiante relacione conceptos como sobreajuste, generalización o convergencia con resultados palpables.
+%La relevancia de TensorFlow Playground reside en que conecta elementos habitualmente tratados de forma abstracta con consecuencias observables.
+%Cambiar el número de capas, el número de neuronas, la tasa de aprendizaje, la regularización o las características de entrada altera de manera visible el proceso de ajuste.
+%Esto facilita que el estudiante relacione conceptos como sobreajuste, generalización o convergencia con resultados palpables.
+
+A diferencia de los recursos puramente expositivos, la relevancia de TensorFlow Playground reside en que conecta elementos habitualmente tratados de forma abstracta con consecuencias observables.
+Modificar directamente la arquitectura del modelo (número de capas y neuronas) o sus hiperparámetros (tasa de aprendizaje y regularización) altera de manera inmediata el proceso de ajuste.
+Este enfoque interactivo facilita que el estudiante relacione conceptos críticos como el sobreajuste, la generalización o la convergencia con resultados palpables.
+
+%\textcolor{blue}{Hoy estoy teniendo un día raro e igual es eso, pero me cuesta la vida entender este parrafo. Propongo: A diferencia de los recursos puramente expositivos, la relevancia de TensorFlow Playground reside en que conecta elementos habitualmente tratados de forma abstracta con consecuencias observables. Modificar directamente la arquitectura del modelo (número de capas y neuronas) o sus hiperparámetros (tasa de aprendizaje y regularización) altera de manera inmediata el proceso de ajuste. Este enfoque interactivo facilita que el estudiante relacione conceptos críticos como el sobreajuste, la generalización o la convergencia con resultados palpables.}
 
 La herramienta se centra principalmente en la frontera de decisión y en la pérdida, sin profundizar de forma detallada en operaciones internas como el cálculo de gradientes o la propagación de errores capa a capa.
 
@@ -37,19 +46,24 @@ La herramienta se centra principalmente en la frontera de decisión y en la pér
 %\label{sec:sota_modelos_generativos}
 
 Otra línea relevante está formada por las aplicaciones centradas en arquitecturas específicas.
-``GAN Lab'', desarrollado por Minsuk Kahng, Nikhil Thorat, Polo Chau, Fernanda Viégas y Martin Wattenberg, permite experimentar en el navegador con redes generativas adversarias~\cite{GANLab}.
+``GAN Lab'' permite experimentar en el navegador con redes generativas adversarias~\cite{GANLab}.
 Este tipo de modelo introduce una dinámica de aprendizaje distinta a la de una red supervisada clásica, ya que enfrenta dos redes: un generador, que intenta producir muestras plausibles, y un discriminador, que intenta distinguir entre datos reales y generados.
 
 La aportación principal de GAN Lab es representar visualmente una interacción compleja como la de un par de redes adversarias.
 La herramienta permite observar cómo cambian las distribuciones generadas durante el entrenamiento y cómo la competencia entre generador y discriminador afecta al resultado.
 Desde el punto de vista educativo, esto resulta útil para explicar que no todos los modelos de aprendizaje profundo optimizan el mismo tipo de objetivo ni aprenden bajo el mismo esquema.
 
-Su limitación principal es que presupone una base de conocimiento mayor que la requerida para una introducción a las redes neuronales.
+Su limitación principal, a parte de pecar de lo mismo que el anterior, es que presupone una base de conocimiento mayor que la requerida para una introducción a las redes neuronales.
 Para comprender correctamente una GAN es necesario haber asimilado previamente ideas como función de pérdida, optimización, representación interna o entrenamiento iterativo.
 En consecuencia, GAN Lab es una herramienta valiosa para una fase posterior del aprendizaje, aunque no sustituye a una aplicación centrada en los fundamentos de una red neuronal básica.
 
-\section{Simuladores interactivos de árboles de decisión}
-\label{sec:sota_arboles_decision}
+%\textcolor{blue}{Duda, la límitación del anterior no se mantiene aquí?}\\
+%\textcolor{green}{Sí, sí que se mantiene. He puesto lo de "a parte de pecar de lo mismo que lo anterior"}
+
+%\section{Simuladores interactivos de árboles de decisión}
+%\label{sec:sota_arboles_decision}
+%
+%\textcolor{blue}{Yo me cargaría esta división de secciones. Tenemos por un lado las audiovisuales y por otro los simuladores.}
 
 En el ámbito de los algoritmos clásicos de aprendizaje automático, existen propuestas para ilustrar el funcionamiento de los árboles de decisión.
 La herramienta web interactiva sobre árboles de decisión de Interactive Machine Learning~\cite{InteractiveDecisionTrees} permite al usuario construir un árbol y observar el proceso de división de un conjunto de datos en tiempo real.
@@ -58,12 +72,20 @@ La herramienta presenta una experiencia de uso limitada y ofrece explicaciones p
 Aunque muestra los valores de distintas métricas, no acompaña dichos valores con una interpretación suficiente de su significado ni de su papel dentro del algoritmo.
 Esto reduce su utilidad como recurso formativo autónomo, especialmente para estudiantes que se aproximan por primera vez a los árboles de decisión.
 
-En comparación con las redes neuronales, la disponibilidad de herramientas interactivas centradas en árboles de decisión parece más reducida, especialmente cuando se buscan recursos que combinen visualización, explicación del criterio de partición y evaluación paso a paso.
+En comparación con las redes neuronales, la disponibilidad de herramientas interactivas centradas en árboles de decisión es más reducida.
+La revisión realizada muestra una presencia mucho mayor de simuladores y visualizaciones dedicados a redes neuronales, tanto en recursos divulgativos como en herramientas web orientadas a la experimentación.
+Esta diferencia es especialmente visible cuando se buscan recursos que combinen visualización del modelo, explicación del criterio de partición y evaluación paso a paso.
+
 \section{Oportunidades de mejora}
 \label{sec:sota_comparacion}
+
+%\textcolor{blue}{Yo me cargaría esta división tmb. El texto lleva naturalmente a esta conclusión, al final se basa en las limitaciones}
+%\textcolor{green}{A mí como que se me hace raro hablar de mejoras en la sección de simuladores, habiendo antes una sección de otra cosa separada de la que no se dan mejoras}
 
 Desde la perspectiva de este proyecto, la principal oportunidad se encuentra en combinar las fortalezas de estos recursos.
 Una herramienta educativa eficaz debería mantener la claridad visual de los recursos divulgativos y su atención a la base matemática, incorporar la manipulación directa de los simuladores y ofrecer suficiente rigor técnico para que lo presentado al usuario se corresponda con el funcionamiento real del algoritmo.
 
 Asimismo, debería evitar que la interacción se limite a modificar hiperparámetros globales.
 Para entender una red neuronal resulta especialmente útil poder observar el flujo de datos, la contribución de los pesos y el efecto del entrenamiento sobre cada componente del modelo.
+
+\textcolor{blue}{Solo se concluye sobre redes? Los árboles bien? Arriba hablas de la importancia de acompañar las simulaciones con texto explicativo, habría que seguir ese hilo (al final lo incorpora el tuyo)}
