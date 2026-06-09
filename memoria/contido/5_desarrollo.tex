@@ -4,7 +4,7 @@
 En este capítulo se explicará todo el proceso de desarrollo.
 
 
-\section{Mockup: versión 0.1}
+\section{Prototipo: versión 0.1}
 
 El paso previo antes de comenzar con un desarrollo profundo consistió en comprobar que las herramientas que se querían usar servían para el propósito propuesto.
 Fue así que la primera versión ``usable'' del proyecto consistió en un botón con el que se podía interactuar.
@@ -72,7 +72,7 @@ Una vez subidos los cambios a la rama ``main'', la aplicación estaba desplegada
 
 \section{Árbol de decisión: versión 0.2}
 
-El proyecto dejó de ser un simple mockup cuando se comenzó a trabajar en el primer algoritmo: el árbol de decisión.
+El proyecto dejó de ser un simple prototipo cuando se comenzó a trabajar en el primer algoritmo: el árbol de decisión.
 
 \subsection{Primera arquitectura del árbol}
 
@@ -89,7 +89,7 @@ Si todos los nodos se colocasen directamente sobre una escena fija, bastarían u
 Por ello se creó un ``DTreeCanvas'', el nodo hijo del ScrollContainer, que instanciaba la escena del árbol.
 Su función era calcular el tamaño mínimo necesario para contener la estructura completa.
 El cálculo partía de los límites del árbol, obtenidos mediante ``get\_tree\_bounds'', y ajustaba ``custom\_minimum\_size'' para que el ScrollContainer pudiera desplazarse hasta todas las zonas relevantes.
-%%Dudas: pongo en esta parte que había un nodo de godot que ya me ayudaba con esto, o ya lo digo más adelante?
+\textcolor{olive}{pongo en esta parte que había un nodo de godot que ya me ayudaba con esto, o ya lo digo más adelante?}
 
 El núcleo visual del árbol se encapsuló en la clase ``DTreeLogical''.
 En su primera versión esta clase heredaba de ``Node2D'' y mantenía un diccionario ``nodes\_dict'', donde cada clave era el identificador de un nodo y cada valor era la instancia visual correspondiente.
@@ -170,13 +170,15 @@ Si todas eran iguales, pedía crear un nodo hoja con esa clase.
 Si no quedaban atributos, calculaba la clase mayoritaria y creaba una hoja de mayoría.
 En el resto de casos calculaba la ganancia de información para cada atributo, seleccionaba el atributo con mayor ganancia, preparaba un contexto por cada valor posible del atributo elegido y solicitaba crear un nodo interno.
 
-%%Dudas: estoy diferenciando los métodos creados por mí y los del motor poninendo "personalizado" en los que he hecho yo. Quizá deba referirme a las otras como "nativas" y a estas sin ningún apellido (por ser más abundantes)? O deberían tener ambas apellido? Debería explicar a qué me refiero con personalizada y nativa?
+\textcolor{olive}{estoy diferenciando los métodos creados por mí y los del motor poninendo "personalizado" en los que he hecho yo. Quizá deba referirme a las otras como "nativas" y a estas sin ningún apellido (por ser más abundantes)? O deberían tener ambas apellido? Debería explicar a qué me refiero con personalizada y nativa?}
+
 La entropía se calculó directamente en GDScript.
 La función personalizada ``\_entropy'' contaba ocurrencias de cada etiqueta, transformaba cada conteo en una probabilidad y acumulaba la expresión $-p \log_2(p)$.
 Sobre esa función se construyó ``\_information\_gain'', que calculaba la entropía total del conjunto, dividía los datos por el valor del atributo y restaba la entropía ponderada de los subconjuntos.
 Esta implementación fue deliberadamente explícita.
 En lugar de delegar en una biblioteca externa, el código mostraba de forma transparente los mismos cálculos que después debían explicarse en la interfaz.
-%%Dudas: explico las cosas que se quedaron fuera? Como por ejemplo, más formas de calcular la ganancia de información que no son la entropía.
+
+\textcolor{olive}{explico las cosas que se quedaron fuera? Como por ejemplo, más formas de calcular la ganancia de información que no son la entropía.}
 
 La coordinación entre el algoritmo y la escena visual se hizo mediante señales.
 ``AlgorithmDTree'' emitía ``add\_node\_requested'' indicando padre, valor de rama, atributo, etiqueta y si el nodo era hoja.
@@ -265,7 +267,8 @@ En la Figura \ref{fig:dtree_view_training_buttons_es} se puede ver esta misma in
 
 %El nombre del controlador también se corrigió de ``AlgDTree'' a ``ControllerDTree''. Aunque pueda parecer un cambio menor, aclara la responsabilidad de la clase. El algoritmo vive en ``AlgorithmDTree'', mientras que ``ControllerDTree'' se ocupa de conectar botones, señales, nodos visuales, árbol y ventana. Esta separación fue ganando valor en los commits posteriores, porque cada avance del algoritmo requería actualizar la escena, recalcular posiciones, refrescar la ventana o cambiar estados de botones.
 
-%%Dudas: Y si explico todos los nodos en el glosario?
+\textcolor{olive}{Y si explico todos los nodos en el glosario?}
+
 Otro cambio de esta etapa fue la creación de una ventana informativa.
 Primero se añadió directamente como un nodo ``Window'' dentro de ``DTreeView'', con un texto que mostraba el mensaje inicial ``Presiona el botón ``Empezar entrenamiento''''.
 Después se extrajo a su propia escena con su propio script.
@@ -382,7 +385,8 @@ Así se creó la escena ``BarsChart'', implementada como un ``VBoxContainer'', y
 El script asociado a este gráfico de barras recibía un título y un diccionario ``data\_to\_plot'' que mapea strings a valores reales.
 En ``\_ready'', por cada clave del diccionario se creaba una etiqueta con el nombre del atributo, un ``ColorRect'' (un nodo Control que es un rectánculo de un solo color) cuya anchura dependía del valor del atributo en el diccionario, multiplicado por factor de escala, y una etiqueta numérica con el valor formateado a dos decimales.
 
-%%Dudas: el nombre de los nodos, siempre entre comillas?
+\textcolor{olive}{el nombre de los nodos, siempre entre comillas?}
+
 Para integrar la gráfica, el contenido de la ventana dejó de usar un único ``Label'' y pasó a contener un ScrollContainer con un VBoxContainer.
 Dentro de ese contenedor había dos etiquetas, ``Label0'' y ``Label1'', y una instancia de ``BarsChart''.
 Las plantillas de texto pasaron de ser cadenas únicas a arrays con dos strings: el primero sería la plantilla del Label0, y el segundo del Label1.
@@ -392,14 +396,14 @@ Esta estructura hacía que el gráfico quedase integrado en la explicación.
 El método ``update\_current\_text'' de la ventana empezó a tratar ``lista\_ganancias'' como un diccionario cuando era posible.
 Antes de añadir un gráfico nuevo, buscaba si ya existía un nodo ``BarsChart'' en el contenedor y lo eliminaba.
 Después añadía una nueva instancia creada con ``BarsChart.newone(``Entropía por atributo'', plot\_data)'' y recolocaba ``Label1'' al final.
-%%Dudas: esto igual se puede poner como nota a pié de página?
+\textcolor{olive}{esto igual se puede poner como nota a pié de página?}
 Esta recolocación era necesaria por cómo ordenan los VBoxContainer a sus hijos.
 Todo nodo hijo de otro tiene un índice asociado dentro del padre, comenzando en 0.
 A la hora de organizar verticalmente a sus hijos una vez instanciados, los VBoxContainer se fijan en este índice: menor el índice, más arriba se coloca el nodo.
 Además al añadir un nuevo hijo, este se pone de último, sumando uno al valor más alto de los índices ya ocupados.
 Al eliminar el BarsChart, el Label1 pasaba a ser el segundo hijo, y al recrear el BarsChart, pasa a ser el tercero.
 Por lo que para mantener la organización de Label0 $\rightarrow$ BarsChart $\rightarrow$ Label1, había que reocolocar los nodos dentro del padre.
-%%Dudas: hará falta un gráfico explicando esto o directamente sobra que te cagas.
+\textcolor{olive}{hará falta un gráfico explicando esto o directamente sobra que te cagas.}
 
 %Al mismo tiempo, la ventana ganó su propia lógica de scroll.
 %Igual que en la vista principal, se añadieron variables para arrastre con botón central y rueda del ratón.

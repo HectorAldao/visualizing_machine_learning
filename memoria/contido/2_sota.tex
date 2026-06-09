@@ -1,6 +1,9 @@
 \chapter{Estado del Arte}
 \label{chap:estado_de_la_cuestion}
 
+\textcolor{violet}{incluso puedes ir a métodos visuales para aprendizaje en general, y luego reconducirlo a modelos matemáticos/IA}
+\textcolor{green}{Cómo "métodos visuales"?}
+
 \lettrine{L}{a} inteligencia artificial y el aprendizaje automático se apoyan en algoritmos cuyo funcionamiento interno no siempre resulta fácil de visualizar.
 Conceptos como la selección de atributos en un árbol de decisión, el cálculo de una frontera de decisión o la actualización iterativa de los parámetros de un modelo pueden resultar abstractos cuando se estudian únicamente desde una formulación teórica.
 Esta dificultad se acentúa en el aprendizaje profundo, donde intervienen elementos como funciones de activación, pesos, sesgos, propagación hacia delante, retropropagación o gradientes.
@@ -12,7 +15,14 @@ En el contexto de este trabajo, resultan especialmente relevantes las herramient
 
 Uno de los recursos divulgativos más conocidos para introducir las redes neuronales es la serie de Grant Sanderson ``Neural networks'' \cite{SandersonNeuralNetworksYoutube}, publicada en el \textit{canal de YouTube} 3Blue1Brown.
 Este proyecto cuenta también con una página web \cite{SandersonNeuralNetworks}, cuya principal aportación pedagógica es la posibilidad de interactuar con una red neuronal entrenada con el conjunto de datos MNIST \cite{MNIST}.
-La herramienta permite observar en tiempo real cómo la red reacciona a los cambios en el dato de entrada, representado mediante una superficie de dibujo en la que cada píxel se corresponde con una neurona de la capa de entrada.
+La herramienta permite observar en tiempo real cómo la red reacciona a los cambios en el dato de entrada, representado mediante una superficie de dibujo en la que cada píxel se corresponde con una neurona de la capa de entrada como se aprecia en la Figura \ref{fig:3blue1brown}
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=0.75\textwidth]{imaxes/3blue1brown.png}
+  \caption{Sección interactiva de la página web de 3Blue1Brown.}
+  \label{fig:3blue1brown}
+\end{figure}
 
 Este tipo de recurso resulta valioso para desarrollar intuición, ya que reduce la barrera de entrada matemática y proporciona una primera aproximación visual al funcionamiento de una red.
 También es adecuado para motivar y contextualizar el problema gracias a una explicación apoyada en recursos visuales claros.
@@ -29,6 +39,14 @@ Por ello, el recurso no cubre por completo la necesidad de aprendizaje activo as
 Frente al formato audiovisual, existen herramientas que permiten manipular redes neuronales en tiempo real.
 Un ejemplo es ``A Neural Network Playground'', desarrollado por Daniel Smilkov y Shan Carter y publicado por TensorFlow~\cite{TensorFlowPlayground}.
 Esta aplicación permite configurar una red neuronal sencilla desde el navegador, seleccionar conjuntos de datos sintéticos, modificar hiperparámetros y observar cómo evoluciona la frontera de decisión durante el entrenamiento.
+En la Figura \ref{fig:tensorflowplayground} se puede visualizar la página web.
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=0.75\textwidth]{imaxes/tensorflowplayground.png}
+  \caption{Página web TensorFlow Playground.}
+  \label{fig:tensorflowplayground}
+\end{figure}
 
 %La relevancia de TensorFlow Playground reside en que conecta elementos habitualmente tratados de forma abstracta con consecuencias observables.
 %Cambiar el número de capas, el número de neuronas, la tasa de aprendizaje, la regularización o las características de entrada altera de manera visible el proceso de ajuste.

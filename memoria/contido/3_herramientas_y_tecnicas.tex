@@ -2,13 +2,17 @@
 \label{chap:herramientas_y_tecnicas}
 
 \lettrine{E}{l} desarrollo de este trabajo se apoya en un conjunto de herramientas orientadas a construir una aplicación educativa, interactiva y ejecutable desde el navegador.
-La elección tecnológica tuvo en cuenta tanto criterios de implementación como la naturaleza del problema abordado: explicar modelos de aprendizaje automático mediante visualizaciones dinámicas, animaciones y ejemplos manipulables por el usuario.
+\textcolor{blue}{Ahora mismo podrías hacer un ejecutable de pc sin problema, no?}
+\textcolor{olive}{Sí}
+La elección tecnológica del entorno de desarrollo tuvo en cuenta tanto criterios de implementación como la naturaleza del problema abordado: explicar modelos de aprendizaje automático mediante visualizaciones dinámicas, animaciones y ejemplos manipulables por el usuario.
 En consecuencia, se priorizaron tecnologías que facilitasen la construcción de interfaces interactivas, la validación de los algoritmos implementados y el despliegue web del resultado final.
 
 \section{Godot como motor de desarrollo}
 \label{sec:herramientas_godot}
 
-La herramienta principal empleada fue Godot, un motor de desarrollo libre y multiplataforma orientado a la creación de aplicaciones interactivas y videojuegos~\cite{GodotEngine}.
+\textcolor{olive} "Libre" se entiende?
+La herramienta principal empleada fue Godot, un motor de desarrollo de desarrollo libre y multiplataforma orientado a la creación de aplicaciones interactivas y videojuegos~\cite{GodotEngine}.
+\textcolor{blue}{No descartaría dejarlo solo como aplicaciones interactivas y en el parrafo siguiente olvidar el concepto de videojuego, permite crear aplicaciones interactivas y creamos una aplicación interactiva (un videojuego es una app software interactiva con un nombre fancy)}
 Aunque su uso más habitual se asocia al desarrollo de videojuegos, sus características también resultan adecuadas para una aplicación educativa como la desarrollada en este trabajo.
 El proyecto requiere presentar información visual, responder a acciones del usuario, animar procesos paso a paso y mantener una estructura clara entre los distintos elementos de la interfaz.
 Estas necesidades encajan de forma natural con el modelo de escenas, nodos y señales que propone Godot~\cite{GodotDocs}.
@@ -22,6 +26,7 @@ Igual que en la programación orientada a objetos, los atributos son variables o
 Las señales son disparadores de funciones.
 Cuándo son emitidas llaman a la función a la que están conectadas.
 Son una forma de conectar eventos entre diferentes nodos.
+Son el núcleo del paradigma de programación que promueve el motor: la prgramación dirigida por eventos. \textcolor{olive}{Aquí puse lo de la programación dirigida por eventos}
 
 Los atributos, métodos y señales de cada nodo vienen definidos por su clase.
 Godot dispone de un gran árbol de clases predefinidas que heredan atributos y métodos de sus clases padre.
@@ -33,8 +38,6 @@ y el ``Control'', pensado para los elementos de interfaz de usuario.
 Por encima de estas, el desarrollador siempre puede definir sus propias clases ampliando las ya existentes.
 %Este sistema sigue la filosifía de la programación orientada a objetos y la herencia.
 
-%%%
-
 Los nodos por sí solos son clases abstractas que no existen en el programa ejecutable final por si mismos.
 Para instanciarlos están las escenas.
 Estas son la materialización concreta del proyecto: los archivos que son guardados en disco y con los que se interactúa en el editor.
@@ -44,18 +47,18 @@ De este nodo raiz pueden colgar nodos hijo, que a su vez pueden contar con sus p
 Finalmente, las escenas, como en última instancia son árboles de nodos, pueden ser instanciadas dentro de otras escenas.
 Esto habilita una modularidad total, puesto que toda estructura de nodos que sea susceptible de ser reutilizada, puede guardarse como una escena para no tener que ser recreada. 
 
-
-%%%
-
 A mayores, los nodos pueden tener asociados un script.
 Estos son código desde el que se puede interactuar, principalmente, con los atributos y métodos del nodo al que están asociados, así como con sus hijos.
 Pero no están limitados a estos elementos. Siempre se puede acceder al nodo raiz, y desde este modificar cualquier propiedad global o acceder a cualquier nodo en la escena. O mediante la creación de ``Autoloads'' en el proyecto se puede acceder a clases personalizadas en cualquier punto del código.
 
-La organización en escenas permitió separar componentes de la aplicación con responsabilidades distintas, como las vistas de entrenamiento, los paneles explicativos, las representaciones gráficas y los controles de interacción.
-Este enfoque favorece una estructura modular en la que cada parte de la interfaz puede desarrollarse, probarse y reutilizarse con menor acoplamiento.
+La organización en escenas permite separar componentes de la aplicación con responsabilidades distintas, como las vistas de entrenamiento, los paneles explicativos, las representaciones gráficas y los controles de interacción.
+Este enfoque favorece una estructura modular en la que cada parte de la interfaz puede desarrollarse, probarse y reutilizarse con menor acoplamiento. \textcolor{blue}{ Es raro, al final estamos diciendo que permiten aplicar patrones de diseño} \textcolor{olive}{En qué sentido es raro?}
 El sistema de señales facilita la comunicación entre elementos de la aplicación sin imponer dependencias directas innecesarias, lo que resulta útil en un entorno en el que las acciones del usuario deben provocar cambios visuales y actualizaciones del estado interno de los modelos.
 
-La manera en que Godot organiza las interfaces mediante nodos resulta compatible con las representaciones habituales de los algoritmos tratados.
+%La manera en que Godot organiza las interfaces mediante nodos resulta compatible con las representaciones habituales de los algoritmos tratados.
+%\textcolor{violet}{ (Sugerencia: eliminar "compatible") La manera en que Godot organiza las interfaces mediante nodos permite estrucutar los elementos de los algoritmos tratados de forma sencilla}
+La manera en que Godot organiza las interfaces mediante nodos permite estrucutar los ele-
+mentos de los algoritmos tratados de forma sencilla.
 Un árbol de decisión puede mostrarse como una estructura jerárquica de nodos conectados, mientras que una red neuronal puede representarse mediante capas, neuronas y conexiones.
 Esta correspondencia conceptual ayuda a trasladar las estructuras internas del algoritmo a elementos visuales manipulables dentro de la aplicación.
 
@@ -63,9 +66,16 @@ Otro motivo importante para escoger Godot fue su capacidad de exportación a web
 El motor permite generar una versión HTML5 de la aplicación~\cite{GodotWebExport}, lo que evita exigir al usuario una instalación local y facilita el acceso desde un navegador.
 Esta característica es especialmente relevante en un proyecto con finalidad educativa, ya que reduce la fricción de uso y permite distribuir la herramienta como una aplicación web estática.
 
+\textcolor{blue}{Yo lo que veo es que no justificamos la elección de Godot frente a herramientas de desarrollo de interfaces interactivas. ¿Que nos aporta Godot que no haga Java, .Net, Flutter etc... }
+\textcolor{violet}{ yo creo que se puede justificar por la parte de la interacción/animaciones, al tener el propio ciclo de vida del juego, facilita toda esa parte}
+\textcolor{olive}{hmmm vale, lo hablamos}
 
 \section{Lenguajes de programación empleados}
 \label{sec:herramientas_lenguajes}
+
+\textcolor{blue}{Debatir en reunión. ¿No integraríais esto en sus propias secciones de desarrollo?}
+\textcolor{violet}{ rust y js sí, porque son para funcionalidades específicas}
+\textcolor{olive}{cómo considereis}
 
 El desarrollo combina varios lenguajes, cada uno empleado en una parte concreta del proyecto.
 La lógica principal de la aplicación se implementó dentro del propio entorno de Godot, utilizando GDScript para construir las visualizaciones, gestionar la interacción y ejecutar las implementaciones didácticas de los algoritmos.
@@ -120,3 +130,7 @@ El repositorio se alojó en GitHub, lo que proporcionó almacenamiento remoto y 
 Además, se utilizó GitHub Pages para publicar la versión web de la aplicación~\cite{GitHubPages}.
 Este servicio permite desplegar sitios estáticos directamente desde un repositorio, por lo que encaja con la exportación web generada por Godot.
 La combinación de Godot y GitHub Pages permitió que el resultado final pudiese consultarse desde el navegador sin infraestructura de servidor adicional.
+
+\textcolor{blue}{Yo esto lo vendería algo más. Entiendo que luego va en su cap de desarrollo}
+\textcolor{violet}{ídem: aunque sea todo con github, el VCS es una cosa más trivial pero el despliegue es algo más interesante}
+\textcolor{olive}{Es que poco más hay tbh. Podría entrar en mayor profundidad en el export, ns. Pero sí, tenía pensado en entrar en algo más de detalle en la parte del plugin de Rust porque ahí tuve que hacer movidas.}
