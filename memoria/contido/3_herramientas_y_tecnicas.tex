@@ -13,6 +13,7 @@ En consecuencia, se priorizaron tecnologías que facilitasen la construcción de
 \textcolor{olive} "Libre" se entiende?
 La herramienta principal empleada fue Godot, un motor de desarrollo de desarrollo libre y multiplataforma orientado a la creación de aplicaciones interactivas y videojuegos~\cite{GodotEngine}.
 \textcolor{blue}{No descartaría dejarlo solo como aplicaciones interactivas y en el parrafo siguiente olvidar el concepto de videojuego, permite crear aplicaciones interactivas y creamos una aplicación interactiva (un videojuego es una app software interactiva con un nombre fancy)}
+\textcolor{olive}{okey}
 Aunque su uso más habitual se asocia al desarrollo de videojuegos, sus características también resultan adecuadas para una aplicación educativa como la desarrollada en este trabajo.
 El proyecto requiere presentar información visual, responder a acciones del usuario, animar procesos paso a paso y mantener una estructura clara entre los distintos elementos de la interfaz.
 Estas necesidades encajan de forma natural con el modelo de escenas, nodos y señales que propone Godot~\cite{GodotDocs}.
@@ -50,6 +51,9 @@ Esto habilita una modularidad total, puesto que toda estructura de nodos que sea
 A mayores, los nodos pueden tener asociados un script.
 Estos son código desde el que se puede interactuar, principalmente, con los atributos y métodos del nodo al que están asociados, así como con sus hijos.
 Pero no están limitados a estos elementos. Siempre se puede acceder al nodo raiz, y desde este modificar cualquier propiedad global o acceder a cualquier nodo en la escena. O mediante la creación de ``Autoloads'' en el proyecto se puede acceder a clases personalizadas en cualquier punto del código.
+
+\textcolor{violet}{ estaría bien tener un diagrama sencillo que explicase las relaciones escena/nodos/scripts, igual en la doc de Godot hay algo así?}
+\textcolor{olive}{sí, veo si hay ya alguno. Vale encontré, he de ver dónde referenciarlo}
 
 La organización en escenas permite separar componentes de la aplicación con responsabilidades distintas, como las vistas de entrenamiento, los paneles explicativos, las representaciones gráficas y los controles de interacción.
 Este enfoque favorece una estructura modular en la que cada parte de la interfaz puede desarrollarse, probarse y reutilizarse con menor acoplamiento. \textcolor{blue}{ Es raro, al final estamos diciendo que permiten aplicar patrones de diseño} \textcolor{olive}{En qué sentido es raro?}
