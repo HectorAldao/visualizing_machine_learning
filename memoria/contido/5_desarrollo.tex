@@ -1,28 +1,21 @@
 \chapter{Desarrollo}
 \label{chap:desarrollo}
 
-En este capítulo se explicará todo el proceso de desarrollo.
+En este capítulo se describe el proceso seguido para construir la aplicación. La explicación se plantea como una evolución por versiones: primero se comprobó que la idea era viable, después se desarrolló el árbol de decisión y, a partir de las primeras pruebas, se fueron incorporando explicaciones, animaciones y formas más claras de elegir los datos de entrada.
 
 
 \section{Prototipo: versión 0.1}
 
-El paso previo antes de comenzar con un desarrollo profundo consistió en comprobar que las herramientas que se querían usar servían para el propósito propuesto.
-Fue así que la primera versión ``usable'' del proyecto consistió en un botón con el que se podía interactuar.
-Al hacerlo, se mostraría un menú que permitiría añadir nuevos botones, conectados por líneas, formando una estructura con forma de árbol.
-Esto sería exportado a formato web y se desplegaría en GitHub Pages.
+El primer objetivo consistió en comprobar que la herramienta elegida servía para crear una aplicación interactiva y publicarla como página web. Antes de invertir más tiempo en el desarrollo, era necesario verificar tres aspectos básicos: que Godot permitía crear una interfaz sencilla, que se podía representar una estructura con forma de árbol y que el resultado podía ejecutarse desde el navegador.
 
-Para iniciar este proceso, primero hizo falta hacer un análisis de la forma en la que se estructura Godot.
-Esto se explica en la Sección \ref{sec:herramientas_godot}.
+Por ese motivo, la primera versión del proyecto fue deliberadamente simple. Consistía en un menú inicial y en una escena donde el usuario podía crear pequeños elementos conectados entre sí. Al pulsar sobre uno de ellos aparecía una opción para añadir un nuevo elemento debajo, de manera que poco a poco se formaba una estructura parecida a un árbol. Esta prueba estaba todavía lejos de un árbol de decisión real. Su valor estaba en comprobar si la interacción principal de la aplicación tenía sentido.
 
+Para iniciar este proceso, primero hizo falta entender cómo se organiza un proyecto en Godot. Esta base se explica en la Sección \ref{sec:herramientas_godot}.
 
-%\subsection{Godot: el motor y sus componentes estructurales}
 
 \subsection{Primeras escenas}
 
-La primera escena que se creó fue el menú principal.
-Al ya esperar crear varios algoritmos, era una escena simple de la que había que partir.
-En ella se instanció un nodo de tipo Button (un nodo Control (interfaz) caracterizado por emitir una señal cuando es pulsado) con el texto que cambiaba a la escena donde se encontraba el árbol.
-En la Figura \ref{fig:primera_version_del_main_menu} se ve este menú principal.
+La primera escena creada fue el menú principal. En ese momento tenía un único botón, ya que su papel era servir como punto de entrada hacia la prueba del árbol. Incluir este menú desde el principio ayudaba a pensar la aplicación como un conjunto de módulos y facilitaba su ampliación posterior. En la Figura \ref{fig:primera_version_del_main_menu} se ve esta primera versión.
 
 \begin{figure}[hp!]
   \centering
@@ -31,116 +24,47 @@ En la Figura \ref{fig:primera_version_del_main_menu} se ve este menú principal.
   \label{fig:primera_version_del_main_menu}
 \end{figure}
 
-Al pulsar el botón se cambiaba de escena a una en la que se encontraba una entidad de una clase personalizada, el ``DNode''.
-Esta clase funcionaba como un botón (aunque por el momento no heredaba del tipo de nodo Button) y tenía tres atributos más: ``id'', ``parent\_id'', y ``sons\_id''.
-Los primeros eran enteros, y el segundo un Array de enteros.
-Al hacerle click se desplegaba un menú con una opción: añadir nodo hijo.
-Seleccionarla hacía aparecer un nuevo botón debajo del anterior, conectado por una línea.
-Esto se podía hacer cuantas veces se quisiera, y hacía que fueran apareciendo nuevos nodos hijo, que se colocaban uno al lado de otro.
-Estos siguientes botones tenían una segunda opción en el menú: eliminar nodo.
-Esto eliminaba el nodo y sus hijos.
+Al entrar en la escena del árbol aparecía un único elemento inicial. Desde él se podían crear nuevos elementos hijos, conectados por líneas y colocados bajo el anterior. También se añadió la posibilidad de borrar partes del árbol, con el fin de comprobar que la estructura podía cambiar durante la ejecución sin que la escena dejase de ser comprensible.
 
-Por debajo el árbol era un diccionario.
-Las claves eran enteros, correspondientes a los ids de los DNodes, y los valores eran los propios DNodes.
-Estos eran conectados con otros nodos y colocados en pantalla en base a sus atributos de ``parent\_id'' y ``sons\_id''.
-
-Además, en la escena había otros dos botones arriba a la derecha.
-En este momento no hacían nada; eran el inicio de lo que acabaría siendo la funcionalidad de cargar y guardar el árbol, retomada durante el desarrollo del árbol de decisión.
-En la Figura \ref{fig:primera_version_arbol} se puede ver el estado de esta primera escena interactiva.
+Esta primera prueba tenía una finalidad muy concreta: validar la interacción. Lo importante era comprobar que el usuario podía construir una jerarquía visual, que las conexiones se actualizaban y que la pantalla seguía siendo manejable al crecer el número de elementos. En la Figura \ref{fig:primera_version_arbol} se muestra el estado de esta escena inicial.
 
 \begin{figure}[hp!]
   \centering
   \includegraphics[width=0.75\textwidth]{imaxes/primera_version_arbol.png}
-  \caption{Primera escena de prueba para ver el funcionamiento del árbol.}
+  \caption{Primera escena de prueba del árbol.}
   \label{fig:primera_version_arbol}
 \end{figure}
+
+También se dejaron visibles dos botones relacionados con cargar y guardar. En esta versión todavía no tenían una utilidad real. Su presencia servía para reservar un espacio de la interfaz a una necesidad que ya se preveía: poder conservar un árbol y recuperarlo más adelante.
 
 
 \subsection{Exportación web con GitHub Pages}
 
-Con esta versión funcional, faltaba probar a exportar a web para comprobar que Godot servía como motor de desarrollo para la aplicación web.
-En Godot, para exportar el proyecto a HTML5, hay que descargar las plantillas de exportación, las cuales proporcionan el entorno web base y un archivo HTML que contiene en su estructura el elemento ``<canvas>'', donde el motor (compilado en WebAssembly) inicializa el renderizado gráfico y captura la interactividad.
-La prueba se completó sin problemas con un proyecto tan simple.
-Más adelante se exploran configuraciones más complejas de la exportación web debido a la creación del plugin para el renderizado de fórmulas.
+Una vez que la prueba interactiva funcionaba dentro de Godot, el siguiente paso lógico fue llevarla al navegador. Esta comprobación era esencial, ya que la aplicación estaba pensada para ser consultada como una página web y también debía poder probarse fuera del editor de desarrollo.
 
-Después se configuró desde la interfaz web de GitHub la funcionalidad de GitHub Pages.
-Para ello, accedí desde la configuración del repositorio a la ventana ``Pages'', desde la cual se puede seleccionar una rama de publicación (para este caso se seleccionó ``main'') y una carpeta para ser la raíz de la página web (en este caso, la carpeta ``docs'', la predeterminada).
-Con esta función activada, hubo que exportar el proyecto a la carpeta indicada.
-Una vez subidos los cambios a la rama ``main'', la aplicación estaba desplegada.
+La exportación se realizó correctamente con este proyecto inicial. El resultado se publicó mediante GitHub Pages, usando la configuración del propio repositorio para indicar qué carpeta debía servir como página web. Con esto se confirmó que el flujo completo era viable: desarrollar en Godot, exportar el proyecto y publicarlo en una dirección accesible desde el navegador.
 
+Esta prueba temprana redujo el riesgo del proyecto. Si la exportación web hubiese dado problemas graves, habría sido necesario replantear la tecnología antes de avanzar con los algoritmos. Al funcionar desde el inicio, el desarrollo pudo continuar sobre una base más segura.
 
 
 \section{Árbol de decisión: versión 0.2}
 
-El proyecto dejó de ser un simple prototipo cuando se comenzó a trabajar en el primer algoritmo: el árbol de decisión.
+El proyecto dejó de ser un prototipo aislado cuando comenzó el desarrollo del primer algoritmo: el árbol de decisión. A partir de este punto, el reto pasó a consistir en conseguir que el árbol se construyese siguiendo las decisiones del algoritmo y que el usuario pudiese entender cada paso.
+
 
 \subsection{Primera arquitectura del árbol}
 
-Para comenzar el desarrollo del árbol de decisión, el primer objetivo fue separar la prueba visual inicial de una estructura que pudiera sostener más adelante un algoritmo real.
-La primera versión del árbol, descrita en la sección anterior, servía para crear nodos manualmente y para comprobar que Godot permitía representar una estructura jerárquica en una escena interactiva.
-A partir de ese punto se empezó a transformar esa prueba en una vista específica de árbol, con sus propias escenas, scripts y responsabilidades.
+El primer cambio fue separar la prueba visual inicial de una estructura preparada para crecer. El árbol tenía que convertirse en una vista capaz de representar tanto acciones del usuario como decisiones tomadas por el algoritmo.
 
-La escena principal del proyecto quedó configurada en Godot como un menú simple, implementado como un nodo de tipo ``Control''. Este menú contenía un único botón que al pulsarse llamaba a ``change\_scene\_to\_file'' para cargar la escena del árbol. De esta manera, el menú principal podía crecer en el futuro sin mezclar su lógica con la representación del árbol.
+Para ello se mantuvo el menú principal como entrada de la aplicación y se creó una vista específica para el árbol. Esta vista debía resolver un problema práctico desde el principio: un árbol puede crecer hacia abajo y hacia los lados con mucha rapidez. Si todo se colocaba en una pantalla fija, una parte del contenido quedaría fuera de la vista en cuanto apareciesen varios niveles. Por esta razón se introdujo una zona desplazable, de forma que el usuario pudiese moverse por el árbol cuando su tamaño aumentase.
 
-La vista del árbol se organizó dentro de un nodo Control de tipo ``ScrollContainer''.
-Este nodo está pensado para tener un solo hijo de tipo Control, y habilita que cuándo este es más grande que la zona que tiene asignada, se pueda scrollear para mover el contenido.
-Esta decisión fue importante desde el principio, porque un árbol puede crecer en anchura y altura con rapidez.
-Si todos los nodos se colocasen directamente sobre una escena fija, bastarían unos pocos niveles para que parte del árbol quedase fuera de pantalla.
-Por ello se creó un ``DTreeCanvas'', el nodo hijo del ScrollContainer, que instanciaba la escena del árbol.
-Su función era calcular el tamaño mínimo necesario para contener la estructura completa.
-El cálculo partía de los límites del árbol, obtenidos mediante ``get\_tree\_bounds'', y ajustaba ``custom\_minimum\_size'' para que el ScrollContainer pudiera desplazarse hasta todas las zonas relevantes.
-\textcolor{olive}{pongo en esta parte que había un nodo de godot que ya me ayudaba con esto, o ya lo digo más adelante?}
+También se revisó la forma de colocar los elementos. La versión inicial podía añadir hijos bajo un nodo y el resultado necesitaba más orden. Se adoptó una distribución sencilla: los hijos se colocaban por debajo de su padre y el padre quedaba centrado respecto a ellos. Esta decisión buscaba mantener una lectura clara y estable cada vez que el árbol cambiaba.
 
-El núcleo visual del árbol se encapsuló en la clase ``DTreeLogical''.
-En su primera versión esta clase heredaba de ``Node2D'' y mantenía un diccionario ``nodes\_dict'', donde cada clave era el identificador de un nodo y cada valor era la instancia visual correspondiente.
-También guardaba ``root\_id'', que apuntaba al nodo raíz.
-Al iniciarse, el árbol creaba una raíz con identificador 0, la añadía al contenedor de nodos y ejecutaba un reposicionamiento completo.
-Esta estructura basada en diccionario permitía acceder a cualquier nodo por su identificador sin recorrer toda la escena de Godot.
+Otro aspecto importante fue separar visualmente los elementos del árbol y las líneas que los unen. Esta separación hizo que cada parte tuviese una responsabilidad clara: unos elementos representaban preguntas o resultados, y las líneas representaban el camino seguido entre ellos. Gracias a esto, más adelante fue más sencillo animar las ramas y mostrar sobre ellas el valor que conducía de un punto del árbol al siguiente.
 
-El posicionamiento se resolvió mediante un recorrido en orden.
-Cada nodo guardaba su profundidad y un índice ``inorder\_index''.
-Las hojas recibían índices consecutivos, y los nodos internos se colocaban en el punto medio entre el primer y el último hijo.
-Después, ``\_apply\_positions'' multiplicaba esos índices por dos constantes de espaciado, una horizontal y otra vertical.
-Con ello se conseguía una distribución simple, estable y suficiente para las primeras pruebas: los hijos aparecían por debajo del padre, y el padre quedaba centrado respecto a ellos.
-Tras cada modificación se llamaba a ``relayout\_tree'', que recalculaba índices, posiciones y conexiones.
+En esta etapa se conservó también el modo manual. El objetivo principal era construir árboles de decisión, y el modo manual seguía siendo útil para probar la interfaz, comprobar el desplazamiento por la pantalla y detectar problemas de colocación sin depender todavía del algoritmo.
 
-Las conexiones se implementaron como una escena independiente, ``Conection'', basada en ``Line2D'', un Node2D al que se le pueden establecer un Array de puntos por el que trazar una línea.
-En un primer momento la línea solo unía las posiciones globales del nodo padre y del nodo hijo.
-Más adelante se adaptó para trabajar con nodos de tipo ``Control'', tomando el centro visual de cada botón y convirtiendo esas posiciones al espacio local de la conexión.
-El contenedor de conexiones recorría ``nodes\_dict'', comprobaba los hijos de cada nodo mediante ``sons\_id'' y creaba una línea por cada relación padre-hijo.
-Esta separación evitaba que los nodos tuviesen que dibujar sus propias ramas y dejó la responsabilidad de las aristas concentrada en una escena concreta.
-
-El nodo del árbol, ``DNode'', también cambió durante esta primera fase.
-La versión inicial era un ``Node2D'' con un ``Sprite2D'', un ``Area2D'' y una ``CollisionShape2D'', no un nodo Button como tal.
-El ``Area2D'' recibía eventos de ratón, cambiaba el color del sprite al pasar el cursor y abría un menú contextual al hacer click.
-Esta solución funcionaba para una prueba gráfica, aunque obligaba a gestionar manualmente colisiones, sprites y etiquetas.
-En el refactor posterior el nodo pasó a heredar directamente de ``Button''.
-Con esto se aprovechó el sistema de interfaz de Godot, incluyendo eventos ``gui\_input'', texto incorporado, temas y tamaños de control.
-
-El ``DNode'' conservó las variables necesarias para representar la estructura: ``id'', ``parent\_id'', ``sons\_id'', ``depth'' e ``inorder\_index''.
-A ellas se añadieron variables relacionadas con el aprendizaje automático, como ``attribute'', ``label'', ``is\_leaf'' y ``branch\_value''.
-Aunque al principio muchas de ellas todavía no se usaban para ejecutar un algoritmo completo, dejaban preparado el nodo para distinguir entre nodos internos, que representan atributos de división, y nodos hoja, que representan etiquetas de clasificación.
-También se mantuvo ``can\_remove'', usado para impedir que la raíz pudiese eliminarse desde el modo manual.
-
-La interacción manual quedó coordinada por ``ControllerDTree''.
-El controlador recibía referencias al árbol, al canvas y a la vista, calculaba el siguiente identificador disponible y conectaba la señal ``change\_child\_requested'' de cada ``DNode''.
-Cuando un nodo solicitaba añadir un hijo, el controlador instanciaba un nuevo ``DNode'', le asignaba identificador, padre y profundidad, lo añadía a ``nodes\_dict'', lo insertaba en el contenedor visual y registraba su identificador en ``sons\_id'' del padre.
-Cuando se solicitaba eliminar un nodo, el controlador borraba recursivamente todo su subárbol.
-Para ello duplicaba la lista de hijos antes de iterar, evitando modificar el array original durante el recorrido, eliminaba el identificador del hijo en el padre, retiraba el nodo del diccionario y liberaba la instancia visual con ``queue\_free''.
-
-En paralelo se crearon dos escenas auxiliares para cargar y guardar árboles.
-En esta fase eran una funcionalidad preliminar, basada en serializar los atributos estructurales de cada nodo a un archivo JSON en una ruta predeterminada.
-El guardado recorría ``nodes\_dict'' y extraía identificador, padre, hijos, profundidad e índice de orden.
-La carga hacía el proceso inverso: leía el JSON, reconstruía instancias de ``DNode'', rellenaba sus atributos y las añadía a un nuevo árbol.
-Aunque esta persistencia se revisaría bastante más tarde, ya muestra que desde el inicio se pensaba en el árbol como una estructura de datos reconstruible, no solo como elementos colocados manualmente en una escena.
-
-El siguiente cambio relevante fue la preparación del modo automático.
-El controlador dejó de limitarse a gestionar solo la edición manual del árbol y empezó a recibir un modo de funcionamiento, ``manual'' o ``automatic''.
-En modo manual seguía conectando señales de nodos y permitiendo crear o borrar ramas.
-En modo automático se mostraba un menú con botones para iniciar entrenamiento y avanzar al siguiente paso del entrenamiento, basado en el algoritmo ID3.
-Este menú se añadía sobre la vista principal y conectaba sus botones con métodos del controlador.
-La interfaz todavía era sencilla, con los Buttons ``Start Training'' y ``Next Step'', como se muestra en la Figura \ref{fig:dtree_view_start_next_english}.
-Con ello ya se introducía el flujo que se mantendría durante el desarrollo: el usuario avanza el algoritmo paso a paso desde la interfaz.
+El siguiente avance fue preparar el modo automático. En este modo, el usuario dejaba de añadir ramas a mano y pasaba a controlar el avance del entrenamiento. La primera versión de esta interfaz era todavía muy simple, con botones en inglés, como se muestra en la Figura \ref{fig:dtree_view_start_next_english}. Esta pantalla introducía una idea que se mantuvo durante todo el desarrollo: el algoritmo avanzaría al ritmo marcado por el usuario.
 
 \begin{figure}[hp!]
   \centering
@@ -157,66 +81,18 @@ Con ello ya se introducía el flujo que se mantendría durante el desarrollo: el
   \label{fig:dtree_view_start_next_english}
 \end{figure}
 
-Para ese modo automático se creó la clase ``AlgorithmDTree''.
-Su primera responsabilidad fue implementar una versión básica de ID3 sobre datos categóricos.
-El algoritmo guardaba los datos de entrenamiento, la lista de atributos disponibles, una referencia al árbol visual y una pila de llamadas, ``call\_stack'', que permitía convertir una construcción recursiva en una ejecución incremental.
-Cada contexto de la pila contenía el subconjunto de datos correspondiente, los atributos restantes, el identificador del padre, el valor de la rama por la que se llegaba a ese nodo, la profundidad y un identificador visual todavía pendiente.
+Para conseguirlo, el algoritmo se organizó de forma incremental. La construcción completa se repartía en pasos pequeños: se guardaba el punto en el que se encontraba el proceso y se resolvía una parte cada vez que el usuario pulsaba el botón de avanzar. Esta decisión fue clave para el propósito educativo de la aplicación, porque permitía observar cómo se forma el árbol paso a paso.
 
-El método personalizado ``start\_training'' inicializaba el estado y añadía a ``call\_stack'' el contexto de la raíz.
-A partir de ahí, cada pulsación en ``Next Step'' ejecutaba ``next\_step'', que extraía un contexto de la pila y llamaba a ``\_build\_node\_step''.
-Esta función concentraba la lógica de decisión.
-Primero obtenía las etiquetas de los datos.
-Si todas eran iguales, pedía crear un nodo hoja con esa clase.
-Si no quedaban atributos, calculaba la clase mayoritaria y creaba una hoja de mayoría.
-En el resto de casos calculaba la ganancia de información para cada atributo, seleccionaba el atributo con mayor ganancia, preparaba un contexto por cada valor posible del atributo elegido y solicitaba crear un nodo interno.
-
-\textcolor{olive}{estoy diferenciando los métodos creados por mí y los del motor poninendo "personalizado" en los que he hecho yo. Quizá deba referirme a las otras como "nativas" y a estas sin ningún apellido (por ser más abundantes)? O deberían tener ambas apellido? Debería explicar a qué me refiero con personalizada y nativa?}
-
-La entropía se calculó directamente en GDScript.
-La función personalizada ``\_entropy'' contaba ocurrencias de cada etiqueta, transformaba cada conteo en una probabilidad y acumulaba la expresión $-p \log_2(p)$.
-Sobre esa función se construyó ``\_information\_gain'', que calculaba la entropía total del conjunto, dividía los datos por el valor del atributo y restaba la entropía ponderada de los subconjuntos.
-Esta implementación fue deliberadamente explícita.
-En lugar de delegar en una biblioteca externa, el código mostraba de forma transparente los mismos cálculos que después debían explicarse en la interfaz.
-
-\textcolor{olive}{explico las cosas que se quedaron fuera? Como por ejemplo, más formas de calcular la ganancia de información que no son la entropía.}
-
-La coordinación entre el algoritmo y la escena visual se hizo mediante señales.
-``AlgorithmDTree'' emitía ``add\_node\_requested'' indicando padre, valor de rama, atributo, etiqueta y si el nodo era hoja.
-El controlador recibía esa señal y decidía si debía crear la raíz o un hijo.
-Para los nodos hijos, actualizaba ``branch\_value'' con el valor del atributo que llevaba hasta ese nodo.
-Esta variable se usaría poco después para mostrar etiquetas en las conexiones.
-Como los contextos de los hijos se añadían a la pila antes de saber el identificador real del nodo padre, se introdujo el valor temporal ``-2'' para marcar padres pendientes.
-Cuando el controlador terminaba de crear un nodo, llamaba a ``update\_pending\_parent\_ids'', que sustituía esos padres pendientes por el identificador recién creado.
-
-Este primer modo automático aún tenía datos de entrenamiento definidos en el propio controlador.
-El conjunto de prueba contenía frutas descritas mediante atributos categóricos como ``color'', ``shape'' y ``size'', y una columna ``class''.
-Aunque era un dataset muy pequeño, cumplía dos funciones.
-Permitía comprobar que la lógica ID3 generaba nodos y ramas, y permitía observar si el árbol visual se actualizaba correctamente en cada paso.
-
-A partir de aquí el problema principal dejó de ser crear nodos a mano y pasó a ser sincronizar tres niveles: el estado del algoritmo, la estructura lógica del árbol y la escena que veía el usuario.
+La primera prueba de entrenamiento utilizó un conjunto de datos pequeño y controlado. Su objetivo era comprobar que el árbol se creaba correctamente, que las ramas aparecían donde debían y que la interfaz se actualizaba después de cada paso. En esta fase, lo más difícil fue coordinar tres niveles al mismo tiempo: el estado interno del algoritmo, la estructura del árbol y lo que el usuario veía en pantalla.
 
 
 \subsection{Reorganización de la escena y primeros elementos explicativos}
 
-Una vez creada la primera versión automática, se reorganizó la escena del árbol para reducir la complejidad.
-Se eliminó el ``DTreeCanvas'' intermedio, lo que obligó a revisar el centrado del árbol.
-En Godot, un ``ScrollContainer'' controla la posición de sus hijos, así que desplazar el propio ``DTree'' no ofrecía un resultado estable.
-La solución fue mover internamente las posiciones de los nodos.
-El método personalizado ``update\_canvas\_size\_and\_center'' quedó dentro de ``DTreeLogical'', calculando primero el rectángulo de ocupación del árbol, después el tamaño final necesario y, por último, un desplazamiento aplicado a cada nodo.
-Con este desplazamiento, el contenido del árbol quedaba centrado dentro del área de scroll.
-Después se actualizaba ``custom\_minimum\_size'' para que las barras del ``ScrollContainer'' conociesen el nuevo tamaño navegable.
-¿? En lo que se refiere a la parte de centrar el árbol, ya se explorará en la Sección ¿? cómo se acabó realizando esto, puesto que hay una manera más sencilla de hacerlo gracias a Godot. 
+Cuando el modo automático empezó a funcionar, se reorganizó la escena para simplificarla. Algunas piezas que habían sido útiles durante las pruebas iniciales dejaron de ser necesarias, así que se redujo la cantidad de elementos intermedios. Esta limpieza facilitó seguir avanzando sin arrastrar soluciones provisionales.
 
-También se tuvo en cuenta que el ``ScrollContainer'' actualiza sus barras después de una pasada de layout.
-Por ese motivo, al centrar el árbol se usó ``set\_deferred'' sobre ``scroll\_horizontal'' y ``scroll\_vertical''.
-Esta decisión evitaba que Godot limitase el desplazamiento a los valores antiguos justo después de cambiar el tamaño mínimo.
-Es un detalle pequeño, con un efecto importante para que la vista quedase centrada al crear o modificar el árbol y no apareciese desplazada a una esquina.
+Uno de los problemas que apareció al reorganizar la vista fue el centrado del árbol. Al crecer, el árbol podía quedar desplazado hacia una esquina, lo que dificultaba seguir la construcción. Se ajustó entonces el comportamiento de la zona desplazable para que el contenido apareciese centrado y el usuario pudiese moverse por él de forma natural. Esta mejora mantenía intacto el algoritmo y afectaba mucho a la experiencia de uso.
 
-La escena ``DTreeView'' empezó a actuar como punto de entrada del flujo de árbol.
-En ``\_ready'', una función nativa del motor que es llamada cuándo el script aparece en la escena, conectaba los botones del panel de selección, ocultaba el ``ScrollContainer'' y el menú del árbol, y solo mostraba el panel inicial.
-Al escoger modo manual, hacía visible el árbol, activaba el menú con los botones de carga y guardado, configuraba ``DTreeLogical'' en modo ``manual'' e inicializaba el controlador.
-Al escoger modo algorítmico, hacía visible el árbol y la ventana, creaba una instancia de ``AlgorithmDTree'', la añadía a la escena y entregaba esa referencia al controlador.
-La vista dejó de ser una escena pasiva y pasó a gestionar un flujo de usuario: primero elegir modo, como se ve en la Figura \ref{fig:menu_manualmente_algoritmicamente}, después interactuar con el árbol.
+La escena del árbol empezó a funcionar como un pequeño flujo guiado. Primero se mostraba un panel para escoger entre crear el árbol manualmente o dejar que lo construyese el algoritmo. Después, según la opción elegida, aparecían los controles correspondientes. En la Figura \ref{fig:menu_manualmente_algoritmicamente} se muestra este panel inicial.
 
 \begin{figure}[hp!]
   \centering
@@ -225,30 +101,9 @@ La vista dejó de ser una escena pasiva y pasó a gestionar un flujo de usuario:
   \label{fig:menu_manualmente_algoritmicamente}
 \end{figure}
 
-En esta misma fase se creó el autoload ``Constants''.
-Este script centralizaba identificadores de escenas y temas en dos diccionarios, ``SCENES'' y ``THEMES''.
-En vez de repetir rutas o UID en scripts distintos, el controlador, el árbol, el menú principal y las conexiones podían acudir a ``Constants.SCENES'' para instanciar escenas como ``dnode'', ``controller\_dtree'', ``panel\_algorithm\_dtree'' o ``conection''.
-En un proyecto Godot que cambia de carpetas durante el desarrollo, esta centralización reduce errores al mover escenas, porque las referencias se corrigen en un único punto y no están ligadas a la ruta del archivo en el proyecto.
+En esta misma etapa se empezó a cuidar más la apariencia de los nodos. Los puntos que representaban una decisión y los puntos que representaban una clasificación final pasaron a tener estilos diferentes. Esta distinción visual ayudaba a leer el árbol sin depender tanto del texto: algunas partes indicaban que todavía había una pregunta que responder, y otras indicaban que se había llegado a una conclusión.
 
-La representación visual de los nodos ganó una primera distinción semántica mediante temas.
-Se añadieron dos recursos ``Theme'': uno para nodos hoja y otro para nodos internos.
-El tema de hoja usaba una forma más redondeada y un color verdoso, mientras que el tema de nodo interno usaba un color rojizo y esquinas menos redondeadas.
-``DNode'' precargaba ambos temas desde ``Constants.THEMES'' y en ``\_ready'' aplicaba uno u otro según ``is\_leaf''.
-Esta separación hacía que la estructura del árbol se entendiese con menos lectura: los nodos que clasifican y los nodos que dividen los datos tenían una apariencia distinta.
-
-El mismo cambio introdujo ``was\_created\_by\_algorithm''.
-Los nodos creados por el algoritmo marcaban esta variable a ``true'', y ``DNode'' solo conectaba el menú contextual si el nodo no había sido creado por el modo automático.
-Esta decisión evitaba que el usuario modificase manualmente nodos que formaban parte de una ejecución algorítmica.
-El modo manual y el modo automático compartían la misma escena de nodo, aunque su comportamiento frente a clicks era distinto.
-Así se reutilizaba la representación visual sin permitir ediciones que rompiesen la coherencia del entrenamiento paso a paso.
-A mayores, esto habilitaría modificar el funcionamiento de los DNodes creados por ID3 al ser pulsados.
-
-El menú desde el que se controla el algoritmo también se ajustó a una interfaz más cercana al idioma de la aplicación.
-Los botones pasaron de ``Start Training'' y ``Next Step'' a ``Empezar entrenamiento'' y ``Siguiente paso''.
-Además se añadió un botón ``Detalle'', a pesar de que finalmente fue eliminado, que anticipaba la necesidad de abrir o actualizar información complementaria.
-En el controlador se añadieron señales propias, ``next\_step'' y ``detail'', de forma que el botón de siguiente emitía una señal del controlador y esta se conectaba al método ``next\_step'' del algoritmo.
-Esto desacoplaba la interfaz del algoritmo: el botón ya no llamaba directamente al objeto de entrenamiento.
-En la Figura \ref{fig:dtree_view_training_buttons_es} se puede ver esta misma interfaz tras traducir los botones y aplicar los temas visuales a los nodos del árbol.
+También se tradujo la interfaz al castellano. Los botones iniciales pasaron a llamarse ``Empezar entrenamiento'' y ``Siguiente paso''. Este cambio era pequeño desde el punto de vista técnico y resultaba importante para que la aplicación fuese coherente con el resto del proyecto. En la Figura \ref{fig:dtree_view_training_buttons_es} se ve la interfaz después de esta adaptación y de los primeros cambios visuales.
 
 \begin{figure}[hp!]
   \centering
@@ -265,16 +120,9 @@ En la Figura \ref{fig:dtree_view_training_buttons_es} se puede ver esta misma in
   \label{fig:dtree_view_training_buttons_es}
 \end{figure}
 
-%El nombre del controlador también se corrigió de ``AlgDTree'' a ``ControllerDTree''. Aunque pueda parecer un cambio menor, aclara la responsabilidad de la clase. El algoritmo vive en ``AlgorithmDTree'', mientras que ``ControllerDTree'' se ocupa de conectar botones, señales, nodos visuales, árbol y ventana. Esta separación fue ganando valor en los commits posteriores, porque cada avance del algoritmo requería actualizar la escena, recalcular posiciones, refrescar la ventana o cambiar estados de botones.
+El siguiente paso natural fue añadir una ventana informativa. Hasta ese momento, el árbol mostraba qué se estaba creando y apenas explicaba por qué se tomaba cada decisión. La ventana nació para cubrir esa carencia: debía acompañar a la construcción del árbol con una explicación escrita del paso actual.
 
-\textcolor{olive}{Y si explico todos los nodos en el glosario?}
-
-Otro cambio de esta etapa fue la creación de una ventana informativa.
-Primero se añadió directamente como un nodo ``Window'' dentro de ``DTreeView'', con un texto que mostraba el mensaje inicial ``Presiona el botón ``Empezar entrenamiento''''.
-Después se extrajo a su propia escena con su propio script.
-Esta extracción era necesaria para que la ventana tuviese su propia lógica, sus plantillas de texto y su método de actualización, sin llenar ``DTreeView'' de código explicativo.
-Esta metodología basada en que cada elemento suficientemente complejo como para requerir de un script, era desarrollado en una escena a parte.
-En la Figura \ref{fig:dtree_view_ventana_empezar_entrenamiento} se puede ver la primera integración de esta ventana en la escena del árbol.
+Su primera versión contenía un mensaje inicial que invitaba al usuario a comenzar el entrenamiento. Más adelante se convirtió en un componente propio, separado de la vista principal, porque iba a necesitar textos distintos según el caso y debía poder actualizarse cada vez que avanzase el algoritmo. En la Figura \ref{fig:dtree_view_ventana_empezar_entrenamiento} se puede ver esta primera integración.
 
 \begin{figure}[hp!]
   \centering
@@ -283,169 +131,104 @@ En la Figura \ref{fig:dtree_view_ventana_empezar_entrenamiento} se puede ver la 
   \label{fig:dtree_view_ventana_empezar_entrenamiento}
 \end{figure}
 
-%La ventana comenzó con una posición a la derecha del árbol, cerca de ``(800, 200)'', y después se movió a ``(20, 150)'' con un tamaño de ``300 x 350''. El ajuste mantuvo la lógica y muestra una preocupación temprana por la composición de la escena. La ventana debía estar visible durante el entrenamiento y ocupar un lugar que no estorbase demasiado a la lectura del árbol. En estas primeras versiones seguía siendo una ventana flotante de Godot, bastante distinta de los paneles integrados que se adoptarían más adelante.
+Los primeros textos de la ventana explicaban tres situaciones frecuentes. La primera era la creación de un nodo de decisión, cuando el algoritmo todavía tenía que escoger por qué característica dividir los datos. La segunda era la creación de una hoja porque todos los ejemplos que llegaban a ese punto tenían la misma respuesta. La tercera era la creación de una hoja por mayoría, usada cuando ya no había más preguntas útiles y se debía escoger la respuesta más frecuente.
 
-El primer contenido de la ventana se construyó con plantillas de texto.
-En el script de la ventana se definía un diccionario ``template\_texts'' con tres casos: ``internal'', ``leaf'' y ``leaf\_mayority''.
-El texto de nodo interno explicaba cuántos datos habían llegado por la rama, qué etiquetas tenían, qué atributos quedaban, qué métrica se usaba para decidir la división, qué valores obtuvo cada atributo y qué ramas se crearían a partir del mejor atributo.
-El texto de nodo hoja explicaba el caso en el que todos los datos tenían la misma etiqueta.
-El texto de hoja por mayoría explicaba el caso en el que ya no quedaban atributos y era necesario escoger la etiqueta más frecuente.
-Para alimentar esas plantillas, en ``AlgorithmDTree'' se definió un diccionario ``details''.
-En cada paso se guardaban elementos como ``lista\_etiquetas'', ``numero\_de\_datos'', ``lista\_atributos'', ``tipo\_de\_nodo'', ``mejor\_atributo'', ``valor\_metrica\_mejor\_atributo'', ``lista\_ganancias'' y ``lista\_ramas\_mejor\_atributo''.
-El controlador llamaba a ``window.update\_current\_text(algorithm.details)'' después de crear cada nodo.
-De esta forma, la creación visual de un nodo y la explicación asociada quedaban sincronizadas.
-La primera versión de esta ventana tuvo problemas porque no todos los campos esperados por las plantillas existían en ``details'', y algunas estructuras se mostraban con formato interno de GDScript.
-Para corregirlo se completó el diccionario y se añadió un preprocesado en la propia ventana.
-La función ``\_clean\_lists'' recorría el diccionario y, cuando encontraba arrays de cadenas, los sustituía por una frase con comillas, comas y la conjunción final.
-Así una lista como ``[``color'', ``shape'' ``size'']'' pasaba a mostrarse como `` ``color'' ``shape'' y ``size'' ''
-Esta transformación era relevante porque la ventana debía ser leída por una persona, no por quien estuviese depurando estructuras de datos.
+Durante estas pruebas se detectó que el texto necesitaba una preparación previa. Algunas listas aparecían con un formato propio de programación y poco adecuado para la lectura. Por ello se preparó la información antes de enseñarla, transformándola en frases más naturales. Esta fue una decisión importante para el tono de la aplicación: la ventana debía parecer una explicación dirigida al usuario.
 
-También se cambió la forma de mostrar las ganancias.
-Al principio el algoritmo preparaba un diccionario ``ganancias\_info''.
-La plantilla necesitaba una representación textual, así que se generó ``lista\_ganancias'' concatenando líneas del tipo ``atributo = valor''.
-La solución todavía era básica, y más tarde se sustituiría por gráficos.
-En esta fase permitió que la ventana empezase a explicar el criterio de selección de atributo sin depender de la consola de Godot.
-Esta fue la primera conexión clara entre la matemática del algoritmo y una explicación visible dentro de la aplicación.
+También se empezó a mostrar el criterio usado para escoger la siguiente división. En esta primera fase aparecía como texto, con una línea por cada opción evaluada. Era una solución básica y permitió conectar el cálculo del algoritmo con una explicación visible dentro de la interfaz. A partir de aquí, la aplicación construía el árbol y empezaba a justificarlo.
 
 
 \subsection{Animación de la construcción del árbol}
 
-Con la construcción paso a paso funcionando, el siguiente problema fue que la aparición de nodos y ramas resultaba demasiado brusca.
-Cada pulsación añadía elementos nuevos al árbol, recalculaba posiciones y redibujaba conexiones, de modo que el usuario podía perder el hilo de qué parte acababa de aparecer.
-En última instancia se buscaba que la inferfaz fuera amigable y permitiese entender lo mejor posible el proceso.
-Por ello se añadieron animaciones a las ramas y, poco después, a los propios nodos.
+Con la construcción paso a paso funcionando, apareció un nuevo problema: los cambios eran demasiado bruscos. Cada pulsación podía crear un nodo, mover partes del árbol y dibujar nuevas ramas. El resultado era correcto. En algunos pasos, el usuario podía perder de vista qué elemento acababa de aparecer.
 
-La escena ``Conection'' pasó de dibujar una línea completa en cada frame a mantener un progreso de animación, ``\_anim\_progress'', y un estado booleano ``\_animating''.
-En ``\_ready'' se inicializaba la conexión con progreso cero, se ocultaba la etiqueta poniendo su alfa a cero y se creaba un ``Tween'' que llevaba ``\_anim\_progress'' hasta 1.0 en medio segundo.
-En paralelo, el mismo ``Tween'' hacía aparecer la etiqueta de la rama. Durante la animación, ``\_process'' llamaba a ``\_update\_from\_progress'', que recalculaba los puntos visibles de la línea.
+Para mejorar esta lectura se añadieron animaciones. Primero se animaron las ramas, de manera que cada conexión parecía crecer desde el punto anterior hasta el nuevo. Después se animó la aparición de los nodos, que dejaban de mostrarse de golpe y pasaban a aparecer de forma gradual. Estas animaciones dirigían la atención hacia el cambio producido en cada paso.
 
-El cálculo de puntos se concentró en ``\_calc\_points(p)''.
-Si la conexión no tenía texto, el método interpolaba directamente entre el centro del nodo padre y el centro del nodo hijo.
-Si tenía texto, la línea se dividía en dos segmentos con un hueco central reservado para la etiqueta.
-Para ello se calculaba el centro de la conexión, la dirección de la línea, el tamaño mínimo del texto y un margen.
-Después se obtenían dos puntos de corte alrededor del texto.
-En vez de dibujar de golpe los dos segmentos, la animación repartía el progreso sobre la longitud total visible.
-Con esto la rama parecía crecer desde el padre hasta el hijo, respetando el espacio ocupado por la etiqueta.
+Al introducir animaciones fue necesario revisar cómo se actualizaban las conexiones. En las primeras versiones, al modificar el árbol se redibujaban todas las ramas. Esto hacía que, cada vez que aparecía una conexión nueva, también se reiniciasen las que ya existían. Se cambió este comportamiento para conservar las ramas anteriores y animar solo las recién creadas. Gracias a ello, el avance resultaba más claro y menos repetitivo.
 
-Esta animación obligó a cambiar el contenedor de conexiones.
-Antes, cada redibujado eliminaba todas las conexiones y las volvía a crear.
-Ese enfoque podía servir para una escena estática.
-Con animaciones provocaba que las ramas existentes volviesen a animarse cada vez que se añadía un nodo nuevo.
-Para evitarlo, ``ConectionContainer'' empezó a guardar un diccionario ``\_connections'', usando una clave de la forma ``parentId\_childId''.
-En cada actualización se construía el conjunto de conexiones deseadas a partir de ``sons\_id''.
-Las conexiones que ya existían se conservaban, las que sobraban se eliminaban y solo se instanciaban las nuevas.
-Así, al avanzar un paso, se animaba la rama recién creada sin reiniciar el resto del árbol.
+Después se incorporó una idea pensada específicamente para explicar mejor el algoritmo: los nodos pendientes. Cuando el árbol decide dividir los datos por una característica, ya se sabe qué caminos van a aparecer y todavía falta conocer qué habrá al final de cada uno. Para representar ese estado intermedio, la aplicación empezó a mostrar nodos temporales con un aspecto distinto.
 
-Después se añadió una animación de aparición a ``DNode''.
-Cada nodo comenzaba con ``modulate.a = 0.0'' (la opacidad al mínimo) y un ``Tween'' lo llevaba a opacidad completa en 0.75 segundos con transición sinusoidal.
-Esto suavizaba tanto la creación de hojas como la creación de nodos internos.
+Estos nodos pendientes indicaban que el algoritmo ya había abierto una rama y que aún quedaba por resolver su contenido. Más adelante, cuando esa parte del árbol se procesaba, el nodo temporal se transformaba en una decisión real o en una clasificación final. Esta transición también se animó para que el usuario percibiese el cambio y entendiese que se estaba completando una parte que antes solo estaba prevista.
 
-La incorporación de nodos pendientes fue un avance importante.
-Cuando el algoritmo selecciona un atributo para dividir, ya conoce los valores que darán lugar a ramas, aunque todavía no ha procesado el contenido de cada subrama.
-Esto hacía que a pesar de que que ya se supiera que un cierto atibuto sería el que dividiría el nodo actual, no se visualizaban los valores que tomaba ese atributo.
-Para representar esa situación, la señal ``add\_node\_requested'' se amplió con el parámetro ``children\_branch\_values''.
-Si el nodo creado era interno, el controlador recibía la lista de valores del atributo y ejecutaba ``\_create\_placeholder\_children''.
-Este método creaba un ``DNode'' por cada valor de rama, con ``is\_pending = true'', ``text = \"...\"'', ``branch\_value'' asignado y el tema visual de nodo pendiente.
-
-%%TODO: también hay que explicar los Themes
-
-El tema de nodo pendiente se añadió como ``nodedefault'' en ``Constants.THEMES''.
-Visualmente usaba un color distinto y una forma más redondeada, de modo que se distinguía de las hojas y de los nodos internos definitivos.
-En términos de interacción, estos placeholders indicaban que el algoritmo ya había decidido que existiría una rama.
-La decisión concreta de esa rama todavía quedaba pendiente: podía terminar en una hoja o en un nuevo atributo de división.
-La escena mostraba así un estado intermedio de la construcción, que es más fiel al proceso recursivo que una aparición instantánea de subárboles completos.
-Para que los placeholders quedasen asociados a los contextos pendientes del algoritmo, el controlador construía un diccionario ``branch\_to\_id'' con el valor de rama como clave y el identificador del placeholder como valor.
-Después llamaba a ``algorithm.register\_placeholder\_node\_ids''.
-El algoritmo recorría su ``call\_stack'' y, para cada contexto cuyo ``parent\_id'' todavía fuese ``-2'', buscaba su ``branch\_value'' en ese diccionario.
-Si lo encontraba, guardaba el identificador visual en ``node\_id''.
-De este modo, cuando más adelante se procesaba ese contexto, el controlador podía actualizar el placeholder existente en vez de crear un nodo nuevo.
-Algo después, esta actualización de placeholders también se refinó visualmente.
-En una primera versión, al resolver un placeholder se cambiaban directamente ``attribute'', ``label'', ``text'', ``is\_leaf'', ``is\_pending'' y ``theme''.
-El cambio era funcional, aunque resultaba abrupto.
-Para suavizarlo se añadió ``apply\_theme\_animated'' a ``DNode''.
-Este método hacía desaparecer el nodo, cambiaba el tema y el texto en una llamada de ``tween\_callback'', y volvía a mostrarlo.
-Así, el paso de ``...'' a un atributo o una etiqueta tenía una transición perceptible.
-
-Otro recurso temprano para explicar el cálculo fue mostrar información al pasar el cursor por un nodo.
-El algoritmo empezó a enviar un ``info\_value'' junto a la señal de creación de nodo.
-Para nodos internos, ese valor era la mejor ganancia formateada con dos decimales.
-``DNode'' incorporó ``information\_variable\_value'' y conectó ``mouse\_entered'' y ``mouse\_exited''.
-Al entrar el cursor, el texto del botón se sustituía por ese valor; al salir, volvía a mostrarse el atributo o la etiqueta.
-Esta solución de hover permitía inspeccionar valores numéricos sin llenar todos los nodos con números de forma permanente.
-El árbol seguía mostrando atributos y clases como texto principal, mientras que la métrica quedaba disponible cuando quisiese ser consultada.
-Más adelante esta idea se trasladaría hacia la ventana informativa al hacer click sobre los nodos, ya que de esta forma se habilitaba el poner una explicación del significado de lo que era ese valor, cómo se había obtenido... y no que fuera solo un número que aparecía al poner el ratón sobre él.
+Otra prueba temprana consistió en mostrar un valor numérico al pasar el cursor por ciertos nodos. La intención era permitir consultar información sobre la decisión tomada sin llenar todo el árbol de números. La idea funcionaba de forma limitada: un número aislado dice poco si no se explica qué significa. Por esa razón, más adelante esa información se trasladó hacia la ventana informativa, donde podía acompañarse de una explicación más completa.
 
 
 \subsection{Gráficas y casos explicativos en la ventana}
 
-La ventana informativa evolucionó después de texto plano a una composición con texto, scroll y gráficos.
-El objetivo del ScrollContainer era el ya comentado en la Sección ¿?, mientras que el objetivo del gráfico de barras era plasmar visualmente qué atributo tenía mayor entropía.
+La ventana informativa evolucionó después de los primeros textos. A medida que el árbol crecía y los pasos se volvían más ricos, una única explicación en texto plano resultaba insuficiente. El objetivo pasó a ser combinar texto y apoyo visual para que la decisión del algoritmo fuese más fácil de seguir.
 
-Así se creó la escena ``BarsChart'', implementada como un ``VBoxContainer'', y tipo nodo Control que organiza a sus hijos (también Control) verticalmente, lo que permite no tener que ordenar manualmente elementos en una interfaz cambiante.
-El script asociado a este gráfico de barras recibía un título y un diccionario ``data\_to\_plot'' que mapea strings a valores reales.
-En ``\_ready'', por cada clave del diccionario se creaba una etiqueta con el nombre del atributo, un ``ColorRect'' (un nodo Control que es un rectánculo de un solo color) cuya anchura dependía del valor del atributo en el diccionario, multiplicado por factor de escala, y una etiqueta numérica con el valor formateado a dos decimales.
+El cambio principal fue introducir una gráfica de barras. La ventana pasó de una lista de valores a una comparación visual entre las opciones que el algoritmo estaba evaluando. Así era más sencillo ver cuál destacaba y por qué se escogía una división determinada.
 
-\textcolor{olive}{el nombre de los nodos, siempre entre comillas?}
+Para integrar esta gráfica, la ventana pasó a tener una estructura desplazable. Esto era necesario porque algunas explicaciones ocupaban más espacio que otras. El usuario podía leer la primera parte del texto, observar la gráfica y continuar después con la explicación del resultado. De esta forma, la gráfica quedaba dentro del relato del paso actual.
 
-Para integrar la gráfica, el contenido de la ventana dejó de usar un único ``Label'' y pasó a contener un ScrollContainer con un VBoxContainer.
-Dentro de ese contenedor había dos etiquetas, ``Label0'' y ``Label1'', y una instancia de ``BarsChart''.
-Las plantillas de texto pasaron de ser cadenas únicas a arrays con dos strings: el primero sería la plantilla del Label0, y el segundo del Label1.
-En el caso de un nodo interno, la primera parte explicaba los datos y atributos disponibles, después se insertaba la gráfica y la segunda parte explicaba qué atributo había sido escogido y qué ramas se crearían.
-Esta estructura hacía que el gráfico quedase integrado en la explicación.
+Este cambio obligó también a preparar mejor la información que recibía la ventana. Los valores utilizados para la gráfica debían conservarse como datos numéricos, sin transformarlos desde el inicio en frases ya formateadas. Esta separación permitió que la misma información sirviese para explicar el paso con texto y para construir la representación visual.
 
-El método ``update\_current\_text'' de la ventana empezó a tratar ``lista\_ganancias'' como un diccionario cuando era posible.
-Antes de añadir un gráfico nuevo, buscaba si ya existía un nodo ``BarsChart'' en el contenedor y lo eliminaba.
-Después añadía una nueva instancia creada con ``BarsChart.newone(``Entropía por atributo'', plot\_data)'' y recolocaba ``Label1'' al final.
-\textcolor{olive}{esto igual se puede poner como nota a pié de página?}
-Esta recolocación era necesaria por cómo ordenan los VBoxContainer a sus hijos.
-Todo nodo hijo de otro tiene un índice asociado dentro del padre, comenzando en 0.
-A la hora de organizar verticalmente a sus hijos una vez instanciados, los VBoxContainer se fijan en este índice: menor el índice, más arriba se coloca el nodo.
-Además al añadir un nuevo hijo, este se pone de último, sumando uno al valor más alto de los índices ya ocupados.
-Al eliminar el BarsChart, el Label1 pasaba a ser el segundo hijo, y al recrear el BarsChart, pasa a ser el tercero.
-Por lo que para mantener la organización de Label0 $\rightarrow$ BarsChart $\rightarrow$ Label1, había que reocolocar los nodos dentro del padre.
-\textcolor{olive}{hará falta un gráfico explicando esto o directamente sobra que te cagas.}
+En esta etapa se añadió además un caso explicativo para los empates. Durante las pruebas apareció una situación en la que varias opciones podían ser igual de buenas. Si la aplicación escogía una sin explicar nada, la decisión podía parecer arbitraria. Por eso se incorporó un texto específico que indicaba que había varias alternativas equivalentes y que el algoritmo continuaba con una de ellas.
 
-%Al mismo tiempo, la ventana ganó su propia lógica de scroll.
-%Igual que en la vista principal, se añadieron variables para arrastre con botón central y rueda del ratón.
-%Esto era útil porque la explicación empezaba a ocupar más altura que la ventana.
-%La interfaz de detalle dejaba de ser un texto corto fijo y empezaba a comportarse como un panel de lectura, con contenido variable según el tipo de nodo y según el número de atributos.
+También se revisaron los textos de las hojas. Las primeras frases estaban escritas pensando en ejemplos muy pequeños, donde a veces solo llegaba un dato a cada resultado final. Al probar conjuntos más variados, esa redacción dejó de ser válida. Se sustituyó por una explicación más general, capaz de describir tanto un único ejemplo como varios ejemplos que terminan en la misma clasificación.
 
-El algoritmo también se adaptó a esta representación.
-``details[``lista\_ganancias'']'' pasó a guardar directamente un ``Dictionary[String, float]''.
-Con ello ``BarsChart'' podía usar los valores numéricos reales, sin tener que interpretar una cadena previamente formateada.
-La función ``\_information\_gains\_for\_all\_atributes'' se tipó como un diccionario de cadenas a reales, reforzando la idea de que esos valores eran datos para la interfaz, no solo texto para imprimir.
-
-También se añadió un caso específico para empates entre atributos.
-Tras calcular las ganancias, el algoritmo recorría el diccionario y contaba cuántos atributos tenían el valor máximo.
-Si solo había uno, ``details[``tipo\_de\_nodo'']'' seguía siendo ``internal''.
-Si había varios, pasaba a ser ``internal\_multi\_atribute'' y se guardaba ``n\_atributos\_con\_ganancia\_maxima''.
-La ventana incorporó una plantilla para este caso, explicando que varios atributos compartían la mejor métrica y que se continuaba con uno de ellos.
-%Esta explicación era necesaria para que la elección no pareciese arbitraria cuando los datos daban varias divisiones equivalentes.
-
-La redacción de los nodos hoja también se ajustó al probar datasets más grandes.
-La plantilla inicial decía que solo había bajado un dato por la rama, algo que era cierto en el primer dataset de frutas.
-La frase dejaba de encajar en cuanto varios ejemplos con la misma clase llegaban a la misma hoja.
-El texto pasó a decir que habían bajado ``{numero\_de\_datos}'' datos con la misma etiqueta.
-Este cambio muestra cómo la explicación dependía de probar casos distintos: al ampliar los datos, aparecían frases demasiado específicas que había que generalizar.
-Este proceso iterativo de analizar casos extremos para que la explicación fuera lo más completa posible siguió a lo largo de todo el desarrollo, especialmente en los momentos en los que se añadían nuevos datasets de prueba.
+Este proceso se repitió varias veces durante el desarrollo: al probar nuevos datos aparecían casos que la explicación inicial no cubría bien. Esos casos se fueron incorporando al discurso de la aplicación para que el usuario no tuviese que interpretar silencios o comportamientos inesperados.
 
 
-\subsection{Primer panel de selección de datasets}
+\subsection{Primer panel de selección de datos}
 
-Hasta ese momento, los datos de entrenamiento estaban incrustados en el controlador.
-Esto facilitaba las primeras pruebas y limitaba la aplicación a un único ejemplo.
-El siguiente paso fue separar la selección de datos del arranque del entrenamiento.
-Primero se probó un segundo dataset definido también en código, con atributos ``tipo'', ``estado'' y ``tamaño'', y una etiqueta ``clase''.
-Este conjunto incluía rocas, animales y plantas, con casos puros, casos mezclados y contradicciones diseñadas para forzar ramas más profundas.
-El objetivo era comprobar que el árbol se comportaba bien cuando la columna objetivo no se llamaba ``class''.
-Para conseguirlo se añadió el atributo ``label\_column'' a ``AlgorithmDTree''.
-La función personalizada ``\_get\_labels'' dejó de acceder siempre a \texttt{row[``class'']} y pasó a leer \texttt{row[label\_column]}.
-El controlador infería esa columna buscando en las claves del primer dato aquella que no estuviese en la lista de atributos (ya que esta lista era información que se proporcionaba con el dataset).
-Esta solución todavía era simple y hacía posible entrenar con datasets que usasen nombres de etiqueta distintos, como ``clase'' o ``y''.
-Con ello el algoritmo quedaba menos acoplado al primer ejemplo de frutas.
+Hasta este momento, los datos usados para entrenar el árbol estaban fijados dentro del propio proyecto. Esto era cómodo para las primeras pruebas, porque permitía centrarse en el funcionamiento del algoritmo y de la interfaz. Con el tiempo, esta comodidad empezó a limitar la aplicación: el usuario necesitaba poder escoger con qué ejemplo trabajar.
 
-Después se creó ``PanelDatasetSelection''.
-La escena era un ``PanelContainer'', un nodo Control pensado para contener en un rectángulo a sus hijos.
-Este contaba con una Label en forma de título, dos botones grandes para ``Frutas'' y ``Csv'', un panel de texto informativo y un botón ``Entrenar''.
-Al principio el script solo guardaba la opción seleccionada y dejaba la carga de CSV como una función vacía.
-En la siguiente iteración se completó la lógica: el panel contenía ``DICT\_OF\_DATASETS'' con el dataset de frutas y sus atributos, deshabilitaba el botón de entrenamiento hasta que hubiese una selección válida, mostraba mensajes de éxito o error en colores distintos y emitía ``SignalsObserver.dataset\_selected'' con los datos y atributos cuando el Button de entrenamiento era pulsado.
+El siguiente paso fue separar la elección de los datos del entrenamiento. Primero se probó un segundo conjunto preparado manualmente, con casos diseñados para forzar ramas más profundas y situaciones menos evidentes. Esta prueba ayudó a comprobar que el árbol también funcionaba con ejemplos distintos del primero y que los textos seguían teniendo sentido cuando los datos cambiaban.
+
+A partir de ahí se creó un panel de selección. Su papel era guiar al usuario antes de empezar el entrenamiento: primero se elegía una fuente de datos y después se iniciaba la construcción del árbol. La primera opción permitía usar el conjunto de ejemplo incluido en la aplicación. La segunda opción abría la puerta a cargar un archivo CSV.
+
+La carga de archivos se introdujo de forma progresiva. En una primera versión, el panel ya mostraba la opción de CSV y todavía estaba incompleta. Después se añadió la lectura del archivo y la comprobación de que la selección fuese válida antes de permitir entrenar. También se añadieron mensajes de éxito o error para que el usuario supiese si podía continuar.
+
+Con este panel, el flujo del modo algorítmico cambió de manera importante. Antes, el usuario pulsaba directamente el botón de comenzar. Después de esta mejora, primero escogía los datos, luego confirmaba la selección y finalmente avanzaba por la construcción del árbol. Esta separación hacía el proceso más comprensible, porque dejaba claro que el entrenamiento depende de los datos elegidos.
+
+La versión inicial del panel todavía era provisional. Quedaban detalles por ajustar, como mejorar la detección de la respuesta esperada en archivos externos y pulir la transición entre la selección de datos, el árbol y la ventana informativa. Con esas limitaciones pendientes, el cambio marcó un avance importante: el árbol dejó de estar ligado a un único ejemplo y empezó a comportarse como una herramienta más flexible.
+
+
+\subsection{Carga de CSV y navegación por pasos}
+
+El primer ajuste tras introducir el panel de datasets fue hacer que la carga de CSV fuese usable para entrenar. Se añadió una lista de nombres habituales para la columna objetivo, ``class'', ``Class'', ``y'', ``Y'', ``label'' y ``Label''. Al leer un CSV, el panel convertía las cabeceras a ``Array[String]'' con ``safe\_get\_array\_of\_strings'' y, una vez cargadas las filas, eliminaba de la lista de atributos la primera cabecera que coincidiese con uno de esos nombres. Así el array ``attrs\_info'' dejaba de incluir la etiqueta, y el controlador podía detectar la columna objetivo como la diferencia entre las claves del dato y los atributos.
+
+También se corrigió la lectura de filas. En Godot, ``eof\_reached'' se activa después de intentar leer más allá del final, por lo que el bucle inicial podía resultar incómodo de razonar. La versión corregida usaba un ``while true'', leía una fila con ``get\_csv\_line'', comprobaba después si se había alcanzado el final y salía del bucle en ese caso. Las filas vacías se ignoraban y cada fila válida se convertía en un diccionario. Este parseo seguía siendo sencillo y ya era suficiente para cargar datasets categóricos externos con una cabecera y varias filas.
+
+La vista del árbol ajustó su visibilidad al nuevo flujo. Al escoger el modo algorítmico se mostraba el panel de selección de dataset, mientras que el árbol y la ventana quedaban ocultos. Después de recibir ``SignalsObserver.dataset\_selected'', se mostraban el ``ScrollContainer'' y la ventana. Con ello el usuario no veía un árbol vacío ni una ventana de explicación antes de haber elegido los datos. El texto inicial de la ventana se cambió a ``Presiona el botón \"Siguiente\"'', porque el entrenamiento ya empezaba al seleccionar el dataset y no al pulsar un botón de entrenamiento dentro del panel algorítmico.
+
+En ese mismo momento empezó a prepararse la navegación hacia atrás. Se añadió la señal ``previous\_step'' al controlador, se conectó con el algoritmo y se creó un método ``previous\_step'' en ``AlgorithmDTree''. La primera versión solo movía el último contexto de ``called\_stack'' de vuelta a ``call\_stack'' y llamaba a ``\_unbuild\_node\_step'', que todavía estaba vacío. Aunque no deshacía nada, este cambio ya introducía las estructuras necesarias: una pila de pasos pendientes, ``call\_stack'', y otra de pasos ejecutados, ``called\_stack''.
+
+Después se añadió el botón ``Paso previo'' al panel del algoritmo. La escena ``panel\_algorithm\_dtree.tscn'' incorporó ``PrevButton'', y el controlador guardó una referencia ``previous\_step\_button'', conectó su pulsación con ``\_on\_previous\_step\_button\_pressed'' y lo hizo visible al comenzar el entrenamiento. Desde la interfaz, el modo de construcción del árbol dejaba de ser estrictamente lineal. El usuario podía avanzar con ``Siguiente paso'' y retroceder con ``Paso previo'', una característica importante para una herramienta didáctica, porque permite revisar el punto exacto en el que aparece una rama o se decide una hoja.
+
+La implementación real del retroceso se hizo en ``\_unbuild\_node\_step''. El algoritmo comprobaba primero que existiese una referencia válida al árbol y resolvía qué nodo visual correspondía al contexto que se quería deshacer. Para ello se añadió ``\_resolve\_context\_node\_id''. Este método intentaba usar ``context[\"node\_id\"]'' si ya estaba disponible. Si no lo estaba, buscaba el nodo raíz cuando el padre era ``-1'', o recorría los hijos del padre comparando ``branch\_value''. Esta segunda vía era necesaria porque algunos contextos se asociaban a placeholders creados antes de que el nodo se resolviese por completo.
+
+Antes de borrar un nodo, el algoritmo determinaba si el contexto correspondía a un nodo interno con ``\_is\_internal\_context''. Para ello reutilizaba las mismas condiciones de construcción: si todas las etiquetas eran iguales, el contexto era una hoja; si no quedaban atributos, también era una hoja; en otro caso se trataba como un nodo interno. Cuando se deshacía un nodo interno, primero se eliminaban de ``call\_stack'' los contextos de sus hijos mediante ``\_remove\_child\_contexts\_for\_parent'', y después se eliminaban visualmente sus hijos con ``\_remove\_visual\_children\_for\_node''. Así se evitaba dejar en la pila tareas que dependían de un nodo que acababa de desaparecer.
+
+La forma de deshacer dependía del origen del nodo. Si el contexto correspondía a la raíz, se eliminaba todo el subárbol y se ponía ``root\_id'' a ``null''. Si el nodo procedía de un placeholder, se restauraba como pendiente en lugar de borrarlo. Esto se hizo con ``restore\_node\_as\_pending'', que limpiaba ``attribute'', ``label'' e ``information\_variable\_value'', ponía ``is\_leaf'' a ``false'', ``is\_pending'' a ``true'' y llamaba a ``apply\_theme\_animated'' con el tema de pendiente y el texto ``...''. Si el nodo no procedía de un placeholder, se eliminaba con ``remove\_subtree\_and\_self''.
+
+Para soportar ese borrado, ``DTreeLogical'' incorporó ``remove\_subtree\_and\_self''. El método comprobaba que el nodo existiese, duplicaba su lista de hijos, eliminaba cada subárbol de forma recursiva, retiraba el identificador del nodo en el padre, borraba la entrada de ``nodes\_dict'', actualizaba ``root\_id'' si era necesario y liberaba la instancia visual. Esta función era parecida al borrado del modo manual y quedó dentro del propio árbol para que el algoritmo pudiera usarla al deshacer pasos.
+
+Al probar el retroceso apareció un problema al volver al paso cero: si el árbol quedaba vacío, el reposicionamiento no redibujaba las conexiones. La corrección consistió en hacer que ``relayout\_tree'' comprobaba si ``root\_id'' era ``null'' o si ``nodes\_dict'' estaba vacío. En ese caso llamaba igualmente a ``\_redraw\_edges'' y terminaba. Así el contenedor de conexiones podía eliminar las ramas que ya no existían. El controlador también reactivaba el botón de siguiente al pulsar ``Paso previo'', porque deshacer un paso debe permitir avanzar de nuevo.
+
+
+\subsection{Primera evaluación visual del árbol}
+
+El último avance de este tramo inicial fue una primera versión del modo de evaluación. Hasta entonces, la aplicación había mostrado cómo se construía el árbol; el uso de ese árbol para clasificar datos nuevos quedaba pendiente. La evaluación se introdujo con un enfoque visual: un dato de prueba se representaría como un objeto que cae por el árbol siguiendo las ramas marcadas por sus atributos.
+
+El panel algorítmico incorporó dos botones nuevos: ``Evaluar'' y ``Dropear dato''. Durante el entrenamiento, ``Evaluar'' permanecía deshabilitado. Cuando el algoritmo emitía ``algorithm\_completed'', el controlador deshabilitaba ``Siguiente paso'' y habilitaba ``Evaluar''. Al pulsarlo, se ocultaban los botones de construcción y se volvía a mostrar el panel de selección de dataset. Esta reutilización del panel permitía escoger datos para probar el árbol después de haberlo entrenado.
+
+El controlador empezó a distinguir entre dos fases mediante ``has\_train\_started''. La primera vez que recibía ``dataset\_selected'', guardaba los datos, configuraba el algoritmo e iniciaba el entrenamiento. Las siguientes veces interpretaba la selección como datos de evaluación, hacía visible ``Dropear dato'' y emitía ``SignalsObserver.start\_evaluation''. Esta solución era provisional y permitía reutilizar la misma señal global para entrenamiento y evaluación sin crear todavía una interfaz separada para cada fase.
+
+Para representar cada muestra se creó ``EvalData''. Era una escena pequeña basada en ``Node2D'', con un ``ColorRect'' como forma visual y una variable ``data\_dict'' donde se guardaba el diccionario de atributos de la muestra. La función estática ``newone'' instanciaba la escena, asignaba el diccionario y devolvía el objeto listo para colocarse en la vista.
+
+La lógica del recorrido quedó en ``EvalDataContainer''. Esta escena recibía el árbol entrenado y una lista de ``EvalData''. Al crearse, copiaba la información relevante de cada nodo del árbol a un diccionario ``nodes'': posición, profundidad, atributo, etiqueta, valor de rama y padre. Esta copia era útil porque el dato evaluado necesitaba recorrer la estructura aunque el algoritmo original ya hubiese terminado. El contenedor se conectaba a ``SignalsObserver.drop\_data'', de modo que cada pulsación en ``Dropear dato'' ejecutaba ``\_drop\_one\_data''.
+
+El método ``\_drop\_one\_data'' tomaba la primera muestra pendiente, la añadía como hija del contenedor y buscaba la raíz identificando el nodo con profundidad cero. Después entraba en un bucle. En cada iteración movía el objeto ``EvalData'' hasta la posición del nodo actual con un ``Tween'' de 0.35 segundos y esperaba a que terminase. Si el nodo actual tenía etiqueta, el recorrido terminaba, porque se había llegado a una hoja. Si era un nodo interno, obtenía el atributo de división, buscaba en ``data\_dict'' el valor de ese atributo y localizaba entre los nodos copiados un hijo cuyo ``parent\_id'' coincidiese con el nodo actual y cuyo ``branch'' coincidiese con el valor de la muestra. Ese hijo pasaba a ser el siguiente nodo.
+
+El algoritmo se conectó a esta fase mediante ``SignalsObserver.start\_evaluation''. En ``\_evaluate\_dtree'', convertía cada diccionario del dataset de evaluación en un ``EvalData'' y añadía a la escena actual un ``EvalDataContainer'' creado con el árbol y la lista de muestras. Las señales globales se ampliaron con ``start\_evaluation'', ``drop\_data'' y ``all\_data\_droped''. La última se emitía cuando ya no quedaban muestras por soltar.
+
+Esta primera evaluación era todavía básica. Los datos se dibujaban como rectángulos simples, el contenedor se añadía directamente a la escena actual y el recorrido completo de una muestra se hacía de una vez hasta la hoja. Las mejoras posteriores, como el movimiento nivel a nivel, el apilado bajo hojas, el color por clase y la explicación de cada decisión en la ventana, pertenecen a una etapa posterior del desarrollo. Aun así, este commit dejó establecida la idea central del modo de evaluación: ver físicamente cómo una muestra atraviesa las decisiones del árbol hasta llegar a una clasificación.
+
+Con este conjunto de cambios quedó completada la primera versión significativa del árbol de decisión. El proyecto pasó de dibujar nodos conectados a construir un árbol ID3 paso a paso, mostrar estados pendientes, animar la aparición de ramas y nodos, explicar la selección de atributos con texto y gráficos, cargar datasets sencillos y ejecutar una primera evaluación visual. A partir de aquí el desarrollo del árbol continuó con mejoras de interfaz, persistencia, adaptación a móvil y explicaciones más completas, que se tratarán en apartados posteriores para no mezclar esta primera fase con las revisiones finales.
+
+
+
+
+
