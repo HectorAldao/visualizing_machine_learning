@@ -2,20 +2,22 @@
 \label{chap:herramientas_y_tecnicas}
 
 \lettrine{E}{l} desarrollo de este trabajo se apoya en un conjunto de herramientas orientadas a construir una aplicación educativa, interactiva y ejecutable desde el navegador.
-\textcolor{blue}{Ahora mismo podrías hacer un ejecutable de pc sin problema, no?}
-\textcolor{olive}{Sí}
-\textcolor{olive}{Hay que narrar que vamos a escoger en web para accesibilidad, no por limitación}
+%\textcolor{blue}{Ahora mismo podrías hacer un ejecutable de pc sin problema, no?}
+%\textcolor{olive}{Sí}
+%\textcolor{olive}{Hay que narrar que vamos a escoger en web para accesibilidad, no por limitación}
 La elección tecnológica del entorno de desarrollo tuvo en cuenta tanto criterios de implementación como la naturaleza del problema abordado: explicar modelos de aprendizaje automático mediante visualizaciones dinámicas, animaciones y ejemplos manipulables por el usuario.
-En consecuencia, se priorizaron tecnologías que facilitasen la construcción de interfaces interactivas, la validación de los algoritmos implementados y el despliegue web del resultado final.
+En consecuencia, se priorizaron tecnologías que facilitasen la construcción de interfaces interactivas, la validación de los algoritmos implementados y la publicación del resultado final en un entorno accesible.
+Godot permite exportar un mismo proyecto a distintas plataformas, como escritorio, móvil o web.
+En este caso, la versión web se escogió por su accesibilidad: el usuario puede abrir la aplicación desde un navegador, sin instalar software ni preparar un entorno de ejecución específico.
 
 \section{Godot como motor de desarrollo}
 \label{sec:herramientas_godot}
 
-\textcolor{olive}{ "Libre" se entiende?}
-La herramienta principal empleada fue Godot, un motor de desarrollo de desarrollo libre y multiplataforma orientado a la creación de aplicaciones interactivas y videojuegos~\cite{GodotEngine}.
-\textcolor{blue}{No descartaría dejarlo solo como aplicaciones interactivas y en el parrafo siguiente olvidar el concepto de videojuego, permite crear aplicaciones interactivas y creamos una aplicación interactiva (un videojuego es una app software interactiva con un nombre fancy)}
-\textcolor{olive}{okey}
-Aunque su uso más habitual se asocia al desarrollo de videojuegos, sus características también resultan adecuadas para una aplicación educativa como la desarrollada en este trabajo.
+%\textcolor{olive}{ "Libre" se entiende?}
+La herramienta principal empleada fue Godot, un motor de desarrollo libre y multiplataforma orientado a la creación de aplicaciones interactivas~\cite{GodotEngine}.
+%\textcolor{blue}{No descartaría dejarlo solo como aplicaciones interactivas y en el parrafo siguiente olvidar el concepto de videojuego, permite crear aplicaciones interactivas y creamos una aplicación interactiva (un videojuego es una app software interactiva con un nombre fancy)}
+%\textcolor{olive}{okey}
+Sus características resultan adecuadas para una aplicación educativa como la desarrollada en este trabajo.
 El proyecto requiere presentar información visual, responder a acciones del usuario, animar procesos paso a paso y mantener una estructura clara entre los distintos elementos de la interfaz.
 Estas necesidades encajan de forma natural con el modelo de escenas, nodos y señales que propone Godot~\cite{GodotDocs}.
 
@@ -26,9 +28,9 @@ Todo elemento y subelemento que vaya a estar presente en tiempo de ejecución en
 Y cada nodo cuenta, principalmente, con una serie de atributos, métodos y señales.
 Igual que en la programación orientada a objetos, los atributos son variables o constantes y los métodos funciones.
 Las señales son disparadores de funciones.
-Cuándo son emitidas llaman a la función a la que están conectadas.
+Cuando son emitidas llaman a la función a la que están conectadas.
 Son una forma de conectar eventos entre diferentes nodos.
-Son el núcleo del paradigma de programación que promueve el motor: la prgramación dirigida por eventos. \textcolor{olive}{Aquí puse lo de la programación dirigida por eventos}
+Son el núcleo del paradigma de programación que promueve el motor: la programación dirigida por eventos. %\textcolor{olive}{Aquí puse lo de la programación dirigida por eventos}
 
 Los atributos, métodos y señales de cada nodo vienen definidos por su clase.
 Godot dispone de un gran árbol de clases predefinidas que heredan atributos y métodos de sus clases padre.
@@ -40,101 +42,124 @@ y el ``Control'', pensado para los elementos de interfaz de usuario.
 Por encima de estas, el desarrollador siempre puede definir sus propias clases ampliando las ya existentes.
 %Este sistema sigue la filosifía de la programación orientada a objetos y la herencia.
 
-Los nodos por sí solos son clases abstractas que no existen en el programa ejecutable final por si mismos.
+Los nodos por sí solos son clases abstractas que no existen en el programa ejecutable final por sí mismos.
 Para instanciarlos están las escenas.
 Estas son la materialización concreta del proyecto: los archivos que son guardados en disco y con los que se interactúa en el editor.
-Están formadas, como mínimo, por un nodo raiz.
-De este nodo raiz pueden colgar nodos hijo, que a su vez pueden contar con sus propios nodos hijo, y así sucesivamente.
+Están formadas, como mínimo, por un nodo raíz.
+De este nodo raíz pueden colgar nodos hijo, que a su vez pueden contar con sus propios nodos hijo, y así sucesivamente.
 
 Finalmente, las escenas, como en última instancia son árboles de nodos, pueden ser instanciadas dentro de otras escenas.
 Esto habilita una modularidad total, puesto que toda estructura de nodos que sea susceptible de ser reutilizada, puede guardarse como una escena para no tener que ser recreada. 
 
-A mayores, los nodos pueden tener asociados un script.
+Además, los nodos pueden tener asociado un script.
 Estos son código desde el que se puede interactuar, principalmente, con los atributos y métodos del nodo al que están asociados, así como con sus hijos.
-Pero no están limitados a estos elementos. Siempre se puede acceder al nodo raiz, y desde este modificar cualquier propiedad global o acceder a cualquier nodo en la escena. O mediante la creación de ``Autoloads'' en el proyecto se puede acceder a clases personalizadas en cualquier punto del código.
+Los scripts no están limitados a estos elementos.
+Siempre se puede acceder al nodo raíz y, desde este, modificar cualquier propiedad global o acceder a cualquier nodo en la escena.
+Mediante la creación de ``Autoloads'' en el proyecto también se puede acceder a clases personalizadas en cualquier punto del código.
 
-\textcolor{violet}{ estaría bien tener un diagrama sencillo que explicase las relaciones escena/nodos/scripts, igual en la doc de Godot hay algo así?}
-\textcolor{olive}{sí, veo si hay ya alguno. Vale encontré, he de ver dónde referenciarlo}
+%\textcolor{violet}{ estaría bien tener un diagrama sencillo que explicase las relaciones escena/nodos/scripts, igual en la doc de Godot hay algo así?}
+%\textcolor{olive}{sí, veo si hay ya alguno. Vale encontré, he de ver dónde referenciarlo}
+
+La Figura \ref{fig:godot_architecture_diagram} muestra de forma esquemática esta organización y sitúa las escenas, los nodos, los scripts y los módulos dentro de la arquitectura general del motor.
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=0.95\textwidth]{imaxes/godot_architecture_diagram.png}
+  \caption{Diagrama general de la arquitectura de Godot.}
+  \label{fig:godot_architecture_diagram}
+\end{figure}
 
 La organización en escenas permite separar componentes de la aplicación con responsabilidades distintas, como las vistas de entrenamiento, los paneles explicativos, las representaciones gráficas y los controles de interacción.
-Este enfoque favorece una estructura modular en la que cada parte de la interfaz puede desarrollarse, probarse y reutilizarse con menor acoplamiento. \textcolor{blue}{ Es raro, al final estamos diciendo que permiten aplicar patrones de diseño} \textcolor{olive}{En qué sentido es raro?}
+Este enfoque favorece una estructura modular en la que cada parte de la interfaz puede desarrollarse, probarse y reutilizarse con menor acoplamiento. %\textcolor{blue}{ Es raro, al final estamos diciendo que permiten aplicar patrones de diseño} \textcolor{olive}{En qué sentido es raro?}
 El sistema de señales facilita la comunicación entre elementos de la aplicación sin imponer dependencias directas innecesarias, lo que resulta útil en un entorno en el que las acciones del usuario deben provocar cambios visuales y actualizaciones del estado interno de los modelos.
 
 %La manera en que Godot organiza las interfaces mediante nodos resulta compatible con las representaciones habituales de los algoritmos tratados.
 %\textcolor{violet}{ (Sugerencia: eliminar "compatible") La manera en que Godot organiza las interfaces mediante nodos permite estrucutar los elementos de los algoritmos tratados de forma sencilla}
-La manera en que Godot organiza las interfaces mediante nodos permite estrucutar los ele-
-mentos de los algoritmos tratados de forma sencilla.
+La manera en que Godot organiza las interfaces mediante nodos permite estructurar los elementos de los algoritmos tratados de forma sencilla.
 Un árbol de decisión puede mostrarse como una estructura jerárquica de nodos conectados, mientras que una red neuronal puede representarse mediante capas, neuronas y conexiones.
 Esta correspondencia conceptual ayuda a trasladar las estructuras internas del algoritmo a elementos visuales manipulables dentro de la aplicación.
 
-Otro motivo importante para escoger Godot fue su capacidad de exportación a web.
-El motor permite generar una versión HTML5 de la aplicación~\cite{GodotWebExport}, lo que evita exigir al usuario una instalación local y facilita el acceso desde un navegador.
+Otro motivo importante para escoger Godot fue su sistema de exportación multiplataforma.
+El motor permite generar versiones para diferentes entornos a partir del mismo proyecto, incluida una versión HTML5 de la aplicación~\cite{GodotWebExport}.
+La exportación web se adoptó por la forma en la que se quería distribuir la herramienta: una aplicación educativa debe ser sencilla de abrir, compartir y probar.
+Publicarla como aplicación web evita exigir al usuario una instalación local y facilita el acceso desde un navegador.
 Esta característica es especialmente relevante en un proyecto con finalidad educativa, ya que reduce la fricción de uso y permite distribuir la herramienta como una aplicación web estática.
 
-\textcolor{blue}{Yo lo que veo es que no justificamos la elección de Godot frente a herramientas de desarrollo de interfaces interactivas. ¿Que nos aporta Godot que no haga Java, .Net, Flutter etc... }
-\textcolor{violet}{ yo creo que se puede justificar por la parte de la interacción/animaciones, al tener el propio ciclo de vida del juego, facilita toda esa parte}
-\textcolor{olive}{hmmm vale, lo hablamos}
+%\textcolor{blue}{Yo lo que veo es que no justificamos la elección de Godot frente a herramientas de desarrollo de interfaces interactivas. ¿Que nos aporta Godot que no haga Java, .Net, Flutter etc... }
+%\textcolor{violet}{ yo creo que se puede justificar por la parte de la interacción/animaciones, al tener el propio ciclo de vida del juego, facilita toda esa parte}
+%\textcolor{olive}{hmmm vale, lo hablamos}
 
-\section{Lenguajes de programación empleados}
-\label{sec:herramientas_lenguajes}
-
-\textcolor{blue}{Debatir en reunión. ¿No integraríais esto en sus propias secciones de desarrollo?}
-\textcolor{violet}{ rust y js sí, porque son para funcionalidades específicas}
-\textcolor{olive}{cómo considereis}
-
-El desarrollo combina varios lenguajes, cada uno empleado en una parte concreta del proyecto.
-La lógica principal de la aplicación se implementó dentro del propio entorno de Godot, utilizando GDScript para construir las visualizaciones, gestionar la interacción y ejecutar las implementaciones didácticas de los algoritmos.
-Junto a ello, Python, Rust y JavaScript se emplearon como tecnologías de apoyo para resolver necesidades específicas que no formaban parte del núcleo de la aplicación.
-
-\subsection{GDScript como base del proyecto}
-\label{sec:herramientas_gdscript}
-
-GDScript es el lenguaje oficial utilizado en Godot para definir la lógica de las escenas y la interacción entre nodos.
-Su integración directa con el motor permitió implementar tanto el comportamiento de la interfaz como las versiones didácticas de los algoritmos de aprendizaje automático.
-La implementación de estos algoritmos en el propio lenguaje de la aplicación facilitó la obtención de resultados parciales en cada paso del proceso, lo que permitió generar explicaciones detalladas y sincronizadas con la visualización.
-
-\subsection{Python para validación de resultados}
-\label{subsec:herramientas_python}
-
-Python se utilizó para contrastar el comportamiento de las implementaciones realizadas en la aplicación~\cite{Python}.
-La finalidad de este uso fue disponer de un entorno externo con bibliotecas consolidadas que sirviesen como referencia para la lógica implementada en Godot.
-En particular, se compararon resultados producidos por la aplicación con los obtenidos mediante implementaciones estándar de árboles de decisión y redes neuronales en bibliotecas como scikit-learn~\cite{ScikitLearn} y PyTorch~\cite{PyTorch}, respectivamente.
-
-Este proceso ayudó a detectar errores tanto en la implementación de los algoritmos como en la conexión entre sus resultados internos y la información presentada por la interfaz.
-El uso concreto de Python en este proceso se detalla en el Capítulo~\ref{chap:desarrollo}.
-
-\subsection{Rust para generación de fórmulas}
-\label{subsec:herramientas_rust}
-
-Rust se empleó para desarrollar un plugin para Godot destinado a generar fórmulas matemáticas de forma dinámica en tiempo de ejecución~\cite{RustLanguage}.
-Esta necesidad surge porque la aplicación debe mostrar resultados numéricos y explicar los cálculos que conducen a ellos.
-Para ello se utilizó la biblioteca Ratex~\cite{Ratex}, que permite generar representaciones en LaTeX a partir de expresiones construidas durante la ejecución.
-
-La elección de Rust se justifica por su rendimiento, su seguridad de memoria y su integración con Godot.
-En este proyecto, el complemento se compila a WebAssembly para poder utilizarlo en la versión web de la aplicación~\cite{WebAssembly}.
-De este modo, la generación de fórmulas puede integrarse en el despliegue web sin depender de componentes nativos específicos de una plataforma.
-El desarrollo de este plugin y su integración con la aplicación se explican en el Capítulo~\ref{chap:desarrollo}.
-
-\subsection{JavaScript para integración con el navegador}
-\label{subsec:herramientas_javascript}
-
-JavaScript se utilizó en una parte concreta de la aplicación relacionada con la interacción con el navegador~\cite{MDNJavaScript}.
-Su función principal fue permitir que el usuario cargase sus propios ficheros CSV, de forma que la herramienta no quedase limitada únicamente a conjuntos de datos predefinidos.
-Esta funcionalidad resulta importante desde el punto de vista educativo, porque permite experimentar con datos distintos y observar cómo cambian las decisiones del árbol o el comportamiento de la red en función de la entrada utilizada.
-De forma nativa, Godot permite cargar datos desde el sistema en el que se ejecuta la aplicación.
-En la exportación a HTML5, el funcionamiento de los navegadores modernos restringe esta característica, lo que hizo necesaria una capa de integración específica con JavaScript.
-La parte concreta desarrollada en JavaScript se describe en el Capítulo~\ref{chap:desarrollo}.
+%\section{Lenguajes de programación empleados}
+%\label{sec:herramientas_lenguajes}
+%
+%\textcolor{blue}{Debatir en reunión. ¿No integraríais esto en sus propias secciones de desarrollo?}
+%\textcolor{violet}{ rust y js sí, porque son para funcionalidades específicas}
+%\textcolor{olive}{cómo considereis}
+%
+%El desarrollo combina varios lenguajes, cada uno empleado en una parte concreta del proyecto.
+%La lógica principal de la aplicación se implementó dentro del propio entorno de Godot, utilizando GDScript para construir las visualizaciones, gestionar la interacción y ejecutar las implementaciones didácticas de los algoritmos.
+%Junto a ello, Python, Rust y JavaScript se emplearon como tecnologías de apoyo para resolver necesidades específicas que no formaban parte del núcleo de la aplicación.
+%
+%\subsection{GDScript como base del proyecto}
+%\label{sec:herramientas_gdscript}
+%
+%GDScript es el lenguaje oficial utilizado en Godot para definir la lógica de las escenas y la interacción entre nodos.
+%Su integración directa con el motor permitió implementar tanto el comportamiento de la interfaz como las versiones didácticas de los algoritmos de aprendizaje automático.
+%La implementación de estos algoritmos en el propio lenguaje de la aplicación facilitó la obtención de resultados parciales en cada paso del proceso, lo que permitió generar explicaciones detalladas y sincronizadas con la visualización.
+%
+%\subsection{Python para validación de resultados}
+%\label{subsec:herramientas_python}
+%
+%Python se utilizó para contrastar el comportamiento de las implementaciones realizadas en la aplicación~\cite{Python}.
+%La finalidad de este uso fue disponer de un entorno externo con bibliotecas consolidadas que sirviesen como referencia para la lógica implementada en Godot.
+%En particular, se compararon resultados producidos por la aplicación con los obtenidos mediante implementaciones estándar de árboles de decisión y redes neuronales en bibliotecas como scikit-learn~\cite{ScikitLearn} y PyTorch~\cite{PyTorch}, respectivamente.
+%
+%Este proceso ayudó a detectar errores tanto en la implementación de los algoritmos como en la conexión entre sus resultados internos y la información presentada por la interfaz.
+%El uso concreto de Python en este proceso se detalla en el Capítulo~\ref{chap:desarrollo}.
+%
+%\subsection{Rust para generación de fórmulas}
+%\label{subsec:herramientas_rust}
+%
+%Rust se empleó para desarrollar un plugin para Godot destinado a generar fórmulas matemáticas de forma dinámica en tiempo de ejecución~\cite{RustLanguage}.
+%Esta necesidad surge porque la aplicación debe mostrar resultados numéricos y explicar los cálculos que conducen a ellos.
+%Para ello se utilizó la biblioteca Ratex~\cite{Ratex}, que permite generar representaciones en LaTeX a partir de expresiones construidas durante la ejecución.
+%
+%La elección de Rust se justifica por su rendimiento, su seguridad de memoria y su integración con Godot.
+%En este proyecto, el complemento se compila a WebAssembly para poder utilizarlo en la versión web de la aplicación~\cite{WebAssembly}.
+%De este modo, la generación de fórmulas puede integrarse en el despliegue web sin depender de componentes nativos específicos de una plataforma.
+%El desarrollo de este plugin y su integración con la aplicación se explican en el Capítulo~\ref{chap:desarrollo}.
+%
+%\subsection{JavaScript para integración con el navegador}
+%\label{subsec:herramientas_javascript}
+%
+%JavaScript se utilizó en una parte concreta de la aplicación relacionada con la interacción con el navegador~\cite{MDNJavaScript}.
+%Su función principal fue permitir que el usuario cargase sus propios ficheros CSV, de forma que la herramienta no quedase limitada únicamente a conjuntos de datos predefinidos.
+%Esta funcionalidad resulta importante desde el punto de vista educativo, porque permite experimentar con datos distintos y observar cómo cambian las decisiones del árbol o el comportamiento de la red en función de la entrada utilizada.
+%De forma nativa, Godot permite cargar datos desde el sistema en el que se ejecuta la aplicación.
+%En la exportación a HTML5, el funcionamiento de los navegadores modernos restringe esta característica, lo que hizo necesaria una capa de integración específica con JavaScript.
+%La parte concreta desarrollada en JavaScript se describe en el Capítulo~\ref{chap:desarrollo}.
 
 \section{Control de versiones y despliegue}
 \label{sec:herramientas_control_versiones_despliegue}
 
 Para la gestión del código fuente se utilizó Git, un sistema de control de versiones distribuido ampliamente utilizado~\cite{ProGit}.
 Su uso permitió mantener un registro de los cambios y trabajar de forma incremental.
+Esto resultó útil durante el desarrollo, ya que la aplicación fue creciendo mediante pruebas sucesivas: primero se validó la interacción básica, después se incorporaron los algoritmos y más adelante se añadieron explicaciones, animaciones y mejoras de interfaz.
+Disponer de un historial de cambios permitió avanzar con mayor seguridad y conservar puntos estables del proyecto mientras se realizaban modificaciones sobre escenas, scripts y recursos visuales.
 
 El repositorio se alojó en GitHub, lo que proporcionó almacenamiento remoto y una copia accesible del proyecto.
 Además, se utilizó GitHub Pages para publicar la versión web de la aplicación~\cite{GitHubPages}.
 Este servicio permite desplegar sitios estáticos directamente desde un repositorio, por lo que encaja con la exportación web generada por Godot.
+La aplicación exportada se publica como un conjunto de archivos preparados para ejecutarse en el navegador, distinto del proyecto editable de Godot.
+%Por ello, el despliegue forma parte del flujo de trabajo del proyecto: tras generar la versión web, es necesario asegurarse de que los ficheros resultantes están organizados correctamente, que los recursos se cargan desde las rutas esperadas y que la página inicial conduce a la aplicación.
+
+Esta fase tiene importancia porque marca la diferencia entre una aplicación que funciona dentro del entorno de desarrollo y una herramienta que puede utilizar cualquier persona desde un enlace.
+En el editor, el proyecto se ejecuta en un contexto controlado, con acceso directo a las escenas, scripts y recursos locales.
+En el navegador, la aplicación depende de los archivos exportados, de las restricciones propias de la plataforma web y de la forma en la que el servicio de publicación sirve esos archivos.
+Por este motivo, el despliegue se trató como una parte más del desarrollo y no únicamente como el último paso administrativo.
+
 La combinación de Godot y GitHub Pages permitió que el resultado final pudiese consultarse desde el navegador sin infraestructura de servidor adicional.
+Esto encaja con el objetivo de accesibilidad planteado al escoger la exportación web: el usuario solo necesita abrir una dirección, mientras que el proyecto mantiene un proceso de publicación suficientemente simple para ser actualizado durante el desarrollo.
 
 %\textcolor{blue}{Yo esto lo vendería algo más. Entiendo que luego va en su cap de desarrollo}
 %\textcolor{violet}{ídem: aunque sea todo con github, el VCS es una cosa más trivial pero el despliegue es algo más interesante}
