@@ -51,7 +51,7 @@ En la Figura \ref{fig:primera_version_arbol} se muestra cómo era esta escena in
 \begin{figure}[hp!]
   \centering
   \includegraphics[width=0.75\textwidth]{imaxes/primera_version_arbol.png}
-  \caption{Primera escena de prueba del árbol. Arriba a la derecha hay dos botones que sirven para guardar y cargar un árbol ya creado. Abajo a la izquiera de ve una sencilla estructura conforma de ábol, con los nodos rojos con un texto de ejemplo conectados por lineas negras. Sobre uno de los nodos, se ve el menú que permite añadirle un hijo o eliminarlo.}
+  \caption{Primera escena de prueba del árbol. Arriba a la derecha hay dos botones que sirven para guardar y cargar un árbol ya creado. Abajo a la izquierda se ve una sencilla estructura con forma de árbol, con los nodos rojos con un texto de ejemplo conectados por líneas negras. Sobre uno de los nodos, se ve el menú que permite añadirle un hijo o eliminarlo.}
   \label{fig:primera_version_arbol}
 \end{figure}
 
@@ -78,33 +78,39 @@ Al funcionar desde el inicio, el desarrollo puede continuar sobre una base más 
 
 \section{Árbol de decisión: versión 0.2}
 
-El proyecto deja de ser un prototipo aislado cuando comienza el desarrollo del primer algoritmo: el árbol de decisión.
-A partir de este punto, el reto pasa a consistir en conseguir que el árbol se construya siguiendo las decisiones del algoritmo y que el usuario pueda entender cada paso.
+El proyecto deja de ser una prueba de interacción cuando comienza el desarrollo del primer algoritmo.
+A partir de esta versión, el objetivo pasa de dibujar elementos conectados a construir un árbol de decisión real, mostrar su evolución paso a paso y explicar las decisiones tomadas durante el entrenamiento.
+La dificultad principal está en coordinar tres niveles: el algoritmo que calcula la siguiente división, la estructura lógica del árbol y la escena que el usuario ve en pantalla.
 
 
 \subsection{Primera arquitectura del árbol}
 
-El primer cambio consiste en crear una nueva escena, dejando de lado la prueba visual inicial.
-Esta vista debe resolver un problema que se había dejado de lado para la prueba inicial: un árbol puede crecer hacia abajo y hacia los lados indefinidamente y con mucha rapidez.
-Si todo se coloca en una pantalla fija, una parte del contenido puede quedar fuera de la vista en cuanto aparecen varios niveles.
-Por esta razón se introduce por medio de un nodo especializado de Godot una zona desplazable, de forma que el usuario pueda mover la posición el árbol en pantalla cuando su tamaño exceda los límites de la misma.
+El primer cambio consiste en sustituir la escena de prueba por una vista preparada para un árbol construido por algoritmo.
+La prueba inicial servía para validar que se podían añadir y borrar nodos manualmente, aunque su estructura resultaba insuficiente para un entrenamiento real.
+Un árbol de decisión puede crecer varios niveles y abrir muchas ramas en poco espacio, por lo que una pantalla fija deja de ser útil en cuanto el número de nodos aumenta.
+Por esta razón se incorpora una zona desplazable dentro de la interfaz, de manera que el usuario pueda moverse por el árbol cuando su tamaño supere el área visible.
 
-También hace falta revisar la forma en la que se distribuyen los nodos.
-La versión inicial puede añadir hijos bajo un nodo pero por cómo se distribuían los nodos en pantalla los nodos padre podían quedar mal distribuidos con respecto a los hijos.
-Para solucionar este inconveniente se adapató el código para que generara una distribución más clara a la vista: los hijos se colocan por debajo de su padre y el padre queda centrado respecto a ellos.
-Esta decisión busca mantener una lectura clara y estable cada vez que el árbol cambia.
+También se revisa la distribución de los nodos.
+En la versión manual bastaba con colocar cada hijo bajo su padre, ya que el objetivo era comprobar la interacción.
+Durante el entrenamiento algorítmico se necesita una disposición más estable: los hijos deben aparecer por debajo, el padre debe quedar centrado respecto a ellos y el árbol debe reorganizarse cada vez que se añade una rama.
+Para conseguirlo se introduce un cálculo de posiciones basado en la profundidad de cada nodo y en su orden dentro de la estructura.
+Así se evita que las ramas se acumulen en la misma zona y se mantiene una lectura jerárquica clara.
 
-Otro aspecto importante de cara al cómo iba a avanzar el proyecto es separar a nivel lógico los nodos del árbol y las conexiones que los unen.
-Esto hace que cada parte tenga una responsabilidad clara: unos elementos representan preguntas o resultados, y las líneas representan el camino seguido entre ellos.
-Gracias a esto, más adelante se hizo más sencillo tanto animar las ramas como mostrar sobre ellas el valor que conduce de un punto del árbol al siguiente.
+Otra decisión importante es separar la información lógica del árbol de su representación visual.
+Cada nodo visible conserva un identificador, una referencia al padre, una lista de hijos, su profundidad y la información que representa, como el atributo de decisión o la etiqueta final.
+Al mismo tiempo, el árbol mantiene un diccionario interno que permite localizar cada nodo por su identificador.
+Esta duplicidad resulta útil porque la escena de Godot sirve para dibujar, animar y recibir eventos, mientras que el diccionario permite recorrer la estructura, recalcular posiciones, eliminar subárboles y evaluar ejemplos más adelante.
 
-Con estas cuestiones cerradas, el siguiente avance es preparar el modo automático.
-En este modo, el usuario deja de añadir ramas a mano y pasa a controlar el avance del entrenamiento.
-La primera versión de esta interfaz es todavía muy simple, con botones con texto en inglés por convencionalismos del gremio, como se muestra en la Figura \ref{fig:dtree_view_start_next_english}.
-Esta pantalla introduce una idea importante que se mantiene durante todo el desarrollo: el algoritmo avanza al ritmo marcado por el usuario.
-Y para conseguirlo, el algoritmo se organiza de forma incremental.
-La construcción completa se reparte en pasos pequeños: se guarda el punto en el que se encuentra el proceso y se resuelve una parte cada vez que el usuario pulsa el botón de avanzar.
-Esta decisión es clave para el propósito educativo de la aplicación, porque permite observar cómo se forma el árbol pudiendo atender a los pásos que este mismo ejecuta.
+Las conexiones entre nodos se tratan como elementos propios.
+Cada conexión representa una rama del árbol y puede mostrar el valor del atributo que conduce desde el nodo padre hasta el hijo.
+Esta separación permite que los nodos se encarguen de mostrar decisiones o clasificaciones, y que las conexiones expliquen el camino seguido.
+Más adelante, esta decisión facilita tanto la animación de las ramas como la evaluación visual de nuevos datos.
+
+\textcolor{olive}{Por ejemplo, en esta frase de aquí yo creo que el presente contínuo queda mal, y que habría que poner más bien "se añadió el modo automático"}
+Con la base visual preparada, se añade el modo automático.
+En este modo, el usuario controla el avance del entrenamiento en lugar de añadir ramas manualmente.
+La primera versión de la interfaz es sencilla, con un botón para iniciar el proceso y otro para avanzar al siguiente paso, como se muestra en la Figura \ref{fig:dtree_view_start_next_english}.
+Los textos aparecen todavía en inglés porque pertenecen a una fase temprana de la aplicación.
 
 \begin{figure}[hp!]
   \centering
@@ -121,31 +127,32 @@ Esta decisión es clave para el propósito educativo de la aplicación, porque p
   \label{fig:dtree_view_start_next_english}
 \end{figure}
 
+La construcción paso a paso se apoya en una separación de responsabilidades.
+El algoritmo calcula qué tipo de nodo debe crearse en cada momento y emite la información necesaria para hacerlo: padre, valor de la rama, atributo elegido, etiqueta si se trata de una hoja y datos explicativos del paso.
+El controlador recibe esa información y la traduce a cambios en la escena, creando o actualizando los nodos visibles.
+De este modo, la lógica de aprendizaje queda aislada de los elementos gráficos de Godot, y la vista puede centrarse en representar el resultado de cada decisión.
 
-La primera prueba de entrenamiento utiliza un conjunto de datos pequeño y controlado.
-Su objetivo es comprobar que el árbol se crea correctamente, que las ramas aparecen donde deben y que la interfaz se actualiza después de cada paso, como se aprecia en la Figura \ref{fig:dtree_view_start_next_english}.
+Para que el usuario pueda avanzar con el botón de siguiente paso, el algoritmo no construye todo el árbol de una sola vez.
+El trabajo pendiente se guarda como una serie de contextos, cada uno con los datos que llegan a una rama, los atributos disponibles, el padre visual y la profundidad correspondiente.
+Cada pulsación extrae uno de esos contextos, decide si debe convertirse en una hoja o en un nodo interno, actualiza la escena y deja preparados los contextos que quedan por procesar.
+Esta organización incremental ayuda a que el árbol pueda explicarse nodo a nodo sin necesidad de tener que almacenar toda la información a la que se quiere acceder en memoria.
 
-En esta fase, lo más difícil es coordinar tres niveles al mismo tiempo: el estado interno del algoritmo, la estructura del árbol y lo que el usuario ve en pantalla.
-La estructura del árbol y su representación ya eran un problema resulento en la primera iteración.
-Sin embargo, el reto añadido en este punto fue la sincronización de estas partes con el recién creado algoritmo.
-Para afrontar las dificultades de este sistema, el algoritmo y el árbol son dos entidades distintas.
-La primera le dicta a la segunda cómo modificarse en base a los resultados que dicten los cálculos.
+Las primeras pruebas se realizan con un conjunto de datos pequeño y controlado.
+Su finalidad es comprobar que el algoritmo crea la raíz, abre ramas, coloca los nodos en posiciones coherentes y mantiene sincronizados el estado interno y la vista.
+En esta fase queda fijado el patrón principal del resto del desarrollo del árbol: el algoritmo decide, el controlador traduce esa decisión y el árbol visible se reorganiza tras cada paso.
 
 
 \subsection{Reorganización de la escena y primeros elementos explicativos}
 
-Cuando el modo automático empieza a funcionar, se reorganiza la escena para simplificarla.
-Algunas piezas que resultan útiles durante las pruebas iniciales dejan de ser necesarias, así que se reduce la cantidad de elementos intermedios.
-Esta limpieza facilita seguir avanzando sin arrastrar soluciones provisionales.
+Cuando el modo automático empieza a funcionar, la escena se reorganiza para reducir elementos provisionales.
+La vista del árbol pasa a integrarse mejor con los contenedores de interfaz de Godot, lo que permite combinar botones, paneles y zonas desplazables de forma más natural.
+Esta reorganización también mejora el centrado del árbol.
+En lugar de mover la escena completa, se recalculan las posiciones internas de los nodos y el área mínima del contenedor desplazable.
+Así el árbol aparece centrado cuando cabe en pantalla y sigue pudiendo recorrerse cuando crece.
 
-Uno de los problemas que aparece al reorganizar la vista es el centrado del árbol.
-Al crecer, el árbol puede quedar desplazado hacia una esquina, lo que dificulta seguir la construcción.
-Se ajusta entonces el comportamiento de la zona desplazable para que el contenido aparezca centrado y el usuario pueda moverse por él de forma natural.
-Esta mejora mantiene intacto el algoritmo y afecta mucho a la experiencia de uso.
-
-La escena del árbol empieza a funcionar como un pequeño flujo guiado.
-Primero se muestra un panel para escoger entre crear el árbol manualmente o dejar que lo construya el algoritmo.
-Después, según la opción elegida, aparecen los controles correspondientes.
+La escena se convierte entonces en un flujo guiado.
+Al entrar en la vista del árbol se muestra primero un panel que permite escoger entre creación manual y creación algorítmica.
+Cada opción activa controles distintos y evita mezclar acciones pensadas para usos diferentes.
 En la Figura \ref{fig:menu_manualmente_algoritmicamente} se muestra este panel inicial.
 
 \begin{figure}[hp!]
@@ -155,14 +162,15 @@ En la Figura \ref{fig:menu_manualmente_algoritmicamente} se muestra este panel i
   \label{fig:menu_manualmente_algoritmicamente}
 \end{figure}
 
-En esta misma etapa se empieza a cuidar más la apariencia de los nodos.
-Los puntos que representan una decisión y los puntos que representan una clasificación final pasan a tener estilos diferentes.
-Esta distinción visual ayuda a leer el árbol sin depender tanto del texto: algunas partes indican que todavía hay una pregunta que responder, y otras indican que se llega a una conclusión.
+En esta etapa también se mejora la apariencia de los nodos.
+Los nodos internos, que representan preguntas sobre un atributo, y las hojas, que representan una clasificación final, reciben estilos visuales distintos.
+Esta distinción permite interpretar la estructura con mayor rapidez: algunos nodos indican que todavía hay una decisión que tomar, y otros señalan que se ha llegado a un resultado.
+Los nodos creados por el algoritmo quedan protegidos frente al menú de edición manual, ya que representan el resultado del entrenamiento y deben cambiar solo cuando avanza o retrocede el proceso.
 
-También se traduce la interfaz al castellano.
-Los botones iniciales pasan a llamarse ``Empezar entrenamiento'' y ``Siguiente paso''.
-Este cambio es pequeño desde el punto de vista técnico y resulta importante para que la aplicación sea coherente con el resto del proyecto.
-En la Figura \ref{fig:dtree_view_training_buttons_es} se ve la interfaz después de esta adaptación y de los primeros cambios visuales.
+La interfaz se traduce al castellano en este mismo tramo.
+Los controles principales pasan a llamarse ``Empezar entrenamiento'' y ``Siguiente paso''.
+El cambio ayuda a que la vista del árbol sea coherente con el idioma del resto de la aplicación y con el tono explicativo del trabajo.
+En la Figura \ref{fig:dtree_view_training_buttons_es} se ve la interfaz tras esta adaptación y los primeros cambios visuales.
 
 \begin{figure}[hp!]
   \centering
@@ -180,13 +188,10 @@ En la Figura \ref{fig:dtree_view_training_buttons_es} se ve la interfaz después
   \label{fig:dtree_view_training_buttons_es}
 \end{figure}
 
-El siguiente paso natural es añadir una ventana informativa.
-Hasta ese momento, el árbol muestra qué se está creando y apenas explica por qué se toma cada decisión.
-La ventana nace para cubrir esa carencia: debe acompañar a la construcción del árbol con una explicación escrita del paso actual.
-
-Su primera versión contiene un mensaje inicial que invita al usuario a comenzar el entrenamiento.
-Más adelante se convierte en un componente propio, separado de la vista principal, porque va a necesitar textos distintos según el caso y debe poder actualizarse cada vez que avance el algoritmo.
-En la Figura \ref{fig:dtree_view_ventana_empezar_entrenamiento} se puede ver esta primera integración.
+Una vez que la construcción visual resulta estable, se incorpora la ventana informativa.
+Hasta este punto, la escena permite ver qué se añade al árbol, aunque todavía ofrece poca información sobre el motivo de cada decisión.
+La ventana nace para acompañar cada paso con una explicación escrita y sincronizada con el estado interno del algoritmo.
+Su primera versión contiene un mensaje inicial que invita a comenzar el entrenamiento, como se observa en la Figura \ref{fig:dtree_view_ventana_empezar_entrenamiento}.
 
 \begin{figure}[hp!]
   \centering
@@ -195,48 +200,63 @@ En la Figura \ref{fig:dtree_view_ventana_empezar_entrenamiento} se puede ver est
   \label{fig:dtree_view_ventana_empezar_entrenamiento}
 \end{figure}
 
-Los primeros textos de la ventana explican tres situaciones frecuentes.
-La primera es la creación de un nodo de decisión, cuando el algoritmo todavía tiene que escoger por qué característica dividir los datos.
-La segunda es la creación de una hoja porque todos los ejemplos que llegan a ese punto tienen la misma respuesta.
-La tercera es la creación de una hoja por mayoría, usada cuando ya no hay más preguntas útiles y se debe escoger la respuesta más frecuente.
+La ventana se implementa como un componente separado de la vista principal.
+Esta separación permite actualizar su contenido cada vez que el algoritmo procesa un contexto, sin mezclar la redacción de explicaciones con la creación de nodos en pantalla.
+El algoritmo prepara un conjunto de datos explicativos del paso actual: etiquetas presentes, número de ejemplos, atributos disponibles, tipo de nodo creado, atributo escogido y valores de la métrica usada para comparar alternativas.
+La ventana recibe esa información y la convierte en texto dirigido al usuario.
 
-Durante estas pruebas se detecta que el texto necesita una preparación previa.
-Algunas listas aparecen con un formato propio de programación y poco adecuado para la lectura.
-Por ello se prepara la información antes de enseñarla, transformándola en frases más naturales.
-Esta es una decisión importante para el tono de la aplicación: la ventana debe parecer una explicación dirigida al usuario.
+Los primeros textos cubren tres casos fundamentales.
+El primero aparece cuando se crea un nodo interno y hay que escoger por qué atributo dividir los datos.
+El segundo se usa cuando todos los ejemplos que llegan a una rama comparten la misma etiqueta y se puede crear una hoja pura.
+El tercero explica la creación de una hoja por mayoría, necesaria cuando quedan ejemplos con etiquetas distintas y ya no existen atributos útiles para seguir dividiendo.
 
-También se empieza a mostrar el criterio usado para escoger la siguiente división.
-En esta primera fase aparece como texto, con una línea por cada opción evaluada.
-Es una solución básica y permite conectar el cálculo del algoritmo con una explicación visible dentro de la interfaz.
-A partir de aquí, la aplicación construye el árbol y empieza a justificarlo.
+Durante estas pruebas se detecta que la información interna del algoritmo necesita una preparación antes de mostrarse.
+Las listas de etiquetas o atributos, si se presentan tal como las maneja el código, tienen un formato propio de programación y resultan poco naturales en una explicación.
+Por ello, la ventana transforma esos valores en frases legibles, con enumeraciones y textos adaptados al caso concreto.
+Esta decisión marca el tono de la aplicación, que gira alrededor de que la interfaz debe traducir las estructuras internas del programa a una explicación comprensible para el usuario.
+
+También se empieza a mostrar el criterio utilizado para elegir la siguiente división.
+Al principio aparece como una lista textual de valores calculados para cada atributo.
+Aunque es una solución sencilla, ya conecta el cálculo del algoritmo con una justificación visible dentro de la interfaz.
+A partir de este punto, la construcción del árbol queda acompañada por una justificación de cada paso.
 
 
 \subsection{Animación de la construcción del árbol}
 
-Con la construcción paso a paso funcionando, aparece un nuevo problema: los cambios son demasiado bruscos.
-Cada pulsación puede crear un nodo, mover partes del árbol y dibujar nuevas ramas.
-El resultado es correcto.
-En algunos pasos, el usuario puede perder de vista qué elemento acaba de aparecer.
+Cuando la construcción paso a paso está funcionando, se aprecia otro problema de lectura.
+Una pulsación puede crear un nodo, desplazar parte del árbol y dibujar varias ramas nuevas.
+El resultado lógico es correcto, aunque el cambio visual puede ser demasiado brusco para seguirlo con claridad.
+Por esta razón se incorporan animaciones a la construcción.
 
-Para mejorar esta lectura se añaden animaciones.
-Primero se animan las ramas, de manera que cada conexión parece crecer desde el punto anterior hasta el nuevo.
-Después se anima la aparición de los nodos, que dejan de mostrarse de golpe y pasan a aparecer de forma gradual.
-Estas animaciones dirigen la atención hacia el cambio producido en cada paso.
+Las primeras animaciones se aplican a las conexiones.
+Cada rama se dibuja progresivamente desde el nodo padre hasta el nodo hijo, de manera que el usuario pueda identificar qué parte acaba de aparecer.
+Las etiquetas de las ramas también se integran en la conexión: la línea deja un espacio para el texto y este se orienta siguiendo la inclinación de la rama, con la corrección necesaria para que no quede invertido.
+Así se muestra el valor del atributo que conduce a cada hijo sin llenar los nodos de información secundaria.
 
-Al introducir animaciones es necesario revisar cómo se actualizan las conexiones.
-En las primeras versiones, al modificar el árbol se redibujan todas las ramas.
-Esto hace que, cada vez que aparece una conexión nueva, también se reinicien las que ya existen.
-Se cambia este comportamiento para conservar las ramas anteriores y animar solo las recién creadas.
-Gracias a ello, el avance resulta más claro y menos repetitivo.
+Después se anima la aparición de los nodos.
+En vez de mostrarse de golpe, los nodos nuevos aparecen mediante una transición de opacidad.
+Este efecto tiene una finalidad funcional, no solo estética, ya que dirige la atención hacia el elemento incorporado en el paso actual y ayuda a distinguirlo de los nodos que ya estaban presentes.
 
-Después se incorpora una idea pensada específicamente para explicar mejor el algoritmo: los nodos pendientes.
-Cuando el árbol decide dividir los datos por una característica, ya se sabe qué caminos van a aparecer y todavía falta conocer qué hay al final de cada uno.
-Para representar ese estado intermedio, la aplicación empieza a mostrar nodos temporales con un aspecto distinto.
+\textcolor{olive}{otro caso donde creo que suefa forzado}
+La introducción de animaciones obliga a revisar la actualización de conexiones.
+En una versión temprana, al recalcular el árbol se redibujaban todas las ramas.
+Eso provocaba que una conexión antigua volviese a animarse cada vez que se añadía una nueva.
+La solución consiste en conservar las conexiones existentes, actualizar su posición si el árbol se recoloca y animar únicamente las conexiones creadas en ese paso.
+Con ello, el movimiento de la escena comunica mejor qué elemento pertenece al avance actual.
 
-Estos nodos pendientes indican que el algoritmo ya tiene una rama abierta y que aún queda por resolver su contenido.
-Más adelante, cuando esa parte del árbol se procesa, el nodo temporal se transforma en una decisión real o en una clasificación final.
-Esta transición también se anima para que el usuario perciba el cambio y entienda que se está completando una parte que antes solo queda prevista.
-En la Figura \ref{fig:dtree_nodos_pendientes} se puede ver el aspecto estos nodos pendientes.
+En esta misma etapa se añaden los nodos pendientes.
+Cuando el algoritmo crea un nodo interno, ya conoce los valores del atributo elegido y, por tanto, las ramas que saldrán de él.
+Todavía queda por decidir si cada rama terminará en una hoja o en otro nodo de decisión.
+Hasta este momento, esta incertidumbre no era representada de ninguna forma, ya que las ramas no eran dibujadas hasta que el siguiente nodo era definido.
+Pero como el objetivo es representar la información que tiene el árbol en cada instante, se optó por crear nodos temporales con un texto provisional y un estilo propio que los diferencia.
+\textcolor{olive}{aquí he metido un pretérito que no se si desentona mucho}
+Así las conexiones son dibujadas cuándo el algoritmo las tiene en cuenta.
+Los nodos pendientes muestran que una rama ya está prevista y que su contenido se resolverá en un paso posterior.
+Cuando el algoritmo procesa esa rama, el nodo temporal se transforma en el nodo definitivo, con su atributo o su etiqueta final.
+La transformación también se anima: el nodo reduce su opacidad, cambia de texto y tema visual, y vuelve a mostrarse.
+De esta manera, el usuario percibe que se está completando una parte del árbol que ya existía como posibilidad abierta.
+\textcolor{olive}{No se si es correcto poner estas "afirmaciones" sobre el usuario}
+En la Figura \ref{fig:dtree_nodos_pendientes} se puede ver el aspecto de estos nodos pendientes.
 % https://rawcdn.githack.com/HectorAldao/visualizing_machine_learning/55ac8e0508601cc7a456013159a7bfa8ba01f5d3/docs/index.html
 
 \begin{figure}[hp!]
@@ -246,21 +266,21 @@ En la Figura \ref{fig:dtree_nodos_pendientes} se puede ver el aspecto estos nodo
   \label{fig:dtree_nodos_pendientes}
 \end{figure}
 
-Otra prueba temprana consiste en mostrar un valor numérico al pasar el cursor por ciertos nodos.
-La intención es permitir consultar información sobre la decisión tomada sin llenar todo el árbol de números.
-La idea funciona de forma limitada: un número aislado dice poco si no se explica qué significa.
-Por esa razón, más adelante esa información se traslada hacia la ventana informativa, donde puede acompañarse de una explicación más completa.
+También se añade una forma de obtener información de los nodos una vez estos han pasado.
+Al pasar por ciertos nodos, el texto podía cambiar para mostrar un valor numérico asociado a la decisión.
+La idea permitía consultar información sin recargar visualmente todo el árbol, aunque un número aislado resultaba difícil de interpretar fuera de contexto.
+Esta prueba ayuda a confirmar que la explicación principal debía concentrarse en la ventana informativa, donde los valores pueden acompañarse de texto y comparaciones visuales.
 
 
 \subsection{Gráficas y casos explicativos en la ventana}
 
-La ventana informativa evoluciona después de los primeros textos.
-A medida que el árbol crece y los pasos se vuelven más ricos, una única explicación en texto plano resulta insuficiente.
-El objetivo pasa a ser combinar texto y apoyo visual para que la decisión del algoritmo sea más fácil de seguir.
+La ventana informativa evoluciona a medida que los pasos del árbol se vuelven más complejos.
+Una explicación en texto plano resulta suficiente para los primeros casos, aunque se queda corta cuando el algoritmo compara varios atributos y escoge uno de ellos.
+El objetivo pasa entonces a combinar texto y apoyo visual, de forma que el usuario pueda ver la comparación en lugar de leer solo una lista de números.
 
-El cambio principal es introducir una gráfica de barras como la que se aprecia en la Figura \ref{fig:dtree_grafica_entropia}.
-La ventana pasa de una lista de valores a una comparación visual entre las opciones que el algoritmo está evaluando.
-Así es más sencillo ver cuál destaca y por qué se escoge una división determinada.
+El cambio principal es la incorporación de una gráfica de barras, mostrada en la Figura \ref{fig:dtree_grafica_entropia}.
+La gráfica representa la métrica calculada para cada atributo, basada en la entropía y utilizada por el algoritmo como ganancia de información.
+Esta representación permite comparar de un vistazo qué atributo reduce mejor la incertidumbre de los datos y por qué se utiliza para abrir las ramas del nodo actual.
 % https://rawcdn.githack.com/HectorAldao/visualizing_machine_learning/fff2fdaf1b89c4140cd4c9496a34d7446c30f061/docs/index.html
 
 \begin{figure}[hp!]
@@ -270,139 +290,132 @@ Así es más sencillo ver cuál destaca y por qué se escoge una división deter
   \label{fig:dtree_grafica_entropia}
 \end{figure}
 
-Para integrar esta gráfica, la ventana pasa a tener una estructura desplazable.
-Esto es necesario porque algunas explicaciones ocupan más espacio que otras.
-El usuario puede leer la primera parte del texto, observar la gráfica y continuar después con la explicación del resultado.
-De esta forma, la gráfica queda dentro del relato del paso actual.
+Para integrar la gráfica, la ventana se reorganiza como una zona desplazable con varios elementos.
+El texto se divide en dos partes: primero se presentan los datos que llegan al nodo, las etiquetas y los atributos disponibles; después se inserta la gráfica; al final se explica el atributo elegido y las ramas que se van a crear.
+Esta estructura evita que la gráfica aparezca como un elemento aislado y la sitúa dentro del relato del paso actual.
 
-Este cambio obliga también a preparar mejor la información que recibe la ventana.
-Los valores utilizados para la gráfica deben conservarse como datos numéricos, sin transformarlos desde el inicio en frases ya formateadas.
-Esta separación permite que la misma información sirva para explicar el paso con texto y para construir la representación visual.
+El cambio también modifica la forma en la que se preparan los datos explicativos.
+Los valores de la métrica dejan de generarse únicamente como frases ya formateadas y se conservan como números.
+La misma información puede usarse entonces para dos fines: construir el texto de la explicación y alimentar la gráfica de barras.
+Esta separación mantiene la ventana sincronizada con el cálculo real del algoritmo y evita duplicar la lógica de la métrica en la interfaz.
 
-En esta etapa se añade además un caso explicativo para los empates.
-Durante las pruebas aparece una situación en la que varias opciones pueden ser igual de buenas.
-Si la aplicación escoge una sin explicar nada, la decisión puede parecer arbitraria.
-Por eso se incorpora un texto específico que indica que hay varias alternativas equivalentes y que el algoritmo continúa con una de ellas.
+Durante las pruebas aparece un caso importante: varios atributos pueden obtener el mismo valor máximo de la métrica.
+Si la aplicación escoge uno de ellos sin explicar la situación, la decisión parece arbitraria.
+Para cubrir este caso se añade una explicación específica de empate.
+La ventana indica que hay varias alternativas equivalentes y que el algoritmo continúa con una de ellas para poder seguir construyendo el árbol.
 
-También se revisan los textos de las hojas.
-Las primeras frases están escritas pensando en ejemplos muy pequeños, donde a veces solo llega un dato a cada resultado final.
-Al probar conjuntos más variados, esa redacción deja de ser válida.
-Se sustituye por una explicación más general, capaz de describir tanto un único ejemplo como varios ejemplos que terminan en la misma clasificación.
+También se revisan los textos asociados a las hojas.
+Las primeras redacciones estaban pensadas para conjuntos muy pequeños, donde a veces solo llegaba un ejemplo a cada resultado final.
+Al probar datos más variados, se hizo necesario explicar hojas creadas a partir de varios ejemplos con la misma etiqueta y hojas creadas por mayoría.
+La ventana pasa así a describir el motivo de una clasificación final de forma más general, sin depender del tamaño exacto del subconjunto que llega a la rama.
 
-Este proceso se repite varias veces durante el desarrollo: al probar nuevos datos aparecen casos que la explicación inicial no cubre bien.
-Esos casos se van incorporando al discurso de la aplicación para que el usuario no tenga que interpretar silencios o comportamientos inesperados.
+Este proceso de ajuste se repite durante toda la fase del árbol.
+Cada nuevo conjunto de datos revela situaciones que la explicación inicial no cubría bien: ramas puras, atributos agotados, empates, varios ejemplos con la misma clasificación o decisiones que crean nodos pendientes.
+La ventana va incorporando esos casos para que el usuario no tenga que interpretar silencios de la interfaz.
 
 
 \subsection{Primer panel de selección de datos}
 
-Hasta este momento, los datos usados para entrenar el árbol están fijados dentro del propio proyecto.
-Esto es cómodo para las primeras pruebas, porque permite centrarse en el funcionamiento del algoritmo y de la interfaz.
-Con el tiempo, esta comodidad empieza a limitar la aplicación: el usuario necesita poder escoger con qué ejemplo trabajar.
+Hasta este momento, los datos de entrenamiento están definidos dentro del propio proyecto.
+Esta decisión facilita las primeras pruebas, porque permite repetir siempre el mismo ejemplo y centrar el esfuerzo en el algoritmo y la visualización.
+Cuando la construcción del árbol se estabiliza, esa limitación empieza a ser relevante, ya que es muy interesante que una herramienta didáctica permita observar cómo cambian las decisiones al cambiar los datos.
 
-El siguiente paso es separar la elección de los datos del entrenamiento.
-Primero se prueba un segundo conjunto preparado manualmente, con casos diseñados para forzar ramas más profundas y situaciones menos evidentes.
-Esta prueba ayuda a comprobar que el árbol también funciona con ejemplos distintos del primero y que los textos siguen teniendo sentido cuando los datos cambian.
+El primer paso para resolverlo es probar un segundo conjunto preparado manualmente.
+Este nuevo ejemplo incluye atributos y etiquetas distintos, y fuerza situaciones que el primer conjunto apenas mostraba: ramas más profundas, hojas por mayoría y casos con menos atributos disponibles.
+Gracias a esta prueba se comprueba que el algoritmo no depende de nombres concretos de columnas y que los textos de la ventana siguen siendo válidos con datos diferentes.
 
 A partir de ahí se crea el panel de selección que se aprecia en la Figura \ref{fig:dtree_dataset_selection_panel}.
-Su papel es guiar al usuario antes de empezar el entrenamiento: primero se elige una fuente de datos y después se inicia la construcción del árbol.
-La primera opción permite usar el conjunto de ejemplo incluido en la aplicación.
-La segunda opción abre la puerta a cargar un archivo CSV.
+Su función es guiar al usuario antes de iniciar el entrenamiento.
+Primero se elige una fuente de datos, después se valida la selección y finalmente se activa el entrenamiento.
+La primera opción permite usar un conjunto incluido en la aplicación, mientras que la segunda prepara la carga de archivos CSV.
 % https://rawcdn.githack.com/HectorAldao/visualizing_machine_learning/188dbce95d24c849a472f802326a333802c7c1a2/docs/index.html
 
 \begin{figure}[hp!]
   \centering
   \includegraphics[width=0.85\textwidth]{imaxes/dtree_dataset_selection_panel.png}
-  \caption{Menú que aparece tras seleccionar el modo algoritmico para seleccionar el dataset de entrenamiento.}
+  \caption{Menú que aparece tras seleccionar el modo algorítmico para escoger el conjunto de datos de entrenamiento.}
   \label{fig:dtree_dataset_selection_panel}
 \end{figure}
 
-La carga de archivos se introduce de forma progresiva.
-En una primera versión, el panel ya muestra la opción de CSV y todavía está incompleta.
-Después se añade la lectura del archivo y la comprobación de que la selección sea válida antes de permitir entrenar.
-También se añaden mensajes de éxito o error para que el usuario sepa si puede continuar.
+La aparición de este panel cambia el flujo del modo algorítmico.
+Antes, el usuario comenzaba el entrenamiento directamente.
+Con el panel, primero selecciona los datos, recibe un mensaje de confirmación o error y solo después puede avanzar por la construcción del árbol.
+La vista del árbol y la ventana informativa permanecen ocultas hasta que existe una selección válida, lo que evita mostrar una escena sin contexto.
 
-Con este panel, el flujo del modo algorítmico cambia de manera importante.
-Antes, el usuario pulsa directamente el botón de comenzar.
-Después de esta mejora, primero escoge los datos, luego confirma la selección y finalmente avanza por la construcción del árbol.
-Esta separación hace el proceso más comprensible, porque deja claro que el entrenamiento depende de los datos elegidos.
+La comunicación entre el panel de selección, el controlador y la vista se resuelve mediante señales.
+Cuando el usuario confirma un conjunto de datos, el panel emite la información seleccionada y el controlador inicia el algoritmo con esos datos y atributos.
+Esta solución encaja con la organización de Godot, ya que permite que componentes situados en partes distintas de la escena colaboren sin depender directamente unos de otros.
 
-La versión inicial del panel todavía es provisional.
-Quedan detalles por ajustar, como mejorar la detección de la respuesta esperada en archivos externos y pulir la transición entre la selección de datos, el árbol y la ventana informativa.
-Con esas limitaciones pendientes, el cambio marca un avance importante: el árbol deja de estar ligado a un único ejemplo y empieza a comportarse como una herramienta más flexible.
+La columna objetivo se generaliza en esta etapa.
+En las primeras pruebas, el algoritmo podía asumir un nombre fijo para la etiqueta de salida.
+Con datasets distintos, esa suposición deja de ser adecuada.
+La solución adoptada consiste en tratar como atributos las columnas indicadas por el panel y deducir la etiqueta como la columna restante.
+De esta forma, el árbol puede entrenarse con conjuntos que usen nombres como \textit{class}, \textit{label}, \textit{y} o una etiqueta en castellano, siempre que el conjunto tenga una única columna objetivo.
 
 
 \subsection{Carga de archivos y navegación por pasos}
 
-El primer ajuste tras introducir el panel de selección es hacer que los archivos CSV puedan usarse realmente para entrenar el árbol.
-Hasta ese momento, la carga de datos es una posibilidad visible en la interfaz y todavía necesita más trabajo para integrarse en el flujo completo.
-El problema principal está en distinguir qué parte del archivo describe cada ejemplo y qué parte contiene la respuesta que el árbol debe aprender.
+Tras introducir el panel, se completa la carga de CSV para que los archivos seleccionados puedan alimentar el entrenamiento.
+La lectura se plantea de forma práctica y limitada al tipo de datos que maneja esta versión del árbol: tablas simples, con una primera fila de cabeceras, varias filas de ejemplos y valores categóricos.
+La aplicación ignora filas vacías, transforma cada fila en un diccionario de valores y separa la columna objetivo del resto de atributos mediante nombres habituales o mediante la diferencia entre columnas de entrada y salida.
 
-Para resolverlo, la aplicación empieza a buscar automáticamente la columna que representa esa respuesta.
-La solución se plantea de forma práctica: se reconocen algunos nombres habituales y se separan del resto de características.
-Con ello, el usuario puede cargar archivos sencillos sin tener que modificar manualmente la estructura de los datos antes de entrenar.
+El panel informa al usuario del resultado de la carga.
+Si el archivo puede leerse y la estructura es válida, se activa el botón de entrenamiento.
+Si aparece un problema, se muestra un mensaje de error y se impide continuar.
+Esta comprobación es sencilla, aunque suficiente para evitar que el algoritmo empiece con datos incompletos o sin una etiqueta identificable.
 
-También se revisa la lectura del archivo para hacerla más fiable.
-El objetivo es aceptar tablas simples, con una primera fila de nombres y varias filas de ejemplos, ignorando las líneas vacías.
-Esta mejora sigue siendo limitada, ya que está pensada para datos formados por categorías y con una estructura clara.
-Con esa base basta para probar el árbol con ejemplos externos al proyecto.
+Con la selección de datos integrada, el entrenamiento gana una fase previa clara.
+El usuario escoge datos, confirma la selección, ve aparecer la escena del árbol y utiliza los botones de avance para construirlo.
+Esta separación hace explícita la dependencia entre el conjunto de entrada y la forma final del árbol.
 
-El flujo visual se ajusta a esta nueva forma de empezar.
-Al escoger el modo algorítmico, primero aparece el panel para seleccionar los datos.
-El árbol y la ventana informativa permanecen ocultos hasta que el usuario hace una selección válida.
-Así se evita mostrar una escena vacía o una explicación sin contexto.
-Una vez elegidos los datos, la vista pasa directamente al entrenamiento y la ventana indica que el siguiente paso consiste en avanzar por la construcción.
-
-En paralelo empieza a prepararse la navegación hacia atrás.
-Hasta ese momento, el entrenamiento solo permite avanzar.
-Esta limitación es poco adecuada para una herramienta educativa, porque el usuario puede querer revisar justo el paso anterior para entender por qué aparece una rama o una hoja.
-Por eso se añade la idea de un botón de paso previo, que se puede apreciar en la Figura \ref{} ¿?.
+El siguiente cambio importante es la navegación hacia atrás.
+Hasta entonces, el entrenamiento solo avanzaba, lo que obligaba a reiniciar el proceso si el usuario quería revisar una decisión anterior.
+Para una herramienta educativa, poder retroceder es especialmente útil: permite observar de nuevo por qué se abrió una rama, por qué apareció una hoja o qué atributo se escogió en un nodo interno.
+Por eso se añade el botón ``Paso previo'', visible en la Figura \ref{fig:dtree_paso_previo}.
 % https://rawcdn.githack.com/HectorAldao/visualizing_machine_learning/0d3c78342180c5160c83de556e611674a0bf84e0/docs/index.html
 
 \begin{figure}[hp!]
   \centering
   \includegraphics[width=0.85\textwidth]{imaxes/dtree_paso_previo.png}
-  \caption{Vista del árbol en la que ahora está el botón de retroceder al paso anterior.}
+  \caption{Vista del árbol con el botón para retroceder al paso anterior.}
   \label{fig:dtree_paso_previo}
 \end{figure}
 
-La primera versión de esta navegación hacia atrás solo prepara el camino.
-La aplicación empieza a recordar qué pasos ya están ejecutados y cuáles quedan pendientes, de forma que más adelante pueda deshacer una decisión concreta.
-Después se añade el botón ``Paso previo'' a la interfaz.
-Con él, la construcción del árbol deja de ser estrictamente lineal: el usuario puede avanzar con ``Siguiente paso'' y retroceder cuando necesite revisar el proceso.
+El retroceso se apoya en la misma idea que permite avanzar por pasos.
+El algoritmo mantiene una colección de contextos pendientes y otra de contextos ya ejecutados.
+Al avanzar, un contexto pasa de pendiente a ejecutado.
+Al retroceder, el último contexto ejecutado vuelve a quedar pendiente y la escena debe deshacer su efecto visual.
+Esta estructura evita reconstruir todo el árbol desde cero cada vez que se pulsa ``Paso previo''.
 
-Hacer que el retroceso funcione de verdad requiere pensar qué debe ocurrir con cada tipo de elemento del árbol.
-Si se deshace una decisión que abre varias ramas, también hay que retirar las partes que dependen de ella.
-Si el elemento deshecho es temporal, resulta más claro devolverlo a su estado pendiente que eliminarlo por completo.
-Si se vuelve al inicio, el árbol debe quedar vacío y sin conexiones antiguas en pantalla.
+Hacer que el retroceso sea coherente requiere tratar varios casos.
+Si se deshace un nodo interno, también deben retirarse los contextos hijos y los nodos visuales que dependen de él.
+Si se deshace una rama que estaba representada por un nodo pendiente, conviene restaurar ese estado provisional en vez de eliminar toda la indicación visual.
+Si el usuario retrocede hasta el inicio, la raíz desaparece y el árbol debe quedar vacío.
 
-Durante las pruebas aparece precisamente ese último problema.
-Al regresar al primer paso, algunas conexiones pueden permanecer visibles después de eliminar el árbol.
-La corrección consiste en actualizar también las ramas cuando el árbol queda vacío.
-Con esto, retroceder hasta el inicio deja la vista en un estado coherente y permite avanzar de nuevo sin arrastrar restos visuales de la ejecución anterior.
+Durante las pruebas se detecta un fallo en ese último caso.
+Al volver al paso cero, podían quedar conexiones visibles aunque los nodos ya se hubiesen eliminado.
+La corrección consiste en recalcular también las conexiones cuando el árbol queda sin raíz o sin nodos.
+Con ello, retroceder hasta el inicio deja la vista en un estado consistente y permite avanzar de nuevo sin restos visuales de la ejecución anterior.
 
 
 \subsection{Primera evaluación visual del árbol}
 
-El último avance de este tramo inicial es una primera versión del modo de evaluación.
-Hasta entonces, la aplicación muestra cómo se construye el árbol.
-Todavía falta enseñar cómo se usa ese árbol para clasificar ejemplos nuevos.
-La evaluación se plantea de forma visual: cada ejemplo de prueba se representa como un objeto que atraviesa el árbol siguiendo las decisiones ya aprendidas.
+El último avance de esta fase es la primera versión del modo de evaluación.
+Hasta este punto, la aplicación enseña cómo se construye el árbol.
+Queda por mostrar cómo se usa ese árbol ya entrenado para clasificar nuevos ejemplos.
+La evaluación se plantea de forma visual: cada dato de prueba se representa como una pieza que se desplaza por la estructura siguiendo las ramas aprendidas.
 
-Para introducir este modo se añaden controles específicos a la interfaz.
+Para introducir este modo se añaden nuevos controles al panel del algoritmo.
 Durante el entrenamiento, la evaluación permanece desactivada.
-Al terminar la construcción del árbol, el usuario puede pasar a una nueva fase y escoger datos para probar el resultado.
-Se reutiliza el panel de selección, ya que su papel sigue siendo el mismo: elegir con qué datos se va a trabajar.
+Cuando el árbol termina de construirse, el botón de avanzar se bloquea y se habilita la opción de evaluar.
+Al activarla, se reutiliza el panel de selección de datos para escoger un conjunto de prueba.
+Así se distinguen dos momentos: primero se seleccionan datos para entrenar y después se seleccionan datos para comprobar el árbol resultante.
 
-La aplicación empieza entonces a distinguir entre dos momentos.
-En el primero, los datos seleccionados sirven para construir el árbol.
-En el segundo, los datos seleccionados sirven para comprobar cómo clasifica el árbol ya entrenado.
-Esta separación todavía es provisional y permite probar el ciclo completo: entrenar primero y evaluar después.
-
-Para que la evaluación se entienda mejor, cada ejemplo se dibuja como una pieza sencilla que puede moverse por la escena.
-En la Figura \ref{fig:dtree_eval_data} se ve un ejemplo de esta representación.
+La evaluación utiliza una representación sencilla de cada ejemplo, como se aprecia en la Figura \ref{fig:dtree_eval_data}.
+Cada dato se dibuja como una pieza pequeña que entra en el árbol al pulsar el botón correspondiente.
+El recorrido se calcula leyendo el atributo de cada nodo interno y buscando la rama cuyo valor coincide con el dato evaluado.
+Cuando la pieza llega a una hoja, el recorrido termina y queda representada la clasificación obtenida.
 % https://rawcdn.githack.com/HectorAldao/visualizing_machine_learning/135fc3338e0bc7cfe3d4fb8dea5d09dbfad162e6/docs/index.html
-Al pulsar el botón correspondiente, una de esas piezas entra en el árbol y se desplaza desde la raíz hasta una hoja.
-En cada punto sigue la rama que coincide con sus características, hasta llegar a la clasificación final.
 
 \begin{figure}[hp!]
   \centering
@@ -411,15 +424,109 @@ En cada punto sigue la rama que coincide con sus características, hasta llegar 
   \label{fig:dtree_eval_data}
 \end{figure}
 
-Esta primera versión es básica.
-Los ejemplos se representan con formas simples y cada recorrido se ejecuta de una vez hasta el final.
-Las mejoras posteriores, como avanzar nivel a nivel, agrupar los ejemplos bajo las hojas o explicar cada decisión en la ventana informativa, quedan para una fase posterior.
-Esta prueba deja establecida la idea central del modo de evaluación: ver físicamente cómo un ejemplo recorre las decisiones del árbol hasta llegar a una clasificación.
+Para evitar dependencias innecesarias con el árbol en construcción, la evaluación toma una copia de la información relevante de los nodos visibles: posición, profundidad, atributo, etiqueta, valor de rama y padre.
+Con esa información puede mover los datos por la escena y decidir el siguiente nodo sin alterar la estructura entrenada.
+El movimiento entre nodos se anima, de forma que el usuario ve el recorrido como una secuencia de decisiones y no como un salto directo al resultado final.
 
-Con este conjunto de cambios queda casi completada la primera versión significativa del árbol de decisión.
-El proyecto pasa de dibujar elementos conectados a construir un árbol paso a paso, mostrar estados pendientes, animar la aparición de ramas y nodos, explicar las decisiones con texto y gráficos, cargar datos sencillos y ejecutar una primera evaluación visual.
-A partir de aquí, el desarrollo continúa añadiendo un nuevo algoritmo, la red neuronal, pero el 
+Esta primera versión del modo de evaluación es todavía básica.
+Los datos se representan con formas simples y cada pulsación deja caer un ejemplo que recorre el árbol hasta una hoja.
+Quedan para fases posteriores mejoras como agrupar visualmente los ejemplos bajo las hojas, enriquecer la explicación de cada decisión o introducir una navegación más detallada del recorrido.
+Aun así, esta prueba establece la idea central del modo de evaluación: mostrar físicamente cómo un ejemplo atraviesa las decisiones aprendidas hasta llegar a una clasificación.
+
+Con este conjunto de cambios queda completada la primera versión significativa del árbol de decisión.
+El proyecto pasa de dibujar elementos conectados a entrenar un árbol categórico paso a paso, mantener una estructura lógica sincronizada con la escena, mostrar ramas con valores, distinguir nodos internos, hojas y nodos pendientes, animar los cambios, explicar las decisiones con texto y gráficas, cargar datos sencillos, retroceder por la construcción y evaluar ejemplos nuevos de forma visual.
+A partir de aquí, el desarrollo continúa con el segundo algoritmo de la aplicación: la red neuronal.
 
 
 \section{Red neuronal: versión 0.3}
 
+% Esta sección debe cubrir el desarrollo funcional de la red neuronal.
+% Quedan fuera de este bloque los cambios posteriores de menú principal, responsive, zoom, fondo, reorganización visual general, renderizador LaTeX como infraestructura y otros pulidos de interfaz.
+
+
+\subsection{Primera arquitectura visual de la red}
+
+% Tratar el paso desde una aplicación centrada en el árbol de decisión a una segunda vista propia para redes neuronales.
+% Explicar la creación de las primeras escenas de red, capas y neuronas, junto con el acceso desde el menú principal como punto de entrada inicial.
+% Presentar la red visible como una estructura formada por capas colocadas en horizontal, neuronas como elementos interactivos y conexiones densas entre capas consecutivas.
+% Explicar que la red comienza con una capa de entrada y una capa de salida, y que las capas ocultas aparecen después al configurar la arquitectura.
+% Introducir la separación entre componentes visuales y estado lógico: la escena de la red representa lo que se ve, mientras que el estado interno conserva pesos, activaciones y estructura.
+% Mencionar que las conexiones no son líneas decorativas, ya que terminan representando pesos reales mediante color y grosor.
+
+
+\subsection{Configuración de la arquitectura y representación lógica}
+
+% Tratar la evolución del menú de creación de red, desde controles simples hasta un panel capaz de modificar entradas, salidas, capas ocultas, neuronas por capa y funciones de activación.
+% Explicar la introducción de límites globales para evitar arquitecturas demasiado grandes o estados inválidos durante la edición.
+% Presentar la convención de identificadores de capa: 0 para la entrada, enteros positivos para capas ocultas y -1 para la salida.
+% Explicar el uso de diccionarios temporales y definitivos en la representación lógica de la red, de forma que el usuario pueda editar una propuesta de arquitectura antes de aplicarla a la red visible.
+% Describir las matrices de pesos por capa como la estructura que conecta cada neurona de una capa con todas las neuronas de la anterior.
+% Incluir la selección de funciones de activación por capa y la necesidad de guardar esa configuración en el modelo lógico, además de reflejarla en el menú.
+% Mencionar las correcciones necesarias para mantener las conexiones densas sincronizadas al añadir o eliminar capas y neuronas, evitando enlaces obsoletos y errores por estados intermedios.
+
+
+\subsection{Selección de datos y restricciones de la red}
+
+% Tratar la introducción del panel de selección de dataset específico para redes neuronales.
+% Explicar que, en la red neuronal, el dataset condiciona directamente la arquitectura: fija cuántas neuronas de entrada hacen falta, cuántas salidas debe tener la red y qué activación debe usarse en la capa final.
+% Describir los datasets internos principales, como clasificación con Iris y regresión con Cultivos, solo como ejemplos de los dos tipos de problema soportados.
+% Explicar la carga de CSV y la selección explícita de columnas objetivo por parte del usuario.
+% Tratar la inferencia de tipos de columnas, la normalización de valores numéricos, la codificación de entradas categóricas y la codificación de etiquetas de clasificación en ids contiguos.
+% Explicar la restricción de la salida: softmax para clasificación e identidad para regresión.
+% Mencionar que las neuronas de entrada pasan a mostrar los nombres de los atributos y las de salida muestran las clases o variables objetivo, lo que conecta la arquitectura con el problema elegido.
+% Explicar por qué el flujo acaba situando primero la selección de dataset y después la creación de la red.
+
+
+\subsection{Algoritmo de entrenamiento incremental}
+
+% Tratar la aparición de AlgorithmNn como pieza separada de la vista, siguiendo la misma idea general que en el árbol: el algoritmo calcula y emite señales, y la escena representa los cambios.
+% Explicar qué recibe el algoritmo al configurarse: datos de entrenamiento, atributos de entrada, columnas objetivo, pesos, biases, activaciones, tasa de aprendizaje y función de pérdida.
+% Describir la máquina de estados del entrenamiento: carga de muestra, forward pass, comparación de salida con objetivo, retorno visual del error, backward pass y finalización.
+% Explicar los modos de avance disponibles: siguiente neurona, siguiente capa, siguiente dato y acabar entrenamiento.
+% Tratar los diccionarios internos que se conservan durante el entrenamiento, como salidas activadas, sumas ponderadas y deltas, sin bajar al detalle de cada función.
+% Mencionar que el entrenamiento se recorre muestra a muestra y que cada muestra reutiliza la misma red actualizada.
+% Explicar que, al terminar el entrenamiento, los controles de avance se desactivan y se habilita la evaluación de la red.
+
+
+\subsection{Forward pass y visualización de datos}
+
+% Tratar cómo se ejecuta el forward pass capa a capa y neurona a neurona.
+% Explicar el cálculo general de cada neurona: producto de entradas por pesos, suma del bias y aplicación de la función de activación.
+% Mencionar que softmax se calcula sobre el vector completo de la capa de salida, ya que cada componente depende del conjunto de valores de la capa.
+% Describir la caché de valores z y a para que la explicación y el backward pass usen los mismos resultados calculados en forward.
+% Explicar la visualización de valores de entrada mediante NnEvalData y NnEvalDataContainer: los valores aparecen junto a las neuronas de entrada y se animan hacia la red al comenzar el cálculo.
+% Tratar la aparición de las columnas visuales de salida y esperado, y cómo la salida se va completando a medida que se calculan las neuronas de la capa final.
+% Mencionar el resaltado de neuronas y capas como ayuda para seguir qué parte de la red se está evaluando en cada momento.
+
+
+\subsection{Cálculo del error y backward pass}
+
+% Tratar la fase intermedia en la que la salida calculada se compara con el objetivo esperado antes de iniciar la retropropagación.
+% Explicar que la columna de salida se desplaza y que la columna de esperado se transforma en error o delta visible, preparando el retorno del error por la red.
+% Describir el backward pass en orden inverso de capas, empezando por la salida y continuando por las capas ocultas.
+% Explicar los casos principales del cálculo de deltas: salida con softmax y entropía cruzada, salida con otras combinaciones, y capas ocultas que reciben el gradiente desde la capa siguiente.
+% Tratar la actualización de pesos mediante el gradiente calculado a partir del delta y la salida de la capa anterior.
+% Explicar la incorporación del bias y por qué es relevante para que la red pueda aprender desplazamientos y relaciones que no pasen por el origen.
+% Mencionar que los pesos actualizados se sincronizan de vuelta con la representación lógica y que las conexiones visuales cambian de color o grosor según el peso real.
+% Citar de forma breve las pruebas externas con Python como apoyo para comprobar convergencia y detectar la necesidad del bias, sin convertirlo en un apartado independiente.
+
+
+\subsection{Ventana informativa de la red neuronal}
+
+% Tratar la ventana informativa como el componente que traduce los cálculos internos de la red a texto y fórmulas comprensibles.
+% Explicar la información mostrada al pulsar una neurona: pesos y bias asociados.
+% Describir la explicación del forward pass: entradas, pesos, bias, suma ponderada, función de activación y salida obtenida.
+% Describir la explicación del cálculo de error y del backward pass: pérdida, derivadas, gradiente entrante, delta y actualización de pesos.
+% Mencionar que la ventana cambia la granularidad de la explicación según el modo de avance, pudiendo explicar una neurona, una capa completa o una muestra completa.
+% Explicar que la información llega desde el algoritmo mediante señales, lo que mantiene separadas la lógica matemática, la representación visual y la redacción de explicaciones.
+% Indicar que los detalles del renderizado de fórmulas pertenecen mejor a la fase posterior de mejoras de interfaz, salvo una mención mínima si hace falta justificar que se muestran fórmulas.
+
+
+\subsection{Inferencia con la red entrenada}
+
+% Tratar la transición desde entrenamiento a evaluación de la red.
+% Explicar que la inferencia reutiliza el mismo recorrido del forward pass, con la diferencia de que no calcula backward pass ni actualiza pesos.
+% Describir la selección de un dataset compatible para inferencia y las validaciones de atributos y salidas respecto al dataset usado en entrenamiento.
+% Mencionar que el algoritmo se configura en modo inferencia con tasa de aprendizaje nula y que al completar la capa de salida la muestra se da por finalizada.
+% Explicar que la visualización de entrada y salida se aprovecha también en inferencia, reforzando la idea de que evaluar una red entrenada consiste en propagar datos hacia delante.
+% Cerrar la subsección indicando que con esto queda completo el núcleo funcional de la red neuronal: crear arquitectura, ajustarla a los datos, entrenar paso a paso, explicar forward y backward, y evaluar mediante inferencia.
