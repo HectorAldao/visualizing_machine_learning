@@ -5,13 +5,13 @@
 %\textcolor{olive}{Buscar si cosas que se están explicando ya tienen nombre. Como las explicaciones visuales de la pizza y las fracciones}
 
 \lettrine{L}{a} inteligencia artificial y el aprendizaje automático se apoyan en algoritmos cuyo funcionamiento interno no siempre resulta fácil de visualizar.
-Conceptos como la selección de atributos en un árbol de decisión, el cálculo de una frontera de decisión o la actualización iterativa de los parámetros de un modelo pueden resultar abstractos cuando se estudian únicamente desde una formulación teórica.
+Conceptos como el cálculo de una frontera de decisión o la actualización iterativa de los parámetros de un modelo pueden resultar abstractos cuando se estudian únicamente desde una formulación teórica.
 Esta dificultad se acentúa en el aprendizaje profundo, donde intervienen elementos como funciones de activación, pesos, sesgos, propagación hacia delante, retropropagación o gradientes.
 Por ello, se han desarrollado recursos educativos orientados a hacer más comprensible el comportamiento de estos modelos mediante explicaciones visuales y simulaciones interactivas.
 En el contexto de este trabajo, resultan especialmente relevantes las herramientas que permiten comprender el proceso de aprendizaje de los modelos, la relación entre sus componentes internos y la forma en la que una decisión algorítmica se transforma en un resultado observable.
 
-Uno de los recursos divulgativos más conocidos para introducir las redes neuronales es la serie de Grant Sanderson ``Neural networks'' \cite{SandersonNeuralNetworksYoutube}.
-Esta serie fue publicada en el \textit{canal de YouTube} 3Blue1Brown.
+Uno de los recursos divulgativos más conocidos para introducir las redes neuronales es la serie de vídeos \textit{Neural networks} \cite{SandersonNeuralNetworksYoutube}.
+Esta fue publicada en el canal de YouTube \textit{3Blue1Brown}.
 Este proyecto cuenta también con una página web \cite{SandersonNeuralNetworks}, cuya principal aportación pedagógica es la posibilidad de interactuar con una red neuronal entrenada con el conjunto de datos MNIST \cite{MNIST}.
 La herramienta permite observar en tiempo real cómo la red reacciona a los cambios en el dato de entrada, representado mediante una superficie de dibujo en la que cada píxel se corresponde con una neurona de la capa de entrada, como se aprecia en la Figura \ref{fig:3blue1brown}.
 
@@ -29,8 +29,8 @@ El estudiante trabaja con una explicación limitada al conjunto MNIST y sin capa
 Esta restricción deja abierta la necesidad de recursos más activos, en los que sea posible analizar el efecto de cada decisión de diseño sobre el comportamiento de una red neuronal.
 
 Frente al formato audiovisual, existen herramientas que permiten manipular redes neuronales en tiempo real.
-Un ejemplo es ``A Neural Network Playground'', desarrollado por Daniel Smilkov y Shan Carter y publicado por TensorFlow~\cite{TensorFlowPlayground}.
-Esta aplicación permite configurar una red neuronal sencilla desde el navegador, seleccionar conjuntos de datos sintéticos, modificar hiperparámetros y observar cómo evoluciona la frontera de decisión durante el entrenamiento.
+Un ejemplo es \textit{A Neural Network Playground}~\cite{TensorFlowPlayground},
+una aplicación que permite configurar una red neuronal sencilla desde el navegador, seleccionar conjuntos de datos sintéticos, modificar hiperparámetros y observar cómo evoluciona la frontera de decisión durante el entrenamiento.
 En la Figura \ref{fig:tensorflowplayground} se puede visualizar la página web.
 
 %\textcolor{blue}{Yo le quitaría el apellido y lo dejaría como simuladores interactivos}
@@ -54,15 +54,15 @@ La herramienta se centra principalmente en la frontera de decisión y en la pér
 %\textcolor{blue}{Hoy estoy teniendo un día raro e igual es eso, pero me cuesta la vida entender este parrafo. Propongo: A diferencia de los recursos puramente expositivos, la relevancia de TensorFlow Playground reside en que conecta elementos habitualmente tratados de forma abstracta con consecuencias observables. Modificar directamente la arquitectura del modelo (número de capas y neuronas) o sus hiperparámetros (tasa de aprendizaje y regularización) altera de manera inmediata el proceso de ajuste. Este enfoque interactivo facilita que el estudiante relacione conceptos críticos como el sobreajuste, la generalización o la convergencia con resultados palpables.}
 
 Esta misma orientación hacia la experimentación aparece en herramientas centradas en arquitecturas más específicas.
-``GAN Lab'' permite experimentar en el navegador con redes generativas adversarias~\cite{GANLab}.
+\textit{GAN Lab}~\cite{GANLab} permite experimentar en el navegador con redes generativas adversarias.
 Este tipo de modelo introduce una dinámica de aprendizaje distinta a la de una red supervisada clásica, ya que enfrenta dos redes: un generador, que intenta producir muestras plausibles, y un discriminador, que intenta distinguir entre datos reales y generados.
 La aportación principal de GAN Lab es representar visualmente una interacción compleja como la de un par de redes adversarias.
 La herramienta permite observar cómo cambian las distribuciones generadas durante el entrenamiento y cómo la competencia entre generador y discriminador afecta al resultado.
 Desde el punto de vista educativo, esto resulta útil para explicar que existen modelos de aprendizaje profundo con objetivos y esquemas de aprendizaje diferentes.
 
-La limitación principal de GAN Lab, junto con la falta de detalle sobre ciertas operaciones internas, es que presupone una base de conocimiento mayor que la requerida para una introducción a las redes neuronales.
+La limitación principal de \textit{GAN Lab}, junto con la falta de detalle sobre ciertas operaciones internas, es que presupone una base de conocimiento mayor que la requerida para una introducción a las redes neuronales.
 Para comprender correctamente una GAN es necesario haber asimilado previamente ideas como función de pérdida, optimización, representación interna o entrenamiento iterativo.
-En consecuencia, GAN Lab es una herramienta valiosa para una fase posterior del aprendizaje, aunque no sustituye a una aplicación centrada en los fundamentos de una red neuronal básica.
+En consecuencia, \textit{GAN Lab} es una herramienta valiosa para una fase posterior del aprendizaje, aunque no sustituye a una aplicación centrada en los fundamentos de una red neuronal básica.
 
 %\textcolor{blue}{Duda, la límitación del anterior no se mantiene aquí?}\\
 %\textcolor{green}{Sí, sí que se mantiene. He puesto lo de "a parte de pecar de lo mismo que lo anterior"}
