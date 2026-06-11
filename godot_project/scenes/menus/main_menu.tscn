@@ -17,18 +17,12 @@ PanelContainer/styles/panel = SubResource("StyleBoxFlat_2o76q")
 
 [sub_resource type="LabelSettings" id="LabelSettings_ovrgc"]
 font_size = 40
-font_color = Color(0, 0, 0, 1)
-outline_size = 7
 
 [sub_resource type="LabelSettings" id="LabelSettings_2o76q"]
 font_size = 35
-font_color = Color(0, 0, 0, 1)
-outline_size = 7
 
 [sub_resource type="LabelSettings" id="LabelSettings_6bivr"]
-font_size = 30
-font_color = Color(0, 0, 0, 1)
-outline_size = 5
+font_size = 25
 
 [node name="MainMenu" type="Control" unique_id=807388]
 layout_mode = 3

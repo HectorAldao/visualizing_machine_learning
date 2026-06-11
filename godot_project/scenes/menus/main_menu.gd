@@ -51,7 +51,10 @@ func _on_start_button_pressed() -> void:
 			else:
 				get_tree().change_scene_to_file(Constants.SCENES.dtree_view)
 		2:
-			get_tree().change_scene_to_file(Constants.SCENES.nn_view)
+			if _is_horizontal():
+				get_tree().change_scene_to_file(Constants.SCENES.nn_view)
+			else:
+				get_tree().change_scene_to_file(Constants.SCENES.nn_view_vertical)
 		_:
 			# This shold not happen, because the button should be disabled
 			# if there is no selected algorithm. But in case it happended

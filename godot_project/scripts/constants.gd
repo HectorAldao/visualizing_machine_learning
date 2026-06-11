@@ -17,6 +17,7 @@ const SCENES: Dictionary[String, String] = {
 	"nn_eval_data":"uid://0nval2e1ex2v",
 
 	"nn_view": "uid://cxtlfe3b8dfux",
+	"nn_view_vertical": "res://scenes/views/nn_view/nn_view_vertical.tscn",
 	"layer": "uid://bs14tnn0hedwc",
 	"neuron": "uid://re6neyyt2frx",
 	"neuronsinlayer": "uid://e7nvan78e0pf",
