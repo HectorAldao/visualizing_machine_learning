@@ -5,10 +5,10 @@ En este capítulo se describe el proceso seguido para construir la aplicación.
 La explicación se plantea como una evolución por versiones.
 Comienza por comprobar que la idea es viable.
 Después se desarrolla el árbol de decisión, desde sus inicios hasta el resultado funcional con todas las características que se buscaban.
-Contitúa con el desarrollo de red neuronal, pasando por todas sus fases de creación y mejora.
+Continúa con el desarrollo de la red neuronal, pasando por todas sus fases de creación y mejora.
 Y termina con el pulido final de la interfaz y retoques a todas las características con las que cuenta el resultado final.
 
-\textcolor{olive}{aquí "característica" lo estoy traduciendo de "feature", creo q está bien pero me está sonando algo raro}
+\textcolor{olive}{aquí "característica" lo estoy traduciendo de "feature", creo q puede estar bien, me genera dudas porque me está sonando algo raro}
 
 \section{Prototipo: versión 0.1}
 
@@ -84,30 +84,27 @@ A partir de este punto, el reto pasa a consistir en conseguir que el árbol se c
 
 \subsection{Primera arquitectura del árbol}
 
-El primer cambio es separar la prueba visual inicial de una estructura preparada para crecer.
-El árbol tiene que convertirse en una vista capaz de representar tanto acciones del usuario como decisiones tomadas por el algoritmo.
+El primer cambio consiste en crear una nueva escena, dejando de lado la prueba visual inicial.
+Esta vista debe resolver un problema que se había dejado de lado para la prueba inicial: un árbol puede crecer hacia abajo y hacia los lados indefinidamente y con mucha rapidez.
+Si todo se coloca en una pantalla fija, una parte del contenido puede quedar fuera de la vista en cuanto aparecen varios niveles.
+Por esta razón se introduce por medio de un nodo especializado de Godot una zona desplazable, de forma que el usuario pueda mover la posición el árbol en pantalla cuando su tamaño exceda los límites de la misma.
 
-Para ello se mantiene el menú principal como entrada de la aplicación y se crea una vista específica para el árbol.
-Esta vista debe resolver un problema práctico desde el principio: un árbol puede crecer hacia abajo y hacia los lados con mucha rapidez.
-Si todo se coloca en una pantalla fija, una parte del contenido queda fuera de la vista en cuanto aparecen varios niveles.
-Por esta razón se introduce una zona desplazable, de forma que el usuario pueda moverse por el árbol cuando su tamaño aumente.
-
-También se revisa la forma de colocar los elementos.
-La versión inicial puede añadir hijos bajo un nodo y el resultado necesita más orden.
-Se adopta una distribución sencilla: los hijos se colocan por debajo de su padre y el padre queda centrado respecto a ellos.
+También hace falta revisar la forma en la que se distribuyen los nodos.
+La versión inicial puede añadir hijos bajo un nodo pero por cómo se distribuían los nodos en pantalla los nodos padre podían quedar mal distribuidos con respecto a los hijos.
+Para solucionar este inconveniente se adapató el código para que generara una distribución más clara a la vista: los hijos se colocan por debajo de su padre y el padre queda centrado respecto a ellos.
 Esta decisión busca mantener una lectura clara y estable cada vez que el árbol cambia.
 
-Otro aspecto importante es separar visualmente los elementos del árbol y las líneas que los unen.
-Esta separación hace que cada parte tenga una responsabilidad clara: unos elementos representan preguntas o resultados, y las líneas representan el camino seguido entre ellos.
-Gracias a esto, más adelante es más sencillo animar las ramas y mostrar sobre ellas el valor que conduce de un punto del árbol al siguiente.
+Otro aspecto importante de cara al cómo iba a avanzar el proyecto es separar a nivel lógico los nodos del árbol y las conexiones que los unen.
+Esto hace que cada parte tenga una responsabilidad clara: unos elementos representan preguntas o resultados, y las líneas representan el camino seguido entre ellos.
+Gracias a esto, más adelante se hizo más sencillo tanto animar las ramas como mostrar sobre ellas el valor que conduce de un punto del árbol al siguiente.
 
-En esta etapa se conserva también el modo manual.
-El objetivo principal es construir árboles de decisión, y el modo manual sigue siendo útil para probar la interfaz, comprobar el desplazamiento por la pantalla y detectar problemas de colocación sin depender todavía del algoritmo.
-
-El siguiente avance es preparar el modo automático.
+Con estas cuestiones cerradas, el siguiente avance es preparar el modo automático.
 En este modo, el usuario deja de añadir ramas a mano y pasa a controlar el avance del entrenamiento.
-La primera versión de esta interfaz es todavía muy simple, con botones en inglés, como se muestra en la Figura \ref{fig:dtree_view_start_next_english}.
-Esta pantalla introduce una idea que se mantiene durante todo el desarrollo: el algoritmo avanza al ritmo marcado por el usuario.
+La primera versión de esta interfaz es todavía muy simple, con botones con texto en inglés por convencionalismos del gremio, como se muestra en la Figura \ref{fig:dtree_view_start_next_english}.
+Esta pantalla introduce una idea importante que se mantiene durante todo el desarrollo: el algoritmo avanza al ritmo marcado por el usuario.
+Y para conseguirlo, el algoritmo se organiza de forma incremental.
+La construcción completa se reparte en pasos pequeños: se guarda el punto en el que se encuentra el proceso y se resuelve una parte cada vez que el usuario pulsa el botón de avanzar.
+Esta decisión es clave para el propósito educativo de la aplicación, porque permite observar cómo se forma el árbol pudiendo atender a los pásos que este mismo ejecuta.
 
 \begin{figure}[hp!]
   \centering
@@ -124,13 +121,15 @@ Esta pantalla introduce una idea que se mantiene durante todo el desarrollo: el 
   \label{fig:dtree_view_start_next_english}
 \end{figure}
 
-Para conseguirlo, el algoritmo se organiza de forma incremental.
-La construcción completa se reparte en pasos pequeños: se guarda el punto en el que se encuentra el proceso y se resuelve una parte cada vez que el usuario pulsa el botón de avanzar.
-Esta decisión es clave para el propósito educativo de la aplicación, porque permite observar cómo se forma el árbol paso a paso.
 
 La primera prueba de entrenamiento utiliza un conjunto de datos pequeño y controlado.
 Su objetivo es comprobar que el árbol se crea correctamente, que las ramas aparecen donde deben y que la interfaz se actualiza después de cada paso, como se aprecia en la Figura \ref{fig:dtree_view_start_next_english}.
+
 En esta fase, lo más difícil es coordinar tres niveles al mismo tiempo: el estado interno del algoritmo, la estructura del árbol y lo que el usuario ve en pantalla.
+La estructura del árbol y su representación ya eran un problema resulento en la primera iteración.
+Sin embargo, el reto añadido en este punto fue la sincronización de estas partes con el recién creado algoritmo.
+Para afrontar las dificultades de este sistema, el algoritmo y el árbol son dos entidades distintas.
+La primera le dicta a la segunda cómo modificarse en base a los resultados que dicten los cálculos.
 
 
 \subsection{Reorganización de la escena y primeros elementos explicativos}
@@ -417,6 +416,10 @@ Los ejemplos se representan con formas simples y cada recorrido se ejecuta de un
 Las mejoras posteriores, como avanzar nivel a nivel, agrupar los ejemplos bajo las hojas o explicar cada decisión en la ventana informativa, quedan para una fase posterior.
 Esta prueba deja establecida la idea central del modo de evaluación: ver físicamente cómo un ejemplo recorre las decisiones del árbol hasta llegar a una clasificación.
 
-Con este conjunto de cambios queda completada la primera versión significativa del árbol de decisión.
+Con este conjunto de cambios queda casi completada la primera versión significativa del árbol de decisión.
 El proyecto pasa de dibujar elementos conectados a construir un árbol paso a paso, mostrar estados pendientes, animar la aparición de ramas y nodos, explicar las decisiones con texto y gráficos, cargar datos sencillos y ejecutar una primera evaluación visual.
-A partir de aquí, el desarrollo continúa con mejoras de interfaz, persistencia, adaptación a móvil y explicaciones más completas, que se tratan en apartados posteriores para separar esta primera fase de las revisiones finales.
+A partir de aquí, el desarrollo continúa añadiendo un nuevo algoritmo, la red neuronal, pero el 
+
+
+\section{Red neuronal: versión 0.3}
+
