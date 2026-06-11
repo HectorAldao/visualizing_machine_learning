@@ -83,7 +83,7 @@ El siguiente avance fue preparar el modo automático. En este modo, el usuario d
 
 Para conseguirlo, el algoritmo se organizó de forma incremental. La construcción completa se repartía en pasos pequeños: se guardaba el punto en el que se encontraba el proceso y se resolvía una parte cada vez que el usuario pulsaba el botón de avanzar. Esta decisión fue clave para el propósito educativo de la aplicación, porque permitía observar cómo se forma el árbol paso a paso.
 
-La primera prueba de entrenamiento utilizó un conjunto de datos pequeño y controlado. Su objetivo era comprobar que el árbol se creaba correctamente, que las ramas aparecían donde debían y que la interfaz se actualizaba después de cada paso. En esta fase, lo más difícil fue coordinar tres niveles al mismo tiempo: el estado interno del algoritmo, la estructura del árbol y lo que el usuario veía en pantalla.
+La primera prueba de entrenamiento utilizó un conjunto de datos pequeño y controlado. Su objetivo era comprobar que el árbol se creaba correctamente, que las ramas aparecían donde debían y que la interfaz se actualizaba después de cada paso, como se aprecia en la Figura \ref{fig:dtree_view_start_next_english}. En esta fase, lo más difícil fue coordinar tres niveles al mismo tiempo: el estado interno del algoritmo, la estructura del árbol y lo que el usuario veía en pantalla.
 
 
 \subsection{Reorganización de la escena y primeros elementos explicativos}
@@ -149,6 +149,15 @@ Al introducir animaciones fue necesario revisar cómo se actualizaban las conexi
 Después se incorporó una idea pensada específicamente para explicar mejor el algoritmo: los nodos pendientes. Cuando el árbol decide dividir los datos por una característica, ya se sabe qué caminos van a aparecer y todavía falta conocer qué habrá al final de cada uno. Para representar ese estado intermedio, la aplicación empezó a mostrar nodos temporales con un aspecto distinto.
 
 Estos nodos pendientes indicaban que el algoritmo ya había abierto una rama y que aún quedaba por resolver su contenido. Más adelante, cuando esa parte del árbol se procesaba, el nodo temporal se transformaba en una decisión real o en una clasificación final. Esta transición también se animó para que el usuario percibiese el cambio y entendiese que se estaba completando una parte que antes solo estaba prevista.
+En la Figura \ref{fig:dtree_nodos_pendientes} se puede ver el aspecto estos nodos pendientes.
+% https://rawcdn.githack.com/HectorAldao/visualizing_machine_learning/55ac8e0508601cc7a456013159a7bfa8ba01f5d3/docs/index.html
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=0.85\textwidth]{imaxes/dtree_nodos_pendientes.png}
+  \caption{Entrenamiento del árbol en el que se aprecian los nodos pendientes.}
+  \label{fig:dtree_nodos_pendientes}
+\end{figure}
 
 Otra prueba temprana consistió en mostrar un valor numérico al pasar el cursor por ciertos nodos. La intención era permitir consultar información sobre la decisión tomada sin llenar todo el árbol de números. La idea funcionaba de forma limitada: un número aislado dice poco si no se explica qué significa. Por esa razón, más adelante esa información se trasladó hacia la ventana informativa, donde podía acompañarse de una explicación más completa.
 
@@ -157,7 +166,15 @@ Otra prueba temprana consistió en mostrar un valor numérico al pasar el cursor
 
 La ventana informativa evolucionó después de los primeros textos. A medida que el árbol crecía y los pasos se volvían más ricos, una única explicación en texto plano resultaba insuficiente. El objetivo pasó a ser combinar texto y apoyo visual para que la decisión del algoritmo fuese más fácil de seguir.
 
-El cambio principal fue introducir una gráfica de barras. La ventana pasó de una lista de valores a una comparación visual entre las opciones que el algoritmo estaba evaluando. Así era más sencillo ver cuál destacaba y por qué se escogía una división determinada.
+El cambio principal fue introducir una gráfica de barras como la que se aprecia en la Figura \ref{fig:dtree_grafica_entropia}. La ventana pasó de una lista de valores a una comparación visual entre las opciones que el algoritmo estaba evaluando. Así era más sencillo ver cuál destacaba y por qué se escogía una división determinada.
+% https://rawcdn.githack.com/HectorAldao/visualizing_machine_learning/fff2fdaf1b89c4140cd4c9496a34d7446c30f061/docs/index.html
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=0.85\textwidth]{imaxes/dtree_grafica_entropia.png}
+  \caption{Ventana informativa en la que se dibuja la gráfica de la entropía de cada atributo.}
+  \label{fig:dtree_grafica_entropia}
+\end{figure}
 
 Para integrar esta gráfica, la ventana pasó a tener una estructura desplazable. Esto era necesario porque algunas explicaciones ocupaban más espacio que otras. El usuario podía leer la primera parte del texto, observar la gráfica y continuar después con la explicación del resultado. De esta forma, la gráfica quedaba dentro del relato del paso actual.
 
@@ -176,7 +193,15 @@ Hasta este momento, los datos usados para entrenar el árbol estaban fijados den
 
 El siguiente paso fue separar la elección de los datos del entrenamiento. Primero se probó un segundo conjunto preparado manualmente, con casos diseñados para forzar ramas más profundas y situaciones menos evidentes. Esta prueba ayudó a comprobar que el árbol también funcionaba con ejemplos distintos del primero y que los textos seguían teniendo sentido cuando los datos cambiaban.
 
-A partir de ahí se creó un panel de selección. Su papel era guiar al usuario antes de empezar el entrenamiento: primero se elegía una fuente de datos y después se iniciaba la construcción del árbol. La primera opción permitía usar el conjunto de ejemplo incluido en la aplicación. La segunda opción abría la puerta a cargar un archivo CSV.
+A partir de ahí se creó el panel de selección que se aprecia en la Figura \ref{fig:dtree_dataset_selection_panel}. Su papel era guiar al usuario antes de empezar el entrenamiento: primero se elegía una fuente de datos y después se iniciaba la construcción del árbol. La primera opción permitía usar el conjunto de ejemplo incluido en la aplicación. La segunda opción abría la puerta a cargar un archivo CSV.
+% https://rawcdn.githack.com/HectorAldao/visualizing_machine_learning/188dbce95d24c849a472f802326a333802c7c1a2/docs/index.html
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=0.85\textwidth]{imaxes/dtree_dataset_selection_panel.png}
+  \caption{Menú que aparece tras seleccionar el modo algoritmico para seleccionar el dataset de entrenamiento.}
+  \label{fig:dtree_dataset_selection_panel}
+\end{figure}
 
 La carga de archivos se introdujo de forma progresiva. En una primera versión, el panel ya mostraba la opción de CSV y todavía estaba incompleta. Después se añadió la lectura del archivo y la comprobación de que la selección fuese válida antes de permitir entrenar. También se añadieron mensajes de éxito o error para que el usuario supiese si podía continuar.
 
@@ -195,7 +220,16 @@ También se revisó la lectura del archivo para hacerla más fiable. El objetivo
 
 El flujo visual se ajustó a esta nueva forma de empezar. Al escoger el modo algorítmico, primero aparecía el panel para seleccionar los datos. El árbol y la ventana informativa permanecían ocultos hasta que el usuario hacía una selección válida. Así se evitaba mostrar una escena vacía o una explicación sin contexto. Una vez elegidos los datos, la vista pasaba directamente al entrenamiento y la ventana indicaba que el siguiente paso consistía en avanzar por la construcción.
 
-En paralelo empezó a prepararse la navegación hacia atrás. Hasta ese momento, el entrenamiento solo permitía avanzar. Esta limitación era poco adecuada para una herramienta educativa, porque el usuario podía querer revisar justo el paso anterior para entender por qué había aparecido una rama o una hoja. Por eso se añadió la idea de un botón de paso previo.
+En paralelo empezó a prepararse la navegación hacia atrás. Hasta ese momento, el entrenamiento solo permitía avanzar. Esta limitación era poco adecuada para una herramienta educativa, porque el usuario podía querer revisar justo el paso anterior para entender por qué había aparecido una rama o una hoja. Por eso se añadió la idea de un botón de paso previo,
+que se puede apreciar en la Figura \ref{} ¿?.
+% https://rawcdn.githack.com/HectorAldao/visualizing_machine_learning/0d3c78342180c5160c83de556e611674a0bf84e0/docs/index.html
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=0.85\textwidth]{imaxes/dtree_paso_previo.png}
+  \caption{Vista del árbol en la que ahora está el botón de retroceder al paso anterior.}
+  \label{fig:dtree_paso_previo}
+\end{figure}
 
 La primera versión de esta navegación hacia atrás solo preparaba el camino. La aplicación empezó a recordar qué pasos ya se habían ejecutado y cuáles quedaban pendientes, de forma que más adelante pudiera deshacer una decisión concreta. Después se añadió el botón ``Paso previo'' a la interfaz. Con él, la construcción del árbol dejó de ser estrictamente lineal: el usuario podía avanzar con ``Siguiente paso'' y retroceder cuando necesitase revisar el proceso.
 
@@ -212,7 +246,17 @@ Para introducir este modo se añadieron controles específicos a la interfaz. Du
 
 La aplicación empezó entonces a distinguir entre dos momentos. En el primero, los datos seleccionados servían para construir el árbol. En el segundo, los datos seleccionados servían para comprobar cómo clasificaba el árbol ya entrenado. Esta separación todavía era provisional y permitía probar el ciclo completo: entrenar primero y evaluar después.
 
-Para que la evaluación se entendiese mejor, cada ejemplo se dibujó como una pieza sencilla que podía moverse por la escena. Al pulsar el botón correspondiente, una de esas piezas entraba en el árbol y se desplazaba desde la raíz hasta una hoja. En cada punto seguía la rama que coincidía con sus características, hasta llegar a la clasificación final.
+Para que la evaluación se entendiese mejor, cada ejemplo se dibujó como una pieza sencilla que podía moverse por la escena.
+En la Figura \ref{fig:dtree_eval_data} se ve un ejemplo de esta representación.
+% https://rawcdn.githack.com/HectorAldao/visualizing_machine_learning/135fc3338e0bc7cfe3d4fb8dea5d09dbfad162e6/docs/index.html
+Al pulsar el botón correspondiente, una de esas piezas entraba en el árbol y se desplazaba desde la raíz hasta una hoja. En cada punto seguía la rama que coincidía con sus características, hasta llegar a la clasificación final.
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=0.85\textwidth]{imaxes/dtree_eval_data.png}
+  \caption{Fase de evaluación en la que se ven dos datos ya clasificados y uno en proceso de clasificación.}
+  \label{fig:dtree_eval_data}
+\end{figure}
 
 Esta primera versión era básica. Los ejemplos se representaban con formas simples y cada recorrido se ejecutaba de una vez hasta el final. Las mejoras posteriores, como avanzar nivel a nivel, agrupar los ejemplos bajo las hojas o explicar cada decisión en la ventana informativa, quedaron para una fase posterior. Esta prueba dejó establecida la idea central del modo de evaluación: ver físicamente cómo un ejemplo recorre las decisiones del árbol hasta llegar a una clasificación.
 
