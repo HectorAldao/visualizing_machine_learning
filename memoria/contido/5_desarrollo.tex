@@ -248,7 +248,7 @@ En esta misma etapa se añaden los nodos pendientes.
 Cuando el algoritmo crea un nodo interno, ya conoce los valores del atributo elegido y, por tanto, las ramas que saldrán de él.
 Todavía queda por decidir si cada rama terminará en una hoja o en otro nodo de decisión.
 Hasta este momento, esta incertidumbre no era representada de ninguna forma, ya que las ramas no eran dibujadas hasta que el siguiente nodo era definido.
-Pero como el objetivo es representar la información que tiene el árbol en cada instante, se optó por crear nodos temporales con un texto provisional y un estilo propio que los diferencia.
+Como el objetivo es representar la información que tiene el árbol en cada instante, se optó por crear nodos temporales con un texto provisional y un estilo propio que los diferencia.
 \textcolor{olive}{aquí he metido un pretérito que no se si desentona mucho}
 Así las conexiones son dibujadas cuándo el algoritmo las tiene en cuenta.
 Los nodos pendientes muestran que una rama ya está prevista y que su contenido se resolverá en un paso posterior.
@@ -438,95 +438,366 @@ El proyecto pasa de dibujar elementos conectados a entrenar un árbol categóric
 A partir de aquí, el desarrollo continúa con el segundo algoritmo de la aplicación: la red neuronal.
 
 
+
 \section{Red neuronal: versión 0.3}
 
-% Esta sección debe cubrir el desarrollo funcional de la red neuronal.
-% Quedan fuera de este bloque los cambios posteriores de menú principal, responsive, zoom, fondo, reorganización visual general, renderizador LaTeX como infraestructura y otros pulidos de interfaz.
+Una vez completada la primera versión funcional del árbol de decisión, el proyecto incorpora el segundo modelo previsto: una red neuronal multicapa.
+El cambio de algoritmo también cambia el tipo de visualización necesaria.
+En el árbol, el entrenamiento construye una estructura que crece con nuevas ramas.
+En la red neuronal, la estructura se define antes de entrenar y el aprendizaje modifica valores numéricos asociados a esa estructura, principalmente pesos y sesgos.
+
+Por esta razón, el desarrollo de la red empieza por resolver un problema distinto al del árbol.
+Antes de mostrar el forward pass o el backward pass, hace falta que la aplicación pueda representar una arquitectura formada por capas, neuronas y conexiones densas, y que esa arquitectura tenga una correspondencia clara con el modelo lógico que se va a entrenar.
+La red visible debe servir como explicación y también como soporte para los cálculos posteriores: cada neurona debe poder resaltarse, cada conexión debe poder actualizarse y cada capa debe mantenerse sincronizada con los datos internos del modelo.
+
+La versión de red neuronal sigue la misma filosofía general que ya se había usado en el árbol de decisión.
+La lógica matemática, la representación visual y los elementos informativos se separan en componentes distintos, comunicados mediante señales.
+Esta separación permite que el algoritmo avance paso a paso y que la escena se limite a mostrar lo que ocurre en cada momento.
+El resultado de esta fase es el núcleo funcional de la red: una arquitectura configurable, adaptada al conjunto de datos, entrenable de forma incremental y capaz de mostrar tanto el flujo de datos hacia delante como el retorno del error.
 
 
 \subsection{Primera arquitectura visual de la red}
 
-% Tratar el paso desde una aplicación centrada en el árbol de decisión a una segunda vista propia para redes neuronales.
-% Explicar la creación de las primeras escenas de red, capas y neuronas, junto con el acceso desde el menú principal como punto de entrada inicial.
-% Presentar la red visible como una estructura formada por capas colocadas en horizontal, neuronas como elementos interactivos y conexiones densas entre capas consecutivas.
-% Explicar que la red comienza con una capa de entrada y una capa de salida, y que las capas ocultas aparecen después al configurar la arquitectura.
-% Introducir la separación entre componentes visuales y estado lógico: la escena de la red representa lo que se ve, mientras que el estado interno conserva pesos, activaciones y estructura.
-% Mencionar que las conexiones no son líneas decorativas, ya que terminan representando pesos reales mediante color y grosor.
+El primer paso consiste en añadir una vista propia para redes neuronales y conectarla con el menú principal.
+Hasta ese momento, la aplicación estaba organizada alrededor del árbol de decisión.
+La nueva vista introduce una escena independiente, con sus propios nodos de interfaz y sus propios objetos visuales, de manera que el desarrollo del segundo algoritmo no quede mezclado con la escena del árbol.
+
+La representación inicial de la red se construye a partir de tres elementos básicos: capas, neuronas y conexiones.
+Las capas se colocan en horizontal para mostrar el recorrido natural de los datos, desde la entrada situada a la izquierda hasta la salida situada a la derecha.
+Dentro de cada capa aparecen las neuronas, representadas como elementos interactivos.
+Esta elección permite que más adelante puedan resaltarse durante el entrenamiento o responder cuando el usuario las pulse para consultar información.
+
+La red parte de una estructura mínima formada por una capa de entrada y una capa de salida.
+Esta decisión proporciona una base visual sencilla sobre la que ir añadiendo complejidad.
+Las capas ocultas se incorporan después, cuando el menú de creación permite configurar la arquitectura.
+Desde esta primera fase, la vista se piensa como una estructura dinámica: el número de capas y neuronas puede cambiar, y la escena debe reconstruir las conexiones para seguir representando una red coherente.
+
+Las conexiones se dibujan entre capas consecutivas y siguen una estructura densa.
+Esto significa que cada neurona de una capa queda conectada con todas las neuronas de la capa siguiente.
+En una primera lectura, estas líneas sirven para mostrar la topología de la red.
+Más adelante pasan a representar también información del modelo, ya que su color y grosor dependen del peso asociado.
+Con ello, la escena deja preparado el vínculo entre la arquitectura visible y los valores numéricos que el entrenamiento modificará.
+
+Esta primera arquitectura también fija una separación importante entre la red que se ve y la red que se calcula.
+La escena de Godot se encarga de colocar capas, neuronas y conexiones, mientras que el estado lógico conserva la estructura y los valores que definen el modelo.
+Mantener ambas partes separadas evita que la visualización se convierta en la única fuente de información de la red.
+La vista puede reconstruirse, animarse o actualizar sus conexiones sin perder la referencia al modelo lógico que después usará el algoritmo de entrenamiento.
 
 
 \subsection{Configuración de la arquitectura y representación lógica}
 
-% Tratar la evolución del menú de creación de red, desde controles simples hasta un panel capaz de modificar entradas, salidas, capas ocultas, neuronas por capa y funciones de activación.
-% Explicar la introducción de límites globales para evitar arquitecturas demasiado grandes o estados inválidos durante la edición.
-% Presentar la convención de identificadores de capa: 0 para la entrada, enteros positivos para capas ocultas y -1 para la salida.
-% Explicar el uso de diccionarios temporales y definitivos en la representación lógica de la red, de forma que el usuario pueda editar una propuesta de arquitectura antes de aplicarla a la red visible.
-% Describir las matrices de pesos por capa como la estructura que conecta cada neurona de una capa con todas las neuronas de la anterior.
-% Incluir la selección de funciones de activación por capa y la necesidad de guardar esa configuración en el modelo lógico, además de reflejarla en el menú.
-% Mencionar las correcciones necesarias para mantener las conexiones densas sincronizadas al añadir o eliminar capas y neuronas, evitando enlaces obsoletos y errores por estados intermedios.
+Una vez definida la escena básica de la red, el siguiente paso consiste en permitir que el usuario configure su arquitectura desde la propia aplicación.
+Para ello se crea un menú de construcción que controla el número de neuronas de entrada, el número de neuronas de salida, la cantidad de capas ocultas, las neuronas de cada capa oculta y las funciones de activación asociadas.
+Con este panel, la arquitectura puede editarse dentro de unos límites conocidos.
+
+Estos límites son necesarios porque la escena tiene una finalidad didáctica y debe seguir siendo manejable.
+Se establecen máximos para el número de capas y para el número de neuronas por capa, de forma que la visualización no crezca hasta ocupar un espacio imposible de seguir.
+También se validan los valores introducidos en el menú antes de aplicarlos, ya que una cantidad negativa de neuronas, una capa vacía o una salida incompatible dejarían la red en un estado sin sentido para el algoritmo.
+
+La representación lógica de la red se organiza mediante una convención simple de identificadores.
+La capa de entrada usa el identificador 0, las capas ocultas usan enteros positivos y la capa de salida usa el identificador -1.
+Esta decisión permite tratar la salida como un elemento especial y, al mismo tiempo, recorrer las capas ocultas en orden natural.
+También facilita que las señales de Godot indiquen con claridad qué capa debe crear neuronas, eliminarlas, cambiar su activación o actualizar sus conexiones.
+
+El modelo lógico guarda algo más que el número de capas.
+También conserva las matrices de pesos que conectan cada capa con la anterior y la función de activación que debe aplicarse en cada una.
+Cada matriz se entiende desde la capa de destino: cada fila representa una neurona de esa capa y contiene los pesos que llegan desde todas las neuronas de la capa previa.
+Esta forma encaja con el cálculo posterior de una neurona, que toma sus entradas, las multiplica por sus pesos y obtiene un valor antes de aplicar la activación.
+
+La capa de entrada recibe un tratamiento distinto.
+Su función es mostrar los valores que entran en la red, por lo que no necesita una transformación aprendida como las capas posteriores.
+En la estructura lógica se mantiene como parte de la arquitectura para que la vista pueda dibujar sus neuronas y conectarlas.
+La parte entrenable empieza a partir de las capas que reciben esos valores.
+
+Durante la edición se diferencia entre el estado temporal y el estado definitivo de la red.
+El menú modifica una propuesta de arquitectura almacenada en diccionarios temporales, y esa propuesta se copia al modelo principal cuando la red se recarga o cuando comienza el entrenamiento.
+Esta separación evita que cada cambio parcial del formulario se convierta inmediatamente en la red que va a entrenarse.
+Esto se hizo como medida preventiva para asegurar la fluidez durante el proceso de creación de la red.
+%\textcolor{olive}{Aquí está bien lo de poner que finalmente se cambió?}
+
+La modificación de una capa obliga a actualizar otras partes de la red lógica.
+Si cambia el número de neuronas de una capa, también cambia el número de pesos que necesita la capa siguiente, ya que cada una de sus neuronas debe recibir una conexión desde todas las neuronas anteriores.
+Si se añade una capa oculta, se crean sus pesos iniciales y se reajusta la capa de salida para conectarse con la nueva capa previa.
+Si se elimina una capa, se borran sus datos y se vuelve a enlazar la salida con la última capa que permanece en la arquitectura.
+De esta forma, el modelo conserva siempre una topología densa y consistente.
+
+La representación visual debe seguir esos mismos cambios.
+Al añadir o eliminar capas y neuronas, el contenedor de conexiones densas recalcula los enlaces entre capas consecutivas y borra los que ya no son válidos.
+Esta corrección resulta importante cuando se insertan capas ocultas, porque podrían quedar conexiones antiguas entre entrada y salida, ajenas a la red real.
+Las actualizaciones se realizan de forma diferida cuando es necesario, para que Godot termine de crear o eliminar nodos antes de que las líneas intenten consultar sus posiciones.
+
+Con esta organización, la arquitectura editable queda conectada con una representación lógica estable.
+El menú actúa como interfaz de configuración, la escena traduce esa configuración a capas, neuronas y conexiones, y el modelo interno conserva los pesos y activaciones que después usará el algoritmo.
+Este paso deja preparada la red para una condición que se resuelve a continuación: adaptar automáticamente la arquitectura al conjunto de datos elegido.
 
 
 \subsection{Selección de datos y restricciones de la red}
 
-% Tratar la introducción del panel de selección de dataset específico para redes neuronales.
-% Explicar que, en la red neuronal, el dataset condiciona directamente la arquitectura: fija cuántas neuronas de entrada hacen falta, cuántas salidas debe tener la red y qué activación debe usarse en la capa final.
-% Describir los datasets internos principales, como clasificación con Iris y regresión con Cultivos, solo como ejemplos de los dos tipos de problema soportados.
-% Explicar la carga de CSV y la selección explícita de columnas objetivo por parte del usuario.
-% Tratar la inferencia de tipos de columnas, la normalización de valores numéricos, la codificación de entradas categóricas y la codificación de etiquetas de clasificación en ids contiguos.
-% Explicar la restricción de la salida: softmax para clasificación e identidad para regresión.
-% Mencionar que las neuronas de entrada pasan a mostrar los nombres de los atributos y las de salida muestran las clases o variables objetivo, lo que conecta la arquitectura con el problema elegido.
-% Explicar por qué el flujo acaba situando primero la selección de dataset y después la creación de la red.
+La configuración manual de la arquitectura necesita una restricción externa: el conjunto de datos.
+En una red neuronal, el problema que se quiere resolver determina el número de entradas y salidas.
+Cada atributo usado como entrada necesita una neurona en la primera capa, y cada clase o variable objetivo necesita una representación en la salida.
+Por este motivo se incorpora un panel de selección de datos específico para la red neuronal.
+
+El panel ofrece datasets internos y carga de ficheros CSV.
+Los datasets internos sirven para cubrir los dos tipos de problema principales que soporta la aplicación: clasificación y regresión.
+%Por ejemplo, un conjunto de datos como Iris permite trabajar con varias clases de salida, y un conjunto como Cultivos permite mostrar una salida numérica continua.
+Esta diferencia es relevante porque la red que se crea para cada caso tiene una capa final distinta.
+
+Cuando el usuario carga un CSV, la aplicación muestra las columnas disponibles y permite seleccionar explícitamente una o varias como objetivo.
+Esta decisión hace que la carga de datos sea más flexible que en las primeras pruebas, donde se dependía de nombres habituales como \textit{class}, \textit{label} o \textit{target}.
+El resto de columnas se tratan como atributos de entrada.
+
+El panel analiza los tipos de las columnas seleccionadas para decidir cómo preparar el problema.
+Si hay una única variable objetivo categórica, o una única variable entera tratada como clase, el problema se considera de clasificación.
+Si las variables objetivo son numéricas continuas, el problema se considera de regresión.
+Los valores numéricos se normalizan cuando es necesario y las entradas categóricas se convierten a valores enteros para que puedan circular por la red.
+En clasificación aparece otra transformación importante.
+Las etiquetas textuales, y también las clases enteras que no forman una secuencia compacta, se codifican en identificadores contiguos.
+Así, una clase con valor original 10 queda asignada a un identificador interno compacto.
+La red solo necesita una neurona por clase real, y la aplicación conserva un decodificador para volver a mostrar los nombres originales en la interfaz.
+Todos estos cambios sirven para procesar de forma sencilla el dataset para que se ajuste a las necesidades de entrada y salida de una red neuronal.
+
+Con la información del dataset se construye un conjunto de restricciones para el menú de creación.
+La capa de entrada queda fijada al número de atributos seleccionados.
+La capa de salida queda fijada al número de clases o variables objetivo.
+La función de activación de salida también queda determinada por el tipo de problema: softmax para clasificación e identidad para regresión.
+Cuando esta restricción llega al menú, el selector de activación final se ajusta y queda bloqueado para evitar una configuración incoherente.
+
+El resto de la arquitectura sigue siendo configurable.
+El usuario puede modificar capas ocultas, número de neuronas internas y funciones de activación intermedias, siempre dentro de los límites definidos en el menú.
+De esta manera, la aplicación combina libertad de experimentación con las restricciones mínimas que impone el dataset.
+La red creada siempre recibe vectores del tamaño correcto y produce salidas que pueden compararse con los valores esperados.
+
+La selección de datos también mejora la lectura de la red visible.
+Las neuronas de entrada pasan a mostrar los nombres de los atributos, y las neuronas de salida muestran las clases decodificadas o las variables objetivo de regresión.
+Esto conecta la arquitectura con el problema concreto que se está resolviendo.
+Con estos nombres, cada extremo del modelo representa información reconocible del dataset y la lectura de la arquitectura resulta más concreta.
+
+Con esta dependencia entre datos y arquitectura, el flujo de la vista se reorganiza.
+Primero se selecciona el dataset y después se crea la red.
+Este orden evita que el usuario configure una arquitectura incompatible y, al mismo tiempo, permite que el menú aparezca ya inicializado con las entradas, salidas y activación final adecuadas.
+Una vez fijadas estas condiciones, la red queda preparada para conectarse con el algoritmo de entrenamiento incremental.
 
 
 \subsection{Algoritmo de entrenamiento incremental}
 
-% Tratar la aparición de AlgorithmNn como pieza separada de la vista, siguiendo la misma idea general que en el árbol: el algoritmo calcula y emite señales, y la escena representa los cambios.
-% Explicar qué recibe el algoritmo al configurarse: datos de entrenamiento, atributos de entrada, columnas objetivo, pesos, biases, activaciones, tasa de aprendizaje y función de pérdida.
-% Describir la máquina de estados del entrenamiento: carga de muestra, forward pass, comparación de salida con objetivo, retorno visual del error, backward pass y finalización.
-% Explicar los modos de avance disponibles: siguiente neurona, siguiente capa, siguiente dato y acabar entrenamiento.
-% Tratar los diccionarios internos que se conservan durante el entrenamiento, como salidas activadas, sumas ponderadas y deltas, sin bajar al detalle de cada función.
-% Mencionar que el entrenamiento se recorre muestra a muestra y que cada muestra reutiliza la misma red actualizada.
-% Explicar que, al terminar el entrenamiento, los controles de avance se desactivan y se habilita la evaluación de la red.
+Una vez que la arquitectura y los datos están definidos, la red necesita una pieza encargada de ejecutar el entrenamiento.
+Esta responsabilidad se concentra en un nodo de algoritmo, separado de la vista.
+Su papel es equivalente al que cumplía el algoritmo del árbol: calcula el siguiente avance, actualiza el estado interno y emite señales para que la escena represente el cambio correspondiente.
+La vista, por tanto, puede centrarse en representar el avance recibido mediante señales.
+
+Al comenzar el entrenamiento, la vista configura el algoritmo con toda la información necesaria.
+Le entrega las filas del dataset, los atributos de entrada, las columnas objetivo, y toda la información de la arquitectura de la red.
+Con esa información, el algoritmo prepara el orden de capas, reinicia sus cursores internos y deja lista la primera muestra.
+El mismo mecanismo sirve más adelante para inferencia, con una configuración que recorre la red sin actualizar pesos.
+
+El entrenamiento se organiza como una máquina de estados.
+Primero se carga una muestra del dataset y se colocan sus valores de entrada en la capa inicial.
+Después se ejecuta el forward pass, se compara la salida calculada con el objetivo esperado, se prepara el retorno visual del error y se ejecuta el backward pass.
+Al terminar una muestra, el algoritmo avanza a la siguiente usando los pesos que acaban de actualizarse.
+Este recorrido se repite hasta completar los datos previstos o hasta que se alcanza el estado final.
+
+Para sostener este proceso, el algoritmo conserva varios diccionarios internos.
+Uno almacena las salidas activadas de cada capa, otro conserva las sumas ponderadas previas a la activación y otro guarda los deltas calculados durante la retropropagación.
+Estos valores tienen una doble utilidad: permiten continuar el cálculo sin repetir operaciones ya realizadas y sirven como fuente para las explicaciones mostradas en la ventana informativa.
+
+El avance incremental se controla desde un panel específico.
+El usuario puede avanzar una sola neurona, una capa completa, una muestra completa o terminar todo el entrenamiento de forma automática.
+Cada opción llama al mismo proceso interno, cambiando únicamente hasta dónde debe avanzar antes de devolver el control a la interfaz.
+Así se mantiene una única lógica de entrenamiento y se ofrecen varios niveles de detalle para observar el proceso.
+
+La ejecución por muestras resulta importante para que el aprendizaje sea visible.
+Cada fila del dataset produce una entrada concreta, una salida concreta, un error concreto y una actualización de pesos concreta.
+La siguiente fila ya utiliza la red modificada por la anterior, de modo que el usuario puede entender el entrenamiento como una sucesión de pequeñas correcciones sobre el mismo modelo.
+
+El algoritmo también coordina los elementos visuales que acompañan al entrenamiento.
+Al cargar una muestra, emite señales para preparar los valores de entrada y los valores esperados.
+Durante el forward pass y el backward pass, emite señales de neurona y de capa para resaltar la parte de la red que se está procesando.
+Cuando un peso cambia, emite la actualización correspondiente para que la conexión visual modifique su grosor o color según el nuevo valor.
+
+Al finalizar el entrenamiento, la interfaz cambia de estado.
+Los botones de avance quedan desactivados y se habilita la evaluación de la red.
+Este cierre evita que el usuario continúe modificando una ejecución ya terminada y marca el paso desde el aprendizaje hacia el uso del modelo entrenado.
 
 
 \subsection{Forward pass y visualización de datos}
 
-% Tratar cómo se ejecuta el forward pass capa a capa y neurona a neurona.
-% Explicar el cálculo general de cada neurona: producto de entradas por pesos, suma del bias y aplicación de la función de activación.
-% Mencionar que softmax se calcula sobre el vector completo de la capa de salida, ya que cada componente depende del conjunto de valores de la capa.
-% Describir la caché de valores z y a para que la explicación y el backward pass usen los mismos resultados calculados en forward.
-% Explicar la visualización de valores de entrada mediante NnEvalData y NnEvalDataContainer: los valores aparecen junto a las neuronas de entrada y se animan hacia la red al comenzar el cálculo.
-% Tratar la aparición de las columnas visuales de salida y esperado, y cómo la salida se va completando a medida que se calculan las neuronas de la capa final.
-% Mencionar el resaltado de neuronas y capas como ayuda para seguir qué parte de la red se está evaluando en cada momento.
+El forward pass es la fase en la que una muestra atraviesa la red desde la capa de entrada hasta la capa de salida.
+En la aplicación se ejecuta capa a capa y, dentro de cada capa, neurona a neurona.
+Esta granularidad permite que el usuario avance con mucho detalle y vea qué parte de la red participa en cada instante.
+
+Al cargar una muestra, el algoritmo extrae sus valores de entrada siguiendo el orden de los atributos seleccionados.
+Ese vector se guarda como salida de la capa de entrada, ya que la primera capa entrenable usa esos valores como datos de partida.
+En paralelo, la escena muestra esos valores junto a las neuronas de entrada mediante pequeños elementos visuales asociados a cada atributo.
+Al comenzar el cálculo, los valores se animan hacia la red y desaparecen, reforzando la idea de que la muestra entra en el modelo.
+
+Para cada neurona, el cálculo sigue la forma básica de una red densa.
+Primero se multiplican las salidas de la capa anterior por los pesos que llegan a la neurona y se suma el sesgo correspondiente.
+Este valor se representa como:
+\[
+z_i = \sum_j x_j w_{ij} + b_i
+\]
+Después se aplica la función de activación de la capa para obtener la salida de la neurona:
+\[
+a_i = f(z_i)
+\]
+Así, cada avance de neurona produce un valor intermedio que puede mostrarse y usarse como entrada de la capa siguiente.
+
+La activación softmax requiere un tratamiento especial.
+A diferencia de ReLU, sigmoide o identidad, cada componente de softmax depende del vector completo de valores de la capa.
+Por esta razón, cuando una capa usa softmax se calculan primero todos sus valores previos a la activación y después se aplica la función al conjunto completo.
+La explicación de la ventana informativa refleja este comportamiento para evitar presentar softmax como una operación independiente por neurona.
+
+Durante el forward pass se guardan dos tipos de valores por capa.
+Por un lado se conservan las sumas ponderadas, los valores \(z\), antes de aplicar la activación.
+Por otro lado se guardan las salidas activadas, los valores \(a\).
+Esta caché permite que la explicación, el cálculo del error y el backward pass usen exactamente los mismos resultados que se obtuvieron al propagar la muestra hacia delante.
+
+La salida de la red también se representa visualmente.
+Junto a la capa final aparece una columna de valores producidos por la red, y junto a ella aparece otra columna con el valor esperado.
+Cuando se calcula una neurona de salida, su valor se añade a la columna de salida mientras los valores anteriores de la misma muestra se mantienen visibles.
+De esta manera, la predicción se completa gradualmente y queda alineada con las clases o variables objetivo que se habían mostrado en la arquitectura.
+
+El resaltado de neuronas y capas acompaña todo el proceso.
+Cada vez que se evalúa una neurona, esta cambia de estado visual y la ventana informativa recibe los datos necesarios para explicar el cálculo.
+Al terminar una capa, el vector de salidas activadas pasa a ser la entrada de la capa siguiente.
+El usuario puede seguir así el recorrido completo de la muestra, desde los atributos iniciales hasta la predicción final.
+
+Cuando termina la capa de salida, el flujo se bifurca según el modo de ejecución.
+En entrenamiento, el algoritmo pasa a comparar la salida con el objetivo esperado.
+En inferencia, la muestra termina en ese punto, porque evaluar una red entrenada consiste únicamente en propagar los datos hacia delante.
 
 
 \subsection{Cálculo del error y backward pass}
 
-% Tratar la fase intermedia en la que la salida calculada se compara con el objetivo esperado antes de iniciar la retropropagación.
-% Explicar que la columna de salida se desplaza y que la columna de esperado se transforma en error o delta visible, preparando el retorno del error por la red.
-% Describir el backward pass en orden inverso de capas, empezando por la salida y continuando por las capas ocultas.
-% Explicar los casos principales del cálculo de deltas: salida con softmax y entropía cruzada, salida con otras combinaciones, y capas ocultas que reciben el gradiente desde la capa siguiente.
-% Tratar la actualización de pesos mediante el gradiente calculado a partir del delta y la salida de la capa anterior.
-% Explicar la incorporación del bias y por qué es relevante para que la red pueda aprender desplazamientos y relaciones que no pasen por el origen.
-% Mencionar que los pesos actualizados se sincronizan de vuelta con la representación lógica y que las conexiones visuales cambian de color o grosor según el peso real.
-% Citar de forma breve las pruebas externas con Python como apoyo para comprobar convergencia y detectar la necesidad del bias, sin convertirlo en un apartado independiente.
+Tras completar el forward pass, la red ya dispone de una salida para la muestra actual.
+El siguiente paso consiste en compararla con el objetivo esperado y convertir esa diferencia en una señal de error que pueda volver por la red.
+La interfaz representa esta transición desplazando la columna de salida y transformando la columna de valores esperados en valores de error o delta.
+Así se marca visualmente el cambio entre producir una predicción y corregir el modelo a partir de ella.
+
+El backward pass recorre las capas en orden inverso.
+Empieza en la capa de salida, donde se conoce la diferencia entre lo calculado y lo esperado, y continúa hacia las capas ocultas.
+En cada neurona se calcula un delta, que resume cómo debe cambiar esa neurona para reducir el error de la muestra.
+Ese delta se usa después para actualizar los pesos que llegan a la neurona.
+
+En la capa de salida hay varios casos.
+Cuando el problema es de clasificación y se usa softmax con entropía cruzada, se aplica la simplificación habitual:
+\[
+\delta = a - y
+\]
+donde \(a\) es la salida activada de la red e \(y\) es el vector esperado.
+Esta forma resulta más estable y más clara para mostrar en la explicación, ya que evita desarrollar todo el Jacobiano de softmax en el caso más frecuente de clasificación.
+
+Para otras combinaciones de pérdida y activación, el algoritmo calcula primero el gradiente de la pérdida respecto a la salida activada.
+Después lo multiplica por la derivada local de la función de activación.
+En términos generales, el cálculo queda expresado como:
+\[
+\delta_i = \frac{\partial L}{\partial a_i} f'(z_i)
+\]
+Con esto, la salida genera el primer conjunto de deltas que iniciará la retropropagación.
+
+Las capas ocultas reciben el error de la capa siguiente.
+Para cada neurona oculta se calcula cuánto ha contribuido a los deltas posteriores, ponderando esos deltas con los pesos de salida de la neurona.
+Después se multiplica el resultado por la derivada de su propia activación.
+La idea que se muestra al usuario es que una neurona oculta se corrige según su influencia en las neuronas que vienen después.
+
+Una vez calculado el delta de una neurona, se actualizan sus pesos.
+El gradiente de cada peso se obtiene multiplicando el delta por la salida de la neurona correspondiente en la capa anterior:
+\[
+\frac{\partial L}{\partial w_{ij}} = \delta_i a_j
+\]
+El nuevo peso se calcula restando a su valor actual una parte de ese gradiente, controlada por la tasa de aprendizaje:
+\[
+w_{ij} = w_{ij} - \eta \delta_i a_j
+\]
+
+En esta etapa también se incorpora el sesgo de cada neurona.
+El sesgo se actualiza con el propio delta, ya que puede interpretarse como un peso conectado a una entrada constante de valor 1:
+\[
+b_i = b_i - \eta \delta_i
+\]
+Su inclusión fue importante para que la red pudiera aprender desplazamientos y relaciones que no pasan necesariamente por el origen.
+Las pruebas externas con scripts de Python y una red equivalente en PyTorch ayudaron a comprobar este comportamiento en datasets sintéticos sencillos.
+
+Cada actualización se sincroniza con la representación lógica de la red.
+Los pesos y sesgos modificados se copian de vuelta al modelo compartido, y cada peso emite una señal de actualización.
+El contenedor de conexiones recibe esa señal y redibuja la línea correspondiente con el color y grosor derivados del nuevo valor.
+De esta manera, el backward pass no queda reducido a un cálculo interno: también se observa cómo el modelo cambia visualmente mientras aprende.
+
+Al completar la última capa oculta, la muestra queda terminada.
+El algoritmo guarda la información necesaria para explicar el paso, prepara la siguiente fila del dataset y repite el proceso con los pesos ya actualizados.
+El entrenamiento queda así estructurado como una secuencia de predicciones, errores y correcciones acumuladas sobre la misma red.
 
 
 \subsection{Ventana informativa de la red neuronal}
 
-% Tratar la ventana informativa como el componente que traduce los cálculos internos de la red a texto y fórmulas comprensibles.
-% Explicar la información mostrada al pulsar una neurona: pesos y bias asociados.
-% Describir la explicación del forward pass: entradas, pesos, bias, suma ponderada, función de activación y salida obtenida.
-% Describir la explicación del cálculo de error y del backward pass: pérdida, derivadas, gradiente entrante, delta y actualización de pesos.
-% Mencionar que la ventana cambia la granularidad de la explicación según el modo de avance, pudiendo explicar una neurona, una capa completa o una muestra completa.
-% Explicar que la información llega desde el algoritmo mediante señales, lo que mantiene separadas la lógica matemática, la representación visual y la redacción de explicaciones.
-% Indicar que los detalles del renderizado de fórmulas pertenecen mejor a la fase posterior de mejoras de interfaz, salvo una mención mínima si hace falta justificar que se muestran fórmulas.
+La red neuronal necesita una ventana informativa más rica que la del árbol, porque el aprendizaje depende de operaciones numéricas encadenadas.
+Ver una neurona resaltada o una conexión cambiar de grosor ayuda a seguir el proceso.
+La ventana completa esa representación al explicar qué cálculo acaba de producir cada cambio.
+Para ello, recibe datos internos del algoritmo y los convierte en texto y fórmulas comprensibles.
+
+La ventana se mantiene separada del algoritmo y de la escena visual.
+El algoritmo emite señales con la información del paso actual, y la ventana decide cómo presentarla.
+Esta organización permite que el cálculo siga estando en la clase de entrenamiento, que la red visible se centre en resaltar neuronas y conexiones, y que la explicación textual evolucione sin mezclar responsabilidades.
+
+Una primera utilidad de la ventana aparece al pulsar una neurona.
+En ese caso se muestran los pesos que llegan a esa neurona y su sesgo asociado.
+Esta consulta manual permite inspeccionar el estado del modelo durante el entrenamiento.
+Si el usuario deselecciona la neurona, la ventana recupera la explicación anterior para no perder el contexto del paso que se estaba visualizando.
+
+Durante el forward pass, la ventana explica el cálculo de la neurona resaltada.
+Muestra las entradas recibidas, los pesos utilizados, el sesgo, la suma ponderada y la salida tras aplicar la función de activación.
+La explicación sigue la misma estructura matemática que usa el algoritmo:
+\[
+z = xW + b, \qquad a = f(z)
+\]
+En el caso de una neurona concreta, esa expresión se desarrolla con los valores de entrada y pesos correspondientes.
+
+La ventana también puede explicar una capa completa.
+Cuando el avance se realiza por capas, la explicación pasa de una operación escalar a una operación matricial.
+Esto ayuda a relacionar el cálculo neurona a neurona con la formulación habitual de una red neuronal, donde todas las salidas de una capa pueden obtenerse a partir de un vector de entrada, una matriz de pesos y un vector de sesgos.
+Si la activación es softmax, el texto aclara que la función se aplica al vector completo de la capa.
+
+En la fase de error, la ventana muestra la comparación entre salida y objetivo esperado.
+Indica el tipo de pérdida usado, el valor de la pérdida y los deltas que iniciarán la retropropagación.
+Esta explicación actúa como puente entre el forward pass y el backward pass: primero se ve qué ha producido la red, después se explica cómo ese resultado se transforma en una señal de corrección.
+
+Durante el backward pass, la ventana adapta el texto al tipo de capa que se está procesando.
+En la salida puede mostrar la simplificación de softmax con entropía cruzada, o la combinación de derivada de pérdida y derivada de activación en otros casos.
+En las capas ocultas explica el gradiente entrante como la suma de contribuciones procedentes de la capa siguiente.
+Después muestra cómo ese delta genera gradientes de pesos y cómo esos gradientes modifican los parámetros.
+
+La granularidad de la explicación cambia con el modo de avance elegido por el usuario.
+Si se avanza neurona a neurona, la ventana se centra en una operación pequeña.
+Si se avanza por capas, resume el cálculo de toda la capa.
+Si se avanza una muestra completa, la ventana puede resumir el dato procesado, su salida, el error y la actualización realizada.
+Así, la misma infraestructura permite observar el entrenamiento con distintos niveles de detalle.
+
+Las fórmulas pueden mostrarse como texto plano o con un renderizado matemático más elaborado.
+Ese soporte pertenece en buena medida a las mejoras de interfaz posteriores, por lo que aquí lo relevante es su papel didáctico: acompañar cada paso con una representación simbólica del cálculo.
+Con la ventana informativa, la red combina la animación de valores con el razonamiento matemático que justifica cada cambio del modelo.
 
 
 \subsection{Inferencia con la red entrenada}
 
-% Tratar la transición desde entrenamiento a evaluación de la red.
-% Explicar que la inferencia reutiliza el mismo recorrido del forward pass, con la diferencia de que no calcula backward pass ni actualiza pesos.
-% Describir la selección de un dataset compatible para inferencia y las validaciones de atributos y salidas respecto al dataset usado en entrenamiento.
-% Mencionar que el algoritmo se configura en modo inferencia con tasa de aprendizaje nula y que al completar la capa de salida la muestra se da por finalizada.
-% Explicar que la visualización de entrada y salida se aprovecha también en inferencia, reforzando la idea de que evaluar una red entrenada consiste en propagar datos hacia delante.
-% Cerrar la subsección indicando que con esto queda completo el núcleo funcional de la red neuronal: crear arquitectura, ajustarla a los datos, entrenar paso a paso, explicar forward y backward, y evaluar mediante inferencia.
+Al terminar el entrenamiento, la aplicación habilita la evaluación de la red.
+Esta fase permite comprobar cómo se comporta el modelo entrenado con datos compatibles, usando el mismo tipo de visualización que se había preparado durante el aprendizaje.
+El cambio de modo es importante porque la red pasa de ajustar sus parámetros a aplicar los parámetros que ya ha aprendido.
+
+La inferencia reutiliza el recorrido del forward pass.
+Cada muestra se carga, sus valores aparecen junto a la capa de entrada y después se propagan por las capas hasta producir una salida.
+La diferencia principal está en que el algoritmo se configura con tasa de aprendizaje nula y con el modo de inferencia activado.
+Cuando se completa la capa de salida, la muestra se da por finalizada: no se calcula retorno del error ni se actualizan pesos o sesgos.
+
+Antes de ejecutar la inferencia, la aplicación valida el dataset elegido para evaluar.
+Debe tener los mismos atributos de entrada que el dataset usado en entrenamiento, las mismas salidas esperadas y el mismo orden de columnas.
+Esta comprobación evita alimentar la red con vectores que tengan una estructura distinta a la que aprendió.
+Sin esa validación, una neurona de entrada podría recibir un atributo diferente al que representa su peso entrenado.
+
+La visualización de datos se aprovecha también en este modo.
+Los valores de entrada vuelven a situarse junto a sus neuronas, se animan hacia la red y la columna de salida se completa a medida que avanza el cálculo.
+Al no haber backward pass, la evaluación se entiende como una lectura directa del modelo: se introduce una muestra y se observa qué salida produce.
+
+Con esta fase queda completo el núcleo funcional de la red neuronal dentro de la aplicación.
+La herramienta permite escoger datos, crear una arquitectura coherente con ellos, entrenarla paso a paso, mostrar el forward pass, calcular y explicar el backward pass, actualizar los pesos de forma visible y evaluar la red entrenada mediante inferencia.
+Las mejoras posteriores se centran en pulir la interfaz general, adaptar mejor la vista a distintos tamaños y mejorar la presentación visual, partiendo ya de una red funcional y explicable.
