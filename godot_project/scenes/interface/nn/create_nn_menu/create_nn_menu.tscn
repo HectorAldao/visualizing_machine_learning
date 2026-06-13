@@ -18,6 +18,12 @@ layout_mode = 2
 size_flags_horizontal = 8
 text = "Cargar Red"
 
+[node name="NetworkLoadStatusLabel" type="Label" parent="VBoxContainer"]
+visible = false
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 3
+
 [node name="NeuronsIn" type="HBoxContainer" parent="VBoxContainer" unique_id=305446342]
 layout_mode = 2
 size_flags_horizontal = 0

@@ -3,8 +3,10 @@ extends PanelContainer
 
 @onready var vboxcont: VBoxContainer = $VBoxContainer
 @onready var new_neurons_layer: HBoxContainer = $VBoxContainer/NewNeuronsLayer
+@onready var network_load_status_label: Label = $VBoxContainer/NetworkLoadStatusLabel
 
 var nn_restr_dict: Dictionary[int, int]
+var _web_nn_callback: Variant
 
 var textedit_in: TextEdit
 var textedit_out: TextEdit
@@ -18,6 +20,7 @@ func _ready() -> void:
 	# When this signal is emited, the dictionary with the restrictions is saved
 	# on the nn menu for it to be used in the function "_check_wanted"
 	SignalsObserver.establish_nn_dset_restrictions.connect(_on_restrictions_set)
+	SignalsObserver.load_nn.connect(_load_network)
 
 	for c in vboxcont.get_children():
 
@@ -69,6 +72,197 @@ func _on_button_pressed(which: String) -> void:
 			SignalsObserver.reload_nn.emit()
 			SignalsObserver.train_nn.emit()
 			visible = false			#print(Variables.nn.nn_tmp_dict)  #debug
+
+
+func _load_network() -> void:
+	if OS.has_feature("web") and Engine.has_singleton("JavaScriptBridge"):
+		_load_network_from_browser()
+		return
+
+	var file_dialog := FileDialog.new()
+	file_dialog.access = FileDialog.ACCESS_FILESYSTEM
+	file_dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILE
+	file_dialog.filters = PackedStringArray(["*.onnx, *.nnef ; Neural Network Files"])
+
+	if "use_native_dialog" in file_dialog:
+		file_dialog.use_native_dialog = true
+
+	file_dialog.file_selected.connect(func(file_path: String):
+		_import_network(file_path)
+		file_dialog.queue_free()
+	)
+
+	file_dialog.canceled.connect(func():
+		file_dialog.queue_free()
+	)
+
+	add_child(file_dialog)
+	file_dialog.popup_centered_ratio(0.4)
+
+
+func _load_network_from_browser() -> void:
+	var js_bridge = Engine.get_singleton("JavaScriptBridge")
+	_web_nn_callback = js_bridge.create_callback(_on_web_network_loaded)
+	js_bridge.get_interface("window").godotNnUploadCallback = _web_nn_callback
+
+	js_bridge.eval(
+		"""
+		(function () {
+			const input = document.createElement("input");
+			input.type = "file";
+			input.accept = ".onnx,.nnef";
+			input.style.display = "none";
+			input.addEventListener("change", function () {
+				const file = input.files && input.files[0];
+				if (!file) {
+					input.remove();
+					return;
+				}
+				const reader = new FileReader();
+				reader.onload = function (event) {
+					window.godotNnUploadCallback(event.target.result, file.name);
+					input.remove();
+				};
+				reader.onerror = function () {
+					window.godotNnUploadCallback("", file.name, "No se pudo leer el archivo.");
+					input.remove();
+				};
+				reader.readAsText(file);
+			});
+			document.body.appendChild(input);
+			input.click();
+		})();
+		""",
+		true
+	)
+
+
+func _on_web_network_loaded(args: Array) -> void:
+	if args.size() >= 3 and not str(args[2]).is_empty():
+		_show_network_load_error(str(args[2]))
+		return
+
+	if args.size() < 2 or str(args[0]).is_empty() or str(args[1]).is_empty():
+		_show_network_load_error("No se seleccionó ninguna red.")
+		return
+
+	var display_name := str(args[1])
+	var extension := display_name.get_extension().to_lower()
+	var temp_path := "user://selected_network.%s" % extension
+	var file := FileAccess.open(temp_path, FileAccess.WRITE)
+	if file == null:
+		_show_network_load_error("Error preparando la red: %d" % FileAccess.get_open_error())
+		return
+
+	file.store_string(str(args[0]))
+	file.close()
+	_import_network(temp_path, display_name)
+
+
+func _import_network(file_path: String, display_name: String = "") -> void:
+	var extension := file_path.get_extension().to_lower()
+	var result: Dictionary
+
+	match extension:
+		"onnx":
+			result = ONNXImporter.new().import_network(file_path)
+		"nnef":
+			result = NNEFImporter.new().import_network(file_path)
+		_:
+			_show_network_load_error("Formato de red no soportado: .%s" % extension)
+			return
+
+	if not result.get("ok", false):
+		_show_network_load_error(str(result.get("message", "No se pudo cargar la red.")))
+		return
+
+	var imported_weights := _to_typed_weight_dict(result.get("weights", {}))
+	var restriction_error := _get_network_restriction_error(imported_weights)
+	if not restriction_error.is_empty():
+		_show_network_load_error(restriction_error)
+		return
+
+	Variables.nn.nn_tmp_dict = imported_weights
+	Variables.nn.nn_func_tmp_dict = _to_typed_activation_dict(result.get("activations", {}))
+	var imported_biases: Dictionary = result.get("biases", {})
+	if imported_biases.is_empty():
+		Variables.nn.reset_biases_tmp_to_random()
+	else:
+		Variables.nn.nn_bias_tmp_dict = _to_typed_bias_dict(imported_biases)
+	if not Variables.nn.nn_func_tmp_dict.has(-1):
+		Variables.nn.nn_func_tmp_dict[-1] = Constants.ACT_FUNCS.identity
+
+	if Variables.nn.nn_func_tmp_dict.has(-1):
+		var output_activation_index := optionbutton_act_func_out.get_item_index(Variables.nn.nn_func_tmp_dict[-1])
+		if output_activation_index >= 0:
+			optionbutton_act_func_out.select(output_activation_index)
+
+	SignalsObserver.reload_nn.emit.call_deferred()
+
+	if display_name.is_empty():
+		display_name = file_path.get_file()
+	_show_network_load_success("Red cargada correctamente: %s" % display_name)
+
+
+func _get_network_restriction_error(imported_weights: Dictionary[int, Array]) -> String:
+	if nn_restr_dict.has(0):
+		if not imported_weights.has(0):
+			return "La red cargada no contiene capa de entrada."
+
+		var expected_inputs: int = nn_restr_dict[0]
+		var imported_inputs := imported_weights[0].size()
+		if imported_inputs != expected_inputs:
+			return "La red cargada tiene %d neuronas de entrada, pero el dataset requiere %d." % [imported_inputs, expected_inputs]
+
+	if nn_restr_dict.has(-1):
+		if not imported_weights.has(-1):
+			return "La red cargada no contiene capa de salida."
+
+		var expected_outputs: int = nn_restr_dict[-1]
+		var imported_outputs := imported_weights[-1].size()
+		if imported_outputs != expected_outputs:
+			return "La red cargada tiene %d neuronas de salida, pero el dataset requiere %d." % [imported_outputs, expected_outputs]
+
+	return ""
+
+
+func _show_network_load_error(message: String) -> void:
+	_show_network_load_status(message, true)
+
+
+func _show_network_load_success(message: String) -> void:
+	_show_network_load_status(message, false)
+
+
+func _show_network_load_status(message: String, is_error: bool) -> void:
+	network_load_status_label.text = message
+	network_load_status_label.modulate = Color(1.0, 0.25, 0.25) if is_error else Color(0.25, 0.85, 0.35)
+	network_load_status_label.visible = true
+	if is_error:
+		push_error(message)
+	else:
+		print("[LOG] %s" % message)
+
+
+func _to_typed_weight_dict(source: Dictionary) -> Dictionary[int, Array]:
+	var result: Dictionary[int, Array] = {}
+	for key in source.keys():
+		result[int(key)] = source[key]
+	return result
+
+
+func _to_typed_activation_dict(source: Dictionary) -> Dictionary[int, int]:
+	var result: Dictionary[int, int] = {}
+	for key in source.keys():
+		result[int(key)] = int(source[key])
+	return result
+
+
+func _to_typed_bias_dict(source: Dictionary) -> Dictionary[int, Array]:
+	var result: Dictionary[int, Array] = {}
+	for key in source.keys():
+		result[int(key)] = source[key]
+	return result
 
 
 ## When the text is changed, there must change 1 or 2 things.
