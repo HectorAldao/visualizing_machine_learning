@@ -73,11 +73,28 @@ size_flags_vertical = 3
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="CreateNnMenu" parent="ScrollContainer2/MarginContainer/VBoxContainer/HBoxContainer2/PanelContainer/ScrollContainerDTree/CenterContainer" unique_id=1587040215 instance=ExtResource("3_rwpyt")]
+[node name="MenusPanelContainer" type="PanelContainer" parent="ScrollContainer2/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=624984917]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.0
+
+[node name="ScrollContainerDTree" type="ScrollContainer" parent="ScrollContainer2/MarginContainer/VBoxContainer/HBoxContainer2/MenusPanelContainer" unique_id=439200396]
+layout_mode = 2
+script = ExtResource("5_01wm3")
+metadata/_custom_type_script = "uid://cyinp2iohgy8b"
+
+[node name="CenterContainer" type="CenterContainer" parent="ScrollContainer2/MarginContainer/VBoxContainer/HBoxContainer2/MenusPanelContainer/ScrollContainerDTree" unique_id=176767838]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="CreateNnMenu" parent="ScrollContainer2/MarginContainer/VBoxContainer/HBoxContainer2/MenusPanelContainer/ScrollContainerDTree/CenterContainer" unique_id=677229503 instance=ExtResource("3_rwpyt")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="PanelDatasetSelection" parent="ScrollContainer2/MarginContainer/VBoxContainer/HBoxContainer2/PanelContainer/ScrollContainerDTree/CenterContainer" unique_id=18738779 instance=ExtResource("5_1f7c6")]
+[node name="PanelDatasetSelection" parent="ScrollContainer2/MarginContainer/VBoxContainer/HBoxContainer2/MenusPanelContainer/ScrollContainerDTree/CenterContainer" unique_id=18738779 instance=ExtResource("5_1f7c6")]
 unique_name_in_owner = true
 layout_mode = 2
 

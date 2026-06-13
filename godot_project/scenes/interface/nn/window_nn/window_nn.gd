@@ -309,7 +309,7 @@ func set_resalted_data_step_info(step_info: Dictionary) -> void:
 func set_training_finished_info() -> void:
 	_reset_formula()
 	text0.text = "El entrenamiento ha acabado."
-	text1.text = "Pulse el botón 'Evaluar' para testear la red contra nuevos datos y comprobar si el entrenamiento ha funcionado."
+	text1.text = "Pulse el botón 'Evaluar' para testear la red contra nuevos datos y así evaluar el entrenamiento."
 
 
 func _should_restore_clicked_neuron_window() -> bool:

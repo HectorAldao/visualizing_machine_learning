@@ -7,6 +7,7 @@ extends Control
 @onready var panel_export_format: PanelContainer = %PanelExportFormat
 @onready var window_nn: WindowNn = %WindowNn
 @onready var nn: NeuralNetwork = %NeuralNetwork
+@onready var menus_panel_container: PanelContainer = %MenusPanelContainer
 
 var state: String = "create_nn"  # Other values: train_nn, evaluate_nn
 
@@ -48,6 +49,7 @@ func _ready() -> void:
 	panel_algorithm_nn.visible = false
 	panel_export_format.visible = false
 	window_nn.visible = false
+	menus_panel_container.visible = true
 
 	#_center_nn()
 
@@ -136,6 +138,7 @@ func _on_reload_nn() -> void:
 func _on_train_nn() -> void:
 	state = "train_nn"
 	create_nn_menu.visible = false
+	menus_panel_container.visible = false
 	panel_algorithm_nn.visible = true
 	window_nn.visible = true
 	_configure_algorithm_training()
@@ -189,6 +192,7 @@ func _on_dataset_selected(data:Array[Dictionary], attrs: Array[String], target_a
 	if state == "inference_nn":
 		_configure_algorithm_inference()
 		panel_algorithm_nn.visible = true
+		menus_panel_container.visible = false
 		SignalsObserver.nn_inference_ready.emit()
 
 	else:
@@ -286,6 +290,7 @@ func _on_start_nn_inferece() -> void:
 	state = "inference_nn"
 	panel_algorithm_nn.visible = false
 	SignalsObserver.prepare_nn_inference_dataset_selection.emit(train_attributtes, train_target_attributes)
+	menus_panel_container.visible = true
 
 
 func set_nn_layer_neuron_texts(layer_id: int, texts: Array[String]) -> void:
