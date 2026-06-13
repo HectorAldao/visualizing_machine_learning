@@ -477,6 +477,14 @@ Esto significa que cada neurona de una capa queda conectada con todas las neuron
 En una primera lectura, estas líneas sirven para mostrar la topología de la red.
 Más adelante pasan a representar también información del modelo, ya que su color y grosor dependen del peso asociado.
 Con ello, la escena deja preparado el vínculo entre la arquitectura visible y los valores numéricos que el entrenamiento modificará.
+En la Figura \ref{fig:nn_primera_arquitectura_visual} se muestra esta primera representación visual.
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=0.85\textwidth]{imaxes/nn_primera_arquitectura_visual.png}
+  \caption{Primera arquitectura visual de la red neuronal, formada por capas, neuronas y conexiones densas entre capas consecutivas.}
+  \label{fig:nn_primera_arquitectura_visual}
+\end{figure}
 
 Esta primera arquitectura también fija una separación importante entre la red que se ve y la red que se calcula.
 La escena de Godot se encarga de colocar capas, neuronas y conexiones, mientras que el estado lógico conserva la estructura y los valores que definen el modelo.
@@ -489,6 +497,14 @@ La vista puede reconstruirse, animarse o actualizar sus conexiones sin perder la
 Una vez definida la escena básica de la red, el siguiente paso consiste en permitir que el usuario configure su arquitectura desde la propia aplicación.
 Para ello se crea un menú de construcción que controla el número de neuronas de entrada, el número de neuronas de salida, la cantidad de capas ocultas, las neuronas de cada capa oculta y las funciones de activación asociadas.
 Con este panel, la arquitectura puede editarse dentro de unos límites conocidos.
+La selección de funciones de activación dentro de este menú se aprecia en la Figura \ref{fig:nn_funciones_de_activacion}.
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=0.85\textwidth]{imaxes/nn_funciones_de_activacion.png}
+  \caption{Menú de creación de la red neuronal con selectores para las funciones de activación de las capas.}
+  \label{fig:nn_funciones_de_activacion}
+\end{figure}
 
 Estos límites son necesarios porque la escena tiene una finalidad didáctica y debe seguir siendo manejable.
 Se establecen máximos para el número de capas y para el número de neuronas por capa, de forma que la visualización no crezca hasta ocupar un espacio imposible de seguir.
@@ -546,6 +562,14 @@ Esta diferencia es relevante porque la red que se crea para cada caso tiene una 
 Cuando el usuario carga un CSV, la aplicación muestra las columnas disponibles y permite seleccionar explícitamente una o varias como objetivo.
 Esta decisión hace que la carga de datos sea más flexible que en las primeras pruebas, donde se dependía de nombres habituales como \textit{class}, \textit{label} o \textit{target}.
 El resto de columnas se tratan como atributos de entrada.
+En la Figura \ref{fig:nn_columnas_objetivo} se ve este selector de columnas objetivo.
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=0.85\textwidth]{imaxes/nn_columnas_objetivo.png}
+  \caption{Selección de columnas objetivo para la red neuronal a partir de un dataset cargado desde un archivo CSV.}
+  \label{fig:nn_columnas_objetivo}
+\end{figure}
 
 El panel analiza los tipos de las columnas seleccionadas para decidir cómo preparar el problema.
 Si hay una única variable objetivo categórica, o una única variable entera tratada como clase, el problema se considera de clasificación.
@@ -572,6 +596,14 @@ La selección de datos también mejora la lectura de la red visible.
 Las neuronas de entrada pasan a mostrar los nombres de los atributos, y las neuronas de salida muestran las clases decodificadas o las variables objetivo de regresión.
 Esto conecta la arquitectura con el problema concreto que se está resolviendo.
 Con estos nombres, cada extremo del modelo representa información reconocible del dataset y la lectura de la arquitectura resulta más concreta.
+Esta relación entre dataset y red visible se muestra en la Figura \ref{fig:nn_columnas_input_output_expected_texto_neuronas}, donde las neuronas aparecen etiquetadas con información del conjunto seleccionado.
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=0.85\textwidth]{imaxes/nn_columnas_de_input_output_expected_y_texto_en_neuronas.png}
+  \caption{Red neuronal durante el entrenamiento, con nombres procedentes del dataset en las neuronas de entrada y salida, y con las columnas visuales de entrada, salida y valor esperado.}
+  \label{fig:nn_columnas_input_output_expected_texto_neuronas}
+\end{figure}
 
 Con esta dependencia entre datos y arquitectura, el flujo de la vista se reorganiza.
 Primero se selecciona el dataset y después se crea la red.
@@ -605,6 +637,14 @@ El avance incremental se controla desde un panel específico.
 El usuario puede avanzar una sola neurona, una capa completa, una muestra completa o terminar todo el entrenamiento de forma automática.
 Cada opción llama al mismo proceso interno, cambiando únicamente hasta dónde debe avanzar antes de devolver el control a la interfaz.
 Así se mantiene una única lógica de entrenamiento y se ofrecen varios niveles de detalle para observar el proceso.
+La Figura \ref{fig:nn_panel_de_entrenamiento} muestra este panel de control.
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=0.85\textwidth]{imaxes/nn_panel_de_entrenamiento.png}
+  \caption{Panel de entrenamiento de la red neuronal con controles para avanzar con distintos niveles de granularidad.}
+  \label{fig:nn_panel_de_entrenamiento}
+\end{figure}
 
 La ejecución por muestras resulta importante para que el aprendizaje sea visible.
 Cada fila del dataset produce una entrada concreta, una salida concreta, un error concreto y una actualización de pesos concreta.
@@ -656,7 +696,7 @@ Esta caché permite que la explicación, el cálculo del error y el backward pas
 La salida de la red también se representa visualmente.
 Junto a la capa final aparece una columna de valores producidos por la red, y junto a ella aparece otra columna con el valor esperado.
 Cuando se calcula una neurona de salida, su valor se añade a la columna de salida mientras los valores anteriores de la misma muestra se mantienen visibles.
-De esta manera, la predicción se completa gradualmente y queda alineada con las clases o variables objetivo que se habían mostrado en la arquitectura.
+De esta manera, la predicción se completa gradualmente y queda alineada con las clases o variables objetivo que se habían mostrado en la arquitectura, como se veía en la Figura \ref{fig:nn_columnas_input_output_expected_texto_neuronas}.
 
 El resaltado de neuronas y capas acompaña todo el proceso.
 Cada vez que se evalúa una neurona, esta cambia de estado visual y la ventana informativa recibe los datos necesarios para explicar el cálculo.
