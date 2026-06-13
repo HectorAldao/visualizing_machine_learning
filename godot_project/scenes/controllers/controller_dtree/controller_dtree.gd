@@ -401,6 +401,7 @@ func _add_child_node_for_algorithm(parent_id: int, branch_value, attribute: Stri
 # Called before update_pending_parent_ids so the algorithm can map branch_value -> node_id.
 func _create_placeholder_children(parent_id: int, parent_depth: int, branch_values: Array) -> void:
 	var branch_to_id: Dictionary = {}
+	var parent_dnode: DNode = dtree.nodes_dict[parent_id]
 	for value in branch_values:
 		var new_id: int = next_node_id
 		next_node_id += 1
@@ -413,10 +414,15 @@ func _create_placeholder_children(parent_id: int, parent_depth: int, branch_valu
 		placeholder.was_created_by_algorithm = true
 		placeholder.is_pending            = true
 		placeholder.text                  = "..."
+		placeholder.partition_details     = {
+			"tipo_de_nodo": "pending",
+			"valor_rama": value,
+			"atributo_rama": parent_dnode.attribute,
+		}
 		
 		dtree.nodes_dict[new_id] = placeholder
 		dtree.nodes_container.add_child(placeholder)
-		dtree.nodes_dict[parent_id].sons_id.append(new_id)
+		parent_dnode.sons_id.append(new_id)
 		
 		branch_to_id[value] = new_id
 	

@@ -102,7 +102,7 @@ func _on_pressed() -> void:
 	var details := partition_details.duplicate(true)
 	if details.is_empty():
 		details = {
-			"tipo_de_nodo": "leaf" if is_leaf else "internal",
+			"tipo_de_nodo": "pending" if is_pending else "leaf" if is_leaf else "internal",
 			"numero_de_datos": 0,
 			"lista_etiquetas": [label] if label else [],
 			"lista_atributos": [attribute] if attribute else [],
@@ -116,4 +116,5 @@ func _on_pressed() -> void:
 	details["attribute"] = attribute
 	details["label"] = label
 	details["is_leaf"] = is_leaf
+	details["is_pending"] = is_pending
 	SignalsObserver.dtree_node_selected.emit(details)

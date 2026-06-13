@@ -226,5 +226,12 @@ func restore_node_as_pending(node_id: int) -> void:
 	dnode.is_leaf = false
 	dnode.is_pending = true
 	dnode.information_variable_value = ""
-	dnode.partition_details = {}
+	var parent_attribute: String = ""
+	if dnode.parent_id != null and nodes_dict.has(dnode.parent_id):
+		parent_attribute = str(nodes_dict[dnode.parent_id].attribute)
+	dnode.partition_details = {
+		"tipo_de_nodo": "pending",
+		"valor_rama": dnode.branch_value,
+		"atributo_rama": parent_attribute,
+	}
 	dnode.apply_theme_animated(dnode.pending_theme, "...")

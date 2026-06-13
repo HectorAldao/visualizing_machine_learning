@@ -67,9 +67,13 @@ En este caso '{etiqueta_mayoritaria}'."],
 
 	"node_partition":
 	["Este nodo es un nodo {tipo_visual_de_nodo}.
-Por esta partición han bajado {numero_de_datos} datos{texto_rama}.
+Por este camino han bajado {numero_de_datos} datos{texto_rama}.
 La pureza de este nodo es {pureza_nodo}: {numero_etiqueta_mayoritaria} de {numero_de_datos} datos tienen la etiqueta mayoritaria '{etiqueta_mayoritaria}'.
 Las etiquetas que llegan a este nodo son {lista_etiquetas}.",
+"{texto_decision_nodo}"],
+
+	"node_pending":
+	["Este nodo es un nodo pendiente.",
 "{texto_decision_nodo}"],
 
 	"eval_data":
@@ -87,7 +91,7 @@ Este nodo divide usando el atributo '{atributo_division}'.
 En el dato actual, '{atributo_division}' vale '{valor_atributo}', así que bajará por la rama '{valor_atributo}'."],
 
 	"eval_node_spine":
-	["El dato llega a un nodo spine.
+	["El dato llega a un nodo de decisión.
 Este nodo divide usando el atributo '{atributo_division}'.
 Como en el dato actual '{atributo_division}' vale '{valor_atributo}', el dato continuará por la rama '{valor_atributo}'."],
 
@@ -192,8 +196,9 @@ func update_node_partition_text(details_dict: Dictionary) -> void:
 	_remove_chart()
 	_set_entropy_formula_visible(false)
 
-	label0.text = template_texts["node_partition"][0].format(details_dict)
-	label1.text = template_texts["node_partition"][1].format(details_dict)
+	var template_key: String = "node_pending" if _is_pending_node(details_dict) else "node_partition"
+	label0.text = template_texts[template_key][0].format(details_dict)
+	label1.text = template_texts[template_key][1].format(details_dict)
 
 
 func update_eval_data_text(details_dict: Dictionary) -> void:
@@ -264,11 +269,21 @@ func _prepare_eval_node_details(node_type: int, eval_data_info: Dictionary, node
 
 func _prepare_partition_details(details_dict: Dictionary) -> void:
 	var tipo_de_nodo: String = details_dict.get("tipo_de_nodo", "")
+	var is_pending_node: bool = _is_pending_node(details_dict)
 	var is_leaf_node: bool = bool(details_dict.get("is_leaf", tipo_de_nodo.begins_with("leaf")))
-	details_dict["tipo_visual_de_nodo"] = "hoja" if is_leaf_node else "spine (interno)"
+	details_dict["tipo_visual_de_nodo"] = "pendiente" if is_pending_node else "hoja" if is_leaf_node else "de decisión"
 
 	var branch_value = details_dict.get("valor_rama", details_dict.get("branch_value", null))
 	details_dict["texto_rama"] = "" if branch_value == null else " desde la rama '%s'" % str(branch_value)
+
+	if is_pending_node:
+		var branch_attribute: String = str(details_dict.get("atributo_rama", details_dict.get("parent_attribute", "")))
+		details_dict["texto_decision_nodo"] = "Aún no se ha decidido la característica por la que partirá este nodo."
+		if not branch_attribute.is_empty() and branch_value != null:
+			details_dict["texto_decision_nodo"] += " Solo se sabe que los datos que vengan por aquí tendrán la característica '%s' con el valor '%s'." % [branch_attribute, str(branch_value)]
+		elif branch_value != null:
+			details_dict["texto_decision_nodo"] += " Solo se sabe que los datos que vengan por aquí llegan desde la rama '%s'." % str(branch_value)
+		return
 
 	if not details_dict.has("pureza_nodo"):
 		details_dict["pureza_nodo"] = "sin datos"
@@ -284,7 +299,11 @@ func _prepare_partition_details(details_dict: Dictionary) -> void:
 	else:
 		var formatted_branches: Dictionary = {"lista_ramas_mejor_atributo": details_dict.get("lista_ramas_mejor_atributo", "")}
 		_clean_lists(formatted_branches)
-		details_dict["texto_decision_nodo"] = "Como es spine, la partición continúa dividiendo por el atributo '%s'. Sus ramas posibles son: %s." % [str(details_dict.get("attribute", details_dict.get("mejor_atributo", ""))), str(formatted_branches["lista_ramas_mejor_atributo"])]
+		details_dict["texto_decision_nodo"] = "Como es un nodo de decisión, la partición continúa dividiendo por el atributo '%s'. Sus ramas posibles son: %s." % [str(details_dict.get("attribute", details_dict.get("mejor_atributo", ""))), str(formatted_branches["lista_ramas_mejor_atributo"])]
+
+
+func _is_pending_node(details_dict: Dictionary) -> bool:
+	return bool(details_dict.get("is_pending", false)) or str(details_dict.get("tipo_de_nodo", "")) == "pending"
 
 
 func _build_zero_entropy_explanation(plot_data: Dictionary[String, float]) -> String:
