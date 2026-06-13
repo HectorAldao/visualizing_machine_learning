@@ -393,6 +393,9 @@ func _validate_inference_dataset_structure() -> bool:
 		informative_text.label_settings.font_color = color_error
 		return false
 
+	if _required_inference_target_attrs.is_empty():
+		return true
+
 	var missing_targets: Array[String] = _get_missing_names(_required_inference_target_attrs, target_attrs_info)
 	if not missing_targets.is_empty():
 		informative_text.text = "El dataset de inferencia no tiene esta variable objetivo: %s" % ", ".join(missing_targets)

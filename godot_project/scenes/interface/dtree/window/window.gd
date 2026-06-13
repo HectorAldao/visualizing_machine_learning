@@ -19,6 +19,7 @@ var current_evaldata_text: String = ""
 const ENTROPY_FORMULA: String = "\\begin{aligned}&H(S) : \\text{entropía del atributo } S\\\\&c : \\text{numero de etiquetas distintas}\\\\&p_i : \\text{proporcion de datos con la etiqueta } i\\\\&H(S) = -\\sum_{i=1}^{c} p_i\\log_2(p_i)\\end{aligned}"
 
 const ZERO_ENTROPY_EXPLANATION: String = "\n\n{texto_atributos} {verbo_entropia} entropía 0 porque, con los datos que llegan a este nodo, dividir por {texto_referencia} no reduce la incertidumbre sobre la etiqueta: las proporciones de etiquetas quedan igual o no aportan una separación útil. Por eso su valor es 0 y no ayuda a decidir mejor la clasificación."
+const TRAINING_FINISHED_TEXT: String = "Entrenamiento finalizado, continúe con la evaluación pulsando 'Evaluar'."
 
 
 
@@ -117,6 +118,8 @@ func _ready() -> void:
 		SignalsObserver.dtree_eval_data_selected.connect(update_eval_data_text)
 	if not SignalsObserver.dtree_eval_data_advanced.is_connected(update_eval_data_advanced_text):
 		SignalsObserver.dtree_eval_data_advanced.connect(update_eval_data_advanced_text)
+	if not SignalsObserver.dtree_training_finished.is_connected(show_training_finished_text):
+		SignalsObserver.dtree_training_finished.connect(show_training_finished_text)
 
 	SignalsObserver.clear_window.connect(clear)
 
@@ -127,6 +130,15 @@ func clear() -> void:
 	label0.text = ""
 	label1.text = ""
 	latexformula.reset_sprite()
+	_set_entropy_formula_visible(false)
+	_remove_chart()
+	current_evaldata_instance_id = -1
+	current_evaldata_text = ""
+
+
+func show_training_finished_text() -> void:
+	clear()
+	label0.text = TRAINING_FINISHED_TEXT
 
 
 func update_current_text(details_dict: Dictionary) -> void:
@@ -140,9 +152,7 @@ func update_current_text(details_dict: Dictionary) -> void:
 	
 	_clean_lists(details_dict)
 	
-	var chart = vboxcontainer.get_node_or_null("BarsChart")
-	if chart:
-		vboxcontainer.remove_child(chart)
+	_remove_chart()
 	
 	var tipo_de_nodo: String = details_dict["tipo_de_nodo"]
 	match tipo_de_nodo:
@@ -179,9 +189,7 @@ func update_node_partition_text(details_dict: Dictionary) -> void:
 	_prepare_partition_details(details_dict)
 	_clean_lists(details_dict)
 
-	var chart = vboxcontainer.get_node_or_null("BarsChart")
-	if chart:
-		vboxcontainer.remove_child(chart)
+	_remove_chart()
 	_set_entropy_formula_visible(false)
 
 	label0.text = template_texts["node_partition"][0].format(details_dict)
@@ -192,9 +200,7 @@ func update_eval_data_text(details_dict: Dictionary) -> void:
 	details_dict = details_dict.duplicate(true)
 	_clean_lists(details_dict)
 
-	var chart = vboxcontainer.get_node_or_null("BarsChart")
-	if chart:
-		vboxcontainer.remove_child(chart)
+	_remove_chart()
 	_set_entropy_formula_visible(false)
 
 	label0.text = template_texts["eval_data"][0].format(details_dict)
@@ -202,9 +208,7 @@ func update_eval_data_text(details_dict: Dictionary) -> void:
 
 
 func update_eval_data_advanced_text(node_type: int, eval_data_info: Dictionary, node_info: Dictionary) -> void:
-	var chart = vboxcontainer.get_node_or_null("BarsChart")
-	if chart:
-		vboxcontainer.remove_child(chart)
+	_remove_chart()
 	_set_entropy_formula_visible(false)
 
 	var data_details: Dictionary = eval_data_info.duplicate(true)
@@ -349,6 +353,13 @@ func _ignore_mouse_input_for_window_content() -> void:
 
 func _set_entropy_formula_visible(formula_is_visible: bool) -> void:
 	latexformula.visible = formula_is_visible
+
+
+func _remove_chart() -> void:
+	var chart = vboxcontainer.get_node_or_null("BarsChart")
+	if chart:
+		vboxcontainer.remove_child(chart)
+		chart.queue_free()
 
 
 func _set_mouse_filter_recursive(node: Node, filter: Control.MouseFilter) -> void:

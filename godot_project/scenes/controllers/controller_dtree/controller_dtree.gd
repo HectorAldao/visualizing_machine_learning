@@ -37,9 +37,7 @@ func initialize(p_tree: DTreeLogical, p_window: PanelContainer, p_mode: String, 
 	mode = p_mode
 
 	# Initialize next_node_id based on existing nodes
-	for id in dtree.nodes_dict.keys():
-		if id >= next_node_id:
-			next_node_id = id + 1
+	next_node_id = _get_next_node_id_from_tree()
 
 	if mode == "manual":
 		_connect_all_node_signals()
@@ -47,6 +45,64 @@ func initialize(p_tree: DTreeLogical, p_window: PanelContainer, p_mode: String, 
 		_setup_automatic_mode()
 	
 	_update_canvas()
+
+
+func configure_loaded_tree(input_attributes: Array[String], target_attributes: Array[String]) -> void:
+	if dtree == null:
+		return
+
+	next_node_id = _get_next_node_id_from_tree()
+
+	if mode == "manual":
+		_connect_all_node_signals()
+		_update_canvas()
+		return
+
+	has_train_started = true
+	data = []
+	attributes = input_attributes.duplicate()
+	_reset_algorithm_state_for_loaded_tree(target_attributes)
+
+	if is_instance_valid(eval_data_container):
+		eval_data_container.queue_free()
+	eval_data_container = null
+
+	if next_step_button:
+		next_step_button.visible = false
+		next_step_button.disabled = false
+	if previous_step_button:
+		previous_step_button.visible = false
+	if evaluate_button:
+		evaluate_button.visible = true
+		evaluate_button.disabled = false
+	if drop_button:
+		drop_button.visible = false
+	if panel_dataset_selection:
+		panel_dataset_selection.visible = false
+	if window:
+		window.visible = true
+
+	dtree.visible = true
+	SignalsObserver.clear_window.emit()
+	SignalsObserver.dtree_training_finished.emit()
+	_update_canvas()
+
+
+func _reset_algorithm_state_for_loaded_tree(target_attributes: Array[String]) -> void:
+	if algorithm == null:
+		return
+
+	algorithm.training_data = []
+	algorithm.available_attributes = attributes.duplicate()
+	algorithm.dtree_ref = dtree
+	algorithm.is_running = false
+	algorithm.current_step = 0
+	algorithm.call_stack.clear()
+	algorithm.called_stack.clear()
+	algorithm.details = {}
+	algorithm.pending_parent_id = -1
+	algorithm.last_created_node_id = -1
+	algorithm.label_column = target_attributes[0] if not target_attributes.is_empty() else ""
 
 
 # Manual mode related functions
@@ -181,13 +237,13 @@ func _setup_automatic_mode() -> void:
 func _on_dataset_selected_pressed(datast: Array[Dictionary], attrs: Array[String]) -> void:
 
 	if not has_train_started:
+		_clear_tree_before_training()
 		has_train_started = true
 		data = datast
 		attributes = attrs
 		
 		if algorithm:
-			var  list_of_diferences = data[0].keys().filter(func(element): return not attributes.has(element))
-			algorithm.label_column = list_of_diferences[0]
+			_set_algorithm_label_column_from_dataset(datast, attrs)
 			algorithm.start_training(data, attributes, dtree)
 
 			next_step_button.visible = true
@@ -196,6 +252,7 @@ func _on_dataset_selected_pressed(datast: Array[Dictionary], attrs: Array[String
 			evaluate_button.disabled = true
 			
 	else:
+		_configure_evaluation_dataset_metadata(datast, attrs)
 
 		dtree.visible = true
 		drop_button.visible = true
@@ -206,7 +263,73 @@ func _on_dataset_selected_pressed(datast: Array[Dictionary], attrs: Array[String
 		#evaluate_button.         visible = false
 
 
-		
+func _clear_tree_before_training() -> void:
+	if dtree == null or dtree.nodes_dict.is_empty():
+		return
+
+	if is_instance_valid(eval_data_container):
+		eval_data_container.queue_free()
+	eval_data_container = null
+
+	for child in dtree.nodes_container.get_children():
+		child.queue_free()
+	for child in dtree.edges_container.get_children():
+		child.queue_free()
+
+	var existing_connections = dtree.edges_container.get("_connections")
+	if existing_connections is Dictionary:
+		existing_connections.clear()
+
+	dtree.nodes_dict.clear()
+	dtree.root_id = null
+	next_node_id = 0
+
+
+func _configure_evaluation_dataset_metadata(datast: Array[Dictionary], attrs: Array[String]) -> void:
+	attributes = attrs.duplicate()
+	if algorithm == null:
+		return
+
+	if algorithm.label_column.is_empty() or _dataset_missing_key(datast, algorithm.label_column):
+		_set_algorithm_label_column_from_dataset(datast, attrs)
+
+
+func _set_algorithm_label_column_from_dataset(datast: Array[Dictionary], attrs: Array[String]) -> void:
+	if algorithm == null or datast.is_empty():
+		return
+
+	var target_attributes := _infer_target_attributes_from_dataset(datast, attrs)
+	if not target_attributes.is_empty():
+		algorithm.label_column = target_attributes[0]
+
+
+func _infer_target_attributes_from_dataset(datast: Array[Dictionary], attrs: Array[String]) -> Array[String]:
+	var target_attributes: Array[String] = []
+	if datast.is_empty():
+		return target_attributes
+
+	for key in datast[0].keys():
+		var key_text := str(key)
+		if not attrs.has(key_text):
+			target_attributes.append(key_text)
+
+	return target_attributes
+
+
+func _dataset_missing_key(datast: Array[Dictionary], key: String) -> bool:
+	return datast.is_empty() or not datast[0].has(key)
+
+
+func _get_next_node_id_from_tree() -> int:
+	var new_next_node_id := 0
+	if dtree == null:
+		return new_next_node_id
+
+	for id in dtree.nodes_dict.keys():
+		new_next_node_id = max(new_next_node_id, int(id) + 1)
+
+	return new_next_node_id
+
 
 func _create_root_for_algorithm(attribute: String, label: String, is_leaf: bool, info_value: String) -> int:
 	var dnode: DNode = preload(dnode_scene).instantiate()
@@ -379,6 +502,7 @@ func _on_algorithm_completed() -> void:
 		next_step_button.disabled = true
 	if evaluate_button:
 		evaluate_button.disabled = false
+	SignalsObserver.dtree_training_finished.emit()
 
 
 

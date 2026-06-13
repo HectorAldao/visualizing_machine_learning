@@ -239,7 +239,7 @@ func _load_tree_from_content(json_content: String, source_name: String) -> void:
 
 	dtree.root_id = _resolve_root_id(dtree, tree_data.get("root_id", null))
 	_update_node_remove_flags(dtree)
-	_update_controller_after_load(dtree)
+	_update_controller_after_load(dtree, tree_data)
 	dtree.relayout_tree()
 	dtree.update_canvas_size_and_center()
 	print("Tree loaded")
@@ -301,11 +301,17 @@ func _tree_to_json_data(dtree: DTreeLogical) -> Dictionary:
 		var dnode: DNode = dtree.nodes_dict[node_id]
 		nodes_data[str(node_id)] = _dnode_to_json_data(dnode)
 
-	return {
+	var tree_data := {
 		"root_id": dtree.root_id,
 		"mode": dtree.mode,
 		"nodes": nodes_data,
 	}
+
+	var metadata := _get_tree_metadata()
+	if not metadata.is_empty():
+		tree_data["metadata"] = metadata
+
+	return tree_data
 
 
 func _dnode_to_json_data(dnode: DNode) -> Dictionary:
@@ -403,15 +409,68 @@ func _update_node_remove_flags(dtree: DTreeLogical) -> void:
 		dnode.can_remove = node_id != dtree.root_id
 
 
-func _update_controller_after_load(dtree: DTreeLogical) -> void:
+func _update_controller_after_load(dtree: DTreeLogical, tree_data: Dictionary) -> void:
 	var controller := get_node_or_null("%ControllerDTree") as ControllerDTree
 	if controller == null:
 		return
 
 	controller.dtree = dtree
 	controller.next_node_id = _get_next_node_id(dtree)
-	if controller.mode == "manual":
+	if controller.has_method("configure_loaded_tree"):
+		controller.configure_loaded_tree(_get_loaded_input_attributes(dtree, tree_data), _get_loaded_target_attributes(tree_data))
+	elif controller.mode == "manual":
 		controller._connect_all_node_signals()
+
+
+func _get_tree_metadata() -> Dictionary:
+	var metadata: Dictionary = {}
+	var controller := get_node_or_null("%ControllerDTree") as ControllerDTree
+	if controller == null:
+		return metadata
+
+	if not controller.attributes.is_empty():
+		metadata["input_attributes"] = controller.attributes.duplicate()
+
+	if controller.algorithm != null and not controller.algorithm.label_column.is_empty():
+		metadata["target_attributes"] = [controller.algorithm.label_column]
+
+	return metadata
+
+
+func _get_loaded_input_attributes(dtree: DTreeLogical, tree_data: Dictionary) -> Array[String]:
+	var metadata := _to_dictionary(tree_data.get("metadata", {}))
+	var metadata_attrs := _to_string_array(metadata.get("input_attributes", []))
+	if not metadata_attrs.is_empty():
+		return metadata_attrs
+
+	if dtree.root_id != null and dtree.nodes_dict.has(int(dtree.root_id)):
+		var root_node: DNode = dtree.nodes_dict[int(dtree.root_id)]
+		var root_attrs := _to_string_array(root_node.partition_details.get("lista_atributos", []))
+		if not root_attrs.is_empty():
+			return root_attrs
+
+	var split_attrs: Array[String] = []
+	var node_ids := dtree.nodes_dict.keys()
+	node_ids.sort()
+	for node_id in node_ids:
+		var dnode: DNode = dtree.nodes_dict[node_id]
+		if not dnode.attribute.is_empty() and not split_attrs.has(dnode.attribute):
+			split_attrs.append(dnode.attribute)
+
+	return split_attrs
+
+
+func _get_loaded_target_attributes(tree_data: Dictionary) -> Array[String]:
+	var metadata := _to_dictionary(tree_data.get("metadata", {}))
+	var target_attrs := _to_string_array(metadata.get("target_attributes", []))
+	if not target_attrs.is_empty():
+		return target_attrs
+
+	var label_column := _variant_to_string(metadata.get("label_column", ""))
+	if not label_column.is_empty():
+		target_attrs.append(label_column)
+
+	return target_attrs
 
 
 func _get_next_node_id(dtree: DTreeLogical) -> int:
@@ -442,6 +501,17 @@ func _to_int_array(raw_value: Variant) -> Array[int]:
 
 	for value in raw_value:
 		result.append(int(value))
+
+	return result
+
+
+func _to_string_array(raw_value: Variant) -> Array[String]:
+	var result: Array[String] = []
+	if not (raw_value is Array):
+		return result
+
+	for value in raw_value:
+		result.append(str(value))
 
 	return result
 
