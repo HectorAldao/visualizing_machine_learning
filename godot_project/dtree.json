@@ -1,0 +1,1145 @@
+{
+	"mode": "automatic",
+	"nodes": {
+		"0": {
+			"attribute": "color",
+			"branch_value": null,
+			"can_remove": true,
+			"depth": 0,
+			"id": 0,
+			"information_variable_value": "1.81",
+			"inorder_index": 5.75,
+			"is_leaf": false,
+			"is_pending": false,
+			"label": "",
+			"parent_id": 0,
+			"partition_details": {
+				"conteo_etiquetas": {
+					"calabacín": 1,
+					"cereza": 1,
+					"ciruela": 4,
+					"fresa": 1,
+					"granada": 1,
+					"lima": 1,
+					"limón": 1,
+					"mandarina": 1,
+					"manzana": 4,
+					"melón": 1,
+					"naranja": 1,
+					"pepino": 1,
+					"plátano": 1,
+					"sandía": 1,
+					"uva": 2
+				},
+				"etiqueta_mayoritaria": "manzana",
+				"lista_atributos": [
+					"color",
+					"forma",
+					"tamaño"
+				],
+				"lista_etiquetas": [
+					"manzana",
+					"manzana",
+					"manzana",
+					"manzana",
+					"plátano",
+					"naranja",
+					"granada",
+					"mandarina",
+					"pepino",
+					"calabacín",
+					"melón",
+					"sandía",
+					"cereza",
+					"fresa",
+					"uva",
+					"ciruela",
+					"ciruela",
+					"ciruela",
+					"ciruela",
+					"uva",
+					"limón",
+					"lima"
+				],
+				"lista_ganancias": {
+					"color": 1.80649852879183,
+					"forma": 0.574635697837679,
+					"tamaño": 1.38146085453407
+				},
+				"lista_ramas_mejor_atributo": [
+					"morado",
+					"blanco",
+					"naranja",
+					"amarillo",
+					"verde",
+					"rojo"
+				],
+				"mejor_atributo": "color",
+				"metrica_de_ganancia_de_info_1": "la entropía",
+				"metrica_de_ganancia_de_info_2": "entropía",
+				"n_atributos_con_ganancia_maxima": 1,
+				"numero_de_datos": 22,
+				"numero_etiqueta_mayoritaria": 4,
+				"pureza_nodo": "18.18%",
+				"pureza_nodo_valor": 0.181818181818182,
+				"tipo_de_nodo": "internal",
+				"valor_metrica_mejor_atributo": 1.80649852879183,
+				"valor_rama": null
+			},
+			"sons_id": [
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
+			],
+			"text": "color",
+			"was_created_by_algorithm": true
+		},
+		"1": {
+			"attribute": "tamaño",
+			"branch_value": "rojo",
+			"can_remove": true,
+			"depth": 1,
+			"id": 1,
+			"information_variable_value": "1.50",
+			"inorder_index": 1.0,
+			"is_leaf": false,
+			"is_pending": false,
+			"label": "",
+			"parent_id": 0,
+			"partition_details": {
+				"conteo_etiquetas": {
+					"cereza": 1,
+					"ciruela": 1,
+					"fresa": 1,
+					"granada": 1,
+					"manzana": 3,
+					"sandía": 1
+				},
+				"etiqueta_mayoritaria": "manzana",
+				"lista_atributos": [
+					"forma",
+					"tamaño"
+				],
+				"lista_etiquetas": [
+					"manzana",
+					"manzana",
+					"manzana",
+					"granada",
+					"sandía",
+					"cereza",
+					"fresa",
+					"ciruela"
+				],
+				"lista_ganancias": {
+					"forma": 0.0,
+					"tamaño": 1.5
+				},
+				"lista_ramas_mejor_atributo": [
+					"pequeña",
+					"grande",
+					"mediana"
+				],
+				"mejor_atributo": "tamaño",
+				"metrica_de_ganancia_de_info_1": "la entropía",
+				"metrica_de_ganancia_de_info_2": "entropía",
+				"n_atributos_con_ganancia_maxima": 1,
+				"numero_de_datos": 8,
+				"numero_etiqueta_mayoritaria": 3,
+				"pureza_nodo": "37.50%",
+				"pureza_nodo_valor": 0.375,
+				"tipo_de_nodo": "internal",
+				"valor_metrica_mejor_atributo": 1.5,
+				"valor_rama": "rojo"
+			},
+			"sons_id": [
+				7,
+				8,
+				9
+			],
+			"text": "tamaño",
+			"was_created_by_algorithm": true
+		},
+		"10": {
+			"attribute": "",
+			"branch_value": "redonda",
+			"can_remove": true,
+			"depth": 3,
+			"id": 10,
+			"information_variable_value": "",
+			"inorder_index": 0.0,
+			"is_leaf": true,
+			"is_pending": false,
+			"label": "manzana",
+			"parent_id": 7,
+			"partition_details": {
+				"conteo_etiquetas": {
+					"ciruela": 1,
+					"manzana": 3
+				},
+				"etiqueta_mayoritaria": "manzana",
+				"lista_atributos": [],
+				"lista_etiquetas": [
+					"manzana",
+					"manzana",
+					"manzana",
+					"ciruela"
+				],
+				"numero_de_datos": 4,
+				"numero_etiqueta_mayoritaria": 3,
+				"pureza_nodo": "75.00%",
+				"pureza_nodo_valor": 0.75,
+				"tipo_de_nodo": "leaf_majority",
+				"valor_rama": "redonda"
+			},
+			"sons_id": [],
+			"text": "manzana",
+			"was_created_by_algorithm": true
+		},
+		"11": {
+			"attribute": "",
+			"branch_value": "redonda",
+			"can_remove": true,
+			"depth": 3,
+			"id": 11,
+			"information_variable_value": "",
+			"inorder_index": 1.0,
+			"is_leaf": true,
+			"is_pending": false,
+			"label": "granada",
+			"parent_id": 8,
+			"partition_details": {
+				"conteo_etiquetas": {
+					"granada": 1,
+					"sandía": 1
+				},
+				"etiqueta_mayoritaria": "granada",
+				"lista_atributos": [],
+				"lista_etiquetas": [
+					"granada",
+					"sandía"
+				],
+				"numero_de_datos": 2,
+				"numero_etiqueta_mayoritaria": 1,
+				"pureza_nodo": "50.00%",
+				"pureza_nodo_valor": 0.5,
+				"tipo_de_nodo": "leaf_majority",
+				"valor_rama": "redonda"
+			},
+			"sons_id": [],
+			"text": "granada",
+			"was_created_by_algorithm": true
+		},
+		"12": {
+			"attribute": "",
+			"branch_value": "redonda",
+			"can_remove": true,
+			"depth": 3,
+			"id": 12,
+			"information_variable_value": "",
+			"inorder_index": 2.0,
+			"is_leaf": true,
+			"is_pending": false,
+			"label": "cereza",
+			"parent_id": 9,
+			"partition_details": {
+				"conteo_etiquetas": {
+					"cereza": 1,
+					"fresa": 1
+				},
+				"etiqueta_mayoritaria": "cereza",
+				"lista_atributos": [],
+				"lista_etiquetas": [
+					"cereza",
+					"fresa"
+				],
+				"numero_de_datos": 2,
+				"numero_etiqueta_mayoritaria": 1,
+				"pureza_nodo": "50.00%",
+				"pureza_nodo_valor": 0.5,
+				"tipo_de_nodo": "leaf_majority",
+				"valor_rama": "redonda"
+			},
+			"sons_id": [],
+			"text": "cereza",
+			"was_created_by_algorithm": true
+		},
+		"13": {
+			"attribute": "forma",
+			"branch_value": "mediana",
+			"can_remove": true,
+			"depth": 2,
+			"id": 13,
+			"information_variable_value": "0.00",
+			"inorder_index": 3.0,
+			"is_leaf": false,
+			"is_pending": false,
+			"label": "",
+			"parent_id": 2,
+			"partition_details": {
+				"conteo_etiquetas": {
+					"lima": 1,
+					"manzana": 1
+				},
+				"etiqueta_mayoritaria": "manzana",
+				"lista_atributos": [
+					"forma"
+				],
+				"lista_etiquetas": [
+					"manzana",
+					"lima"
+				],
+				"lista_ganancias": {
+					"forma": 0.0
+				},
+				"lista_ramas_mejor_atributo": [
+					"redonda"
+				],
+				"mejor_atributo": "forma",
+				"metrica_de_ganancia_de_info_1": "la entropía",
+				"metrica_de_ganancia_de_info_2": "entropía",
+				"n_atributos_con_ganancia_maxima": 1,
+				"numero_de_datos": 2,
+				"numero_etiqueta_mayoritaria": 1,
+				"pureza_nodo": "50.00%",
+				"pureza_nodo_valor": 0.5,
+				"tipo_de_nodo": "internal",
+				"valor_metrica_mejor_atributo": 0.0,
+				"valor_rama": "mediana"
+			},
+			"sons_id": [
+				16
+			],
+			"text": "forma",
+			"was_created_by_algorithm": true
+		},
+		"14": {
+			"attribute": "forma",
+			"branch_value": "grande",
+			"can_remove": true,
+			"depth": 2,
+			"id": 14,
+			"information_variable_value": "0.00",
+			"inorder_index": 4.0,
+			"is_leaf": false,
+			"is_pending": false,
+			"label": "",
+			"parent_id": 2,
+			"partition_details": {
+				"conteo_etiquetas": {
+					"calabacín": 1,
+					"pepino": 1
+				},
+				"etiqueta_mayoritaria": "pepino",
+				"lista_atributos": [
+					"forma"
+				],
+				"lista_etiquetas": [
+					"pepino",
+					"calabacín"
+				],
+				"lista_ganancias": {
+					"forma": 0.0
+				},
+				"lista_ramas_mejor_atributo": [
+					"alargada"
+				],
+				"mejor_atributo": "forma",
+				"metrica_de_ganancia_de_info_1": "la entropía",
+				"metrica_de_ganancia_de_info_2": "entropía",
+				"n_atributos_con_ganancia_maxima": 1,
+				"numero_de_datos": 2,
+				"numero_etiqueta_mayoritaria": 1,
+				"pureza_nodo": "50.00%",
+				"pureza_nodo_valor": 0.5,
+				"tipo_de_nodo": "internal",
+				"valor_metrica_mejor_atributo": 0.0,
+				"valor_rama": "grande"
+			},
+			"sons_id": [
+				17
+			],
+			"text": "forma",
+			"was_created_by_algorithm": true
+		},
+		"15": {
+			"attribute": "",
+			"branch_value": "pequeña",
+			"can_remove": true,
+			"depth": 2,
+			"id": 15,
+			"information_variable_value": "",
+			"inorder_index": 5.0,
+			"is_leaf": true,
+			"is_pending": false,
+			"label": "uva",
+			"parent_id": 2,
+			"partition_details": {
+				"conteo_etiquetas": {
+					"uva": 1
+				},
+				"etiqueta_mayoritaria": "uva",
+				"lista_atributos": [
+					"forma"
+				],
+				"lista_etiquetas": [
+					"uva"
+				],
+				"numero_de_datos": 1,
+				"numero_etiqueta_mayoritaria": 1,
+				"pureza_nodo": "100.00%",
+				"pureza_nodo_valor": 1.0,
+				"tipo_de_nodo": "leaf",
+				"valor_rama": "pequeña"
+			},
+			"sons_id": [],
+			"text": "uva",
+			"was_created_by_algorithm": true
+		},
+		"16": {
+			"attribute": "",
+			"branch_value": "redonda",
+			"can_remove": true,
+			"depth": 3,
+			"id": 16,
+			"information_variable_value": "",
+			"inorder_index": 3.0,
+			"is_leaf": true,
+			"is_pending": false,
+			"label": "manzana",
+			"parent_id": 13,
+			"partition_details": {
+				"conteo_etiquetas": {
+					"lima": 1,
+					"manzana": 1
+				},
+				"etiqueta_mayoritaria": "manzana",
+				"lista_atributos": [],
+				"lista_etiquetas": [
+					"manzana",
+					"lima"
+				],
+				"numero_de_datos": 2,
+				"numero_etiqueta_mayoritaria": 1,
+				"pureza_nodo": "50.00%",
+				"pureza_nodo_valor": 0.5,
+				"tipo_de_nodo": "leaf_majority",
+				"valor_rama": "redonda"
+			},
+			"sons_id": [],
+			"text": "manzana",
+			"was_created_by_algorithm": true
+		},
+		"17": {
+			"attribute": "",
+			"branch_value": "alargada",
+			"can_remove": true,
+			"depth": 3,
+			"id": 17,
+			"information_variable_value": "",
+			"inorder_index": 4.0,
+			"is_leaf": true,
+			"is_pending": false,
+			"label": "pepino",
+			"parent_id": 14,
+			"partition_details": {
+				"conteo_etiquetas": {
+					"calabacín": 1,
+					"pepino": 1
+				},
+				"etiqueta_mayoritaria": "pepino",
+				"lista_atributos": [],
+				"lista_etiquetas": [
+					"pepino",
+					"calabacín"
+				],
+				"numero_de_datos": 2,
+				"numero_etiqueta_mayoritaria": 1,
+				"pureza_nodo": "50.00%",
+				"pureza_nodo_valor": 0.5,
+				"tipo_de_nodo": "leaf_majority",
+				"valor_rama": "alargada"
+			},
+			"sons_id": [],
+			"text": "pepino",
+			"was_created_by_algorithm": true
+		},
+		"18": {
+			"attribute": "",
+			"branch_value": "alargada",
+			"can_remove": true,
+			"depth": 2,
+			"id": 18,
+			"information_variable_value": "",
+			"inorder_index": 6.0,
+			"is_leaf": true,
+			"is_pending": false,
+			"label": "plátano",
+			"parent_id": 3,
+			"partition_details": {
+				"conteo_etiquetas": {
+					"plátano": 1
+				},
+				"etiqueta_mayoritaria": "plátano",
+				"lista_atributos": [
+					"tamaño"
+				],
+				"lista_etiquetas": [
+					"plátano"
+				],
+				"numero_de_datos": 1,
+				"numero_etiqueta_mayoritaria": 1,
+				"pureza_nodo": "100.00%",
+				"pureza_nodo_valor": 1.0,
+				"tipo_de_nodo": "leaf",
+				"valor_rama": "alargada"
+			},
+			"sons_id": [],
+			"text": "plátano",
+			"was_created_by_algorithm": true
+		},
+		"19": {
+			"attribute": "tamaño",
+			"branch_value": "redonda",
+			"can_remove": true,
+			"depth": 2,
+			"id": 19,
+			"information_variable_value": "0.00",
+			"inorder_index": 7.0,
+			"is_leaf": false,
+			"is_pending": false,
+			"label": "",
+			"parent_id": 3,
+			"partition_details": {
+				"conteo_etiquetas": {
+					"ciruela": 1,
+					"limón": 1
+				},
+				"etiqueta_mayoritaria": "ciruela",
+				"lista_atributos": [
+					"tamaño"
+				],
+				"lista_etiquetas": [
+					"ciruela",
+					"limón"
+				],
+				"lista_ganancias": {
+					"tamaño": 0.0
+				},
+				"lista_ramas_mejor_atributo": [
+					"mediana"
+				],
+				"mejor_atributo": "tamaño",
+				"metrica_de_ganancia_de_info_1": "la entropía",
+				"metrica_de_ganancia_de_info_2": "entropía",
+				"n_atributos_con_ganancia_maxima": 1,
+				"numero_de_datos": 2,
+				"numero_etiqueta_mayoritaria": 1,
+				"pureza_nodo": "50.00%",
+				"pureza_nodo_valor": 0.5,
+				"tipo_de_nodo": "internal",
+				"valor_metrica_mejor_atributo": 0.0,
+				"valor_rama": "redonda"
+			},
+			"sons_id": [
+				20
+			],
+			"text": "tamaño",
+			"was_created_by_algorithm": true
+		},
+		"2": {
+			"attribute": "tamaño",
+			"branch_value": "verde",
+			"can_remove": true,
+			"depth": 1,
+			"id": 2,
+			"information_variable_value": "1.52",
+			"inorder_index": 4.0,
+			"is_leaf": false,
+			"is_pending": false,
+			"label": "",
+			"parent_id": 0,
+			"partition_details": {
+				"conteo_etiquetas": {
+					"calabacín": 1,
+					"lima": 1,
+					"manzana": 1,
+					"pepino": 1,
+					"uva": 1
+				},
+				"etiqueta_mayoritaria": "manzana",
+				"lista_atributos": [
+					"forma",
+					"tamaño"
+				],
+				"lista_etiquetas": [
+					"manzana",
+					"pepino",
+					"calabacín",
+					"uva",
+					"lima"
+				],
+				"lista_ganancias": {
+					"forma": 0.970950594454669,
+					"tamaño": 1.52192809488736
+				},
+				"lista_ramas_mejor_atributo": [
+					"pequeña",
+					"grande",
+					"mediana"
+				],
+				"mejor_atributo": "tamaño",
+				"metrica_de_ganancia_de_info_1": "la entropía",
+				"metrica_de_ganancia_de_info_2": "entropía",
+				"n_atributos_con_ganancia_maxima": 1,
+				"numero_de_datos": 5,
+				"numero_etiqueta_mayoritaria": 1,
+				"pureza_nodo": "20.00%",
+				"pureza_nodo_valor": 0.2,
+				"tipo_de_nodo": "internal",
+				"valor_metrica_mejor_atributo": 1.52192809488736,
+				"valor_rama": "verde"
+			},
+			"sons_id": [
+				13,
+				14,
+				15
+			],
+			"text": "tamaño",
+			"was_created_by_algorithm": true
+		},
+		"20": {
+			"attribute": "",
+			"branch_value": "mediana",
+			"can_remove": true,
+			"depth": 3,
+			"id": 20,
+			"information_variable_value": "",
+			"inorder_index": 7.0,
+			"is_leaf": true,
+			"is_pending": false,
+			"label": "ciruela",
+			"parent_id": 19,
+			"partition_details": {
+				"conteo_etiquetas": {
+					"ciruela": 1,
+					"limón": 1
+				},
+				"etiqueta_mayoritaria": "ciruela",
+				"lista_atributos": [],
+				"lista_etiquetas": [
+					"ciruela",
+					"limón"
+				],
+				"numero_de_datos": 2,
+				"numero_etiqueta_mayoritaria": 1,
+				"pureza_nodo": "50.00%",
+				"pureza_nodo_valor": 0.5,
+				"tipo_de_nodo": "leaf_majority",
+				"valor_rama": "mediana"
+			},
+			"sons_id": [],
+			"text": "ciruela",
+			"was_created_by_algorithm": true
+		},
+		"21": {
+			"attribute": "tamaño",
+			"branch_value": "redonda",
+			"can_remove": true,
+			"depth": 2,
+			"id": 21,
+			"information_variable_value": "0.00",
+			"inorder_index": 8.0,
+			"is_leaf": false,
+			"is_pending": false,
+			"label": "",
+			"parent_id": 4,
+			"partition_details": {
+				"conteo_etiquetas": {
+					"mandarina": 1,
+					"naranja": 1
+				},
+				"etiqueta_mayoritaria": "naranja",
+				"lista_atributos": [
+					"tamaño"
+				],
+				"lista_etiquetas": [
+					"naranja",
+					"mandarina"
+				],
+				"lista_ganancias": {
+					"tamaño": 0.0
+				},
+				"lista_ramas_mejor_atributo": [
+					"mediana"
+				],
+				"mejor_atributo": "tamaño",
+				"metrica_de_ganancia_de_info_1": "la entropía",
+				"metrica_de_ganancia_de_info_2": "entropía",
+				"n_atributos_con_ganancia_maxima": 1,
+				"numero_de_datos": 2,
+				"numero_etiqueta_mayoritaria": 1,
+				"pureza_nodo": "50.00%",
+				"pureza_nodo_valor": 0.5,
+				"tipo_de_nodo": "internal",
+				"valor_metrica_mejor_atributo": 0.0,
+				"valor_rama": "redonda"
+			},
+			"sons_id": [
+				22
+			],
+			"text": "tamaño",
+			"was_created_by_algorithm": true
+		},
+		"22": {
+			"attribute": "",
+			"branch_value": "mediana",
+			"can_remove": true,
+			"depth": 3,
+			"id": 22,
+			"information_variable_value": "",
+			"inorder_index": 8.0,
+			"is_leaf": true,
+			"is_pending": false,
+			"label": "naranja",
+			"parent_id": 21,
+			"partition_details": {
+				"conteo_etiquetas": {
+					"mandarina": 1,
+					"naranja": 1
+				},
+				"etiqueta_mayoritaria": "naranja",
+				"lista_atributos": [],
+				"lista_etiquetas": [
+					"naranja",
+					"mandarina"
+				],
+				"numero_de_datos": 2,
+				"numero_etiqueta_mayoritaria": 1,
+				"pureza_nodo": "50.00%",
+				"pureza_nodo_valor": 0.5,
+				"tipo_de_nodo": "leaf_majority",
+				"valor_rama": "mediana"
+			},
+			"sons_id": [],
+			"text": "naranja",
+			"was_created_by_algorithm": true
+		},
+		"23": {
+			"attribute": "",
+			"branch_value": "pequeña",
+			"can_remove": true,
+			"depth": 2,
+			"id": 23,
+			"information_variable_value": "",
+			"inorder_index": 10.0,
+			"is_leaf": true,
+			"is_pending": false,
+			"label": "uva",
+			"parent_id": 6,
+			"partition_details": {
+				"conteo_etiquetas": {
+					"uva": 1
+				},
+				"etiqueta_mayoritaria": "uva",
+				"lista_atributos": [
+					"forma"
+				],
+				"lista_etiquetas": [
+					"uva"
+				],
+				"numero_de_datos": 1,
+				"numero_etiqueta_mayoritaria": 1,
+				"pureza_nodo": "100.00%",
+				"pureza_nodo_valor": 1.0,
+				"tipo_de_nodo": "leaf",
+				"valor_rama": "pequeña"
+			},
+			"sons_id": [],
+			"text": "uva",
+			"was_created_by_algorithm": true
+		},
+		"24": {
+			"attribute": "",
+			"branch_value": "mediana",
+			"can_remove": true,
+			"depth": 2,
+			"id": 24,
+			"information_variable_value": "",
+			"inorder_index": 11.0,
+			"is_leaf": true,
+			"is_pending": false,
+			"label": "ciruela",
+			"parent_id": 6,
+			"partition_details": {
+				"conteo_etiquetas": {
+					"ciruela": 2
+				},
+				"etiqueta_mayoritaria": "ciruela",
+				"lista_atributos": [
+					"forma"
+				],
+				"lista_etiquetas": [
+					"ciruela",
+					"ciruela"
+				],
+				"numero_de_datos": 2,
+				"numero_etiqueta_mayoritaria": 2,
+				"pureza_nodo": "100.00%",
+				"pureza_nodo_valor": 1.0,
+				"tipo_de_nodo": "leaf",
+				"valor_rama": "mediana"
+			},
+			"sons_id": [],
+			"text": "ciruela",
+			"was_created_by_algorithm": true
+		},
+		"3": {
+			"attribute": "forma",
+			"branch_value": "amarillo",
+			"can_remove": true,
+			"depth": 1,
+			"id": 3,
+			"information_variable_value": "0.92",
+			"inorder_index": 6.5,
+			"is_leaf": false,
+			"is_pending": false,
+			"label": "",
+			"parent_id": 0,
+			"partition_details": {
+				"conteo_etiquetas": {
+					"ciruela": 1,
+					"limón": 1,
+					"plátano": 1
+				},
+				"etiqueta_mayoritaria": "plátano",
+				"lista_atributos": [
+					"forma",
+					"tamaño"
+				],
+				"lista_etiquetas": [
+					"plátano",
+					"ciruela",
+					"limón"
+				],
+				"lista_ganancias": {
+					"forma": 0.918295834054489,
+					"tamaño": 0.0
+				},
+				"lista_ramas_mejor_atributo": [
+					"redonda",
+					"alargada"
+				],
+				"mejor_atributo": "forma",
+				"metrica_de_ganancia_de_info_1": "la entropía",
+				"metrica_de_ganancia_de_info_2": "entropía",
+				"n_atributos_con_ganancia_maxima": 1,
+				"numero_de_datos": 3,
+				"numero_etiqueta_mayoritaria": 1,
+				"pureza_nodo": "33.33%",
+				"pureza_nodo_valor": 0.333333333333333,
+				"tipo_de_nodo": "internal",
+				"valor_metrica_mejor_atributo": 0.918295834054489,
+				"valor_rama": "amarillo"
+			},
+			"sons_id": [
+				18,
+				19
+			],
+			"text": "forma",
+			"was_created_by_algorithm": true
+		},
+		"4": {
+			"attribute": "forma",
+			"branch_value": "naranja",
+			"can_remove": true,
+			"depth": 1,
+			"id": 4,
+			"information_variable_value": "0.00",
+			"inorder_index": 8.0,
+			"is_leaf": false,
+			"is_pending": false,
+			"label": "",
+			"parent_id": 0,
+			"partition_details": {
+				"conteo_etiquetas": {
+					"mandarina": 1,
+					"naranja": 1
+				},
+				"etiqueta_mayoritaria": "naranja",
+				"lista_atributos": [
+					"forma",
+					"tamaño"
+				],
+				"lista_etiquetas": [
+					"naranja",
+					"mandarina"
+				],
+				"lista_ganancias": {
+					"forma": 0.0,
+					"tamaño": 0.0
+				},
+				"lista_ramas_mejor_atributo": [
+					"redonda"
+				],
+				"mejor_atributo": "forma",
+				"metrica_de_ganancia_de_info_1": "la entropía",
+				"metrica_de_ganancia_de_info_2": "entropía",
+				"n_atributos_con_ganancia_maxima": 2,
+				"numero_de_datos": 2,
+				"numero_etiqueta_mayoritaria": 1,
+				"pureza_nodo": "50.00%",
+				"pureza_nodo_valor": 0.5,
+				"tipo_de_nodo": "internal_multi_atribute",
+				"valor_metrica_mejor_atributo": 0.0,
+				"valor_rama": "naranja"
+			},
+			"sons_id": [
+				21
+			],
+			"text": "forma",
+			"was_created_by_algorithm": true
+		},
+		"5": {
+			"attribute": "",
+			"branch_value": "blanco",
+			"can_remove": true,
+			"depth": 1,
+			"id": 5,
+			"information_variable_value": "",
+			"inorder_index": 9.0,
+			"is_leaf": true,
+			"is_pending": false,
+			"label": "melón",
+			"parent_id": 0,
+			"partition_details": {
+				"conteo_etiquetas": {
+					"melón": 1
+				},
+				"etiqueta_mayoritaria": "melón",
+				"lista_atributos": [
+					"forma",
+					"tamaño"
+				],
+				"lista_etiquetas": [
+					"melón"
+				],
+				"numero_de_datos": 1,
+				"numero_etiqueta_mayoritaria": 1,
+				"pureza_nodo": "100.00%",
+				"pureza_nodo_valor": 1.0,
+				"tipo_de_nodo": "leaf",
+				"valor_rama": "blanco"
+			},
+			"sons_id": [],
+			"text": "melón",
+			"was_created_by_algorithm": true
+		},
+		"6": {
+			"attribute": "tamaño",
+			"branch_value": "morado",
+			"can_remove": true,
+			"depth": 1,
+			"id": 6,
+			"information_variable_value": "0.92",
+			"inorder_index": 10.5,
+			"is_leaf": false,
+			"is_pending": false,
+			"label": "",
+			"parent_id": 0,
+			"partition_details": {
+				"conteo_etiquetas": {
+					"ciruela": 2,
+					"uva": 1
+				},
+				"etiqueta_mayoritaria": "ciruela",
+				"lista_atributos": [
+					"forma",
+					"tamaño"
+				],
+				"lista_etiquetas": [
+					"uva",
+					"ciruela",
+					"ciruela"
+				],
+				"lista_ganancias": {
+					"forma": 0.0,
+					"tamaño": 0.91829583405449
+				},
+				"lista_ramas_mejor_atributo": [
+					"mediana",
+					"pequeña"
+				],
+				"mejor_atributo": "tamaño",
+				"metrica_de_ganancia_de_info_1": "la entropía",
+				"metrica_de_ganancia_de_info_2": "entropía",
+				"n_atributos_con_ganancia_maxima": 1,
+				"numero_de_datos": 3,
+				"numero_etiqueta_mayoritaria": 2,
+				"pureza_nodo": "66.67%",
+				"pureza_nodo_valor": 0.666666666666667,
+				"tipo_de_nodo": "internal",
+				"valor_metrica_mejor_atributo": 0.91829583405449,
+				"valor_rama": "morado"
+			},
+			"sons_id": [
+				23,
+				24
+			],
+			"text": "tamaño",
+			"was_created_by_algorithm": true
+		},
+		"7": {
+			"attribute": "forma",
+			"branch_value": "mediana",
+			"can_remove": true,
+			"depth": 2,
+			"id": 7,
+			"information_variable_value": "0.00",
+			"inorder_index": 0.0,
+			"is_leaf": false,
+			"is_pending": false,
+			"label": "",
+			"parent_id": 1,
+			"partition_details": {
+				"conteo_etiquetas": {
+					"ciruela": 1,
+					"manzana": 3
+				},
+				"etiqueta_mayoritaria": "manzana",
+				"lista_atributos": [
+					"forma"
+				],
+				"lista_etiquetas": [
+					"manzana",
+					"manzana",
+					"manzana",
+					"ciruela"
+				],
+				"lista_ganancias": {
+					"forma": 0.0
+				},
+				"lista_ramas_mejor_atributo": [
+					"redonda"
+				],
+				"mejor_atributo": "forma",
+				"metrica_de_ganancia_de_info_1": "la entropía",
+				"metrica_de_ganancia_de_info_2": "entropía",
+				"n_atributos_con_ganancia_maxima": 1,
+				"numero_de_datos": 4,
+				"numero_etiqueta_mayoritaria": 3,
+				"pureza_nodo": "75.00%",
+				"pureza_nodo_valor": 0.75,
+				"tipo_de_nodo": "internal",
+				"valor_metrica_mejor_atributo": 0.0,
+				"valor_rama": "mediana"
+			},
+			"sons_id": [
+				10
+			],
+			"text": "forma",
+			"was_created_by_algorithm": true
+		},
+		"8": {
+			"attribute": "forma",
+			"branch_value": "grande",
+			"can_remove": true,
+			"depth": 2,
+			"id": 8,
+			"information_variable_value": "0.00",
+			"inorder_index": 1.0,
+			"is_leaf": false,
+			"is_pending": false,
+			"label": "",
+			"parent_id": 1,
+			"partition_details": {
+				"conteo_etiquetas": {
+					"granada": 1,
+					"sandía": 1
+				},
+				"etiqueta_mayoritaria": "granada",
+				"lista_atributos": [
+					"forma"
+				],
+				"lista_etiquetas": [
+					"granada",
+					"sandía"
+				],
+				"lista_ganancias": {
+					"forma": 0.0
+				},
+				"lista_ramas_mejor_atributo": [
+					"redonda"
+				],
+				"mejor_atributo": "forma",
+				"metrica_de_ganancia_de_info_1": "la entropía",
+				"metrica_de_ganancia_de_info_2": "entropía",
+				"n_atributos_con_ganancia_maxima": 1,
+				"numero_de_datos": 2,
+				"numero_etiqueta_mayoritaria": 1,
+				"pureza_nodo": "50.00%",
+				"pureza_nodo_valor": 0.5,
+				"tipo_de_nodo": "internal",
+				"valor_metrica_mejor_atributo": 0.0,
+				"valor_rama": "grande"
+			},
+			"sons_id": [
+				11
+			],
+			"text": "forma",
+			"was_created_by_algorithm": true
+		},
+		"9": {
+			"attribute": "forma",
+			"branch_value": "pequeña",
+			"can_remove": true,
+			"depth": 2,
+			"id": 9,
+			"information_variable_value": "0.00",
+			"inorder_index": 2.0,
+			"is_leaf": false,
+			"is_pending": false,
+			"label": "",
+			"parent_id": 1,
+			"partition_details": {
+				"conteo_etiquetas": {
+					"cereza": 1,
+					"fresa": 1
+				},
+				"etiqueta_mayoritaria": "cereza",
+				"lista_atributos": [
+					"forma"
+				],
+				"lista_etiquetas": [
+					"cereza",
+					"fresa"
+				],
+				"lista_ganancias": {
+					"forma": 0.0
+				},
+				"lista_ramas_mejor_atributo": [
+					"redonda"
+				],
+				"mejor_atributo": "forma",
+				"metrica_de_ganancia_de_info_1": "la entropía",
+				"metrica_de_ganancia_de_info_2": "entropía",
+				"n_atributos_con_ganancia_maxima": 1,
+				"numero_de_datos": 2,
+				"numero_etiqueta_mayoritaria": 1,
+				"pureza_nodo": "50.00%",
+				"pureza_nodo_valor": 0.5,
+				"tipo_de_nodo": "internal",
+				"valor_metrica_mejor_atributo": 0.0,
+				"valor_rama": "pequeña"
+			},
+			"sons_id": [
+				12
+			],
+			"text": "forma",
+			"was_created_by_algorithm": true
+		}
+	},
+	"root_id": 0
+}

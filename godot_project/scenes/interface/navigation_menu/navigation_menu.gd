@@ -1,12 +1,15 @@
 extends PanelContainer
 
-const TREE_FILE_PATH: String = "user://tree.json"
+const TREE_FILE_NAME: String = "tree.json"
+const TREE_FILE_EXTENSION: String = "json"
 
 @export var algorithm_name: String = ""
 
 @onready var load_button: Button = %LoadButton
 @onready var save_button: Button = %SaveButton
 @onready var home_button: Button = %HomeButton
+
+var _web_tree_callback: Variant
 
 
 func _ready() -> void:
@@ -34,7 +37,7 @@ func _on_load_button_pressed() -> void:
 	if _is_nn_algorithm():
 		return
 
-	_load_tree(TREE_FILE_PATH)
+	_request_tree_load_path()
 
 
 func _on_save_button_pressed() -> void:
@@ -42,7 +45,7 @@ func _on_save_button_pressed() -> void:
 		_show_network_export_panel()
 		return
 
-	_save_tree(TREE_FILE_PATH)
+	_request_tree_save_path()
 
 
 func _show_network_export_panel() -> void:
@@ -54,20 +57,136 @@ func _show_network_export_panel() -> void:
 	panel_export_format.visible = true
 
 
-func _save_tree(file_path: String) -> void:
-	var dtree := _get_current_dtree()
-	if dtree == null:
+func _request_tree_load_path() -> void:
+	if OS.has_feature("web") and Engine.has_singleton("JavaScriptBridge"):
+		_load_tree_from_browser()
 		return
 
-	var json_string := JSON.stringify(_tree_to_json_data(dtree), "\t")
+	var file_dialog := FileDialog.new()
+	file_dialog.access = FileDialog.ACCESS_FILESYSTEM
+	file_dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILE
+	file_dialog.filters = PackedStringArray(["*.json ; JSON Files"])
+
+	if "use_native_dialog" in file_dialog:
+		file_dialog.use_native_dialog = true
+
+	file_dialog.file_selected.connect(func(file_path: String):
+		_load_tree(file_path)
+		file_dialog.queue_free()
+	)
+
+	file_dialog.canceled.connect(func():
+		file_dialog.queue_free()
+	)
+
+	add_child(file_dialog)
+	file_dialog.popup_centered_ratio(0.4)
+
+
+func _request_tree_save_path() -> void:
+	if OS.has_feature("web") and Engine.has_singleton("JavaScriptBridge"):
+		var json_string := _get_tree_json_string()
+		if not json_string.is_empty():
+			_download_content_from_browser(json_string, TREE_FILE_NAME)
+		return
+
+	var file_dialog := FileDialog.new()
+	file_dialog.access = FileDialog.ACCESS_FILESYSTEM
+	file_dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
+	file_dialog.filters = PackedStringArray(["*.json ; JSON Files"])
+	file_dialog.current_file = TREE_FILE_NAME
+
+	if "use_native_dialog" in file_dialog:
+		file_dialog.use_native_dialog = true
+
+	file_dialog.file_selected.connect(func(file_path: String):
+		_save_tree(_ensure_extension(file_path, TREE_FILE_EXTENSION))
+		file_dialog.queue_free()
+	)
+
+	file_dialog.canceled.connect(func():
+		file_dialog.queue_free()
+	)
+
+	add_child(file_dialog)
+	file_dialog.popup_centered_ratio(0.4)
+
+
+func _load_tree_from_browser() -> void:
+	var js_bridge = Engine.get_singleton("JavaScriptBridge")
+	_web_tree_callback = js_bridge.create_callback(_on_web_tree_loaded)
+	js_bridge.get_interface("window").godotTreeUploadCallback = _web_tree_callback
+
+	js_bridge.eval(
+		"""
+		(function () {
+			const input = document.createElement("input");
+			input.type = "file";
+			input.accept = ".json,application/json";
+			input.style.display = "none";
+			input.addEventListener("change", function () {
+				const file = input.files && input.files[0];
+				if (!file) {
+					input.remove();
+					return;
+				}
+				const reader = new FileReader();
+				reader.onload = function (event) {
+					window.godotTreeUploadCallback(event.target.result, file.name);
+					input.remove();
+				};
+				reader.onerror = function () {
+					window.godotTreeUploadCallback("", file.name, "No se pudo leer el archivo.");
+					input.remove();
+				};
+				reader.readAsText(file);
+			});
+			document.body.appendChild(input);
+			input.click();
+		})();
+		""",
+		true
+	)
+
+
+func _on_web_tree_loaded(args: Array) -> void:
+	if args.size() >= 3 and not str(args[2]).is_empty():
+		push_error(str(args[2]))
+		return
+
+	if args.is_empty() or str(args[0]).is_empty():
+		push_error("No se seleccionó ningún árbol.")
+		return
+
+	var display_name := TREE_FILE_NAME
+	if args.size() >= 2 and not str(args[1]).is_empty():
+		display_name = str(args[1])
+
+	_load_tree_from_content(str(args[0]), display_name)
+
+
+func _save_tree(file_path: String) -> bool:
+	var json_string := _get_tree_json_string()
+	if json_string.is_empty():
+		return false
+
 	var file := FileAccess.open(file_path, FileAccess.WRITE)
 	if file == null:
 		push_error("It was not possible to open the file to write: %s" % file_path)
-		return
+		return false
 
 	file.store_string(json_string)
 	file.close()
 	print("Tree saved")
+	return true
+
+
+func _get_tree_json_string() -> String:
+	var dtree := _get_current_dtree()
+	if dtree == null:
+		return ""
+
+	return JSON.stringify(_tree_to_json_data(dtree), "\t")
 
 
 func _load_tree(file_path: String) -> void:
@@ -75,10 +194,17 @@ func _load_tree(file_path: String) -> void:
 	if json_content.is_empty():
 		return
 
+	_load_tree_from_content(json_content, file_path)
+
+
+func _load_tree_from_content(json_content: String, source_name: String) -> void:
+	if json_content.is_empty():
+		return
+
 	var json := JSON.new()
 	var error := json.parse(json_content)
 	if error != OK:
-		push_error("Could not parse %s: %s at line %d" % [file_path, json.get_error_message(), json.get_error_line()])
+		push_error("Could not parse %s: %s at line %d" % [source_name, json.get_error_message(), json.get_error_line()])
 		return
 
 	if not (json.data is Dictionary):
@@ -119,6 +245,30 @@ func _load_tree(file_path: String) -> void:
 	print("Tree loaded")
 
 
+func _download_content_from_browser(content: String, download_name: String) -> void:
+	var js_bridge = Engine.get_singleton("JavaScriptBridge")
+	js_bridge.get_interface("window").godotTreeExportContent = content
+	js_bridge.get_interface("window").godotTreeExportFileName = download_name
+	js_bridge.eval(
+		"""
+		(function () {
+			const content = window.godotTreeExportContent || "";
+			const fileName = window.godotTreeExportFileName || "tree.json";
+			const blob = new Blob([content], { type: "application/json;charset=utf-8" });
+			const url = URL.createObjectURL(blob);
+			const link = document.createElement("a");
+			link.href = url;
+			link.download = fileName;
+			document.body.appendChild(link);
+			link.click();
+			link.remove();
+			URL.revokeObjectURL(url);
+		})();
+		""",
+		true
+	)
+
+
 func _load_json_content(file_path: String) -> String:
 	var file := FileAccess.open(file_path, FileAccess.READ)
 	if file == null:
@@ -128,6 +278,13 @@ func _load_json_content(file_path: String) -> String:
 	var content := file.get_as_text()
 	file.close()
 	return content
+
+
+func _ensure_extension(file_path: String, extension: String) -> String:
+	if file_path.get_extension().to_lower() == extension:
+		return file_path
+
+	return "%s.%s" % [file_path, extension]
 
 
 func _get_current_dtree() -> DTreeLogical:
