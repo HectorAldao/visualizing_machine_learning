@@ -22,6 +22,9 @@ signal drop_data()
 
 signal all_data_droped()
 
+# navigation
+signal return_to_main_menu
+
 
 # scenes/interface/nn/create_nn_menu/create_nn_menu.gd
 signal load_nn

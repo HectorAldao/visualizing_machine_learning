@@ -305,4 +305,5 @@ func _variant_to_string(raw_value: Variant) -> String:
 
 ## Returns to home menu
 func _go_home() -> void:
+	SignalsObserver.return_to_main_menu.emit()
 	get_tree().change_scene_to_file(Constants.SCENES.main_menu)
