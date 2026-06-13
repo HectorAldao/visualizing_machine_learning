@@ -1,4 +1,160 @@
 \chapter{Marco teórico}
 \label{chap:marco_teorico}
 
+Este capítulo recoge la base formal de los dos modelos implementados en la aplicación.
+%El objetivo es separar la explicación matemática de los algoritmos de las decisiones concretas de desarrollo que aparecen en el Capítulo~\ref{chap:desarrollo}.
+En primer lugar se presentan los árboles de decisión construidos mediante ID3 con atributos categóricos y entropía.
+Después se describe el funcionamiento de una red neuronal multicapa sencilla, formada por capas densas y entrenada mediante retropropagación.
 
+
+\section{Árboles de decisión e ID3}
+\label{sec:marco_arboles_id3}
+
+Los árboles de decisión son modelos supervisados que organizan una clasificación como una secuencia de preguntas sobre los atributos de entrada.
+Cada nodo interno representa una pregunta, cada rama representa una posible respuesta y cada hoja contiene la etiqueta predicha.
+El algoritmo ID3 fue presentado por Quinlan como un procedimiento para inducir árboles de decisión a partir de ejemplos etiquetados~\cite{QuinlanID3}.
+La versión considerada en este trabajo usa atributos categóricos y selecciona las divisiones mediante entropía y ganancia de información.
+
+Sea \(D\) un conjunto de ejemplos de entrenamiento y sea \(C\) el conjunto de clases posibles.
+Para una clase \(c \in C\), se define
+\[
+p(c) = \frac{|\{x \in D : y(x)=c\}|}{|D|},
+\]
+donde \(y(x)\) es la etiqueta del ejemplo \(x\).
+La entropía del conjunto \(D\) mide la incertidumbre sobre la clase de un ejemplo tomado de ese conjunto:
+\[
+H(D) = -\sum_{c \in C} p(c)\log_2 p(c).
+\]
+Cuando \(p(c)=0\), el término \(p(c)\log_2 p(c)\) se toma como 0.
+Si todos los ejemplos pertenecen a la misma clase, la entropía vale 0.
+Si las clases aparecen repartidas de forma más equilibrada, la entropía aumenta.
+
+Para evaluar un atributo categórico \(A\), ID3 separa \(D\) en subconjuntos según los valores posibles de ese atributo.
+Si \(\mathcal{V}(A)\) es el conjunto de valores de \(A\), se define
+\[
+D_v = \{x \in D : A(x)=v\}, \quad v \in \mathcal{V}(A).
+\]
+La entropía esperada tras dividir por \(A\) es la media ponderada de las entropías de esos subconjuntos:
+\[
+H(D \mid A) = \sum_{v \in \mathcal{V}(A)} \frac{|D_v|}{|D|} H(D_v).
+\]
+La ganancia de información indica cuánto se reduce la incertidumbre al usar ese atributo:
+\[
+IG(D,A) = H(D) - H(D \mid A).
+\]
+ID3 escoge el atributo con mayor ganancia de información:
+\[
+A^* = \operatorname*{arg\,max}_{A \in \mathcal{A}} IG(D,A),
+\]
+donde \(\mathcal{A}\) es el conjunto de atributos disponibles en ese nodo.
+
+El algoritmo se aplica de forma recursiva.
+En cada nodo se comprueba primero si todos los ejemplos tienen la misma clase.
+En ese caso se crea una hoja con esa etiqueta.
+Si todavía hay varias clases y quedan atributos disponibles, se escoge el atributo con mayor ganancia de información y se crea una rama para cada valor observado.
+Después, el mismo proceso se repite sobre cada subconjunto \(D_v\), retirando el atributo usado para que no vuelva a seleccionarse en las ramas inferiores.
+Si se agotan los atributos antes de conseguir subconjuntos puros, se crea una hoja con la clase mayoritaria del conjunto que llega a ese nodo:
+\[
+\hat{c} = \operatorname*{arg\,max}_{c \in C} |\{x \in D : y(x)=c\}|.
+\]
+
+La formulación anterior corresponde a la versión básica de ID3 usada en la aplicación.
+Existen extensiones y variantes que modifican varios puntos del proceso: se pueden tratar atributos continuos mediante umbrales, utilizar otras métricas como el índice de Gini o la razón de ganancia, aplicar técnicas de poda para reducir sobreajuste o permitir árboles con restricciones distintas sobre su profundidad.
+En este trabajo se fija el caso categórico con entropía porque permite mostrar de forma directa cómo una métrica numérica justifica cada partición del conjunto de datos.
+
+
+\section{Redes neuronales multicapa}
+\label{sec:marco_redes_neuronales}
+
+Las redes neuronales artificiales tienen su origen en modelos como el perceptrón de Rosenblatt~\cite{RosenblattPerceptron}.
+La versión utilizada en este trabajo corresponde a un perceptrón multicapa, es decir, una red formada por una capa de entrada, cero o más capas ocultas y una capa de salida.
+El entrenamiento de redes multicapa mediante retropropagación fue popularizado por Rumelhart, Hinton y Williams~\cite{RumelhartBackprop}, y constituye la base del procedimiento implementado en la aplicación.
+
+Una red neuronal densa se organiza en capas numeradas desde \(0\) hasta \(L\).
+La capa \(0\) es la capa de entrada y contiene el vector de atributos:
+\[
+a^{(0)} = x.
+\]
+Para cada capa posterior \(l \in \{1, \dots, L\}\), el modelo dispone de una matriz de pesos \(W^{(l)}\), un vector de sesgos \(b^{(l)}\) y una función de activación \(f_l\).
+El cálculo de la capa se divide en dos pasos.
+Primero se obtiene la combinación lineal:
+\[
+z^{(l)} = W^{(l)}a^{(l-1)} + b^{(l)}.
+\]
+Después se aplica la función de activación:
+\[
+a^{(l)} = f_l\left(z^{(l)}\right).
+\]
+El vector \(a^{(l)}\) pasa a ser la entrada de la capa siguiente.
+La salida final de la red es \(a^{(L)}\).
+
+Las funciones de activación introducen transformaciones no lineales o adaptan la salida al tipo de problema.
+Entre las funciones habituales se encuentran la identidad, usada a menudo en regresión,
+\[
+f(z)=z,
+\]
+la sigmoide,
+\[
+\sigma(z)=\frac{1}{1+e^{-z}},
+\]
+y ReLU,
+\[
+\operatorname{ReLU}(z)=\max(0,z).
+\]
+En clasificación multiclase se usa con frecuencia softmax, que transforma un vector de valores en una distribución de probabilidades:
+\[
+\operatorname{softmax}(z)_i = \frac{e^{z_i}}{\sum_k e^{z_k}}.
+\]
+Softmax se aplica al vector completo de la capa, ya que cada salida depende de todos los componentes del vector \(z\).
+
+Para entrenar la red hace falta definir una función de pérdida \(L\), que mide la diferencia entre la salida calculada \(a^{(L)}\) y el objetivo esperado \(y\).
+En regresión puede emplearse el error cuadrático medio, expresado para una muestra como
+\[
+L = \frac{1}{2}\left\|a^{(L)}-y\right\|^2.
+\]
+En clasificación con softmax suele usarse entropía cruzada:
+\[
+L = -\sum_i y_i \log a^{(L)}_i.
+\]
+El entrenamiento busca ajustar los pesos y sesgos para reducir esta pérdida.
+
+La retropropagación calcula cómo afecta cada parámetro a la pérdida mediante la regla de la cadena.
+Para ello se define un término de error o delta en cada capa:
+\[
+\delta^{(l)} = \frac{\partial L}{\partial z^{(l)}}.
+\]
+En la capa de salida, cuando se combina softmax con entropía cruzada, aparece una simplificación muy usada:
+\[
+\delta^{(L)} = a^{(L)} - y.
+\]
+Para otras combinaciones de pérdida y activación, el delta de salida se obtiene multiplicando el gradiente de la pérdida respecto a la activación por la derivada local de la activación:
+\[
+\delta^{(L)} = \frac{\partial L}{\partial a^{(L)}} \odot f'_L\left(z^{(L)}\right),
+\]
+donde \(\odot\) indica producto elemento a elemento.
+
+En una capa oculta, el error se obtiene a partir de los deltas de la capa siguiente:
+\[
+\delta^{(l)} = \left(W^{(l+1)}\right)^T\delta^{(l+1)} \odot f'_l\left(z^{(l)}\right).
+\]
+Esta expresión resume la contribución de la capa \(l\) al error posterior y la ajusta según la pendiente local de su función de activación.
+
+Una vez conocidos los deltas, los gradientes de los parámetros de cada capa quedan definidos como
+\[
+\frac{\partial L}{\partial W^{(l)}} = \delta^{(l)}\left(a^{(l-1)}\right)^T,
+\]
+\[
+\frac{\partial L}{\partial b^{(l)}} = \delta^{(l)}.
+\]
+Con descenso de gradiente estocástico, los parámetros se actualizan tras cada muestra con una tasa de aprendizaje \(\eta\):
+\[
+W^{(l)} \leftarrow W^{(l)} - \eta \frac{\partial L}{\partial W^{(l)}},
+\]
+\[
+b^{(l)} \leftarrow b^{(l)} - \eta \frac{\partial L}{\partial b^{(l)}}.
+\]
+Este ciclo se repite sobre las muestras de entrenamiento.
+Cada muestra produce una propagación hacia delante, una pérdida, una retropropagación de deltas y una actualización de parámetros.
+
+Durante la inferencia se utiliza únicamente la propagación hacia delante.
+Los pesos y sesgos permanecen fijos, la entrada atraviesa las capas mediante las mismas ecuaciones y la salida final se interpreta como predicción del modelo.

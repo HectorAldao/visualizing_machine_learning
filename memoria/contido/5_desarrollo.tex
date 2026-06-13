@@ -81,6 +81,7 @@ Al funcionar desde el inicio, el desarrollo puede continuar sobre una base más 
 El proyecto deja de ser una prueba de interacción cuando comienza el desarrollo del primer algoritmo.
 A partir de esta versión, el objetivo pasa de dibujar elementos conectados a construir un árbol de decisión real, mostrar su evolución paso a paso y explicar las decisiones tomadas durante el entrenamiento.
 La dificultad principal está en coordinar tres niveles: el algoritmo que calcula la siguiente división, la estructura lógica del árbol y la escena que el usuario ve en pantalla.
+El funcionamiento formal de ID3 y del criterio de entropía se recoge en la Sección~\ref{sec:marco_arboles_id3}; en este capítulo se describe cómo se llevó ese algoritmo a la aplicación.
 
 
 \subsection{Primera arquitectura del árbol}
@@ -279,14 +280,14 @@ Una explicación en texto plano resulta suficiente para los primeros casos, aunq
 El objetivo pasa entonces a combinar texto y apoyo visual, de forma que el usuario pueda ver la comparación en lugar de leer solo una lista de números.
 
 El cambio principal es la incorporación de una gráfica de barras, mostrada en la Figura \ref{fig:dtree_grafica_entropia}.
-La gráfica representa la métrica calculada para cada atributo, basada en la entropía y utilizada por el algoritmo como ganancia de información.
+La gráfica representa la métrica calculada para cada atributo, basada en la entropía y utilizada por el algoritmo como ganancia de información, tal como se define en la Sección~\ref{sec:marco_arboles_id3}.
 Esta representación permite comparar de un vistazo qué atributo reduce mejor la incertidumbre de los datos y por qué se utiliza para abrir las ramas del nodo actual.
 % https://rawcdn.githack.com/HectorAldao/visualizing_machine_learning/fff2fdaf1b89c4140cd4c9496a34d7446c30f061/docs/index.html
 
 \begin{figure}[hp!]
   \centering
   \includegraphics[width=0.85\textwidth]{imaxes/dtree_grafica_entropia.png}
-  \caption{Ventana informativa en la que se dibuja la gráfica de la entropía de cada atributo.}
+  \caption{Ventana informativa en la que se dibuja la gráfica de la métrica basada en la entropía para cada atributo.}
   \label{fig:dtree_grafica_entropia}
 \end{figure}
 
@@ -445,6 +446,7 @@ Una vez completada la primera versión funcional del árbol de decisión, el pro
 El cambio de algoritmo también cambia el tipo de visualización necesaria.
 En el árbol, el entrenamiento construye una estructura que crece con nuevas ramas.
 En la red neuronal, la estructura se define antes de entrenar y el aprendizaje modifica valores numéricos asociados a esa estructura, principalmente pesos y sesgos.
+La formulación matemática del modelo, del forward pass y de la retropropagación se presenta en la Sección~\ref{sec:marco_redes_neuronales}; aquí se describe la implementación interactiva desarrollada en Godot.
 
 Por esta razón, el desarrollo de la red empieza por resolver un problema distinto al del árbol.
 Antes de mostrar el forward pass o el backward pass, hace falta que la aplicación pueda representar una arquitectura formada por capas, neuronas y conexiones densas, y que esa arquitectura tenga una correspondencia clara con el modelo lógico que se va a entrenar.
@@ -628,6 +630,7 @@ Primero se carga una muestra del dataset y se colocan sus valores de entrada en 
 Después se ejecuta el forward pass, se compara la salida calculada con el objetivo esperado, se prepara el retorno visual del error y se ejecuta el backward pass.
 Al terminar una muestra, el algoritmo avanza a la siguiente usando los pesos que acaban de actualizarse.
 Este recorrido se repite hasta completar los datos previstos o hasta que se alcanza el estado final.
+Esta secuencia sigue el proceso formal descrito en la Sección~\ref{sec:marco_redes_neuronales}, adaptado aquí a una ejecución observable paso a paso.
 
 Para sostener este proceso, el algoritmo conserva varios diccionarios internos.
 Uno almacena las salidas activadas de cada capa, otro conserva las sumas ponderadas previas a la activación y otro guarda los deltas calculados durante la retropropagación.
@@ -671,26 +674,15 @@ Ese vector se guarda como salida de la capa de entrada, ya que la primera capa e
 En paralelo, la escena muestra esos valores junto a las neuronas de entrada mediante pequeños elementos visuales asociados a cada atributo.
 Al comenzar el cálculo, los valores se animan hacia la red y desaparecen, reforzando la idea de que la muestra entra en el modelo.
 
-Para cada neurona, el cálculo sigue la forma básica de una red densa.
-Primero se multiplican las salidas de la capa anterior por los pesos que llegan a la neurona y se suma el sesgo correspondiente.
-Este valor se representa como:
-\[
-z_i = \sum_j x_j w_{ij} + b_i
-\]
-Después se aplica la función de activación de la capa para obtener la salida de la neurona:
-\[
-a_i = f(z_i)
-\]
-Así, cada avance de neurona produce un valor intermedio que puede mostrarse y usarse como entrada de la capa siguiente.
+Para cada neurona, el cálculo sigue la operación de una capa densa explicada en la Sección~\ref{sec:marco_redes_neuronales}.
+El algoritmo combina los valores de la capa anterior con los pesos de entrada de la neurona, incorpora su sesgo y aplica la función de activación configurada para la capa.
+Así, cada avance produce un valor intermedio que puede mostrarse y usarse como entrada de la capa siguiente.
 
-La activación softmax requiere un tratamiento especial.
-A diferencia de ReLU, sigmoide o identidad, cada componente de softmax depende del vector completo de valores de la capa.
-Por esta razón, cuando una capa usa softmax se calculan primero todos sus valores previos a la activación y después se aplica la función al conjunto completo.
-La explicación de la ventana informativa refleja este comportamiento para evitar presentar softmax como una operación independiente por neurona.
+La activación softmax requiere un tratamiento específico dentro de la implementación.
+Como sus salidas dependen del vector completo de la capa, primero se calculan todos los valores previos a la activación y después se aplica la función al conjunto completo.
+La explicación de la ventana informativa refleja este comportamiento para presentar softmax como una operación de capa.
 
-Durante el forward pass se guardan dos tipos de valores por capa.
-Por un lado se conservan las sumas ponderadas, los valores \(z\), antes de aplicar la activación.
-Por otro lado se guardan las salidas activadas, los valores \(a\).
+Durante el forward pass se guardan dos tipos de valores por capa: las sumas ponderadas previas a la activación y las salidas activadas.
 Esta caché permite que la explicación, el cálculo del error y el backward pass usen exactamente los mismos resultados que se obtuvieron al propagar la muestra hacia delante.
 
 La salida de la red también se representa visualmente.
@@ -720,49 +712,26 @@ Empieza en la capa de salida, donde se conoce la diferencia entre lo calculado y
 En cada neurona se calcula un delta, que resume cómo debe cambiar esa neurona para reducir el error de la muestra.
 Ese delta se usa después para actualizar los pesos que llegan a la neurona.
 
-En la capa de salida hay varios casos.
-Cuando el problema es de clasificación y se usa softmax con entropía cruzada, se aplica la simplificación habitual:
-\[
-\delta = a - y
-\]
-donde \(a\) es la salida activada de la red e \(y\) es el vector esperado.
-Esta forma resulta más estable y más clara para mostrar en la explicación, ya que evita desarrollar todo el Jacobiano de softmax en el caso más frecuente de clasificación.
-
-Para otras combinaciones de pérdida y activación, el algoritmo calcula primero el gradiente de la pérdida respecto a la salida activada.
-Después lo multiplica por la derivada local de la función de activación.
-En términos generales, el cálculo queda expresado como:
-\[
-\delta_i = \frac{\partial L}{\partial a_i} f'(z_i)
-\]
+En la capa de salida hay varios casos, siguiendo las expresiones recogidas en la Sección~\ref{sec:marco_redes_neuronales}.
+Cuando el problema es de clasificación y se usa softmax con entropía cruzada, el delta coincide con la diferencia vectorial entre la salida activada de la red y el vector esperado.
+Para otras combinaciones de pérdida y activación, el algoritmo calcula primero el gradiente de la pérdida respecto a la salida activada y lo combina con la derivada local de la función de activación.
 Con esto, la salida genera el primer conjunto de deltas que iniciará la retropropagación.
 
 Las capas ocultas reciben el error de la capa siguiente.
 Para cada neurona oculta se calcula cuánto ha contribuido a los deltas posteriores, ponderando esos deltas con los pesos de salida de la neurona.
-Después se multiplica el resultado por la derivada de su propia activación.
+Después se tiene en cuenta la derivada de su propia activación.
 La idea que se muestra al usuario es que una neurona oculta se corrige según su influencia en las neuronas que vienen después.
 
-Una vez calculado el delta de una neurona, se actualizan sus pesos.
-El gradiente de cada peso se obtiene multiplicando el delta por la salida de la neurona correspondiente en la capa anterior:
-\[
-\frac{\partial L}{\partial w_{ij}} = \delta_i a_j
-\]
-El nuevo peso se calcula restando a su valor actual una parte de ese gradiente, controlada por la tasa de aprendizaje:
-\[
-w_{ij} = w_{ij} - \eta \delta_i a_j
-\]
-
-En esta etapa también se incorpora el sesgo de cada neurona.
-El sesgo se actualiza con el propio delta, ya que puede interpretarse como un peso conectado a una entrada constante de valor 1:
-\[
-b_i = b_i - \eta \delta_i
-\]
+Una vez calculado el delta de una neurona, se actualizan sus pesos y su sesgo mediante descenso de gradiente.
+Cada peso se corrige en función del delta de la neurona, del valor que llega desde la capa anterior y de la tasa de aprendizaje configurada.
+El sesgo se actualiza con el propio delta, de forma coherente con la formulación de la Sección~\ref{sec:marco_redes_neuronales}.
 Su inclusión fue importante para que la red pudiera aprender desplazamientos y relaciones que no pasan necesariamente por el origen.
 Las pruebas externas con scripts de Python y una red equivalente en PyTorch ayudaron a comprobar este comportamiento en datasets sintéticos sencillos.
 
 Cada actualización se sincroniza con la representación lógica de la red.
 Los pesos y sesgos modificados se copian de vuelta al modelo compartido, y cada peso emite una señal de actualización.
 El contenedor de conexiones recibe esa señal y redibuja la línea correspondiente con el color y grosor derivados del nuevo valor.
-De esta manera, el backward pass no queda reducido a un cálculo interno: también se observa cómo el modelo cambia visualmente mientras aprende.
+De esta manera, el backward pass se observa como un cambio visual del modelo mientras aprende.
 
 Al completar la última capa oculta, la muestra queda terminada.
 El algoritmo guarda la información necesaria para explicar el paso, prepara la siguiente fila del dataset y repite el proceso con los pesos ya actualizados.
@@ -787,11 +756,8 @@ Si el usuario deselecciona la neurona, la ventana recupera la explicación anter
 
 Durante el forward pass, la ventana explica el cálculo de la neurona resaltada.
 Muestra las entradas recibidas, los pesos utilizados, el sesgo, la suma ponderada y la salida tras aplicar la función de activación.
-La explicación sigue la misma estructura matemática que usa el algoritmo:
-\[
-z = xW + b, \qquad a = f(z)
-\]
-En el caso de una neurona concreta, esa expresión se desarrolla con los valores de entrada y pesos correspondientes.
+La explicación sigue la misma estructura matemática que usa el algoritmo y remite a la formulación general de la Sección~\ref{sec:marco_redes_neuronales}.
+En el caso de una neurona concreta, la ventana desarrolla esa operación con los valores de entrada y pesos correspondientes.
 
 La ventana también puede explicar una capa completa.
 Cuando el avance se realiza por capas, la explicación pasa de una operación escalar a una operación matricial.

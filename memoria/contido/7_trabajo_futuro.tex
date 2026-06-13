@@ -1,2 +1,40 @@
 \chapter{Trabajo futuro}
 \label{chap:trabajo_futuro}
+
+El desarrollo realizado deja una base sobre la que pueden plantearse varias ampliaciones. La aplicación actual se centra en dos modelos concretos, árboles de decisión y redes neuronales multicapa, y los presenta de forma incremental para que el usuario pueda seguir tanto el entrenamiento como la evaluación. A partir de esa base, el trabajo futuro puede organizarse en tres líneas principales: ampliar el catálogo de algoritmos, profundizar en las opciones de los modelos ya implementados e integrar el aprendizaje con simulaciones interactivas creadas en el propio motor.
+
+\section{Ampliación del catálogo de modelos}
+
+Una primera línea de evolución consiste en incorporar nuevos algoritmos de aprendizaje automático. La estructura modular desarrollada para separar algoritmo, representación visual y ventana informativa facilita que la aplicación pueda crecer con nuevos modelos, siempre que cada uno se acompañe de una visualización adaptada a su forma de aprender.
+
+En el caso de las redes neuronales, una extensión natural sería incluir topologías más variadas. La versión actual trabaja con redes densas multicapa, suficientes para explicar el forward pass, el cálculo del error y la retropropagación. A partir de ahí, podrían añadirse arquitecturas convolucionales, recurrentes o basadas en mecanismos de atención. Cada una de ellas permitiría trabajar conceptos nuevos: filtros y mapas de características en redes convolucionales, dependencias temporales en redes recurrentes o matrices de atención en modelos de tipo transformer.
+
+Los transformadores tendrían un interés especial como línea futura por su presencia en muchos sistemas actuales de aprendizaje automático. Su incorporación requeriría representar elementos distintos a los de una red densa clásica, como tokens, embeddings, cabezas de atención y bloques sucesivos de procesamiento. Esta ampliación exigiría una visualización más compleja, con relaciones simultáneas entre muchos elementos y conexiones que van más allá de las capas consecutivas de una red densa.
+
+La incorporación de nuevos modelos también permitiría comparar enfoques. La aplicación podría mostrar cómo distintos algoritmos resuelven un mismo conjunto de datos, qué información utiliza cada uno y qué tipo de explicación resulta más adecuada en cada caso. Esta comparación reforzaría el objetivo didáctico del proyecto, ya que ayudaría a entender que el aprendizaje automático agrupa técnicas con estructuras y procesos de decisión muy diferentes.
+
+\section{Profundización en los modelos existentes}
+
+Una segunda línea de trabajo consiste en enriquecer los algoritmos que ya forman parte de la aplicación. En el árbol de decisión, una mejora directa sería permitir distintos criterios de división. La versión actual se apoya en una métrica basada en entropía e información, por lo que el usuario sigue siempre el mismo tipo de razonamiento al crear cada nodo. Incluir alternativas como el índice Gini o el ratio de ganancia permitiría comparar cómo cambia la elección de atributos según la medida utilizada.
+
+También sería relevante ampliar el tipo de datos aceptados por el árbol. En su estado actual, el algoritmo trabaja con atributos categóricos. Para manejar atributos numéricos continuos habría que buscar umbrales de corte y explicar por qué un valor separa mejor los datos que otros posibles valores. Esta mejora enriquecería la visualización, ya que la ventana informativa podría mostrar la comparación entre atributos y, dentro de cada atributo numérico, la comparación entre posibles puntos de división.
+
+Otra ampliación posible para el árbol sería incorporar técnicas de poda o mecanismos de control de crecimiento. Con ello, el usuario podría observar la diferencia entre construir un árbol que se ajusta mucho a los datos de entrenamiento y construir una estructura más sencilla con mejor capacidad de generalización. Esta línea conectaría la visualización del algoritmo con problemas habituales del aprendizaje automático, como el sobreajuste y la validación del modelo.
+
+En la red neuronal, el trabajo futuro puede avanzar hacia una configuración más flexible del entrenamiento. Algunas opciones posibles son permitir distintos optimizadores, modificar la tasa de aprendizaje durante la ejecución, elegir funciones de pérdida alternativas o incorporar regularización. Cada una de estas decisiones afecta al modo en el que cambian los pesos, por lo que la aplicación podría mostrar sus efectos de forma visual durante el backward pass.
+
+La red también podría dejar de limitarse a conexiones densas. Permitir topologías no densas o definidas por el usuario abriría la puerta a explicar cómo cambia el flujo de información cuando una neurona no está conectada con todas las neuronas de la capa siguiente. Esta mejora mantendría la relación entre arquitectura visible y modelo lógico, a la vez que daría más importancia a la estructura de conexiones como parte del aprendizaje.
+
+Todas estas ampliaciones comparten una misma condición: las nuevas opciones deberían integrarse sin perder el carácter explicativo de la herramienta. Añadir parámetros o variantes del algoritmo tendría sentido si la aplicación muestra qué cambia en el cálculo, qué decisión se toma y qué consecuencia tiene sobre el modelo final.
+
+\section{Integración con simulaciones interactivas}
+
+La tercera línea de trabajo es la más vinculada con la elección de Godot como herramienta de desarrollo. Una evolución especialmente interesante sería conectar los algoritmos con una simulación o un videojuego ejecutándose en la propia aplicación. En ese escenario, el entorno interactivo generaría datos durante la ejecución, y el modelo aprendería a partir de lo que sucede en la escena.
+
+Esta integración permitiría pasar de datasets estáticos a datos producidos por una dinámica viva. Por ejemplo, una escena podría generar posiciones, acciones, colisiones, decisiones de un personaje o resultados obtenidos tras cada intento. Esos eventos podrían convertirse en entradas para un modelo, y la respuesta del modelo podría influir de nuevo en el comportamiento de la simulación. El usuario observaría entonces dos procesos conectados: la evolución del entorno y la evolución del algoritmo que aprende a partir de él.
+
+Una línea de este tipo serviría también para explorar problemas cercanos al aprendizaje por refuerzo. Un agente podría recibir información del estado del juego, escoger acciones y obtener recompensas según lo ocurrido. La visualización tendría que mostrar tanto la ejecución del agente como la actualización interna del modelo. Esto ampliaría el proyecto hacia una dimensión más experimental, donde la explicación del aprendizaje estaría ligada a consecuencias visibles dentro de una escena interactiva.
+
+Esta posibilidad refuerza la justificación del uso de Godot. El motor actuaría como soporte para dibujar interfaces, entorno de simulación, generador de datos y medio de interacción. Además, la exportación a HTML5 permitiría mantener el acceso desde navegador incluso en versiones más cercanas a una experiencia de juego educativo.
+
+En conjunto, estas tres líneas de trabajo permitirían hacer crecer la aplicación en amplitud, profundidad y conexión con entornos interactivos. La prioridad debería seguir siendo la misma que en la versión actual: que cada avance del algoritmo pueda observarse, que cada decisión esté acompañada por una explicación y que la visualización ayude a entender el funcionamiento interno del modelo.
