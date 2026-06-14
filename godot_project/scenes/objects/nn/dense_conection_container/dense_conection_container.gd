@@ -93,14 +93,37 @@ func _refresh_pair_connections(pair_start_position: int) -> void:
 	var from_layer_id: int = from_layer._id
 	var to_layer_id: int = to_layer._id
 
-	_remove_connections_between_layers(from_layer_id, to_layer_id)
+	var desired_connections: Dictionary = {}
 
 	for from_neuron_id in from_layer.get_child_count():
 		for to_neuron_id in to_layer.get_child_count():
-			var key: String = _make_connection_key(from_layer_id, from_neuron_id, to_layer_id, to_neuron_id)
 			var from_neuron: Neuron = from_layer.get_child(from_neuron_id) as Neuron
 			var to_neuron: Neuron = to_layer.get_child(to_neuron_id) as Neuron
-			_add_connection(from_neuron, to_neuron, key)
+			if from_neuron == null or to_neuron == null:
+				continue
+
+			var weight: Variant = _get_connection_weight(to_layer_id, to_neuron._id, from_neuron._id)
+			if weight == null:
+				continue
+
+			var key: String = _make_connection_key(from_layer_id, from_neuron._id, to_layer_id, to_neuron._id)
+			desired_connections[key] = [from_neuron, to_neuron, float(weight)]
+
+	_remove_obsolete_connections_between_layers(from_layer_id, to_layer_id, desired_connections)
+
+	for key in desired_connections:
+		var connection_data: Array = desired_connections[key]
+		var from_neuron: Neuron = connection_data[0]
+		var to_neuron: Neuron = connection_data[1]
+		var weight: float = connection_data[2]
+
+		if _connections.has(key) and is_instance_valid(_connections[key]):
+			var connection: Conection = _connections[key]
+			connection.from_node = from_neuron
+			connection.to_node = to_neuron
+			connection.set_line_style(_get_connection_width(weight), _get_connection_color(weight))
+		else:
+			_add_connection(from_neuron, to_neuron, key, weight)
 
 
 func _add_connection(from_neuron: Neuron, to_neuron: Neuron, key: String, weight_override: Variant = null, show_update_indicator: bool = false) -> void:
@@ -214,11 +237,11 @@ func _prepare_connection_for_output_to_input_destroy(conection: Conection, key: 
 	conection.to_node = to_neuron
 
 
-func _remove_connections_between_layers(from_layer_id: int, to_layer_id: int) -> void:
+func _remove_obsolete_connections_between_layers(from_layer_id: int, to_layer_id: int, desired_connections: Dictionary) -> void:
 	var keys_to_remove: Array[String] = []
 	for key in _connections:
 		var ids: PackedInt32Array = _get_key_values(key)
-		if ids.size() == 4 and ids[0] == from_layer_id and ids[2] == to_layer_id:
+		if ids.size() == 4 and ids[0] == from_layer_id and ids[2] == to_layer_id and not desired_connections.has(key):
 			keys_to_remove.append(key)
 
 	for key in keys_to_remove:
