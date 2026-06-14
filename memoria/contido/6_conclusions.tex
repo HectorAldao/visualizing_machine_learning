@@ -1,7 +1,112 @@
 \chapter{Conclusiones}
 \label{chap:conclusiones}
 
-\lettrine{D}{erradeiro} capítulo da memoria, onde se presentará a
-situación final do traballo, as leccións aprendidas, a relación coas
-competencias da titulación en xeral e a mención en particular,
-posibles liñas futuras,\dots
+En este capítulo se recoge la situación final del trabajo y se valoran los
+resultados obtenidos. Tras el desarrollo descrito en el capítulo anterior, la
+aplicación ya permite construir y evaluar un árbol de decisión, entrenar una red
+neuronal paso a paso, inspeccionar sus cálculos internos y conservar resultados
+para contrastarlos fuera del propio entorno de Godot.
+
+\section{Resultados obtenidos y validación}
+\label{sec:conclusiones_resultados_validacion}
+
+Una parte importante del resultado final consiste en comprobar que lo mostrado
+por la aplicación se corresponde con modelos reales y con cálculos compatibles
+con herramientas externas. Esta validación se realizó en dos direcciones: por un
+lado, comparando la estructura del árbol de decisión generado dentro de la
+aplicación con una referencia obtenida fuera de Godot; por otro, comprobando que
+los pesos de una red neuronal pueden exportarse e importarse mediante ONNX sin
+perder su significado.
+
+En el caso del árbol de decisión, la comprobación se hizo con un dataset
+categórico sintético. La Figura~\ref{fig:resultados_dtree_sintetico} muestra la
+estructura obtenida desde un script externo, impresa en la terminal. La captura
+recoge solo los primeros nodos del árbol completo por limitación de espacio. Esa
+parte permite identificar la raíz, las primeras ramas y varias hojas resultantes.
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=0.72\textwidth]{imaxes/resultados_dtree_sintetico.png}
+  \caption{Primeros nodos de la estructura final de un árbol de decisión obtenido con un dataset sintético desde un script externo.}
+  \label{fig:resultados_dtree_sintetico}
+\end{figure}
+
+Al entrenar el árbol con ese mismo conjunto de datos desde la aplicación se
+obtiene la estructura de la Figura~\ref{fig:resultados_dtree_aplicacion}. La
+coincidencia entre ambas salidas se aprecia en la raíz, en las ramas principales
+y en las etiquetas finales asociadas a las hojas. Esta comparación confirma que
+la implementación del algoritmo en Godot toma las mismas decisiones de división
+que la referencia externa para este caso de prueba, y que la representación
+visual mantiene la información lógica necesaria para interpretar el modelo
+entrenado.
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=0.95\textwidth]{imaxes/resultados_dtree_aplicacion.png}
+  \caption{Árbol de decisión generado por la aplicación con el mismo dataset sintético usado en la referencia externa.}
+  \label{fig:resultados_dtree_aplicacion}
+\end{figure}
+
+La red neuronal se validó desde una perspectiva diferente. En este caso, además
+de comprobar que el entrenamiento actualiza los parámetros dentro de la
+aplicación, se revisó que esos parámetros puedan leerse fuera de ella. La
+Figura~\ref{fig:resultados_pesos_aplicacion_en_aplicacion} muestra el estado de
+una red entrenada en la propia aplicación. En la neurona de salida se observan
+pesos cercanos a \(1.943\), \(1.929\) y \(-0.965\), junto con un sesgo cercano a
+\(0.994\).
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=0.95\textwidth]{imaxes/resultados_pesos_aplicacion_en_aplicacion.png}
+  \caption{Red neuronal entrenada dentro de la aplicación, con los pesos y el sesgo de la neurona de salida visibles en la interfaz.}
+  \label{fig:resultados_pesos_aplicacion_en_aplicacion}
+\end{figure}
+
+Después de exportar esa red a ONNX, un script externo carga el archivo generado
+y muestra los parámetros de salida. Como se ve en la
+Figura~\ref{fig:resultados_pesos_aplicacion_a_onnx}, los valores leídos desde el
+archivo son prácticamente los mismos que los mostrados por la aplicación. Las
+pequeñas diferencias se deben al redondeo visual y a la precisión numérica usada
+en cada entorno. Con esto se comprueba que la exportación conserva el orden y el
+valor de los parámetros aprendidos.
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=0.75\textwidth]{imaxes/resultados_pesos_aplicacion_a_onnx.png}
+  \caption{Lectura externa del archivo ONNX exportado desde la aplicación, con los pesos y el sesgo de la red entrenada.}
+  \label{fig:resultados_pesos_aplicacion_a_onnx}
+\end{figure}
+
+La validación también se realizó en el sentido inverso. Para ello se generó
+fuera de la aplicación una red sintética con pesos exactos \(2.0\), \(2.0\) y
+\(-1.0\), y con sesgo \(1.0\). La salida de terminal de la
+Figura~\ref{fig:resultados_pesos_onnx_sintetico} recoge esos valores antes de
+importar el modelo en Godot.
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=0.55\textwidth]{imaxes/resultados_pesos_onnx_sintetico.png}
+  \caption{Red sintética exportada a ONNX desde un entorno externo, con pesos y sesgo conocidos.}
+  \label{fig:resultados_pesos_onnx_sintetico}
+\end{figure}
+
+Al importar ese archivo en la aplicación, la red reconstruida conserva los
+mismos parámetros, tal como se muestra en la
+Figura~\ref{fig:resultados_pesos_onnx_importado}. Esta prueba completa la
+comprobación de interoperabilidad: los modelos entrenados en la aplicación
+pueden salir hacia ONNX, y los modelos creados fuera pueden entrar en la
+aplicación con sus pesos y sesgos correctamente asignados.
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=0.95\textwidth]{imaxes/resultados_pesos_onnx_importado.png}
+  \caption{Red sintética importada en la aplicación desde ONNX, con los pesos y el sesgo esperados visibles en la interfaz.}
+  \label{fig:resultados_pesos_onnx_importado}
+\end{figure}
+
+Estas pruebas refuerzan la validez del resultado final. En el árbol de decisión,
+la estructura visual coincide con una construcción externa equivalente. En la red
+neuronal, los parámetros que se ven durante el entrenamiento son los mismos que
+se escriben en el archivo exportado y los mismos que se recuperan al importar un
+modelo conocido. Por tanto, la interfaz funciona como una animación didáctica y
+representa el estado real de los modelos que calcula, entrena y evalúa.
