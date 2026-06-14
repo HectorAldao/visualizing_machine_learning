@@ -17,6 +17,7 @@ extends Control
 @onready var hbox_container: HBoxContainer = %TopHBoxContainer
 @onready var vbox_container: VBoxContainer = %MainMenuVBoxContainer
 @onready var panel_container_menu: PanelContainer = %PanelContainerMenu
+@onready var select_algorithm_menu: VBoxContainer = %SelectAlgorithmVBoxContainerMenu
 
 
 var selected_algorithm: int = 0:

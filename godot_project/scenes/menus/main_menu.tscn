@@ -54,16 +54,12 @@ custom_minimum_size = Vector2(675, 1000)
 layout_mode = 2
 theme = SubResource("Theme_6bivr")
 
-[node name="TopHBoxContainer" type="HBoxContainer" parent="ScrollContainer/MarginContainer/CenterContainer/PanelContainer" unique_id=318947414]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="MainMenuVBoxContainer" type="VBoxContainer" parent="ScrollContainer/MarginContainer/CenterContainer/PanelContainer/TopHBoxContainer" unique_id=1982867266]
+[node name="MainMenuVBoxContainer" type="VBoxContainer" parent="ScrollContainer/MarginContainer/CenterContainer/PanelContainer" unique_id=1982867266]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="MainLabel" type="Label" parent="ScrollContainer/MarginContainer/CenterContainer/PanelContainer/TopHBoxContainer/MainMenuVBoxContainer" unique_id=201382217]
+[node name="MainLabel" type="Label" parent="ScrollContainer/MarginContainer/CenterContainer/PanelContainer/MainMenuVBoxContainer" unique_id=201382217]
 layout_mode = 2
 text = "Visualizando el
 aprendizaje máquina"
@@ -71,31 +67,36 @@ label_settings = ExtResource("3_2o76q")
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="VBoxContainerMenu" type="VBoxContainer" parent="ScrollContainer/MarginContainer/CenterContainer/PanelContainer/TopHBoxContainer/MainMenuVBoxContainer" unique_id=1578589725]
+[node name="TopHBoxContainer" type="HBoxContainer" parent="ScrollContainer/MarginContainer/CenterContainer/PanelContainer/MainMenuVBoxContainer" unique_id=318947414]
+unique_name_in_owner = true
 layout_mode = 2
-size_flags_vertical = 4
 
-[node name="OptionsLabel" type="Label" parent="ScrollContainer/MarginContainer/CenterContainer/PanelContainer/TopHBoxContainer/MainMenuVBoxContainer/VBoxContainerMenu" unique_id=1452108106]
+[node name="SelectAlgorithmVBoxContainerMenu" type="VBoxContainer" parent="ScrollContainer/MarginContainer/CenterContainer/PanelContainer/MainMenuVBoxContainer/TopHBoxContainer" unique_id=1578589725]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="OptionsLabel" type="Label" parent="ScrollContainer/MarginContainer/CenterContainer/PanelContainer/MainMenuVBoxContainer/TopHBoxContainer/SelectAlgorithmVBoxContainerMenu" unique_id=1452108106]
 layout_mode = 2
 text = "Selecciona el algoritmo a explorar"
 label_settings = SubResource("LabelSettings_ovrgc")
 horizontal_alignment = 1
 
-[node name="DTreeButton" type="Button" parent="ScrollContainer/MarginContainer/CenterContainer/PanelContainer/TopHBoxContainer/MainMenuVBoxContainer/VBoxContainerMenu" unique_id=514394525]
+[node name="DTreeButton" type="Button" parent="ScrollContainer/MarginContainer/CenterContainer/PanelContainer/MainMenuVBoxContainer/TopHBoxContainer/SelectAlgorithmVBoxContainerMenu" unique_id=514394525]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 70)
 layout_mode = 2
 theme_override_font_sizes/font_size = 35
 text = "Árbol de Decision"
 
-[node name="NeuralNetworkButton" type="Button" parent="ScrollContainer/MarginContainer/CenterContainer/PanelContainer/TopHBoxContainer/MainMenuVBoxContainer/VBoxContainerMenu" unique_id=994976548]
+[node name="NeuralNetworkButton" type="Button" parent="ScrollContainer/MarginContainer/CenterContainer/PanelContainer/MainMenuVBoxContainer/TopHBoxContainer/SelectAlgorithmVBoxContainerMenu" unique_id=994976548]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 70)
 layout_mode = 2
 theme_override_font_sizes/font_size = 35
 text = "Red Neuronal"
 
-[node name="StartButton" type="Button" parent="ScrollContainer/MarginContainer/CenterContainer/PanelContainer/TopHBoxContainer/MainMenuVBoxContainer" unique_id=1424195084]
+[node name="StartButton" type="Button" parent="ScrollContainer/MarginContainer/CenterContainer/PanelContainer/MainMenuVBoxContainer/TopHBoxContainer/SelectAlgorithmVBoxContainerMenu" unique_id=1424195084]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 50)
 layout_mode = 2
@@ -103,16 +104,16 @@ size_flags_horizontal = 4
 size_flags_vertical = 8
 text = "Comenzar"
 
-[node name="PanelContainerMenu" type="PanelContainer" parent="ScrollContainer/MarginContainer/CenterContainer/PanelContainer/TopHBoxContainer/MainMenuVBoxContainer" unique_id=876910558]
+[node name="PanelContainerMenu" type="PanelContainer" parent="ScrollContainer/MarginContainer/CenterContainer/PanelContainer/MainMenuVBoxContainer" unique_id=876910558]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(600, 0)
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="ScrollContainer/MarginContainer/CenterContainer/PanelContainer/TopHBoxContainer/MainMenuVBoxContainer/PanelContainerMenu" unique_id=1461954276]
+[node name="VBoxContainer" type="VBoxContainer" parent="ScrollContainer/MarginContainer/CenterContainer/PanelContainer/MainMenuVBoxContainer/PanelContainerMenu" unique_id=1461954276]
 layout_mode = 2
 size_flags_vertical = 0
 
-[node name="TitleLabel" type="Label" parent="ScrollContainer/MarginContainer/CenterContainer/PanelContainer/TopHBoxContainer/MainMenuVBoxContainer/PanelContainerMenu/VBoxContainer" unique_id=1851289427]
+[node name="TitleLabel" type="Label" parent="ScrollContainer/MarginContainer/CenterContainer/PanelContainer/MainMenuVBoxContainer/PanelContainerMenu/VBoxContainer" unique_id=1851289427]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Información sobre el algoritmo"
@@ -120,7 +121,7 @@ label_settings = SubResource("LabelSettings_2o76q")
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="TextLabel" type="Label" parent="ScrollContainer/MarginContainer/CenterContainer/PanelContainer/TopHBoxContainer/MainMenuVBoxContainer/PanelContainerMenu/VBoxContainer" unique_id=616165297]
+[node name="TextLabel" type="Label" parent="ScrollContainer/MarginContainer/CenterContainer/PanelContainer/MainMenuVBoxContainer/PanelContainerMenu/VBoxContainer" unique_id=616165297]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 0
@@ -128,7 +129,7 @@ text = "Preseleccione uno de los algoritmos para saber más información antes d
 label_settings = SubResource("LabelSettings_6bivr")
 autowrap_mode = 3
 
-[node name="PreviewOfAlgorithm" type="TextureRect" parent="ScrollContainer/MarginContainer/CenterContainer/PanelContainer/TopHBoxContainer/MainMenuVBoxContainer/PanelContainerMenu/VBoxContainer" unique_id=34555296]
+[node name="PreviewOfAlgorithm" type="TextureRect" parent="ScrollContainer/MarginContainer/CenterContainer/PanelContainer/MainMenuVBoxContainer/PanelContainerMenu/VBoxContainer" unique_id=34555296]
 unique_name_in_owner = true
 layout_mode = 2
 expand_mode = 5
