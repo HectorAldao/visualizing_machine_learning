@@ -3,7 +3,7 @@ class_name ScrollContainerV2 extends ScrollContainer
 
 @export var is_horizontal: bool = false
 @export var scroll_speed: int = 30
-@export_range(0.1, 1) var zoom_speed: float = 0.2
+@export_range(0.1, 1) var zoom_speed: float = 0.1
 @export var max_zoom: float = 3.
 @export var min_zoom: float = 0.1
 @export var touch_drag_deadzone: float = 5.0

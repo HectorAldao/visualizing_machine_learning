@@ -14,9 +14,9 @@ extends Control
 @onready var preview_of_algorithm: TextureRect = %PreviewOfAlgorithm
 
 @onready var panelcontainer: PanelContainer = %PanelContainer
-@onready var hbox_container: HBoxContainer = panelcontainer.get_node("HBoxContainer")
-@onready var vbox_container: VBoxContainer = hbox_container.get_node("VBoxContainer")
-@onready var panel_container_menu: PanelContainer = vbox_container.get_node("PanelContainerMenu")
+@onready var hbox_container: HBoxContainer = %TopHBoxContainer
+@onready var vbox_container: VBoxContainer = %MainMenuVBoxContainer
+@onready var panel_container_menu: PanelContainer = %PanelContainerMenu
 
 
 var selected_algorithm: int = 0:
@@ -127,6 +127,8 @@ func _update_layout_orientation() -> void:
 		return
 
 	panel_container_menu.reparent(target_parent, false)
+	panel_container_menu.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	panel_container_menu.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
 
 ## Check if the screen is in vertical or horizontal
