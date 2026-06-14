@@ -19,31 +19,31 @@ La herramienta principal empleada fue Godot, un motor de desarrollo libre y mult
 %\textcolor{olive}{okey}
 Sus características resultan adecuadas para una aplicación educativa como la desarrollada en este trabajo.
 El proyecto requiere presentar información visual, responder a acciones del usuario, animar procesos paso a paso y mantener una estructura clara entre los distintos elementos de la interfaz.
-Estas necesidades encajan de forma natural con el modelo de escenas, nodos y señales que propone Godot~\cite{GodotDocs}.
+Estas necesidades encajan de forma natural con el modelo de Escenas, Nodos y Señales que propone Godot~\cite{GodotDocs}.
 
-Los nodos son el elemento básico y más importante con el que se trabaja en el motor.
-Todo elemento y subelemento que vaya a estar presente en tiempo de ejecución en el programa es un nodo.
-Y cada nodo cuenta, principalmente, con una serie de atributos, métodos y señales.
+Los Nodos son el elemento básico y más importante con el que se trabaja en el motor.
+Todo elemento y subelemento que vaya a estar presente en tiempo de ejecución en el programa es un Nodo.
+Y cada Nodo cuenta, principalmente, con una serie de atributos, métodos y Señales.
 Igual que en la programación orientada a objetos, los atributos son variables o constantes y los métodos funciones.
-Las señales son disparadores de funciones.
+Las Señales son disparadores de funciones.
 Cuando son emitidas llaman a la función a la que están conectadas.
-Son una forma de conectar eventos entre diferentes nodos.
+Son una forma de conectar eventos entre diferentes Nodos.
 Son el núcleo del paradigma de programación que promueve el motor: la programación dirigida por eventos. %\textcolor{olive}{Aquí puse lo de la programación dirigida por eventos}
 
-Los atributos, métodos y señales de cada nodo vienen definidos por su clase.
+Los atributos, métodos y Señales de cada Nodo vienen definidos por su clase.
 Godot dispone de un gran árbol de clases predefinidas que heredan atributos y métodos de sus clases padre.
 Las tres clases básicas son:
-el \textit{Node} una clase vacía, la raíz del resto de nodos, que solo cuenta con los métodos mínimos para que funcione en el motor;
+el \textit{Node} una clase vacía, la raíz del resto de Nodos, que solo cuenta con los métodos mínimos para que funcione en el motor;
 el \textit{Node2D} característico por contar con atributos referentes a la posición en un espacio bidimensional;
 el \textit{Node3D} similar al anterior pero en un espacio tridimensional;
 y el \textit{Control} pensado para los elementos de interfaz de usuario.
 Por encima de estas, el desarrollador siempre puede definir sus propias clases ampliando las ya existentes.
 
-Los nodos por sí solos son clases abstractas que no existen en el programa ejecutable final por sí mismos.
-Para instanciarlos están las escenas.
+Los Nodos por sí solos son clases abstractas que no existen en el programa ejecutable final por sí mismos.
+Para instanciarlos están las Escenas.
 Estas son la materialización concreta del proyecto: los archivos que son guardados en disco y con los que se interactúa en el editor como se puede ver en la Figura \ref{fig:godot_editor}.
-Están formadas, como mínimo, por un nodo raíz.
-De este nodo raíz pueden colgar nodos hijo, que a su vez pueden contar con sus propios nodos hijo, y así sucesivamente.
+Están formadas, como mínimo, por un Nodo raíz.
+De este Nodo raíz pueden colgar Nodos hijo, que a su vez pueden contar con sus propios Nodos hijo, y así sucesivamente.
 
 \begin{figure}[hp!]
   \centering
@@ -55,19 +55,19 @@ De este nodo raíz pueden colgar nodos hijo, que a su vez pueden contar con sus 
 %\textcolor{olive}{Hace falta que en el pie de foto de \ref{fig:godot_editor} describa en mayor profundiad lo que hay en pantalla?}
 %\textcolor{violet}{no}
 
-Finalmente, las escenas, como en última instancia son árboles de nodos, pueden ser instanciadas dentro de otras escenas.
-Esto habilita una modularidad total, puesto que toda estructura de nodos que sea susceptible de ser reutilizada, puede guardarse como una escena para no tener que ser recreada. 
+Finalmente, las Escenas, como en última instancia son árboles de Nodos, pueden ser instanciadas dentro de otras Escenas.
+Esto habilita una modularidad total, puesto que toda estructura de Nodos que sea susceptible de ser reutilizada, puede guardarse como una Escena para no tener que ser recreada. 
 
-Además, los nodos pueden tener asociado un script.
-Estos son código desde el que se puede interactuar, principalmente, con los atributos y métodos del nodo al que están asociados, así como con sus hijos.
+Además, los Nodos pueden tener asociado un script.
+Estos son código desde el que se puede interactuar, principalmente, con los atributos y métodos del Nodo al que están asociados, así como con sus hijos.
 Pero no están limitados a estos elementos.
-Siempre se puede acceder al nodo raíz y, desde este, modificar cualquier propiedad global o acceder a cualquier nodo en la escena.
+Siempre se puede acceder al Nodo raíz y, desde este, modificar cualquier propiedad global o acceder a cualquier Nodo en la Escena.
 Además, mediante la creación de \textit{Autoloads} en el proyecto también se puede acceder a clases personalizadas en cualquier punto del código.
 
 %\textcolor{violet}{ estaría bien tener un diagrama sencillo que explicase las relaciones escena/nodos/scripts, igual en la doc de Godot hay algo así?}
 %\textcolor{olive}{sí, veo si hay ya alguno. Vale encontré, he de ver dónde referenciarlo}
 
-La Figura \ref{fig:godot_architecture_diagram} muestra de forma esquemática esta organización y sitúa las escenas, los nodos, los scripts y los módulos dentro de la arquitectura general del motor.
+La Figura \ref{fig:godot_architecture_diagram} muestra de forma esquemática esta organización y sitúa las Escenas, los Nodos, los Scripts y los módulos dentro de la arquitectura general del motor.
 
 \begin{figure}[hp!]
   \centering
@@ -76,14 +76,14 @@ La Figura \ref{fig:godot_architecture_diagram} muestra de forma esquemática est
   \label{fig:godot_architecture_diagram}
 \end{figure}
 
-La organización en escenas permite separar componentes de la aplicación con responsabilidades distintas, como las vistas de entrenamiento, los paneles explicativos, las representaciones gráficas y los controles de interacción.
+La organización en Escenas permite separar componentes de la aplicación con responsabilidades distintas, como las vistas de entrenamiento, los paneles explicativos, las representaciones gráficas y los controles de interacción.
 Este enfoque favorece una estructura modular en la que cada parte de la interfaz puede desarrollarse, probarse y reutilizarse con menor acoplamiento. %\textcolor{blue}{ Es raro, al final estamos diciendo que permiten aplicar patrones de diseño} \textcolor{olive}{En qué sentido es raro?}
-El sistema de señales facilita la comunicación entre elementos de la aplicación sin imponer dependencias directas innecesarias, lo que resulta útil en un entorno en el que las acciones del usuario deben provocar cambios visuales y actualizaciones del estado interno de los modelos.
+El sistema de Señales facilita la comunicación entre elementos de la aplicación sin imponer dependencias directas innecesarias, lo que resulta útil en un entorno en el que las acciones del usuario deben provocar cambios visuales y actualizaciones del estado interno de los modelos.
 
 %La manera en que Godot organiza las interfaces mediante nodos resulta compatible con las representaciones habituales de los algoritmos tratados.
 %\textcolor{violet}{ (Sugerencia: eliminar "compatible") La manera en que Godot organiza las interfaces mediante nodos permite estrucutar los elementos de los algoritmos tratados de forma sencilla}
-La manera en que Godot organiza las interfaces mediante nodos permite estructurar los elementos de los algoritmos tratados de forma sencilla.
-Un árbol de decisión puede mostrarse como una estructura jerárquica de nodos conectados, mientras que una red neuronal puede representarse mediante capas, neuronas y conexiones.
+La manera en que Godot organiza las interfaces mediante Nodos permite estructurar los elementos de los algoritmos tratados de forma sencilla.
+Un árbol de decisión puede mostrarse como una estructura jerárquica de Nodos conectados, mientras que una red neuronal puede representarse mediante capas, neuronas y conexiones.
 Esta correspondencia conceptual ayuda a trasladar las estructuras internas del algoritmo a elementos visuales manipulables dentro de la aplicación.
 
 Otro motivo importante para escoger Godot fue su sistema de exportación multiplataforma.
@@ -164,7 +164,7 @@ La aplicación exportada se publica como un conjunto de archivos preparados para
 %Por ello, el despliegue forma parte del flujo de trabajo del proyecto: tras generar la versión web, es necesario asegurarse de que los ficheros resultantes están organizados correctamente, que los recursos se cargan desde las rutas esperadas y que la página inicial conduce a la aplicación.
 
 Esta fase tiene importancia porque marca la diferencia entre una aplicación que funciona dentro del entorno de desarrollo y una herramienta que puede utilizar cualquier persona desde un enlace.
-En el editor, el proyecto se ejecuta en un contexto controlado, con acceso directo a las escenas, scripts y recursos locales.
+En el editor, el proyecto se ejecuta en un contexto controlado, con acceso directo a las Escenas, Scripts y recursos locales.
 En el navegador, la aplicación depende de los archivos exportados, de las restricciones propias de la plataforma web y de la forma en la que el servicio de publicación sirve esos archivos.
 Por este motivo, el despliegue se trató como una parte más del desarrollo y no únicamente como el último paso administrativo.
 

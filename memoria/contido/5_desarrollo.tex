@@ -12,23 +12,24 @@ Y termina con el pulido final de la interfaz y retoques a todas las característ
 
 \section{Prototipo: versión 0.1}
 
-El primer objetivo consiste en comprobar que la herramienta elegida sirve para crear una aplicación interactiva y publicarla como página web.
+El primer objetivo consiste en comprobar que la herramienta cualifica para crear una aplicación interactiva y publicarla en una página web.
 Antes de invertir más tiempo en el desarrollo, es necesario verificar tres aspectos básicos: que Godot permite crear una interfaz sencilla, que se puede representar una estructura con forma de árbol y que el resultado puede ejecutarse desde el navegador.
 
 Por ese motivo, la primera versión del proyecto es deliberadamente simple.
-Consiste en un menú inicial y en una escena donde el usuario puede crear pequeños elementos conectados entre sí.
-Al pulsar sobre uno de ellos aparece una opción para añadir un nuevo elemento debajo, de manera que poco a poco se forma una estructura parecida a un árbol.
+Consiste en un menú inicial y en una Escena donde el usuario puede poner y quitar nodos que se colocan formando una estructura de árbol.
 \textcolor{olive}{aquí asumo que cuando hablo de árbol se entiende que es la estructura de datos (por lo tanto que se ve "del revés" a como se ve un árbol real) y no un árbol real, no??}
+Al pulsar sobre uno de los nodos aparece una opción para añadir un nuevo elemento debajo, que se organiza jerárquicamente junto al resto.
 Esta prueba está todavía lejos de un árbol de decisión real.
-Su valor está en comprobar si la interacción principal de la aplicación tiene sentido.
+Su valor está en comprobar si la interacción principal de la aplicación no da problemas.
 
 %Para iniciar este proceso, primero hace falta entender cómo se organiza un proyecto en Godot.
 %Esta base se explica en la Sección \ref{sec:herramientas_godot}.
 
 
-\subsection{Primeras escenas}
+\subsection{Primeras Escenas}
 
-La primera escena creada es el menú principal.
+La primera Escena creada es el menú principal.
+\textcolor{olive}{no se dónde aclarar que Escenas y Nodos son los de godot y escena y nodo significan lo que ponga en la rae}
 En ese momento tiene un único botón, ya que su papel es servir como punto de entrada hacia la prueba del árbol.
 Incluir este menú desde el principio ayuda a pensar la aplicación como un conjunto de módulos y facilita su ampliación posterior.
 En la Figura \ref{fig:primera_version_del_main_menu} se ve esta primera versión.
@@ -46,18 +47,18 @@ También se añade la posibilidad de borrar partes del árbol, con el fin de com
 
 Esta primera prueba tiene una finalidad muy concreta: validar la interacción.
 Lo importante es comprobar que el usuario puede construir una jerarquía visual, que las conexiones se actualizan y que la pantalla sigue siendo manejable al crecer el número de elementos.
-En la Figura \ref{fig:primera_version_arbol} se muestra cómo era esta escena inicial.
+En la Figura \ref{fig:primera_version_arbol} se muestra cómo era esta Escena inicial.
 
 \begin{figure}[hp!]
   \centering
   \includegraphics[width=0.75\textwidth]{imaxes/primera_version_arbol.png}
-  \caption{Primera escena de prueba del árbol. Arriba a la derecha hay dos botones que sirven para guardar y cargar un árbol ya creado. Abajo a la izquierda se ve una sencilla estructura con forma de árbol, con los nodos rojos con un texto de ejemplo conectados por líneas negras. Sobre uno de los nodos, se ve el menú que permite añadirle un hijo o eliminarlo.}
+  \caption{Primera Escena de prueba del árbol. Arriba a la derecha hay dos botones que sirven para guardar y cargar un árbol ya creado. Abajo a la izquierda se ve una sencilla estructura con forma de árbol, con los nodos rojos con un texto de ejemplo conectados por líneas negras. Sobre uno de los nodos, se ve el menú que permite añadirle un hijo o eliminarlo.}
   \label{fig:primera_version_arbol}
 \end{figure}
 
 También se dejan visibles dos botones relacionados con cargar y guardar.
 En esta versión todavía no tienen una utilidad real.
-Su presencia sirve para reservar un espacio de la interfaz a una necesidad que ya se prevé: poder conservar un árbol y recuperarlo más adelante.
+Su presencia sirve para reservar un espacio de la interfaz a una necesidad que ya se prevé: poder guardar un árbol entrenado y recuperarlo más adelante.
 
 
 \subsection{Exportación web con GitHub Pages}
@@ -86,12 +87,12 @@ El funcionamiento formal de ID3 y del criterio de entropía se recoge en la Secc
 
 \subsection{Primera arquitectura del árbol}
 
-El primer cambio consiste en sustituir la escena de prueba por una vista preparada para un árbol construido por algoritmo.
+El primer cambio consiste en sustituir la Escena de prueba por una vista preparada para un árbol construido por el algoritmo.
 La prueba inicial servía para validar que se podían añadir y borrar nodos manualmente, aunque su estructura resultaba insuficiente para un entrenamiento real.
 Un árbol de decisión puede crecer varios niveles y abrir muchas ramas en poco espacio, por lo que una pantalla fija deja de ser útil en cuanto el número de nodos aumenta.
 Por esta razón se incorpora una zona desplazable dentro de la interfaz, de manera que el usuario pueda moverse por el árbol cuando su tamaño supere el área visible.
 
-También se revisa la distribución de los nodos.
+También se revisa la distribución de los nodos en el árbol.
 En la versión manual bastaba con colocar cada hijo bajo su padre, ya que el objetivo era comprobar la interacción.
 Durante el entrenamiento algorítmico se necesita una disposición más estable: los hijos deben aparecer por debajo, el padre debe quedar centrado respecto a ellos y el árbol debe reorganizarse cada vez que se añade una rama.
 Para conseguirlo se introduce un cálculo de posiciones basado en la profundidad de cada nodo y en su orden dentro de la estructura.
@@ -99,8 +100,9 @@ Así se evita que las ramas se acumulen en la misma zona y se mantiene una lectu
 
 Otra decisión importante es separar la información lógica del árbol de su representación visual.
 Cada nodo visible conserva un identificador, una referencia al padre, una lista de hijos, su profundidad y la información que representa, como el atributo de decisión o la etiqueta final.
+\textcolor{olive}{a lo mejor sobra esta lista? la pongo y si sobra se quita}
 Al mismo tiempo, el árbol mantiene un diccionario interno que permite localizar cada nodo por su identificador.
-Esta duplicidad resulta útil porque la escena de Godot sirve para dibujar, animar y recibir eventos, mientras que el diccionario permite recorrer la estructura, recalcular posiciones, eliminar subárboles y evaluar ejemplos más adelante.
+Esta duplicidad resulta útil porque la Escena de Godot sirve para dibujar, animar y recibir eventos, mientras que el diccionario permite recorrer la estructura, recalcular posiciones, eliminar subárboles y evaluar ejemplos más adelante.
 
 Las conexiones entre nodos se tratan como elementos propios.
 Cada conexión representa una rama del árbol y puede mostrar el valor del atributo que conduce desde el nodo padre hasta el hijo.
@@ -108,7 +110,7 @@ Esta separación permite que los nodos se encarguen de mostrar decisiones o clas
 Más adelante, esta decisión facilita tanto la animación de las ramas como la evaluación visual de nuevos datos.
 
 \textcolor{olive}{Por ejemplo, en esta frase de aquí yo creo que el presente contínuo queda mal, y que habría que poner más bien "se añadió el modo automático"}
-Con la base visual preparada, se añade el modo automático.
+Con la base visual preparada, se añade el modo automático, un estado interno de la Escena del árbol que activa diferentes Nodos y llama a diferente código que el modo manual implementado hasta el momento.
 En este modo, el usuario controla el avance del entrenamiento en lugar de añadir ramas manualmente.
 La primera versión de la interfaz es sencilla, con un botón para iniciar el proceso y otro para avanzar al siguiente paso, como se muestra en la Figura \ref{fig:dtree_view_start_next_english}.
 Los textos aparecen todavía en inglés porque pertenecen a una fase temprana de la aplicación.
@@ -130,28 +132,28 @@ Los textos aparecen todavía en inglés porque pertenecen a una fase temprana de
 
 La construcción paso a paso se apoya en una separación de responsabilidades.
 El algoritmo calcula qué tipo de nodo debe crearse en cada momento y emite la información necesaria para hacerlo: padre, valor de la rama, atributo elegido, etiqueta si se trata de una hoja y datos explicativos del paso.
-El controlador recibe esa información y la traduce a cambios en la escena, creando o actualizando los nodos visibles.
+El controlador recibe esa información y la traduce a cambios en la Escena, creando o actualizando los nodos visibles.
 De este modo, la lógica de aprendizaje queda aislada de los elementos gráficos de Godot, y la vista puede centrarse en representar el resultado de cada decisión.
 
-Para que el usuario pueda avanzar con el botón de siguiente paso, el algoritmo no construye todo el árbol de una sola vez.
+Para que el usuario pueda avanzar con el botón de siguiente paso e ir comprendiendo el proceso, el algoritmo no construye todo el árbol de una sola vez.
 El trabajo pendiente se guarda como una serie de contextos, cada uno con los datos que llegan a una rama, los atributos disponibles, el padre visual y la profundidad correspondiente.
-Cada pulsación extrae uno de esos contextos, decide si debe convertirse en una hoja o en un nodo interno, actualiza la escena y deja preparados los contextos que quedan por procesar.
+Cada pulsación extrae uno de esos contextos, decide si debe convertirse en una hoja o en un nodo interno y actualiza la Escena.
 Esta organización incremental ayuda a que el árbol pueda explicarse nodo a nodo sin necesidad de tener que almacenar toda la información a la que se quiere acceder en memoria.
 
 Las primeras pruebas se realizan con un conjunto de datos pequeño y controlado.
-Su finalidad es comprobar que el algoritmo crea la raíz, abre ramas, coloca los nodos en posiciones coherentes y mantiene sincronizados el estado interno y la vista.
+Su finalidad es comprobar que el algoritmo crea la raíz, abre ramas, coloca los nodos en posiciones con sentido y mantiene sincronizados el estado interno y la vista.
 En esta fase queda fijado el patrón principal del resto del desarrollo del árbol: el algoritmo decide, el controlador traduce esa decisión y el árbol visible se reorganiza tras cada paso.
 
 
-\subsection{Reorganización de la escena y primeros elementos explicativos}
+\subsection{Reorganización de la Escena y primeros elementos explicativos}
 
-Cuando el modo automático empieza a funcionar, la escena se reorganiza para reducir elementos provisionales.
+Cuando el modo automático empieza a funcionar, la Escena se reorganiza para reducir elementos provisionales.
 La vista del árbol pasa a integrarse mejor con los contenedores de interfaz de Godot, lo que permite combinar botones, paneles y zonas desplazables de forma más natural.
 Esta reorganización también mejora el centrado del árbol.
 En lugar de mover la escena completa, se recalculan las posiciones internas de los nodos y el área mínima del contenedor desplazable.
 Así el árbol aparece centrado cuando cabe en pantalla y sigue pudiendo recorrerse cuando crece.
 
-La escena se convierte entonces en un flujo guiado.
+La Escena se convierte en ese momento en un flujo guiado.
 Al entrar en la vista del árbol se muestra primero un panel que permite escoger entre creación manual y creación algorítmica.
 Cada opción activa controles distintos y evita mezclar acciones pensadas para usos diferentes.
 En la Figura \ref{fig:menu_manualmente_algoritmicamente} se muestra este panel inicial.
@@ -164,14 +166,12 @@ En la Figura \ref{fig:menu_manualmente_algoritmicamente} se muestra este panel i
 \end{figure}
 
 En esta etapa también se mejora la apariencia de los nodos.
-Los nodos internos, que representan preguntas sobre un atributo, y las hojas, que representan una clasificación final, reciben estilos visuales distintos.
+Los nodos internos, que representan preguntas sobre un atributo, y las hojas, que representan una clasificación final, reciben estilos visuales distintos, como se aprecia en la Figura \ref{fig:dtree_view_training_buttons_es}.
 Esta distinción permite interpretar la estructura con mayor rapidez: algunos nodos indican que todavía hay una decisión que tomar, y otros señalan que se ha llegado a un resultado.
-Los nodos creados por el algoritmo quedan protegidos frente al menú de edición manual, ya que representan el resultado del entrenamiento y deben cambiar solo cuando avanza o retrocede el proceso.
-
+Además se impide que los nodos creados por el algoritmo sean editados manualmente, ya que representan el resultado del entrenamiento y deben cambiar solo cuando avanza o retrocede el proceso.
 La interfaz se traduce al castellano en este mismo tramo.
-Los controles principales pasan a llamarse ``Empezar entrenamiento'' y ``Siguiente paso''.
+Los controles principales pasan a tener escrito el texto ``Empezar entrenamiento'' y ``Siguiente paso'' como se aprecia en la Figura \ref{fig:dtree_view_training_buttons_es}.
 El cambio ayuda a que la vista del árbol sea coherente con el idioma del resto de la aplicación y con el tono explicativo del trabajo.
-En la Figura \ref{fig:dtree_view_training_buttons_es} se ve la interfaz tras esta adaptación y los primeros cambios visuales.
 
 \begin{figure}[hp!]
   \centering
@@ -204,17 +204,17 @@ Su primera versión contiene un mensaje inicial que invita a comenzar el entrena
 La ventana se implementa como un componente separado de la vista principal.
 Esta separación permite actualizar su contenido cada vez que el algoritmo procesa un contexto, sin mezclar la redacción de explicaciones con la creación de nodos en pantalla.
 El algoritmo prepara un conjunto de datos explicativos del paso actual: etiquetas presentes, número de ejemplos, atributos disponibles, tipo de nodo creado, atributo escogido y valores de la métrica usada para comparar alternativas.
+\textcolor{olive}{Aquí tb listé, y pa alante}
 La ventana recibe esa información y la convierte en texto dirigido al usuario.
 
 Los primeros textos cubren tres casos fundamentales.
 El primero aparece cuando se crea un nodo interno y hay que escoger por qué atributo dividir los datos.
 El segundo se usa cuando todos los ejemplos que llegan a una rama comparten la misma etiqueta y se puede crear una hoja pura.
 El tercero explica la creación de una hoja por mayoría, necesaria cuando quedan ejemplos con etiquetas distintas y ya no existen atributos útiles para seguir dividiendo.
-
-Durante estas pruebas se detecta que la información interna del algoritmo necesita una preparación antes de mostrarse.
+Pero durante las pruebas se detecta que la información interna del algoritmo necesita una preparación antes de mostrarse.
 Las listas de etiquetas o atributos, si se presentan tal como las maneja el código, tienen un formato propio de programación y resultan poco naturales en una explicación.
 Por ello, la ventana transforma esos valores en frases legibles, con enumeraciones y textos adaptados al caso concreto.
-Esta decisión marca el tono de la aplicación, que gira alrededor de que la interfaz debe traducir las estructuras internas del programa a una explicación comprensible para el usuario.
+Esta decisión nace del objetivo de la aplicación, que gira alrededor de que la interfaz debe traducir las estructuras internas del programa a una explicación comprensible para el usuario.
 
 También se empieza a mostrar el criterio utilizado para elegir la siguiente división.
 Al principio aparece como una lista textual de valores calculados para cada atributo.
@@ -304,7 +304,6 @@ Durante las pruebas aparece un caso importante: varios atributos pueden obtener 
 Si la aplicación escoge uno de ellos sin explicar la situación, la decisión parece arbitraria.
 Para cubrir este caso se añade una explicación específica de empate.
 La ventana indica que hay varias alternativas equivalentes y que el algoritmo continúa con una de ellas para poder seguir construyendo el árbol.
-
 También se revisan los textos asociados a las hojas.
 Las primeras redacciones estaban pensadas para conjuntos muy pequeños, donde a veces solo llegaba un ejemplo a cada resultado final.
 Al probar datos más variados, se hizo necesario explicar hojas creadas a partir de varios ejemplos con la misma etiqueta y hojas creadas por mayoría.
@@ -343,15 +342,17 @@ Antes, el usuario comenzaba el entrenamiento directamente.
 Con el panel, primero selecciona los datos, recibe un mensaje de confirmación o error y solo después puede avanzar por la construcción del árbol.
 La vista del árbol y la ventana informativa permanecen ocultas hasta que existe una selección válida, lo que evita mostrar una escena sin contexto.
 
-La comunicación entre el panel de selección, el controlador y la vista se resuelve mediante señales.
+La comunicación entre el panel de selección, el controlador y la vista se resuelve mediante Señales.
 Cuando el usuario confirma un conjunto de datos, el panel emite la información seleccionada y el controlador inicia el algoritmo con esos datos y atributos.
-Esta solución encaja con la organización de Godot, ya que permite que componentes situados en partes distintas de la escena colaboren sin depender directamente unos de otros.
+Esta solución encaja con la organización de Godot, ya que permite que componentes situados en partes distintas de la Escena colaboren sin depender directamente unos de otros.
 
-La columna objetivo se generaliza en esta etapa.
-En las primeras pruebas, el algoritmo podía asumir un nombre fijo para la etiqueta de salida.
-Con datasets distintos, esa suposición deja de ser adecuada.
+En esta etapa también se da un paso de cara a que la carga de CSVs sea más universal, al hacer posible que la columna objetivo sea una palabra distinta de \textit{clase}.
+En las primeras pruebas, el algoritmo solo podía asumir ese nombre fijo para la etiqueta de salida.
+Con datasets distintos, esa suposición puede ser limitante.
 La solución adoptada consiste en tratar como atributos las columnas indicadas por el panel y deducir la etiqueta como la columna restante.
-De esta forma, el árbol puede entrenarse con conjuntos que usen nombres como \textit{class}, \textit{label}, \textit{y} o una etiqueta en castellano, siempre que el conjunto tenga una única columna objetivo.
+Y en la carga de CSVs, se aumentó la lista de palabras que el programa reconocía automáticamente como target.
+\textcolor{olive}{aquí he metido este anglicismo para no repetir columna objtivo}
+De esta forma, el árbol puede entrenarse con conjuntos que usen nombres como \textit{class} o \textit{label}, siempre que el conjunto tenga una única columna objetivo.
 
 
 \subsection{Carga de archivos y navegación por pasos}
@@ -365,8 +366,8 @@ Si el archivo puede leerse y la estructura es válida, se activa el botón de en
 Si aparece un problema, se muestra un mensaje de error y se impide continuar.
 Esta comprobación es sencilla, aunque suficiente para evitar que el algoritmo empiece con datos incompletos o sin una etiqueta identificable.
 
-Con la selección de datos integrada, el entrenamiento gana una fase previa clara.
-El usuario escoge datos, confirma la selección, ve aparecer la escena del árbol y utiliza los botones de avance para construirlo.
+Con la selección de datos integrada, el entrenamiento empieza a organizarse en fases.
+Primero el usuario escoge datos y confirma la selección, y después ve aparecer el menú del árbol que le permite avanzar para construirlo.
 Esta separación hace explícita la dependencia entre el conjunto de entrada y la forma final del árbol.
 
 El siguiente cambio importante es la navegación hacia atrás.
@@ -385,14 +386,13 @@ Por eso se añade el botón ``Paso previo'', visible en la Figura \ref{fig:dtree
 El retroceso se apoya en la misma idea que permite avanzar por pasos.
 El algoritmo mantiene una colección de contextos pendientes y otra de contextos ya ejecutados.
 Al avanzar, un contexto pasa de pendiente a ejecutado.
-Al retroceder, el último contexto ejecutado vuelve a quedar pendiente y la escena debe deshacer su efecto visual.
+Al retroceder, el último contexto ejecutado vuelve a quedar pendiente y la Escena debe deshacer su efecto visual.
 Esta estructura evita reconstruir todo el árbol desde cero cada vez que se pulsa ``Paso previo''.
 
 Hacer que el retroceso sea coherente requiere tratar varios casos.
 Si se deshace un nodo interno, también deben retirarse los contextos hijos y los nodos visuales que dependen de él.
 Si se deshace una rama que estaba representada por un nodo pendiente, conviene restaurar ese estado provisional en vez de eliminar toda la indicación visual.
 Si el usuario retrocede hasta el inicio, la raíz desaparece y el árbol debe quedar vacío.
-
 Durante las pruebas se detecta un fallo en ese último caso.
 Al volver al paso cero, podían quedar conexiones visibles aunque los nodos ya se hubiesen eliminado.
 La corrección consiste en recalcular también las conexiones cuando el árbol queda sin raíz o sin nodos.
@@ -426,6 +426,7 @@ Cuando la pieza llega a una hoja, el recorrido termina y queda representada la c
 \end{figure}
 
 Para evitar dependencias innecesarias con el árbol en construcción, la evaluación toma una copia de la información relevante de los nodos visibles: posición, profundidad, atributo, etiqueta, valor de rama y padre.
+\textcolor{olive}{otra lista}
 Con esa información puede mover los datos por la escena y decidir el siguiente nodo sin alterar la estructura entrenada.
 El movimiento entre nodos se anima, de forma que el usuario ve el recorrido como una secuencia de decisiones y no como un salto directo al resultado final.
 
@@ -435,7 +436,7 @@ Quedan para fases posteriores mejoras como agrupar visualmente los ejemplos bajo
 Aun así, esta prueba establece la idea central del modo de evaluación: mostrar físicamente cómo un ejemplo atraviesa las decisiones aprendidas hasta llegar a una clasificación.
 
 Con este conjunto de cambios queda completada la primera versión significativa del árbol de decisión.
-El proyecto pasa de dibujar elementos conectados a entrenar un árbol categórico paso a paso, mantener una estructura lógica sincronizada con la escena, mostrar ramas con valores, distinguir nodos internos, hojas y nodos pendientes, animar los cambios, explicar las decisiones con texto y gráficas, cargar datos sencillos, retroceder por la construcción y evaluar ejemplos nuevos de forma visual.
+El proyecto pasa de dibujar elementos conectados a entrenar un árbol categórico paso a paso, mantener una estructura lógica sincronizada con la Escena, mostrar ramas con valores, distinguir nodos internos, hojas y nodos pendientes, animar los cambios, explicar las decisiones con texto y gráficas, cargar datos sencillos, retroceder por la construcción y evaluar ejemplos nuevos de forma visual.
 A partir de aquí, el desarrollo continúa con el segundo algoritmo de la aplicación: la red neuronal.
 
 
@@ -462,7 +463,7 @@ El resultado de esta fase es el núcleo funcional de la red: una arquitectura co
 
 El primer paso consiste en añadir una vista propia para redes neuronales y conectarla con el menú principal.
 Hasta ese momento, la aplicación estaba organizada alrededor del árbol de decisión.
-La nueva vista introduce una escena independiente, con sus propios nodos de interfaz y sus propios objetos visuales, de manera que el desarrollo del segundo algoritmo no quede mezclado con la escena del árbol.
+La nueva vista introduce una Escena independiente, con sus propios nodos de interfaz y sus propios objetos visuales, de manera que el desarrollo del segundo algoritmo no quede mezclado con la Escena del árbol.
 
 La representación inicial de la red se construye a partir de tres elementos básicos: capas, neuronas y conexiones.
 Las capas se colocan en horizontal para mostrar el recorrido natural de los datos, desde la entrada situada a la izquierda hasta la salida situada a la derecha.
@@ -472,13 +473,14 @@ Esta elección permite que más adelante puedan resaltarse durante el entrenamie
 La red parte de una estructura mínima formada por una capa de entrada y una capa de salida.
 Esta decisión proporciona una base visual sencilla sobre la que ir añadiendo complejidad.
 Las capas ocultas se incorporan después, cuando el menú de creación permite configurar la arquitectura.
-Desde esta primera fase, la vista se piensa como una estructura dinámica: el número de capas y neuronas puede cambiar, y la escena debe reconstruir las conexiones para seguir representando una red coherente.
+Desde esta primera fase, la vista se piensa como una estructura dinámica: el número de capas y neuronas puede cambiar, y la Escena debe reconstruir las conexiones para seguir representando una red coherente.
 
 Las conexiones se dibujan entre capas consecutivas y siguen una estructura densa.
 Esto significa que cada neurona de una capa queda conectada con todas las neuronas de la capa siguiente.
 En una primera lectura, estas líneas sirven para mostrar la topología de la red.
 Más adelante pasan a representar también información del modelo, ya que su color y grosor dependen del peso asociado.
-Con ello, la escena deja preparado el vínculo entre la arquitectura visible y los valores numéricos que el entrenamiento modificará.
+\textcolor{olive}{forshadowin}
+Con ello, la Escena deja preparado el vínculo entre la arquitectura visible y los valores numéricos que el entrenamiento modificará.
 En la Figura \ref{fig:nn_primera_arquitectura_visual} se muestra esta primera representación visual.
 
 \begin{figure}[hp!]
@@ -489,7 +491,7 @@ En la Figura \ref{fig:nn_primera_arquitectura_visual} se muestra esta primera re
 \end{figure}
 
 Esta primera arquitectura también fija una separación importante entre la red que se ve y la red que se calcula.
-La escena de Godot se encarga de colocar capas, neuronas y conexiones, mientras que el estado lógico conserva la estructura y los valores que definen el modelo.
+La Escena de Godot se encarga de colocar capas, neuronas y conexiones, mientras que el estado lógico conserva la estructura y los valores que definen el modelo.
 Mantener ambas partes separadas evita que la visualización se convierta en la única fuente de información de la red.
 La vista puede reconstruirse, animarse o actualizar sus conexiones sin perder la referencia al modelo lógico que después usará el algoritmo de entrenamiento.
 
@@ -508,28 +510,29 @@ La selección de funciones de activación dentro de este menú se aprecia en la 
   \label{fig:nn_funciones_de_activacion}
 \end{figure}
 
-Estos límites son necesarios porque la escena tiene una finalidad didáctica y debe seguir siendo manejable.
-Se establecen máximos para el número de capas y para el número de neuronas por capa, de forma que la visualización no crezca hasta ocupar un espacio imposible de seguir.
-También se validan los valores introducidos en el menú antes de aplicarlos, ya que una cantidad negativa de neuronas, una capa vacía o una salida incompatible dejarían la red en un estado sin sentido para el algoritmo.
+Estos límites son necesarios porque la aplicación tiene una finalidad didáctica y debe seguir siendo manejable.
+Por esto se establecen máximos para el número de capas y para el número de neuronas por capa, de forma que la visualización no crezca hasta ocupar un espacio imposible de seguir.
+También se validan los valores introducidos en el menú antes de aplicarlos, para evitar una cantidad negativa de neuronas o una capa vacía.
 
-La representación lógica de la red se organiza mediante una convención simple de identificadores.
+En cuanto a la representación lógica de la red, esta se organiza mediante una convención simple de identificadores.
 La capa de entrada usa el identificador 0, las capas ocultas usan enteros positivos y la capa de salida usa el identificador -1.
 Esta decisión permite tratar la salida como un elemento especial y, al mismo tiempo, recorrer las capas ocultas en orden natural.
 También facilita que las señales de Godot indiquen con claridad qué capa debe crear neuronas, eliminarlas, cambiar su activación o actualizar sus conexiones.
-
-El modelo lógico guarda algo más que el número de capas.
+Pero el modelo lógico guarda algo más que el número de capas.
 También conserva las matrices de pesos que conectan cada capa con la anterior y la función de activación que debe aplicarse en cada una.
 Cada matriz se entiende desde la capa de destino: cada fila representa una neurona de esa capa y contiene los pesos que llegan desde todas las neuronas de la capa previa.
 Esta forma encaja con el cálculo posterior de una neurona, que toma sus entradas, las multiplica por sus pesos y obtiene un valor antes de aplicar la activación.
 
-La capa de entrada recibe un tratamiento distinto.
+La capa de entrada recibe un tratamiento distinto en este contexto.
 Su función es mostrar los valores que entran en la red, por lo que no necesita una transformación aprendida como las capas posteriores.
+Esto se traduce en que sus pesos son todos 1, y no varían, y su función de activación es la lineal.
 En la estructura lógica se mantiene como parte de la arquitectura para que la vista pueda dibujar sus neuronas y conectarlas.
-La parte entrenable empieza a partir de las capas que reciben esos valores.
+Pero la parte entrenable empieza a partir de las capas que reciben esos valores.
 
-Durante la edición se diferencia entre el estado temporal y el estado definitivo de la red.
+\textcolor{olive}{si hay que borrar, esto podría sobrar}
+Un detalle importante es que, durante la edición de la red, se diferencia entre el estado temporal y el estado definitivo de la red.
 El menú modifica una propuesta de arquitectura almacenada en diccionarios temporales, y esa propuesta se copia al modelo principal cuando la red se recarga o cuando comienza el entrenamiento.
-Esta separación evita que cada cambio parcial del formulario se convierta inmediatamente en la red que va a entrenarse.
+Esta separación evita que cada cambio parcial del formulario se convierta inmediatamente en la red que va a entrenarse, ayudando a disminuir el número de actualizaciones.
 Esto se hizo como medida preventiva para asegurar la fluidez durante el proceso de creación de la red.
 %\textcolor{olive}{Aquí está bien lo de poner que finalmente se cambió?}
 
@@ -539,10 +542,11 @@ Si se añade una capa oculta, se crean sus pesos iniciales y se reajusta la capa
 Si se elimina una capa, se borran sus datos y se vuelve a enlazar la salida con la última capa que permanece en la arquitectura.
 De esta forma, el modelo conserva siempre una topología densa y consistente.
 
-La representación visual debe seguir esos mismos cambios.
+Y la representación visual debe seguir esos mismos cambios.
 Al añadir o eliminar capas y neuronas, el contenedor de conexiones densas recalcula los enlaces entre capas consecutivas y borra los que ya no son válidos.
 Esta corrección resulta importante cuando se insertan capas ocultas, porque podrían quedar conexiones antiguas entre entrada y salida, ajenas a la red real.
 Las actualizaciones se realizan de forma diferida cuando es necesario, para que Godot termine de crear o eliminar nodos antes de que las líneas intenten consultar sus posiciones.
+Así nunca se rompe el orden visual de la red.
 
 Con esta organización, la arquitectura editable queda conectada con una representación lógica estable.
 El menú actúa como interfaz de configuración, la escena traduce esa configuración a capas, neuronas y conexiones, y el modelo interno conserva los pesos y activaciones que después usará el algoritmo.
@@ -551,17 +555,16 @@ Este paso deja preparada la red para una condición que se resuelve a continuaci
 
 \subsection{Selección de datos y restricciones de la red}
 
-La configuración manual de la arquitectura necesita una restricción externa: el conjunto de datos.
-En una red neuronal, el problema que se quiere resolver determina el número de entradas y salidas.
+La configuración manual de toda al arquitectura solo tiene sentido si se escogen de forma arbitraria las entradas y salidas
+Pero en la realidad, las capas de entrada y salida están restringidas por el conjunto de datos.
 Cada atributo usado como entrada necesita una neurona en la primera capa, y cada clase o variable objetivo necesita una representación en la salida.
 Por este motivo se incorpora un panel de selección de datos específico para la red neuronal.
-
 El panel ofrece datasets internos y carga de ficheros CSV.
 Los datasets internos sirven para cubrir los dos tipos de problema principales que soporta la aplicación: clasificación y regresión.
+Esta diferencia es relevante porque la red que se crea para cada caso tiene una capa final cuyo número de neuronas se decide de forma distinta.
 %Por ejemplo, un conjunto de datos como Iris permite trabajar con varias clases de salida, y un conjunto como Cultivos permite mostrar una salida numérica continua.
-Esta diferencia es relevante porque la red que se crea para cada caso tiene una capa final distinta.
 
-Cuando el usuario carga un CSV, la aplicación muestra las columnas disponibles y permite seleccionar explícitamente una o varias como objetivo.
+Ahora cuando el usuario carga un CSV, la aplicación muestra las columnas disponibles y permite seleccionar explícitamente una o varias como objetivo.
 Esta decisión hace que la carga de datos sea más flexible que en las primeras pruebas, donde se dependía de nombres habituales como \textit{class}, \textit{label} o \textit{target}.
 El resto de columnas se tratan como atributos de entrada.
 En la Figura \ref{fig:nn_columnas_objetivo} se ve este selector de columnas objetivo.
@@ -589,15 +592,15 @@ La capa de salida queda fijada al número de clases o variables objetivo.
 La función de activación de salida también queda determinada por el tipo de problema: softmax para clasificación e identidad para regresión.
 Cuando esta restricción llega al menú, el selector de activación final se ajusta y queda bloqueado para evitar una configuración incoherente.
 
-El resto de la arquitectura sigue siendo configurable.
+Mientras, el resto de la arquitectura sigue siendo configurable.
 El usuario puede modificar capas ocultas, número de neuronas internas y funciones de activación intermedias, siempre dentro de los límites definidos en el menú.
 De esta manera, la aplicación combina libertad de experimentación con las restricciones mínimas que impone el dataset.
 La red creada siempre recibe vectores del tamaño correcto y produce salidas que pueden compararse con los valores esperados.
 
 La selección de datos también mejora la lectura de la red visible.
 Las neuronas de entrada pasan a mostrar los nombres de los atributos, y las neuronas de salida muestran las clases decodificadas o las variables objetivo de regresión.
-Esto conecta la arquitectura con el problema concreto que se está resolviendo.
 Con estos nombres, cada extremo del modelo representa información reconocible del dataset y la lectura de la arquitectura resulta más concreta.
+Esto es muy relevante de cara a que el usuario relacione lo que se le muestra con lo que está sucediendo.
 Esta relación entre dataset y red visible se muestra en la Figura \ref{fig:nn_columnas_input_output_expected_texto_neuronas}, donde las neuronas aparecen etiquetadas con información del conjunto seleccionado.
 
 \begin{figure}[hp!]
@@ -616,16 +619,16 @@ Una vez fijadas estas condiciones, la red queda preparada para conectarse con el
 \subsection{Algoritmo de entrenamiento incremental}
 
 Una vez que la arquitectura y los datos están definidos, la red necesita una pieza encargada de ejecutar el entrenamiento.
-Esta responsabilidad se concentra en un nodo de algoritmo, separado de la vista.
-Su papel es equivalente al que cumplía el algoritmo del árbol: calcula el siguiente avance, actualiza el estado interno y emite señales para que la escena represente el cambio correspondiente.
+Esta responsabilidad se concentra en un Nodo de algoritmo, separado de la vista.
+Su papel es equivalente al que cumplía el algoritmo del árbol: calcula el siguiente avance, actualiza el estado interno y emite señales para que la Escena represente el cambio correspondiente.
 La vista, por tanto, puede centrarse en representar el avance recibido mediante señales.
 
-Al comenzar el entrenamiento, la vista configura el algoritmo con toda la información necesaria.
+Al comenzar el entrenamiento, la Escena configura el algoritmo con toda la información necesaria.
 Le entrega las filas del dataset, los atributos de entrada, las columnas objetivo, y toda la información de la arquitectura de la red.
 Con esa información, el algoritmo prepara el orden de capas, reinicia sus cursores internos y deja lista la primera muestra.
 El mismo mecanismo sirve más adelante para inferencia, con una configuración que recorre la red sin actualizar pesos.
 
-El entrenamiento se organiza como una máquina de estados.
+Una vez iniciado, entrenamiento se organiza como una máquina de estados.
 Primero se carga una muestra del dataset y se colocan sus valores de entrada en la capa inicial.
 Después se ejecuta el forward pass, se compara la salida calculada con el objetivo esperado, se prepara el retorno visual del error y se ejecuta el backward pass.
 Al terminar una muestra, el algoritmo avanza a la siguiente usando los pesos que acaban de actualizarse.
@@ -636,8 +639,8 @@ Para sostener este proceso, el algoritmo conserva varios diccionarios internos.
 Uno almacena las salidas activadas de cada capa, otro conserva las sumas ponderadas previas a la activación y otro guarda los deltas calculados durante la retropropagación.
 Estos valores tienen una doble utilidad: permiten continuar el cálculo sin repetir operaciones ya realizadas y sirven como fuente para las explicaciones mostradas en la ventana informativa.
 
-El avance incremental se controla desde un panel específico.
-El usuario puede avanzar una sola neurona, una capa completa, una muestra completa o terminar todo el entrenamiento de forma automática.
+El proceso de aprendizaje se controla desde un panel específico.
+El usuario puede avanzar una sola neurona, una capa completa, una muestra completa o terminar todo el entrenamiento pulsando diferentes botones.
 Cada opción llama al mismo proceso interno, cambiando únicamente hasta dónde debe avanzar antes de devolver el control a la interfaz.
 Así se mantiene una única lógica de entrenamiento y se ofrecen varios niveles de detalle para observar el proceso.
 La Figura \ref{fig:nn_panel_de_entrenamiento} muestra este panel de control.
@@ -652,10 +655,11 @@ La Figura \ref{fig:nn_panel_de_entrenamiento} muestra este panel de control.
 La ejecución por muestras resulta importante para que el aprendizaje sea visible.
 Cada fila del dataset produce una entrada concreta, una salida concreta, un error concreto y una actualización de pesos concreta.
 La siguiente fila ya utiliza la red modificada por la anterior, de modo que el usuario puede entender el entrenamiento como una sucesión de pequeñas correcciones sobre el mismo modelo.
+En la realidad las redes neuronales usan mecanismos algo más complejos para evitar saltos bruscos en los valores de los pesos, pero aquí se decidió realizar la actualización directamente para simplificar el proceso y hacerlo más directo, y por ende entendible.
 
-El algoritmo también coordina los elementos visuales que acompañan al entrenamiento.
-Al cargar una muestra, emite señales para preparar los valores de entrada y los valores esperados.
-Durante el forward pass y el backward pass, emite señales de neurona y de capa para resaltar la parte de la red que se está procesando.
+Además algoritmo también coordina los elementos visuales que acompañan al entrenamiento.
+Al cargar una muestra, emite Señales para preparar los valores de entrada y los valores esperados.
+Durante el forward pass y el backward pass, emite Señales de neurona y de capa para resaltar la parte de la red que se está procesando.
 Cuando un peso cambia, emite la actualización correspondiente para que la conexión visual modifique su grosor o color según el nuevo valor.
 
 Al finalizar el entrenamiento, la interfaz cambia de estado.
@@ -690,8 +694,7 @@ Junto a la capa final aparece una columna de valores producidos por la red, y ju
 Cuando se calcula una neurona de salida, su valor se añade a la columna de salida mientras los valores anteriores de la misma muestra se mantienen visibles.
 De esta manera, la predicción se completa gradualmente y queda alineada con las clases o variables objetivo que se habían mostrado en la arquitectura, como se veía en la Figura \ref{fig:nn_columnas_input_output_expected_texto_neuronas}.
 
-El resaltado de neuronas y capas acompaña todo el proceso.
-Cada vez que se evalúa una neurona, esta cambia de estado visual y la ventana informativa recibe los datos necesarios para explicar el cálculo.
+El resaltado de neuronas y capas acompaña todo el proceso, haciendo que cada vez que se evalúa una neurona, esta cambie de estado visual y la ventana informativa reciba los datos necesarios para explicar el cálculo.
 Al terminar una capa, el vector de salidas activadas pasa a ser la entrada de la capa siguiente.
 El usuario puede seguir así el recorrido completo de la muestra, desde los atributos iniciales hasta la predicción final.
 
@@ -707,8 +710,7 @@ El siguiente paso consiste en compararla con el objetivo esperado y convertir es
 La interfaz representa esta transición desplazando la columna de salida y transformando la columna de valores esperados en valores de error o delta.
 Así se marca visualmente el cambio entre producir una predicción y corregir el modelo a partir de ella.
 
-El backward pass recorre las capas en orden inverso.
-Empieza en la capa de salida, donde se conoce la diferencia entre lo calculado y lo esperado, y continúa hacia las capas ocultas.
+El backward pass recorre las capas en orden inverso, empezando en la capa de salida, donde se conoce la diferencia entre lo calculado y lo esperado, y continúando hacia las capas ocultas.
 En cada neurona se calcula un delta, que resume cómo debe cambiar esa neurona para reducir el error de la muestra.
 Ese delta se usa después para actualizar los pesos que llegan a la neurona.
 
@@ -745,13 +747,13 @@ Ver una neurona resaltada o una conexión cambiar de grosor ayuda a seguir el pr
 La ventana completa esa representación al explicar qué cálculo acaba de producir cada cambio.
 Para ello, recibe datos internos del algoritmo y los convierte en texto y fórmulas comprensibles.
 
-La ventana se mantiene separada del algoritmo y de la escena visual.
+La ventana se mantiene separada del algoritmo y de la Escena.
 El algoritmo emite señales con la información del paso actual, y la ventana decide cómo presentarla.
 Esta organización permite que el cálculo siga estando en la clase de entrenamiento, que la red visible se centre en resaltar neuronas y conexiones, y que la explicación textual evolucione sin mezclar responsabilidades.
 
-Una primera utilidad de la ventana aparece al pulsar una neurona.
-En ese caso se muestran los pesos que llegan a esa neurona y su sesgo asociado.
-Esta consulta manual permite inspeccionar el estado del modelo durante el entrenamiento.
+Una primera utilidad implementada de la ventana aparece al pulsar una neurona.
+Al hacerlo se muestran los pesos que llegan a esa neurona y su sesgo asociado.
+Esta consulta manual permite inspeccionar el estado del modelo durante el entrenamiento, revisando los valores de las conexiones representadas.
 Si el usuario deselecciona la neurona, la ventana recupera la explicación anterior para no perder el contexto del paso que se estaba visualizando.
 
 Durante el forward pass, la ventana explica el cálculo de la neurona resaltada.
@@ -806,7 +808,7 @@ Al no haber backward pass, la evaluación se entiende como una lectura directa d
 
 Con esta fase queda completo el núcleo funcional de la red neuronal dentro de la aplicación.
 La herramienta permite escoger datos, crear una arquitectura coherente con ellos, entrenarla paso a paso, mostrar el forward pass, calcular y explicar el backward pass, actualizar los pesos de forma visible y evaluar la red entrenada mediante inferencia.
-Las mejoras posteriores se centran en pulir la interfaz general, adaptar mejor la vista a distintos tamaños y mejorar la presentación visual, partiendo ya de una red funcional y explicable.
+Las mejoras posteriores se centran en pulir la interfaz general, adaptar mejor la vista a distintos tamaños y mejorar la presentación visual, partiendo ya tanto de un árbol como de una red funcionales y explicables.
 
 
 
@@ -814,10 +816,10 @@ Las mejoras posteriores se centran en pulir la interfaz general, adaptar mejor l
 
 Una vez completados los núcleos funcionales del árbol de decisión y la red neuronal, el desarrollo cambia de enfoque.
 Los dos algoritmos principales ya están presentes en la aplicación: el árbol de decisión puede construirse, explicarse y evaluarse, y la red neuronal puede configurarse, entrenarse e inspeccionarse paso a paso.
-A partir de este punto, el trabajo se concentra en convertir ese conjunto de escenas funcionales en una herramienta más cómoda, coherente, preparada y útil para su uso desde la versión web. 
+A partir de este punto, el trabajo se concentra en convertir ese conjunto de Escenas funcionales en una herramienta más cómoda, coherente, preparada y útil para su uso desde la versión web. 
 
 Esta fase se plantea como una revisión de tareas transversales que afectan a la experiencia completa, una vez terminada la incorporación de los algoritmos principales.
-Algunas mejoras se afectan a toda la aplicación, como la navegación o el diseño.
+Algunas mejoras afectan a toda la aplicación, como la navegación, el diseño, la adaptación a web o la limpieza del estado al cambiar de Escena.
 Otras se centran en reforzar partes concretas, como la evaluación del árbol o las explicaciones de la red neuronal.
 En conjunto, estas tareas permiten pasar de una demostración técnica de los modelos a una aplicación que cumple el objetivo de ayudar a comprender los algoritmos propuestos.
 
@@ -837,6 +839,11 @@ También se añaden previsualizaciones de los algoritmos.
 La selección del árbol o de la red puede ir acompañada de una imagen representativa, lo que ayuda a anticipar el tipo de escena que se abrirá a continuación.
 Esta decisión mantiene la filosofía visual de la aplicación: siempre que sea posible, la interfaz combina texto con una referencia gráfica que facilite la orientación.
 
+En los últimos ajustes se completa esta parte con la previsualización de la red neuronal y con una revisión de los textos descriptivos.
+Las primeras redacciones tenían un tono más técnico y se simplifican para funcionar mejor como entrada a la aplicación.
+El árbol se presenta como un modelo que clasifica a partir de características, mientras que la red se describe como una función aproximada formada por capas y neuronas.
+Así, el menú principal empieza a explicar cada módulo antes de que el usuario entre en su vista específica.
+
 La navegación interna se unifica mediante un menú común.
 Tanto el árbol como la red incorporan una opción para volver al menú principal y, cuando corresponde, botones asociados a cargar o guardar.
 Este menú se presenta como una pieza reutilizable, de modo que las vistas no tienen que resolver por separado la navegación básica.
@@ -844,8 +851,13 @@ En el árbol, los botones de carga y guardado se relacionan con la persistencia 
 En la red, el guardado abre el panel de exportación del modelo.
 
 La unificación de navegación tiene un efecto importante sobre la experiencia de uso.
-El usuario puede entrar en un algoritmo, probarlo, volver al inicio y cambiar al otro sin depender de controles distintos en cada escena.
+El usuario puede entrar en un algoritmo, probarlo, volver al inicio y cambiar al otro sin depender de controles distintos en cada Escena.
 Esto reduce la sensación de que árbol y red son prototipos separados y refuerza la idea de una aplicación única con varios módulos.
+
+Al volver al menú principal también se limpia el estado compartido de la red neuronal.
+La vista de red guarda información global como la arquitectura lógica, la cola de entrenamiento, el decodificador de clases, los textos cacheados de las neuronas y la neurona seleccionada manualmente.
+Antes de cambiar de Escena se emite una Señal de retorno al menú, y el estado global se reinicia a partir de ella.
+Con esta limpieza, una red creada en una sesión anterior no interfiere en una nueva entrada a la vista de red.
 
 
 \subsection{Adaptación a web, móvil y pantallas de distinto tamaño}
@@ -869,26 +881,50 @@ La vista pasa a integrarse en un layout horizontal con la red, la ventana inform
 La ventana deja de comportarse como un elemento flotante y queda integrada en la escena.
 Esto facilita el uso en navegador y hace que los paneles principales respondan de forma más coherente al tamaño disponible.
 
+La adaptación de la red se completa con una variante vertical específica.
+El menú principal escoge entre la vista horizontal y la vertical usando el mismo criterio de proporción que ya se emplea en el árbol.
+En la vista vertical, la ventana informativa, la red, el menú de creación, el panel de dataset, los controles de entrenamiento, la navegación y la exportación se colocan dentro de una estructura apilada y desplazable.
+De este modo, la red deja de depender de una distribución pensada solo para escritorio.
+
+Durante la creación de la red también se separa el espacio de edición del espacio de visualización.
+Un contenedor agrupa el menú de creación y el panel de dataset, mientras que otro mantiene la red preliminar visible.
+Cuando comienza el entrenamiento o la inferencia, los paneles de creación se ocultan para dar prioridad a los controles del algoritmo y a la ventana informativa.
+El redibujado de conexiones se optimiza en esta fase: al cambiar la arquitectura se eliminan solo las conexiones obsoletas, se actualizan las que siguen siendo válidas y se crean únicamente las nuevas.
+Esto hace que la previsualización sea más estable cuando se modifica el número de capas o neuronas.
+
 Para las zonas grandes, como el árbol entrenado o la red con varias capas, se mejora el desplazamiento y el zoom.
 El contenedor desplazable incorpora control con rueda, combinaciones de teclado y gestos táctiles.
 Con un dedo se puede arrastrar la vista, y con dos dedos se puede aplicar zoom mediante pinza.
 Estas interacciones son especialmente útiles en el árbol, donde algunas ramas pueden alejarse del centro, y en la red, donde las conexiones densas ocupan bastante espacio.
+
+El desplazamiento se revisa también para layouts con contenedores anidados.
+Si un panel interno llega a su límite de scroll, el evento puede propagarse a un contenedor superior.
+Así se evita que la rueda del ratón o el arrastre táctil queden atrapados en una zona que ya no puede desplazarse más.
+El zoom local se complementa con un zoom global controlado desde teclado, que modifica el factor de escala de la raíz de la ventana dentro de unos límites definidos.
 
 El cálculo del tamaño mínimo de las escenas también se revisa.
 El árbol amplía su lienzo cuando aparecen nodos o datos de evaluación fuera del área inicial.
 La red calcula los límites globales de capas, neuronas, conexiones y datos animados para ajustar el canvas.
 Así se evita que elementos importantes queden fuera del scroll o se pierdan por no estar incluidos en el tamaño lógico de la vista.
 
+Los últimos cambios reducen márgenes y separaciones en las vistas horizontal y vertical.
+En pantallas pequeñas, unos pocos píxeles repetidos en cada contenedor pueden ocupar una parte apreciable del área útil.
+Por eso se recortan bordes, huecos y separaciones principales, conservando la organización de los paneles y ganando espacio para el contenido interactivo.
+
 
 \subsection{Identidad visual y legibilidad de la interfaz}
 
-Con las escenas ya integradas en layouts más flexibles, se revisa la apariencia general.
+Con las Escenas ya integradas en layouts más flexibles, se revisa la apariencia general.
 El objetivo es que la aplicación tenga una identidad visual más consistente y que los elementos importantes destaquen con claridad.
 Se actualizan colores de fondo, estilos de botones, bordes, textos y temas de paneles.
 
+En el cierre del desarrollo se ajustan también colores y tamaños de controles concretos.
+Los botones principales y los botones de suma y resta reciben tonos verdes, el panel de creación de red gana más altura para gestionar capas ocultas, y el botón de entrenamiento se recoloca para quedar mejor alineado dentro de su contenedor.
+Son cambios pequeños por separado, aunque ayudan a que las escenas parezcan parte de la misma aplicación y a que los controles más usados sean fáciles de localizar.
+
 El fondo pasa a usar una textura inspirada en una placa base.
 Esta elección encaja con el carácter técnico del proyecto y diferencia visualmente la aplicación de una interfaz plana genérica.
-El uso de una escena de fondo común permite mantener ese recurso entre vistas sin duplicar lógica en cada una.
+El uso de una Escena de fondo común permite mantener ese recurso entre vistas sin duplicar lógica en cada una.
 
 También se mejoran los iconos y controles pequeños.
 El botón de menú deja de depender de un carácter textual y pasa a usar iconos gráficos.
@@ -914,7 +950,7 @@ Por ello se dedica una tarea específica a integrar un sistema de renderizado La
 
 La primera decisión consiste en tratar la fórmula como un elemento de interfaz.
 El componente pasa a basarse en un nodo compatible con los contenedores de Godot, de forma que pueda colocarse dentro de paneles, zonas desplazables y estructuras verticales junto al texto explicativo.
-Esto evita tener que posicionar manualmente las fórmulas como si fueran sprites de la escena.
+Esto evita tener que posicionar manualmente las fórmulas como si fueran sprites de la Escena.
 
 Se prueba una solución basada en MathJax y elementos HTML superpuestos al canvas de Godot.
 Esa alternativa permite aprovechar el navegador, aunque exige sincronizar la posición del DOM con la interfaz interna del motor.
@@ -948,6 +984,15 @@ Estos datasets permiten observar estructuras más variadas que las usadas en las
 Los datasets internos se traducen al castellano.
 Los nombres de atributos y valores pasan a estar alineados con el idioma de la interfaz y de la memoria.
 Esto evita mezclar explicaciones en castellano con ejemplos en inglés, y hace que los textos generados por la ventana resulten más naturales.
+
+En la red neuronal se revisan también los conjuntos internos.
+El dataset de prueba inicial se sustituye por Iris, un ejemplo clásico de clasificación multiclase con cuatro entradas numéricas y salida \textit{softmax}.
+Sus atributos se traducen a nombres como ``Longitud Sépalo'', ``Anchura Sépalo'', ``Longitud Pétalo'' y ``Anchura Pétalo'', y la salida pasa a mostrarse como ``Tipo de Flor''.
+El dataset de cultivos se traduce de forma equivalente, con atributos como hidratación, luz, nutrientes y temperatura, y con crecimiento como variable objetivo.
+
+Para las pruebas finales de la red se genera también una versión sintética extendida de Iris.
+Este conjunto no cambia el flujo de selección visible para el usuario, aunque sirve para comprobar entrenamiento y evaluación con más muestras y con los mismos nombres de columnas que el dataset integrado.
+Con ello se refuerza la comprobación de que la preparación de entradas, salidas y etiquetas decodificadas funciona con conjuntos de mayor tamaño.
 
 La carga de CSV gana selección explícita de variable objetivo.
 El panel lee las cabeceras del archivo y permite elegir qué columna se quiere predecir.
@@ -1005,6 +1050,15 @@ Cada nodo conserva información sobre la partición que lo creó: número de dat
 Al pulsar un nodo, la ventana muestra ese contexto en lugar de limitarse al texto visible del propio nodo.
 Esto permite inspeccionar el árbol ya construido y entender qué información estadística hay detrás de cada parte de la estructura.
 
+Los últimos ajustes añaden explicaciones para estados que antes podían resultar ambiguos.
+Cuando el entrenamiento termina, la ventana deja de mostrar la última explicación de entropía o partición y presenta un mensaje de cierre que invita a continuar con la evaluación.
+También se centraliza la limpieza de las gráficas para que no permanezcan en pantalla cuando la explicación ya no las necesita.
+
+Los nodos pendientes reciben un tratamiento específico al seleccionarlos.
+Estos nodos se crean con texto provisional mientras el algoritmo ya conoce la rama que debe existir, aunque todavía no ha decidido el contenido definitivo de esa rama.
+La ventana los identifica como pendientes, muestra el valor de rama por el que se llega a ellos cuando esa información está disponible y explica que el algoritmo resolverá su contenido en un paso posterior.
+Además, las listas de ramas o valores posibles se formatean antes de mostrarse, evitando que aparezcan representaciones internas de arrays o diccionarios dentro de la explicación.
+
 
 \subsection{Explicaciones de mayor nivel en la red neuronal}
 
@@ -1031,11 +1085,61 @@ Un usuario puede estudiar una neurona concreta, revisar una capa como operación
 La misma ejecución interna alimenta todas esas explicaciones, lo que mantiene la coherencia entre cálculo, animación y texto.
 
 
+\subsection{Gráficas de activación e inspección de neuronas}
+
+La red neuronal incorpora también una interacción manual sobre las neuronas.
+Hasta este momento, los resaltados visuales dependían sobre todo del avance automático del algoritmo durante el forward pass o el backward pass.
+Con la nueva interacción, el usuario puede pulsar una neurona para seleccionarla, ver su información en la ventana y pulsarla de nuevo para deshacer la selección.
+
+Para que esta acción sea clara, se define un tema visual propio para la neurona pulsada.
+Ese tema se diferencia del que se usa cuando una neurona está siendo evaluada por el algoritmo.
+La separación es importante porque el resaltado automático representa el paso actual del entrenamiento y la selección manual representa una consulta solicitada por el usuario.
+Cuando el entrenamiento avanza, la selección manual se limpia y la ventana recupera la explicación correspondiente al algoritmo, de forma que no se mezclen textos de una consulta anterior con un nuevo paso de cálculo.
+
+La explicación de las funciones de activación se refuerza con gráficas.
+Se generan imágenes para funciones como ReLU, sigmoide e identidad, y también para \textit{softmax} con distinto número de clases.
+Las gráficas se preparan con fondo transparente, ejes claros y cuadrícula tenue para integrarse en la estética oscura de la aplicación.
+Después se incorporan como texturas a la ventana informativa de la red.
+
+Durante el forward pass, la ventana puede mostrar la gráfica asociada a la función de activación de la capa que se está calculando.
+Cuando la explicación pasa a otro tipo de contenido, como la carga de datos, la retropropagación o el fin del entrenamiento, la gráfica se limpia junto con la fórmula anterior.
+Esto mantiene la ventana centrada en el paso actual y evita que una representación matemática permanezca visible fuera de contexto.
+
+El último paso consiste en marcar sobre la gráfica el punto evaluado por la neurona.
+La ventana toma la entrada ponderada, la salida activada y la función correspondiente, y transforma esos valores en una posición dentro del área útil de la imagen.
+Sobre ella se dibuja un marcador rojo que indica qué punto de la curva se está usando en ese cálculo concreto.
+Así se conectan tres niveles de explicación: el valor numérico de entrada, la fórmula aplicada y la forma de la función de activación.
+
+
+\subsection{Carga de redes y validación de compatibilidad}
+
+La red neuronal gana en esta fase la posibilidad de cargar modelos desde archivo.
+La opción de cargar se sitúa en el menú de creación, ya que es ahí donde se define o se sustituye la arquitectura antes de entrenar o evaluar.
+En escritorio, la aplicación abre un diálogo de archivo con filtros para modelos ONNX y NNEF.
+En la versión web, se crea un selector HTML mediante el puente de JavaScript, se lee el archivo con el navegador y se guarda temporalmente en el espacio de usuario antes de importarlo desde Godot.
+
+La importación distingue el formato por extensión.
+Los modelos ONNX se procesan con el importador correspondiente, y los modelos NNEF siguen la misma idea con su propio importador.
+Si la carga falla, el menú muestra un mensaje de error.
+Si la carga se completa, los pesos, sesgos y funciones de activación se convierten a las estructuras internas de la aplicación y se emite una señal para reconstruir la red visible.
+Cuando el archivo no incluye sesgos, la aplicación los regenera para mantener completa la representación del modelo.
+
+La carga se valida contra el dataset seleccionado.
+Si ya se conocen las restricciones del problema, la red importada debe tener el número esperado de neuronas de entrada y de salida.
+Cuando alguna dimensión no coincide, la interfaz informa de la diferencia entre la arquitectura cargada y la requerida por los datos actuales.
+Esta comprobación impide entrenar o ejecutar inferencia con un modelo que no puede recibir las columnas seleccionadas o que no produce las salidas esperadas.
+
+Durante estas pruebas se corrige también el selector de funciones de activación.
+El botón desplegable de Godot distingue entre el índice visual de una opción y el identificador lógico asociado a ella.
+La lectura inicial podía confundir ambos valores y asignar una activación distinta a la seleccionada.
+La corrección usa el identificador real de cada opción al leer y al restaurar el selector, manteniendo coherente la arquitectura creada, importada o modificada desde la interfaz.
+
+
 \subsection{Persistencia, exportación y validación externa}
 
 La última tarea transversal se centra en conservar resultados y aumentar la confianza en los cálculos.
 En el árbol de decisión se implementa guardado y carga en formato JSON.
-El guardado recorre los nodos de la estructura y conserva la raíz, identificadores, relaciones padre-hijo, profundidad, texto, estado pendiente, atributo, etiqueta, tipo de hoja, valor de rama e información de partición.
+El guardado recorre los nodos de la estructura y conserva la raíz, identificadores, relaciones padre-hijo, profundidad, texto, estado pendiente, atributo, etiqueta, tipo de hoja, valor de rama, información de partición y, cuando el controlador la conoce, metadatos del dataset como atributos de entrada y columna objetivo.
 Esto permite recuperar un árbol con su forma visual y con los datos pedagógicos necesarios para seguir inspeccionándolo.
 
 La carga reconstruye el árbol a partir del archivo guardado.
@@ -1043,11 +1147,19 @@ Primero valida la estructura, limpia el árbol actual, instancia los nodos, rest
 Después vuelve a organizar la vista y actualiza el tamaño del canvas.
 Esta persistencia resulta distinta al guardado de una red neuronal, ya que el árbol se conserva como estado visual y lógico propio de la aplicación.
 
+Tras una carga válida, el controlador configura el árbol como una estructura ya entrenada.
+Para ello reinicia los datos de evaluación previos, oculta los botones de avance, muestra el botón de evaluación y prepara el estado interno para que el árbol cargado pueda clasificarse directamente.
+Si el archivo no contiene metadatos de atributos, la aplicación intenta inferirlos a partir de la raíz o de los atributos usados por los nodos.
+Esta recuperación permite evaluar árboles guardados antes de que esos metadatos formasen parte del formato.
+
 En la red, el menú de guardado se vincula con la exportación del modelo.
 El panel de exportación permite escoger el formato y se presenta como un cuadro específico, con cabecera y botón de cierre.
 La idea es que el guardado de una red entrenada genere una representación del modelo que pueda usarse fuera de la aplicación.
 
 La validación externa se aborda mediante scripts de Python.
+En la red neuronal, una comprobación lee con herramientas externas los modelos ONNX exportados desde la aplicación y revisa los pesos y sesgos guardados.
+Otra prueba genera fuera de Godot una red sencilla con valores conocidos, la importa en la aplicación y comprueba que esos parámetros aparecen en la interfaz como se esperaba.
+Estas pruebas cubren la dirección de salida y la de entrada para el caso de redes densas simples que maneja el proyecto.
 Para el árbol de decisión se prepara un script que calcula entropía, ganancia de información, clase mayoritaria, pureza de nodo y construcción ID3 sobre un dataset equivalente.
 Comparar sus resultados con los de Godot ayuda a comprobar que la estructura generada y las métricas mostradas por la ventana corresponden con una referencia independiente.
 
@@ -1057,5 +1169,5 @@ El árbol, la red, las gráficas y las ventanas informativas pasan a depender de
 Esto reduce el riesgo de que la interfaz explique un cálculo distinto del que realmente usa el algoritmo.
 
 Con estas mejoras, la aplicación queda más cohesionada.
-El menú principal presenta mejor los algoritmos, las vistas se adaptan a distintos dispositivos, las fórmulas se renderizan dentro de Godot también en web, los datasets se seleccionan con más control, la evaluación del árbol se vuelve paso a paso, la red ofrece explicaciones a varias escalas y los resultados pueden guardarse o contrastarse con herramientas externas.
+El menú principal presenta mejor los algoritmos, las vistas se adaptan a distintos dispositivos, las fórmulas se renderizan dentro de Godot también en web, los datasets se seleccionan con más control, la evaluación del árbol se vuelve paso a paso, la red ofrece explicaciones a varias escalas, las funciones de activación se acompañan con gráficas y los modelos pueden cargarse, guardarse o contrastarse con herramientas externas.
 El proyecto termina así con una interfaz más usable y con una correspondencia más sólida entre cálculo interno, representación visual y explicación textual.
