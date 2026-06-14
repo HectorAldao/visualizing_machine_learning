@@ -41,10 +41,10 @@ border_width_bottom = 10
 border_color = Color(0, 0, 0, 0.9019608)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rjgu6"]
-bg_color = Color(0.3372549, 0.7058824, 0.9137255, 1)
+bg_color = Color(0.4392157, 0.7607843, 0.43137255, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vxwtt"]
-bg_color = Color(0, 0.44705883, 0.69803923, 1)
+bg_color = Color(0.24599999, 0.6, 0.24, 1)
 
 [resource]
 Button/colors/font_color = Color(0, 0, 0, 1)

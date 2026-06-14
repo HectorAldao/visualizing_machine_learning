@@ -139,7 +139,7 @@ theme = ExtResource("1_y8h1s")
 text = " Nº Capas Ocultas"
 
 [node name="NewNeuronsLayer" type="HBoxContainer" parent="VBoxContainer" unique_id=793557005]
-custom_minimum_size = Vector2(0, 138)
+custom_minimum_size = Vector2(0, 211)
 layout_mode = 2
 
 [node name="NeuronsInLayer" parent="VBoxContainer/NewNeuronsLayer" unique_id=1166179227 instance=ExtResource("3_e6v37")]
@@ -152,4 +152,5 @@ text = "Previsualizar red"
 
 [node name="StartButton" type="Button" parent="VBoxContainer" unique_id=1133381881]
 layout_mode = 2
+size_flags_vertical = 8
 text = "Entrenar Red"
