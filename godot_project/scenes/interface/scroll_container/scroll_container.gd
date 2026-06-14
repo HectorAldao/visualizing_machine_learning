@@ -8,6 +8,7 @@ class_name ScrollContainerV2 extends ScrollContainer
 @export var min_zoom: float = 0.1
 @export var touch_drag_deadzone: float = 5.0
 @export var pinch_zoom_pixels_per_step: float = 100.0
+@export var fallback_scroll_container: ScrollContainerV2
 
 var is_middle_mouse_dragging: bool = false
 var last_mouse_position: Vector2 = Vector2.ZERO
@@ -21,7 +22,7 @@ var last_pinch_distance: float = 0.0
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	mouse_force_pass_scroll_events = false
+	mouse_force_pass_scroll_events = true
 
 
 func _gui_input(event: InputEvent) -> void:
@@ -31,11 +32,12 @@ func _gui_input(event: InputEvent) -> void:
 		# where the mause where and where the mouse is
 		var delta_position = event.position - last_mouse_position
 
-		_apply_drag_scroll(delta_position)
+		var did_scroll = try_drag_scroll(delta_position)
 
 		# The new position is saved and the input is set as handled
 		last_mouse_position = event.position
-		accept_event()
+		if did_scroll:
+			accept_event()
 
 	if event is InputEventScreenTouch:
 		_handle_screen_touch(event)
@@ -84,20 +86,10 @@ func _gui_input(event: InputEvent) -> void:
 				
 			# Apply scroll
 			if delta != 0:
-				# Check Shift for horizontal scrolling
-				if is_horizontal:
-					if event.shift_pressed:
-						scroll_vertical += delta
-					else:
-						scroll_horizontal += delta
-				else:
-					if event.shift_pressed:
-						scroll_horizontal += delta
-					else:
-						scroll_vertical += delta
-				
-				# Optional: do not pass the input to lower nodes
-				accept_event()
+				var did_scroll = try_scroll(delta, event.shift_pressed)
+
+				if did_scroll:
+					accept_event()
 
 
 func _handle_screen_touch(event: InputEventScreenTouch) -> void:
@@ -141,14 +133,18 @@ func _handle_screen_drag(event: InputEventScreenDrag) -> void:
 				return
 
 			is_touch_dragging = true
+			var delta_position = event.position - last_touch_position
+			var did_scroll = try_drag_scroll(delta_position)
 			last_touch_position = event.position
-			accept_event()
+			if did_scroll:
+				accept_event()
 			return
 
 		var delta_position = event.position - last_touch_position
-		_apply_drag_scroll(delta_position)
+		var did_scroll = try_drag_scroll(delta_position)
 		last_touch_position = event.position
-		accept_event()
+		if did_scroll:
+			accept_event()
 		return
 
 	if touch_positions.size() == 2:
@@ -162,10 +158,77 @@ func _handle_screen_drag(event: InputEventScreenDrag) -> void:
 		accept_event()
 
 
-func _apply_drag_scroll(delta_position: Vector2) -> void:
+func try_drag_scroll(delta_position: Vector2) -> bool:
+	return _try_drag_scroll(delta_position, [])
+
+
+func _try_drag_scroll(delta_position: Vector2, visited_scroll_containers: Array) -> bool:
+	if self in visited_scroll_containers:
+		return false
+
+	visited_scroll_containers.append(self)
+
+	var previous_horizontal = scroll_horizontal
+	var previous_vertical = scroll_vertical
+
 	# The diff is aplied
 	scroll_horizontal -= int(delta_position.x)
 	scroll_vertical -= int(delta_position.y)
+
+	var did_scroll = scroll_horizontal != previous_horizontal or scroll_vertical != previous_vertical
+	if not did_scroll:
+		var fallback = _get_fallback_scroll_container()
+		if fallback != null:
+			did_scroll = fallback._try_drag_scroll(delta_position, visited_scroll_containers)
+
+	return did_scroll
+
+
+func try_scroll(delta: int, shift_pressed: bool) -> bool:
+	return _try_scroll(delta, shift_pressed, [])
+
+
+func _try_scroll(delta: int, shift_pressed: bool, visited_scroll_containers: Array) -> bool:
+	if self in visited_scroll_containers:
+		return false
+
+	visited_scroll_containers.append(self)
+
+	var previous_horizontal = scroll_horizontal
+	var previous_vertical = scroll_vertical
+
+	if is_horizontal:
+		if shift_pressed:
+			scroll_vertical += delta
+		else:
+			scroll_horizontal += delta
+	else:
+		if shift_pressed:
+			scroll_horizontal += delta
+		else:
+			scroll_vertical += delta
+
+	var did_scroll = scroll_horizontal != previous_horizontal or scroll_vertical != previous_vertical
+	if not did_scroll:
+		var fallback = _get_fallback_scroll_container()
+		if fallback != null:
+			did_scroll = fallback._try_scroll(delta, shift_pressed, visited_scroll_containers)
+
+	return did_scroll
+
+
+func _get_fallback_scroll_container() -> ScrollContainerV2:
+	if fallback_scroll_container != null:
+		return fallback_scroll_container
+
+	var parent = get_parent()
+	while parent != null:
+		if parent is ScrollContainerV2:
+			return parent
+
+		parent = parent.get_parent()
+
+	return null
 
 
 func _apply_zoom_delta(delta: float) -> void:
