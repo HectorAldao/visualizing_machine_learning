@@ -1,11 +1,41 @@
 class_name WindowNn extends PanelContainer
 
 
+@export var plot_offset_lineal: Array[float] = [0.0, 4.0]:
+	set(value):
+		plot_offset_lineal = value
+		_refresh_activation_plot_marker_position()
+
+@export var plot_offset_sigmoid: Array[float] = [0.0, 7.0]:
+	set(value):
+		plot_offset_sigmoid = value
+		_refresh_activation_plot_marker_position()
+
+@export var plot_offset_relu: Array[float] = [0.0, -7.0]:
+	set(value):
+		plot_offset_relu = value
+		_refresh_activation_plot_marker_position()
+
 @onready var text0: Label = %Label0
 @onready var text_formula: Label = %LabelFormula
 @onready var latexformula: LatexFormula = %LatexFormula
 @onready var text1: Label = %Label1
 @onready var plot: TextureRect = %PlotActivationFunctionTextureRect
+
+
+const ACTIVATION_PLOT_MARKER_RADIUS: float = 5.0
+const ACTIVATION_PLOT_MARKER_COLOR: Color = Color(1.0, 0.16, 0.12)
+const ACTIVATION_PLOT_TEXTURE_SIZE: Vector2 = Vector2(640.0, 400.0)
+const ACTIVATION_PLOT_AREA_IN_TEXTURE: Rect2 = Rect2(Vector2(68.0, 43.0) / ACTIVATION_PLOT_TEXTURE_SIZE, Vector2(536.0, 295.0) / ACTIVATION_PLOT_TEXTURE_SIZE)
+const ACTIVATION_PLOT_X_RANGE: Vector2 = Vector2(-6.0, 6.0)
+
+var _activation_plot_marker_overlay: Control
+var _activation_plot_marker_position: Vector2 = Vector2.ZERO
+var _has_activation_plot_marker: bool = false
+var _has_activation_plot_values: bool = false
+var _activation_plot_marker_activation_type: int = Constants.ACT_FUNCS.identity
+var _activation_plot_marker_input: float = 0.0
+var _activation_plot_marker_output: float = 0.0
 
 
 const template_texts: Dictionary[String, Array] = {
@@ -42,6 +72,7 @@ const template_texts: Dictionary[String, Array] = {
 	}
 
 func _ready() -> void:
+	_setup_activation_plot_marker_overlay()
 
 	SignalsObserver.train_nn.connect(_clear_clicked_neuron_window_snapshot)
 	SignalsObserver.train_nn_next_neuron.connect(_clear_clicked_neuron_window_snapshot)
@@ -103,7 +134,6 @@ func set_resalted_neuron_info_forward(neuron_id: int, layer_id: int, input_array
 
 
 	_reset_formula_and_activation_plot()
-	_show_activation_plot_for_layer(layer_id)
 
 	var neuron_bias: float = 0.0
 
@@ -117,6 +147,9 @@ func set_resalted_neuron_info_forward(neuron_id: int, layer_id: int, input_array
 
 	if Variables.nn.nn_dict.has(layer_id) and neuron_id < Variables.nn.nn_dict[layer_id].size():
 		neuron_weights = Variables.nn.nn_dict[layer_id][neuron_id]
+
+	var activation_input: float = _weighted_sum(neuron_weights, input_array, neuron_bias)
+	_show_activation_plot_for_layer(layer_id, activation_input, neuron_output)
 
 	var formula: String
 
@@ -330,6 +363,11 @@ func _cache_clicked_neuron_window_snapshot() -> void:
 		"latex_formula": latexformula.formula,
 		"text1": text1.text,
 		"plot_texture": plot.texture,
+		"has_plot_marker": _has_activation_plot_marker,
+		"has_plot_values": _has_activation_plot_values,
+		"plot_marker_activation_type": _activation_plot_marker_activation_type,
+		"plot_marker_input": _activation_plot_marker_input,
+		"plot_marker_output": _activation_plot_marker_output,
 	}
 
 
@@ -339,6 +377,7 @@ func _restore_clicked_neuron_window_snapshot() -> void:
 	text_formula.text = str(cached_window.get("text_formula", ""))
 	text1.text = str(cached_window.get("text1", ""))
 	_set_activation_plot_texture(cached_window.get("plot_texture", null) as Texture2D)
+	_restore_activation_plot_marker_snapshot(cached_window)
 
 	var cached_formula: String = str(cached_window.get("latex_formula", ""))
 	if cached_formula.strip_edges().is_empty():
@@ -354,16 +393,19 @@ func _clear_clicked_neuron_window_snapshot(_arg1 = null, _arg2 = null, _arg3 = n
 
 
 func _clear_activation_plot() -> void:
+	_clear_activation_plot_marker()
 	_set_activation_plot_texture(null)
 
 
-func _show_activation_plot_for_layer(layer_id: int) -> void:
+func _show_activation_plot_for_layer(layer_id: int, activation_input: float, activation_output: float) -> void:
 	var activation_type: int = int(Variables.nn.nn_func_dict.get(layer_id, Constants.ACT_FUNCS.identity))
 	var plot_texture: Texture2D = _get_activation_plot_texture(activation_type)
 	if plot_texture == null:
 		return
 
+	_set_activation_plot_marker_values(activation_type, activation_input, activation_output)
 	_set_activation_plot_texture(plot_texture)
+	_refresh_activation_plot_marker_position()
 
 
 func _get_activation_plot_texture(activation_type: int) -> Texture2D:
@@ -395,7 +437,167 @@ func _set_activation_plot_texture(texture: Texture2D) -> void:
 
 
 func _after_activation_plot_texture_changed() -> void:
-	pass
+	_update_activation_plot_marker_overlay_size()
+	_refresh_activation_plot_marker_position()
+
+
+func _setup_activation_plot_marker_overlay() -> void:
+	_activation_plot_marker_overlay = Control.new()
+	_activation_plot_marker_overlay.name = "ActivationPlotMarkerOverlay"
+	_activation_plot_marker_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_activation_plot_marker_overlay.anchor_right = 1.0
+	_activation_plot_marker_overlay.anchor_bottom = 1.0
+	_activation_plot_marker_overlay.offset_left = 0.0
+	_activation_plot_marker_overlay.offset_top = 0.0
+	_activation_plot_marker_overlay.offset_right = 0.0
+	_activation_plot_marker_overlay.offset_bottom = 0.0
+	_activation_plot_marker_overlay.draw.connect(_draw_activation_plot_marker)
+	plot.add_child(_activation_plot_marker_overlay)
+	plot.resized.connect(_update_activation_plot_marker_overlay_size)
+	plot.resized.connect(_refresh_activation_plot_marker_position)
+	_update_activation_plot_marker_overlay_size()
+
+
+func _update_activation_plot_marker_overlay_size() -> void:
+	if _activation_plot_marker_overlay == null:
+		return
+
+	_activation_plot_marker_overlay.size = plot.size
+	_activation_plot_marker_overlay.queue_redraw()
+
+
+func _draw_activation_plot_marker() -> void:
+	if not _has_activation_plot_marker:
+		return
+
+	_activation_plot_marker_overlay.draw_circle(_activation_plot_marker_position, ACTIVATION_PLOT_MARKER_RADIUS, ACTIVATION_PLOT_MARKER_COLOR)
+
+
+func _set_activation_plot_marker_values(activation_type: int, activation_input: float, activation_output: float) -> void:
+	_activation_plot_marker_activation_type = activation_type
+	_activation_plot_marker_input = activation_input
+	_activation_plot_marker_output = activation_output
+	_has_activation_plot_values = true
+
+
+func _clear_activation_plot_marker() -> void:
+	_has_activation_plot_values = false
+	_has_activation_plot_marker = false
+	_queue_activation_plot_marker_redraw()
+
+
+func _restore_activation_plot_marker_snapshot(cached_window: Dictionary) -> void:
+	_has_activation_plot_values = bool(cached_window.get("has_plot_values", false))
+	_has_activation_plot_marker = bool(cached_window.get("has_plot_marker", false))
+	_activation_plot_marker_activation_type = int(cached_window.get("plot_marker_activation_type", Constants.ACT_FUNCS.identity))
+	_activation_plot_marker_input = float(cached_window.get("plot_marker_input", 0.0))
+	_activation_plot_marker_output = float(cached_window.get("plot_marker_output", 0.0))
+	_refresh_activation_plot_marker_position()
+
+
+func _refresh_activation_plot_marker_position() -> void:
+	if plot == null or plot.texture == null or not _has_activation_plot_values:
+		_has_activation_plot_marker = false
+		_queue_activation_plot_marker_redraw()
+		return
+
+	_activation_plot_marker_position = _activation_plot_value_to_plot_position(
+		_activation_plot_marker_activation_type,
+		_activation_plot_marker_input,
+		_activation_plot_marker_output
+	)
+	_has_activation_plot_marker = true
+	_queue_activation_plot_marker_redraw()
+
+
+func _queue_activation_plot_marker_redraw() -> void:
+	if _activation_plot_marker_overlay == null:
+		return
+
+	_activation_plot_marker_overlay.queue_redraw()
+
+
+func _activation_plot_value_to_plot_position(activation_type: int, activation_input: float, activation_output: float) -> Vector2:
+	var plot_area: Rect2 = _activation_plot_area_rect()
+	var y_range: Vector2 = _activation_plot_y_range(activation_type)
+	var x_factor: float = inverse_lerp(ACTIVATION_PLOT_X_RANGE.x, ACTIVATION_PLOT_X_RANGE.y, activation_input)
+	var y_factor: float = 1.0 - inverse_lerp(y_range.x, y_range.y, activation_output)
+
+	return plot_area.position + Vector2(x_factor * plot_area.size.x, y_factor * plot_area.size.y) + _activation_plot_offset(activation_type)
+
+
+func _activation_plot_offset(activation_type: int) -> Vector2:
+	match activation_type:
+		Constants.ACT_FUNCS.relu:
+			return _plot_offset_array_to_vector(plot_offset_relu)
+		Constants.ACT_FUNCS.sigmoid:
+			return _plot_offset_array_to_vector(plot_offset_sigmoid)
+		_:
+			return _plot_offset_array_to_vector(plot_offset_lineal)
+
+
+func _plot_offset_array_to_vector(offset: Array[float]) -> Vector2:
+	var x: float = 0.0
+	var y: float = 0.0
+	if offset.size() > 0:
+		x = offset[0]
+	if offset.size() > 1:
+		y = offset[1]
+	return Vector2(x, y)
+
+
+func _activation_plot_area_rect() -> Rect2:
+	var texture_rect: Rect2 = _activation_plot_texture_rect()
+	return Rect2(
+		texture_rect.position + ACTIVATION_PLOT_AREA_IN_TEXTURE.position * texture_rect.size,
+		ACTIVATION_PLOT_AREA_IN_TEXTURE.size * texture_rect.size
+	)
+
+
+func _activation_plot_texture_rect() -> Rect2:
+	if plot == null or plot.texture == null:
+		return Rect2(Vector2.ZERO, Vector2.ZERO)
+
+	var texture_size: Vector2 = plot.texture.get_size()
+	if texture_size.x <= 0.0 or texture_size.y <= 0.0:
+		return Rect2(Vector2.ZERO, plot.size)
+
+	match plot.stretch_mode:
+		TextureRect.STRETCH_KEEP:
+			return Rect2(Vector2.ZERO, texture_size)
+		TextureRect.STRETCH_KEEP_CENTERED:
+			return Rect2((plot.size - texture_size) * 0.5, texture_size)
+		TextureRect.STRETCH_KEEP_ASPECT:
+			var scale: float = minf(plot.size.x / texture_size.x, plot.size.y / texture_size.y)
+			return Rect2(Vector2.ZERO, texture_size * scale)
+		TextureRect.STRETCH_KEEP_ASPECT_CENTERED:
+			var scale: float = minf(plot.size.x / texture_size.x, plot.size.y / texture_size.y)
+			var size: Vector2 = texture_size * scale
+			return Rect2((plot.size - size) * 0.5, size)
+		TextureRect.STRETCH_KEEP_ASPECT_COVERED:
+			var scale: float = maxf(plot.size.x / texture_size.x, plot.size.y / texture_size.y)
+			var size: Vector2 = texture_size * scale
+			return Rect2((plot.size - size) * 0.5, size)
+		_:
+			return Rect2(Vector2.ZERO, plot.size)
+
+
+func _activation_plot_y_range(activation_type: int) -> Vector2:
+	match activation_type:
+		Constants.ACT_FUNCS.sigmoid:
+			return Vector2(0.0, 1.0)
+		Constants.ACT_FUNCS.relu:
+			return Vector2(0.0, 6.0)
+		_:
+			return Vector2(-6.0, 6.0)
+
+
+func _weighted_sum(weights: Array, inputs: Array, bias: float) -> float:
+	var value: float = bias
+	var term_count: int = min(weights.size(), inputs.size())
+	for i in range(term_count):
+		value += float(weights[i]) * float(inputs[i])
+	return value
 
 
 func _reset_formula_and_activation_plot() -> void:
