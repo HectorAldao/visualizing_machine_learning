@@ -55,7 +55,7 @@ func _ready() -> void:
 					optionbutton_act_func_out = c.get_node("VBoxContainer2").get_node("OptionButton")
 					optionbutton_act_func_out.item_selected.connect(_on_output_activation_selected)
 					if Variables.nn.nn_func_tmp_dict.has(-1):
-						optionbutton_act_func_out.select(Variables.nn.nn_func_tmp_dict[-1])
+						_select_output_activation_by_id(Variables.nn.nn_func_tmp_dict[-1])
 
 
 
@@ -413,9 +413,16 @@ func _on_minus_pressed(which: HBoxContainer) -> void:
 				textedit.text_changed.emit()
 
 
-func _on_output_activation_selected(activation_func_id: int) -> void:
+func _on_output_activation_selected(activation_index: int) -> void:
+	var activation_func_id: int = optionbutton_act_func_out.get_item_id(activation_index)
 	Variables.nn.set_layer_activation_tmp(-1, activation_func_id)
 	_update_nn()
+
+
+func _select_output_activation_by_id(activation_func_id: int) -> void:
+	var activation_index: int = optionbutton_act_func_out.get_item_index(activation_func_id)
+	if activation_index >= 0:
+		optionbutton_act_func_out.select(activation_index)
 
 
 func _on_restrictions_set(nn_restr: Dictionary[int, int]) -> void:
@@ -435,7 +442,7 @@ func _on_restrictions_set(nn_restr: Dictionary[int, int]) -> void:
 		if nn_restr.has(-2):
 			var restricted_activation: int = int(nn_restr[-2])
 			Variables.nn.set_layer_activation_tmp(-1, restricted_activation)
-			optionbutton_act_func_out.select(optionbutton_act_func_out.get_item_index(restricted_activation))
+			_select_output_activation_by_id(restricted_activation)
 			optionbutton_act_func_out.disabled = true
 
 	SignalsObserver.reload_nn.emit.call_deferred()

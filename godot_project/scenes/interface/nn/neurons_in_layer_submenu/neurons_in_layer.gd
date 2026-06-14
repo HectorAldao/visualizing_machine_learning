@@ -24,7 +24,7 @@ func _ready() -> void:
 
 	var nn_logic = Variables.get("nn")
 	if nn_logic.nn_func_tmp_dict.has(neuron_id):
-		activation_option_button.select(nn_logic.nn_func_tmp_dict[neuron_id])
+		_select_activation_by_id(nn_logic.nn_func_tmp_dict[neuron_id])
 	else:
 		nn_logic.set_layer_activation_tmp(neuron_id, activation_option_button.get_selected_id())
 
@@ -87,9 +87,16 @@ func _check_wanted(wanted: int, txtedt: TextEdit, minimum: int) -> int:
 	return wanted
 
 
-func _on_activation_selected(activation_func_id: int) -> void:
+func _on_activation_selected(activation_index: int) -> void:
+	var activation_func_id: int = activation_option_button.get_item_id(activation_index)
 	Variables.nn.set_layer_activation_tmp(neuron_id, activation_func_id)
 	_update_nn()
+
+
+func _select_activation_by_id(activation_func_id: int) -> void:
+	var activation_index: int = activation_option_button.get_item_index(activation_func_id)
+	if activation_index >= 0:
+		activation_option_button.select(activation_index)
 
 
 func _update_nn() -> void:
