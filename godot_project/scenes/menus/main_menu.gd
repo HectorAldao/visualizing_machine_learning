@@ -112,12 +112,12 @@ func _update_size() -> void:
 		var visible_size: Vector2 = viewport.get_visible_rect().size
 		canvas_scale = (window_size / display_scale) / visible_size
 
-	var visual_window_size: Vector2 = window_size / display_scale
-	var available_width: float = maxf(0.0, visual_window_size.x - horizontal_margin * 2.0)
-	var available_height: float = maxf(0.0, visual_window_size.y - horizontal_margin * 2.0)
-	var target_width: float = available_width if _is_horizontal() else min(max_width, available_width)
-	panelcontainer.custom_minimum_size.x = target_width / canvas_scale.x
-	panelcontainer.custom_minimum_size.y = available_height / canvas_scale.y
+	#var visual_window_size: Vector2 = window_size / display_scale
+	#var available_width: float = maxf(0.0, visual_window_size.x - horizontal_margin * 2.0)
+	#var available_height: float = maxf(0.0, visual_window_size.y - horizontal_margin * 2.0)
+	#var target_width: float = available_width if _is_horizontal() else min(max_width, available_width)
+	#panelcontainer.custom_minimum_size.x = target_width / canvas_scale.x
+	#panelcontainer.custom_minimum_size.y = available_height / canvas_scale.y
 	_update_layout_orientation()
 
 
