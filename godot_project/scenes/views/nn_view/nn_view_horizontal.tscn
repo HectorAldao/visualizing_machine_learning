@@ -38,19 +38,20 @@ metadata/_custom_type_script = "uid://cyinp2iohgy8b"
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 10
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
 
 [node name="VBoxContainer" type="VBoxContainer" parent="ScrollContainer2/MarginContainer" unique_id=1294780891]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_constants/separation = 3
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="ScrollContainer2/MarginContainer/VBoxContainer" unique_id=1037477102]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 10
+theme_override_constants/separation = 3
 
 [node name="PanelContainer" type="PanelContainer" parent="ScrollContainer2/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=1654555224]
 layout_mode = 2
