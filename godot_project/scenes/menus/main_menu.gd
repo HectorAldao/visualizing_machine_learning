@@ -25,6 +25,9 @@ var selected_algorithm: int = 0:
 		selected_algorithm = new_value
 		_update_panel()
 
+var preview_original_index: int = 0
+var preview_original_parent: Container
+
 
 func _ready() -> void:
 	# Connect the press of the button to the load of the scene
@@ -33,6 +36,8 @@ func _ready() -> void:
 	start_button.pressed.connect(_on_start_button_pressed)
 
 	start_button.disabled = true
+	preview_original_parent = preview_of_algorithm.get_parent()
+	preview_original_index = preview_of_algorithm.get_index()
 
 	get_viewport().size_changed.connect(_update_size)
 	_update_size()
@@ -124,12 +129,24 @@ func _update_size() -> void:
 
 func _update_layout_orientation() -> void:
 	var target_parent: Container = hbox_container if _is_horizontal() else vbox_container
-	if panel_container_menu.get_parent() == target_parent:
-		return
+	if panel_container_menu.get_parent() != target_parent:
+		panel_container_menu.reparent(target_parent, false)
+		panel_container_menu.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		panel_container_menu.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
-	panel_container_menu.reparent(target_parent, false)
-	panel_container_menu.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	panel_container_menu.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_update_preview_orientation()
+
+
+func _update_preview_orientation() -> void:
+	var horizontal: bool = _is_horizontal()
+	var target_parent: Container = select_algorithm_menu if horizontal else preview_original_parent
+	if preview_of_algorithm.get_parent() != target_parent:
+		preview_of_algorithm.reparent(target_parent, false)
+
+	if horizontal:
+		target_parent.move_child(preview_of_algorithm, target_parent.get_child_count() - 1)
+	else:
+		target_parent.move_child(preview_of_algorithm, mini(preview_original_index, target_parent.get_child_count() - 1))
 
 
 ## Check if the screen is in vertical or horizontal
