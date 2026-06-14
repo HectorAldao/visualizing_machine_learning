@@ -67,6 +67,12 @@ const SPRITES: Dictionary[String, String] = {
 	"nn": "uid://bwcwlqey5yfgs"
 }
 
+const PLOTS: Dictionary[String, String] = {
+	"relu": "uid://bgowpjjotlb00",
+	"sigmoid": "uid://cuhsgg0vlo30u",
+	"identity": "uid://cegjp646ffo0f",
+}
+
 const NN_LOSS_EPSILON: float = 1e-8
 const DTREE_ENTROPY_LOG_BASE: float = 2.0
 const DTREE_CANVAS_MARGIN: float = 100.0

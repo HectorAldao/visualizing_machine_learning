@@ -392,51 +392,51 @@ func _set_mouse_filter_recursive(node: Node, filter: Control.MouseFilter) -> voi
 
 
 # How to move the ScrollContainer
-func _gui_input(event: InputEvent) -> void:
-	# Handle mouse motion for middle mouse dragging
-	if event is InputEventMouseMotion and is_middle_mouse_dragging:
-		# The scroll aplied is going to be the dif frame to frame of
-		# where the mause where and where the mouse is
-		var delta_position = event.position - last_mouse_position
-
-		# The diff is aplied
-		scroll_container.scroll_horizontal -= int(delta_position.x)
-		scroll_container.scroll_vertical -= int(delta_position.y)
-
-		# The new position is saved and the input is set as handled
-		last_mouse_position = event.position
-		accept_event()
-	
-	# If there is a mouse event
-	if event is InputEventMouseButton:
-		# Move the view with middle mouse
-		if event.button_index == MOUSE_BUTTON_MIDDLE:
-			if event.pressed:
-				is_middle_mouse_dragging = true
-				last_mouse_position = event.position
-			else:
-				is_middle_mouse_dragging = false
-
-			accept_event()
-		
-		# Move scroll container view
-		elif event.pressed and not event.ctrl_pressed:
-			# Save the diference frame to frame
-			var delta: int = 0
-			
-			# Determine direction
-			if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-				delta = -scroll_speed
-			elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-				delta = scroll_speed
-				
-			# Apply scroll
-			if delta != 0:
-				# Check Shift for horizontal scrolling
-				if event.shift_pressed:
-					scroll_container.scroll_horizontal += delta
-				else:
-					scroll_container.scroll_vertical += delta
-				
-				# Optional: do not pass the input to lower nodes
-				accept_event()
+#func _gui_input(event: InputEvent) -> void:
+	## Handle mouse motion for middle mouse dragging
+	#if event is InputEventMouseMotion and is_middle_mouse_dragging:
+		## The scroll aplied is going to be the dif frame to frame of
+		## where the mause where and where the mouse is
+		#var delta_position = event.position - last_mouse_position
+#
+		## The diff is aplied
+		#scroll_container.scroll_horizontal -= int(delta_position.x)
+		#scroll_container.scroll_vertical -= int(delta_position.y)
+#
+		## The new position is saved and the input is set as handled
+		#last_mouse_position = event.position
+		#accept_event()
+	#
+	## If there is a mouse event
+	#if event is InputEventMouseButton:
+		## Move the view with middle mouse
+		#if event.button_index == MOUSE_BUTTON_MIDDLE:
+			#if event.pressed:
+				#is_middle_mouse_dragging = true
+				#last_mouse_position = event.position
+			#else:
+				#is_middle_mouse_dragging = false
+#
+			#accept_event()
+		#
+		## Move scroll container view
+		#elif event.pressed and not event.ctrl_pressed:
+			## Save the diference frame to frame
+			#var delta: int = 0
+			#
+			## Determine direction
+			#if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+				#delta = -scroll_speed
+			#elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+				#delta = scroll_speed
+				#
+			## Apply scroll
+			#if delta != 0:
+				## Check Shift for horizontal scrolling
+				#if event.shift_pressed:
+					#scroll_container.scroll_horizontal += delta
+				#else:
+					#scroll_container.scroll_vertical += delta
+				#
+				## Optional: do not pass the input to lower nodes
+				#accept_event()
