@@ -5,6 +5,7 @@ class_name WindowNn extends PanelContainer
 @onready var text_formula: Label = %LabelFormula
 @onready var latexformula: LatexFormula = %LatexFormula
 @onready var text1: Label = %Label1
+@onready var plot: TextureRect = %PlotActivationFunctionTextureRect
 
 
 const template_texts: Dictionary[String, Array] = {
@@ -77,7 +78,7 @@ func set_neuron_info(neuron_id: int, layer_id: int) -> void:
 
 	_cache_clicked_neuron_window_snapshot()
 
-	_reset_formula()
+	_reset_formula_and_activation_plot()
 
 	var bias: float = 0.0
 
@@ -101,7 +102,8 @@ func set_neuron_info(neuron_id: int, layer_id: int) -> void:
 func set_resalted_neuron_info_forward(neuron_id: int, layer_id: int, input_array: Array, neuron_output: float) -> void:
 
 
-	_reset_formula()
+	_reset_formula_and_activation_plot()
+	_show_activation_plot_for_layer(layer_id)
 
 	var neuron_bias: float = 0.0
 
@@ -136,7 +138,7 @@ func set_resalted_neuron_info_forward(neuron_id: int, layer_id: int, input_array
 
 func set_resalted_neuron_info_backward(_neuron_id: int, layer_id: int, backward_info: Dictionary) -> void:
 
-	_reset_formula()
+	_reset_formula_and_activation_plot()
 
 	var formula: String
 	if ConfigVariables.use_latex:
@@ -155,7 +157,7 @@ func set_resalted_neuron_info_backward(_neuron_id: int, layer_id: int, backward_
 
 
 func set_resalted_layer_info_forward(layer_info: Dictionary) -> void:
-	_reset_formula()
+	_reset_formula_and_activation_plot()
 
 	var layer_id: int = int(layer_info.get("layer_id", -9999))
 	var input_values: Array = layer_info.get("input_values", [])
@@ -178,7 +180,7 @@ func set_resalted_layer_info_forward(layer_info: Dictionary) -> void:
 
 
 func set_resalted_layer_info_backward(layer_info: Dictionary) -> void:
-	_reset_formula()
+	_reset_formula_and_activation_plot()
 
 	var layer_id: int = int(layer_info.get("layer_id", -9999))
 	var formula: String
@@ -197,7 +199,7 @@ func set_resalted_layer_info_backward(layer_info: Dictionary) -> void:
 
 
 func set_resalted_data_loaded_info(data_info: Dictionary) -> void:
-	_reset_formula()
+	_reset_formula_and_activation_plot()
 
 	var input_values: Array = data_info.get("input_values", [])
 	var target_values: Array = data_info.get("target_values", [])
@@ -225,7 +227,7 @@ func set_resalted_data_loaded_info(data_info: Dictionary) -> void:
 
 
 func set_resalted_error_calculated_info(error_info: Dictionary) -> void:
-	_reset_formula()
+	_reset_formula_and_activation_plot()
 
 	var output_values: Array = error_info.get("output_values", [])
 	var target_values: Array = error_info.get("target_values", [])
@@ -255,7 +257,7 @@ func set_resalted_error_calculated_info(error_info: Dictionary) -> void:
 
 
 func set_resalted_error_returned_info(error_info: Dictionary) -> void:
-	_reset_formula()
+	_reset_formula_and_activation_plot()
 
 	var output_deltas: Array = error_info.get("output_deltas", [])
 	var formula: String
@@ -274,7 +276,7 @@ func set_resalted_error_returned_info(error_info: Dictionary) -> void:
 
 
 func set_resalted_data_step_info(step_info: Dictionary) -> void:
-	_reset_formula()
+	_reset_formula_and_activation_plot()
 
 	var data_idx: int = int(step_info.get("data_idx", -1))
 	var input_values: Array = step_info.get("input_values", [])
@@ -307,7 +309,7 @@ func set_resalted_data_step_info(step_info: Dictionary) -> void:
 
 
 func set_training_finished_info() -> void:
-	_reset_formula()
+	_reset_formula_and_activation_plot()
 	text0.text = "El entrenamiento ha acabado."
 	text1.text = "Pulse el botón 'Evaluar' para testear la red contra nuevos datos y así evaluar el entrenamiento."
 
@@ -327,6 +329,7 @@ func _cache_clicked_neuron_window_snapshot() -> void:
 		"text_formula": text_formula.text,
 		"latex_formula": latexformula.formula,
 		"text1": text1.text,
+		"plot_texture": plot.texture,
 	}
 
 
@@ -335,6 +338,7 @@ func _restore_clicked_neuron_window_snapshot() -> void:
 	text0.text = str(cached_window.get("text0", ""))
 	text_formula.text = str(cached_window.get("text_formula", ""))
 	text1.text = str(cached_window.get("text1", ""))
+	_set_activation_plot_texture(cached_window.get("plot_texture", null) as Texture2D)
 
 	var cached_formula: String = str(cached_window.get("latex_formula", ""))
 	if cached_formula.strip_edges().is_empty():
@@ -347,6 +351,56 @@ func _restore_clicked_neuron_window_snapshot() -> void:
 
 func _clear_clicked_neuron_window_snapshot(_arg1 = null, _arg2 = null, _arg3 = null, _arg4 = null) -> void:
 	Variables.nn_clicked_neuron_window_snapshot.clear()
+
+
+func _clear_activation_plot() -> void:
+	_set_activation_plot_texture(null)
+
+
+func _show_activation_plot_for_layer(layer_id: int) -> void:
+	var activation_type: int = int(Variables.nn.nn_func_dict.get(layer_id, Constants.ACT_FUNCS.identity))
+	var plot_texture: Texture2D = _get_activation_plot_texture(activation_type)
+	if plot_texture == null:
+		return
+
+	_set_activation_plot_texture(plot_texture)
+
+
+func _get_activation_plot_texture(activation_type: int) -> Texture2D:
+	var plot_uid: String = _activation_plot_uid(activation_type)
+	if plot_uid.is_empty():
+		return null
+
+	return load(plot_uid) as Texture2D
+
+
+func _activation_plot_uid(activation_type: int) -> String:
+	match activation_type:
+		Constants.ACT_FUNCS.relu:
+			return Constants.PLOTS.relu
+		Constants.ACT_FUNCS.sigmoid:
+			return Constants.PLOTS.sigmoid
+		Constants.ACT_FUNCS.identity:
+			return Constants.PLOTS.identity
+		_:
+			return ""
+
+
+func _set_activation_plot_texture(texture: Texture2D) -> void:
+	if plot.texture == texture:
+		return
+
+	plot.texture = texture
+	_after_activation_plot_texture_changed()
+
+
+func _after_activation_plot_texture_changed() -> void:
+	pass
+
+
+func _reset_formula_and_activation_plot() -> void:
+	_clear_activation_plot()
+	_reset_formula()
 
 # --- Helpers ---
 
