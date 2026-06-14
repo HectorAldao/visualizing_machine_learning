@@ -14,6 +14,9 @@ extends Control
 @onready var preview_of_algorithm: TextureRect = %PreviewOfAlgorithm
 
 @onready var panelcontainer: PanelContainer = %PanelContainer
+@onready var hbox_container: HBoxContainer = panelcontainer.get_node("HBoxContainer")
+@onready var vbox_container: VBoxContainer = hbox_container.get_node("VBoxContainer")
+@onready var panel_container_menu: PanelContainer = vbox_container.get_node("PanelContainerMenu")
 
 
 var selected_algorithm: int = 0:
@@ -112,8 +115,18 @@ func _update_size() -> void:
 	var visual_window_size: Vector2 = window_size / display_scale
 	var available_width: float = maxf(0.0, visual_window_size.x - horizontal_margin * 2.0)
 	var available_height: float = maxf(0.0, visual_window_size.y - horizontal_margin * 2.0)
-	panelcontainer.custom_minimum_size.x = min(max_width, available_width) / canvas_scale.x
+	var target_width: float = available_width if _is_horizontal() else min(max_width, available_width)
+	panelcontainer.custom_minimum_size.x = target_width / canvas_scale.x
 	panelcontainer.custom_minimum_size.y = available_height / canvas_scale.y
+	_update_layout_orientation()
+
+
+func _update_layout_orientation() -> void:
+	var target_parent: Container = hbox_container if _is_horizontal() else vbox_container
+	if panel_container_menu.get_parent() == target_parent:
+		return
+
+	panel_container_menu.reparent(target_parent, false)
 
 
 ## Check if the screen is in vertical or horizontal
