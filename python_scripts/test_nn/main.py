@@ -4,7 +4,7 @@ import torch.optim as optim
 import pandas as pd
 from torch.utils.data import DataLoader, TensorDataset
 
-# 1. Carga y preparación de datos
+# Carga y preparación de datos
 def load_data(file_path):
     # Carga el CSV situado en la misma carpeta
     df = pd.read_csv(file_path)
@@ -17,11 +17,11 @@ def load_data(file_path):
     
     return inputs, targets
 
-# 2. Definición del modelo (sin bias)
+# Definición del modelo (sin bias)
 class SimpleNet(nn.Module):
     def __init__(self):
         super(SimpleNet, self).__init__()
-        self.linear = nn.Linear(3, 1, bias=False)
+        self.linear = nn.Linear(3, 1)
         
     def forward(self, x):
         return self.linear(x)
@@ -29,7 +29,7 @@ class SimpleNet(nn.Module):
 # --- Ejecución ---
 
 # Nombre del archivo en la misma carpeta
-csv_filename = 'datos.csv' 
+csv_filename = 'datos_generados.csv' 
 
 try:
     X, Y = load_data(csv_filename)
@@ -41,7 +41,7 @@ try:
     optimizer = optim.SGD(model.parameters(), lr=0.01)
 
     # Bucle de entrenamiento
-    for epoch in range(50):
+    for epoch in range(20):
         for batch_x, batch_y in loader:
             outputs = model(batch_x)
             loss = criterion(outputs, batch_y)
@@ -55,6 +55,8 @@ try:
 
     print("\nPesos finales del modelo:")
     print(model.linear.weight.data)
+    print("\nBias final del modelo:")
+    print(model.linear.bias.data)
 
 except FileNotFoundError:
     print(f"Error: No se encontró el archivo '{csv_filename}' en la carpeta actual.")
