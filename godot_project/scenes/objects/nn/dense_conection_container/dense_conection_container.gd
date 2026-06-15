@@ -15,6 +15,7 @@ func _ready() -> void:
 	SignalsObserver.update_conections.connect(update_conections)
 	SignalsObserver.update_all_conections.connect(refresh_all_connections)
 	SignalsObserver.weight_updated.connect(update_connection_weight)
+	SignalsObserver.nn_resalted_neuron_forward.connect(show_forward_input_flow)
 
 
 func update_conections(layer_id: int, _neuron_id: int) -> void:
@@ -45,6 +46,33 @@ func update_connection_weight(layer_idx: int, neuron_idx: int, weight_idx: int, 
 
 	var key: String = _make_connection_key(from_layer._id, weight_idx, layer_idx, neuron_idx)
 	_update_connection_weight(from_neuron, to_neuron, key, new_value)
+
+
+func show_forward_input_flow(neuron_idx: int, layer_idx: int, input_values: Array, _output_value: float) -> void:
+	var to_layer_position: int = _get_layer_position_from_id(layer_idx)
+	if to_layer_position <= 0:
+		return
+
+	var from_layer: Layer = _get_layer_by_position(to_layer_position - 1)
+	var to_layer: Layer = _get_layer_by_position(to_layer_position)
+	if from_layer == null or to_layer == null:
+		return
+
+	var to_neuron: Neuron = _get_neuron(to_layer, neuron_idx)
+	if to_neuron == null:
+		return
+
+	for from_neuron_idx in range(input_values.size()):
+		var from_neuron: Neuron = _get_neuron(from_layer, from_neuron_idx)
+		if from_neuron == null:
+			continue
+
+		var key: String = _make_connection_key(from_layer._id, from_neuron_idx, layer_idx, neuron_idx)
+		if not _connections.has(key) or not is_instance_valid(_connections[key]):
+			continue
+
+		var connection: Conection = _connections[key]
+		connection.show_forward_flow_indicator(float(input_values[from_neuron_idx]), from_neuron, to_neuron)
 
 
 func _queue_update() -> void:
@@ -144,7 +172,7 @@ func _add_connection(from_neuron: Neuron, to_neuron: Neuron, key: String, weight
 
 	var connection: Conection = Conection.newone(to_neuron, from_neuron, connection_width, connection_color)
 	if show_update_indicator:
-		connection.show_update_indicator(weight >= 0.0)
+		connection.show_update_indicator_for_value(weight)
 
 	add_child(connection)
 	_connections[key] = connection

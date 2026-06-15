@@ -12,6 +12,7 @@ const scene_uid: String = Constants.SCENES.conection
 @export var line_color: Color = Color.BLACK
 @export var positive_update_indicator_color: Color = Color.GREEN
 @export var negative_update_indicator_color: Color = Color.RED
+@export var neutral_update_indicator_color: Color = Color.BLACK
 
 var _label: Label
 
@@ -20,6 +21,7 @@ var _animating : bool = false
 var _animation_tween: Tween
 var _show_update_indicator: bool = false
 var _update_indicator_color: Color = Color.GREEN
+var _forward_flow_indicators: Array[Dictionary] = []
 
 func _ready() -> void:
 	_label = Label.new()
@@ -51,20 +53,32 @@ static func newone(new_from_node: Control, new_to_node: Control, new_line_width:
 	return new_conection
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	var has_forward_flow_updates: bool = _update_forward_flow_indicators(delta)
+
 	if _animating:
 		_update_from_progress()  # actualizar cada frame mientras crece
 		return
 	# Mantener la línea alineada con los nodos (sin animar)
 	points = _calc_points(1.0)
 	_update_label()
+	if has_forward_flow_updates:
+		queue_redraw()
 
 
 func _draw() -> void:
-	if not (_animating and _show_update_indicator and points.size() > 0):
-		return
+	if _animating and _show_update_indicator and points.size() > 0:
+		draw_circle(points[points.size() - 1], Constants.CONECTION_UPDATE_INDICATOR_RADIUS, _update_indicator_color, true)
 
-	draw_circle(points[points.size() - 1], Constants.CONECTION_UPDATE_INDICATOR_RADIUS, _update_indicator_color, true)
+	for indicator in _forward_flow_indicators:
+		var indicator_position: Variant = _get_forward_flow_indicator_position(indicator)
+		if indicator_position == null:
+			continue
+
+		var indicator_center: Vector2 = indicator_position
+		var indicator_color: Color = indicator.get("color", Color.BLACK)
+		var half_size: Vector2 = Vector2.ONE * Constants.CONECTION_UPDATE_INDICATOR_RADIUS
+		draw_rect(Rect2(indicator_center - half_size, half_size * 2.0), indicator_color, true)
 
 
 func _calc_points(p: float) -> Array:
@@ -228,3 +242,66 @@ func show_update_indicator(is_positive_update: bool) -> void:
 	_show_update_indicator = true
 	_update_indicator_color = positive_update_indicator_color if is_positive_update else negative_update_indicator_color
 	queue_redraw()
+
+
+func show_update_indicator_for_value(value: float) -> void:
+	_show_update_indicator = true
+	_update_indicator_color = _get_indicator_color_for_value(value)
+	queue_redraw()
+
+
+func show_forward_flow_indicator(value: float, start_node: Control = null, end_node: Control = null, duration: float = 0.5) -> void:
+	var flow_start_node: Control = start_node if start_node != null else to_node
+	var flow_end_node: Control = end_node if end_node != null else from_node
+	_forward_flow_indicators.append({
+		"progress": 0.0,
+		"duration": maxf(duration, 0.001),
+		"color": _get_indicator_color_for_value(value),
+		"start_node": flow_start_node,
+		"end_node": flow_end_node,
+	})
+	queue_redraw()
+
+
+func _update_forward_flow_indicators(delta: float) -> bool:
+	if _forward_flow_indicators.is_empty():
+		return false
+
+	var indicator_idx: int = _forward_flow_indicators.size() - 1
+	while indicator_idx >= 0:
+		var indicator: Dictionary = _forward_flow_indicators[indicator_idx]
+		var duration: float = float(indicator.get("duration", 0.5))
+		var progress: float = float(indicator.get("progress", 0.0)) + delta / duration
+		if progress >= 1.0:
+			_forward_flow_indicators.remove_at(indicator_idx)
+		else:
+			indicator["progress"] = progress
+			_forward_flow_indicators[indicator_idx] = indicator
+		indicator_idx -= 1
+
+	return true
+
+
+func _get_forward_flow_indicator_position(indicator: Dictionary) -> Variant:
+	var start_node_variant: Variant = indicator.get("start_node")
+	var end_node_variant: Variant = indicator.get("end_node")
+	if not (start_node_variant is Control) or not (end_node_variant is Control):
+		return null
+	if not is_instance_valid(start_node_variant) or not is_instance_valid(end_node_variant):
+		return null
+
+	var start_control: Control = start_node_variant
+	var end_control: Control = end_node_variant
+	var start_center: Vector2 = start_control.global_position + (start_control.size * start_control.scale * 0.5)
+	var end_center: Vector2 = end_control.global_position + (end_control.size * end_control.scale * 0.5)
+	return to_local(start_center).lerp(to_local(end_center), float(indicator.get("progress", 0.0)))
+
+
+func _get_indicator_color_for_value(value: float) -> Color:
+	if is_zero_approx(value):
+		return neutral_update_indicator_color
+
+	if value > 0.0:
+		return positive_update_indicator_color
+
+	return negative_update_indicator_color
