@@ -51,6 +51,8 @@ func configure_loaded_tree(input_attributes: Array[String], target_attributes: A
 	if dtree == null:
 		return
 
+	_reset_clicked_dnode_selection(false)
+
 	next_node_id = _get_next_node_id_from_tree()
 
 	if mode == "manual":
@@ -235,6 +237,7 @@ func _setup_automatic_mode() -> void:
 
 
 func _on_dataset_selected_pressed(datast: Array[Dictionary], attrs: Array[String]) -> void:
+	_reset_clicked_dnode_selection(false)
 
 	if not has_train_started:
 		_clear_tree_before_training()
@@ -266,6 +269,8 @@ func _on_dataset_selected_pressed(datast: Array[Dictionary], attrs: Array[String
 func _clear_tree_before_training() -> void:
 	if dtree == null or dtree.nodes_dict.is_empty():
 		return
+
+	_reset_clicked_dnode_selection(false)
 
 	if is_instance_valid(eval_data_container):
 		eval_data_container.queue_free()
@@ -454,15 +459,18 @@ func _on_algorithm_add_node_requested(parent_id: int, branch_value, attribute: S
 
 
 func _on_step_button_pressed() -> void:
+	_reset_clicked_dnode_selection()
 	next_step.emit()
 
 func _on_previous_step_button_pressed() -> void:
+	_reset_clicked_dnode_selection()
 	previous_step.emit()
 	if next_step_button:
 		next_step_button.disabled = false
 		evaluate_button.disabled = true
 
 func _on_evaluate_button_pressed() -> void:
+	_reset_clicked_dnode_selection(false)
 
 	next_step_button.     visible = false
 	previous_step_button. visible = false
@@ -499,6 +507,7 @@ func _on_detail_button_pressed() -> void:
 
 
 func _on_drop_button_pressed() -> void:
+	_reset_clicked_dnode_selection()
 	SignalsObserver.drop_data.emit()
 
 
@@ -515,3 +524,16 @@ func _on_algorithm_completed() -> void:
 func _update_canvas() -> void:
 	if dtree and dtree.has_method("update_canvas_size_and_center"):
 		dtree.update_canvas_size_and_center()
+
+
+func _reset_clicked_dnode_selection(restore_window: bool = true) -> void:
+	if Variables.dtree_clicked_node_id == -1 and Variables.dtree_clicked_node_window_snapshot.is_empty():
+		return
+
+	Variables.dtree_clicked_node_id = -1
+	SignalsObserver.dtree_clicked_node_changed.emit(-1)
+
+	if restore_window and window != null and window.has_method("restore_clicked_dnode_window_snapshot"):
+		window.call("restore_clicked_dnode_window_snapshot")
+	else:
+		Variables.dtree_clicked_node_window_snapshot.clear()

@@ -31,6 +31,7 @@ const THEMES: Dictionary[String, String] = {
 	"leaf": "uid://vanr6vum3qcu",
 	"noleaf": "uid://cmsv2q8q35lvy",
 	"nodedefault": "uid://dxluxv1xceiqb",
+	"resalted_dnode": "uid://1w4pan6m738w",
 	"resalted_neuron": "uid://b5ecvrwlunl4u",
 	"clicked_neuron": "uid://crl6y52brsh76"
 }

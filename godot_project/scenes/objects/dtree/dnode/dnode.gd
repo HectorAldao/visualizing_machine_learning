@@ -5,6 +5,7 @@ extends Button
 var leaf_theme: Theme    = preload(Constants.THEMES.leaf)
 var noleaf_theme: Theme  = preload(Constants.THEMES.noleaf)
 var pending_theme: Theme = preload(Constants.THEMES.nodedefault)
+var resalted_theme: Theme = preload(Constants.THEMES.resalted_dnode)
 
 # Logic related variables
 var id: int
@@ -29,6 +30,7 @@ var partition_details: Dictionary = {}
 
 # For the algorithmic mode
 var was_created_by_algorithm: bool = false
+var _is_clicked_selected: bool = false
 
 
 
@@ -47,17 +49,19 @@ func _ready():
 		.set_trans(Tween.TRANS_SINE) \
 		.set_ease(Tween.EASE_OUT)
 
-	if is_pending:
-		theme = pending_theme
-	elif is_leaf:
-		theme = leaf_theme
-	else:
-		theme = noleaf_theme
+	_apply_theme()
 
 	if not was_created_by_algorithm:
 		gui_input.connect(_on_gui_input)
 	
 	pressed.connect(_on_pressed)
+	SignalsObserver.dtree_clicked_node_changed.connect(_on_clicked_dnode_changed)
+	SignalsObserver.dtree_eval_data_selected.connect(_reset_clicked_selection)
+	SignalsObserver.dtree_eval_data_advanced.connect(_reset_clicked_selection)
+	SignalsObserver.drop_data.connect(_reset_clicked_selection)
+	SignalsObserver.clear_window.connect(_reset_clicked_selection)
+	SignalsObserver.dtree_training_finished.connect(_reset_clicked_selection)
+	_on_clicked_dnode_changed(Variables.dtree_clicked_node_id)
 
 
 func _on_gui_input(event: InputEvent):
@@ -93,12 +97,19 @@ func apply_theme_animated(new_theme: Theme, new_text: String = text) -> void:
 	var tween := create_tween()
 	tween.tween_property(self, "modulate:a", 0.0, 0.2) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
-	tween.tween_callback(func(): theme = new_theme; text = new_text)
+	tween.tween_callback(func(): text = new_text; theme = resalted_theme if _is_clicked_selected else new_theme)
 	tween.tween_property(self, "modulate:a", 1.0, 0.3) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 
 
 func _on_pressed() -> void:
+	if _is_current_clicked_selection():
+		Variables.dtree_clicked_node_id = -1
+		SignalsObserver.dtree_clicked_node_changed.emit(-1)
+	else:
+		Variables.dtree_clicked_node_id = id
+		SignalsObserver.dtree_clicked_node_changed.emit(id)
+
 	var details := partition_details.duplicate(true)
 	if details.is_empty():
 		details = {
@@ -118,3 +129,37 @@ func _on_pressed() -> void:
 	details["is_leaf"] = is_leaf
 	details["is_pending"] = is_pending
 	SignalsObserver.dtree_node_selected.emit(details)
+
+
+func _on_clicked_dnode_changed(node_id: int) -> void:
+	_is_clicked_selected = node_id == id
+	_apply_theme()
+
+
+func _reset_clicked_selection(_arg1 = null, _arg2 = null, _arg3 = null) -> void:
+	if Variables.dtree_clicked_node_id == -1:
+		return
+
+	Variables.dtree_clicked_node_id = -1
+	SignalsObserver.dtree_clicked_node_changed.emit(-1)
+
+
+func _is_current_clicked_selection() -> bool:
+	return Variables.dtree_clicked_node_id == id
+
+
+func _apply_theme() -> void:
+	var target_theme: Theme = _get_base_theme()
+	if _is_clicked_selected:
+		target_theme = resalted_theme
+
+	if theme != target_theme:
+		theme = target_theme
+
+
+func _get_base_theme() -> Theme:
+	if is_pending:
+		return pending_theme
+	if is_leaf:
+		return leaf_theme
+	return noleaf_theme

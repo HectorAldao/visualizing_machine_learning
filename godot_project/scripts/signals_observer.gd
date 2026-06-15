@@ -8,6 +8,7 @@ extends Node
 
 # dtree
 signal dtree_node_selected(details: Dictionary)
+signal dtree_clicked_node_changed(node_id: int)
 signal dtree_eval_data_selected(details: Dictionary)
 signal dtree_eval_data_advanced(node_type: int, eval_data_info: Dictionary, node_info: Dictionary)
 signal dtree_training_finished

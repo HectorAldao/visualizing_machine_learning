@@ -14,6 +14,8 @@ var is_middle_mouse_dragging: bool = false
 var last_mouse_position: Vector2 = Vector2.ZERO
 var current_evaldata_instance_id: int = -1
 var current_evaldata_text: String = ""
+var current_chart_title: String = ""
+var current_chart_data: Dictionary[String, float] = {}
 
 
 const ENTROPY_FORMULA: String = "\\begin{aligned}&H(S) : \\text{entropía del atributo } S\\\\&c : \\text{numero de etiquetas distintas}\\\\&p_i : \\text{proporcion de datos con la etiqueta } i\\\\&H(S) = -\\sum_{i=1}^{c} p_i\\log_2(p_i)\\end{aligned}"
@@ -131,6 +133,7 @@ func _ready() -> void:
 
 ## Clears all the content in the window
 func clear() -> void:
+	_clear_clicked_dnode_window_snapshot()
 	label0.text = ""
 	label1.text = ""
 	latexformula.reset_sprite()
@@ -141,11 +144,13 @@ func clear() -> void:
 
 
 func show_training_finished_text() -> void:
+	_clear_clicked_dnode_window_snapshot()
 	clear()
 	label0.text = TRAINING_FINISHED_TEXT
 
 
 func update_current_text(details_dict: Dictionary) -> void:
+	_clear_clicked_dnode_window_snapshot()
 	details_dict = details_dict.duplicate(true)
 	
 	var plot_data: Dictionary[String, float] = {}
@@ -163,14 +168,14 @@ func update_current_text(details_dict: Dictionary) -> void:
 		"internal":
 			_set_entropy_formula_visible(true)
 			label0.text = template_texts[tipo_de_nodo][0].format(details_dict)
-			vboxcontainer.add_child(BarsChart.newone("Entropía por atributo", plot_data))
+			_add_chart("Entropía por atributo", plot_data)
 			call_deferred("_ignore_mouse_input_for_window_content")
 			vboxcontainer.move_child(label1, -1)
 			label1.text = template_texts[tipo_de_nodo][1].format(details_dict) + zero_entropy_explanation
 		"internal_multi_atribute":
 			_set_entropy_formula_visible(true)
 			label0.text = template_texts[tipo_de_nodo][0].format(details_dict)
-			vboxcontainer.add_child(BarsChart.newone("Entropía por atributo", plot_data))
+			_add_chart("Entropía por atributo", plot_data)
 			call_deferred("_ignore_mouse_input_for_window_content")
 			vboxcontainer.move_child(label1, -1)
 			label1.text = template_texts[tipo_de_nodo][1].format(details_dict) + zero_entropy_explanation
@@ -189,6 +194,12 @@ func update_current_text(details_dict: Dictionary) -> void:
 
 
 func update_node_partition_text(details_dict: Dictionary) -> void:
+	if _should_restore_clicked_dnode_window():
+		restore_clicked_dnode_window_snapshot()
+		return
+
+	_cache_clicked_dnode_window_snapshot()
+
 	details_dict = details_dict.duplicate(true)
 	_prepare_partition_details(details_dict)
 	_clean_lists(details_dict)
@@ -202,6 +213,7 @@ func update_node_partition_text(details_dict: Dictionary) -> void:
 
 
 func update_eval_data_text(details_dict: Dictionary) -> void:
+	_clear_clicked_dnode_window_snapshot()
 	details_dict = details_dict.duplicate(true)
 	_clean_lists(details_dict)
 
@@ -213,6 +225,7 @@ func update_eval_data_text(details_dict: Dictionary) -> void:
 
 
 func update_eval_data_advanced_text(node_type: int, eval_data_info: Dictionary, node_info: Dictionary) -> void:
+	_clear_clicked_dnode_window_snapshot()
 	_remove_chart()
 	_set_entropy_formula_visible(false)
 
@@ -381,6 +394,76 @@ func _remove_chart() -> void:
 	if chart:
 		vboxcontainer.remove_child(chart)
 		chart.queue_free()
+	current_chart_title = ""
+	current_chart_data.clear()
+
+
+func _add_chart(chart_title: String, chart_data: Dictionary[String, float]) -> void:
+	current_chart_title = chart_title
+	current_chart_data = chart_data.duplicate(true)
+	vboxcontainer.add_child(BarsChart.newone(chart_title, chart_data))
+
+
+func _should_restore_clicked_dnode_window() -> bool:
+	return Variables.dtree_clicked_node_id == -1 \
+		and not Variables.dtree_clicked_node_window_snapshot.is_empty()
+
+
+func _cache_clicked_dnode_window_snapshot() -> void:
+	if not Variables.dtree_clicked_node_window_snapshot.is_empty():
+		return
+
+	Variables.dtree_clicked_node_window_snapshot = {
+		"label0": label0.text,
+		"label1": label1.text,
+		"latex_formula": latexformula.formula,
+		"latex_visible": latexformula.visible,
+		"current_evaldata_instance_id": current_evaldata_instance_id,
+		"current_evaldata_text": current_evaldata_text,
+		"chart_title": current_chart_title,
+		"chart_data": current_chart_data.duplicate(true),
+	}
+
+
+func restore_clicked_dnode_window_snapshot() -> void:
+	if Variables.dtree_clicked_node_window_snapshot.is_empty():
+		return
+
+	var cached_window: Dictionary = Variables.dtree_clicked_node_window_snapshot
+	label0.text = str(cached_window.get("label0", ""))
+	label1.text = str(cached_window.get("label1", ""))
+	current_evaldata_instance_id = int(cached_window.get("current_evaldata_instance_id", -1))
+	current_evaldata_text = str(cached_window.get("current_evaldata_text", ""))
+
+	_remove_chart()
+	var chart_data: Dictionary[String, float] = _to_float_dictionary(cached_window.get("chart_data", {}))
+	if not chart_data.is_empty():
+		_add_chart(str(cached_window.get("chart_title", "")), chart_data)
+		call_deferred("_ignore_mouse_input_for_window_content")
+		vboxcontainer.move_child(label1, -1)
+
+	var cached_formula: String = str(cached_window.get("latex_formula", ""))
+	if cached_formula.strip_edges().is_empty():
+		latexformula.reset_sprite()
+	else:
+		latexformula.request_formula(cached_formula)
+	_set_entropy_formula_visible(bool(cached_window.get("latex_visible", false)))
+
+	Variables.dtree_clicked_node_window_snapshot.clear()
+
+
+func _clear_clicked_dnode_window_snapshot(_arg1 = null, _arg2 = null, _arg3 = null) -> void:
+	Variables.dtree_clicked_node_window_snapshot.clear()
+
+
+func _to_float_dictionary(source: Variant) -> Dictionary[String, float]:
+	var result: Dictionary[String, float] = {}
+	if not (source is Dictionary):
+		return result
+
+	for key in source:
+		result[str(key)] = float(source[key])
+	return result
 
 
 func _set_mouse_filter_recursive(node: Node, filter: Control.MouseFilter) -> void:
