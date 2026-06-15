@@ -1,14 +1,19 @@
 \chapter{Desarrollo}
 \label{chap:desarrollo}
+\textcolor{blue}{este capitulo ha quedado bastante informal}
+\textcolor{olive}{desde dónde hasta dónde es "este capítulo"?}
 
 En este capítulo se describe el proceso seguido para construir la aplicación.
 La explicación se plantea como una evolución por versiones.
 Comienza por comprobar que la idea es viable.
 Después se desarrolla el árbol de decisión, desde sus inicios hasta el resultado funcional con todas las características que se buscaban.
 Continúa con el desarrollo de la red neuronal, pasando por todas sus fases de creación y mejora.
-Y termina con el pulido final de la interfaz y retoques a todas las características con las que cuenta el resultado final.
+Y termina con el pulido final de la interfaz y retoques a todas las funcionalidades con las que cuenta el resultado final.
+\textcolor{blue}{Decir que el desarrollo se hace siguiendo scrum y plantear aquí una tabla con prototipos y caracteristicas? (igual aprovechar y borrar la sección de metodología?) Lo comentamos en la reunión }
 
-\textcolor{olive}{aquí "característica" lo estoy traduciendo de "feature", creo q puede estar bien, me genera dudas porque me está sonando algo raro}
+%\textcolor{olive}{aquí "característica" lo estoy traduciendo de "feature", creo q puede estar bien, me genera dudas porque me está sonando algo raro}
+%\textcolor{blue}{¿Funcionalidades?}
+%\textcolor{olive}{yep}
 
 \section{Prototipo: versión 0.1}
 
@@ -16,9 +21,14 @@ El primer objetivo consiste en comprobar que la herramienta cualifica para crear
 Antes de invertir más tiempo en el desarrollo, es necesario verificar tres aspectos básicos: que Godot permite crear una interfaz sencilla, que se puede representar una estructura con forma de árbol y que el resultado puede ejecutarse desde el navegador.
 
 Por ese motivo, la primera versión del proyecto es deliberadamente simple.
+\textcolor{blue}{¿Se ha decidio implementar un mockup para verificar que la herramienta seleccionada cumple con todos los requisitos?}
+\textcolor{olive}{ya..}
 Consiste en un menú inicial y en una Escena donde el usuario puede poner y quitar nodos que se colocan formando una estructura de árbol.
-\textcolor{olive}{aquí asumo que cuando hablo de árbol se entiende que es la estructura de datos (por lo tanto que se ve "del revés" a como se ve un árbol real) y no un árbol real, no??}
-Al pulsar sobre uno de los nodos aparece una opción para añadir un nuevo elemento debajo, que se organiza jerárquicamente junto al resto.
+%\textcolor{olive}{aquí asumo que cuando hablo de árbol se entiende que es la estructura de datos (por lo tanto que se ve "del revés" a como se ve un árbol real) y no un árbol real, no??} \textcolor{blue}{y si alguien no lo entiende que espabile que es un TFG de IA}
+Al pulsar sobre los nodos aparece una opción para añadir un nodo hijo debajo
+%\textcolor{blue}{¿como hijo?}
+%\textcolor{olive}{mientras lo escribía no quería decirlo, pq estaba con lo de ser lo más genérico posible. Ya lo he cambiado}
+, que se organiza jerárquicamente junto al resto.
 Esta prueba está todavía lejos de un árbol de decisión real.
 Su valor está en comprobar si la interacción principal de la aplicación no da problemas.
 
@@ -29,12 +39,12 @@ Su valor está en comprobar si la interacción principal de la aplicación no da
 \subsection{Primeras Escenas}
 
 La primera Escena creada es el menú principal.
-\textcolor{olive}{no se dónde aclarar que Escenas y Nodos son los de godot y escena y nodo significan lo que ponga en la rae}
+\textcolor{olive}{no se dónde aclarar que Escenas y Nodos son los de godot y escena y nodo significan lo que ponga en la rae} \textcolor{blue}{Yo al inicio del desarrollo pondría una pequeña frase en plan: en este trabajo escena significa esto y nodo signfica esto} \textcolor{olive}{del desarrollo? Entiendo el punto, y pensé en poner algo, pero se me hace desordenado.}
 En ese momento tiene un único botón, ya que su papel es servir como punto de entrada hacia la prueba del árbol.
 Incluir este menú desde el principio ayuda a pensar la aplicación como un conjunto de módulos y facilita su ampliación posterior.
 En la Figura \ref{fig:primera_version_del_main_menu} se ve esta primera versión.
 
-\begin{figure}[hp!]
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.75\textwidth]{imaxes/primera_version_del_main_menu.png}
   \caption{Versión preliminar del menú principal.}
@@ -48,55 +58,79 @@ También se añade la posibilidad de borrar partes del árbol, con el fin de com
 Esta primera prueba tiene una finalidad muy concreta: validar la interacción.
 Lo importante es comprobar que el usuario puede construir una jerarquía visual, que las conexiones se actualizan y que la pantalla sigue siendo manejable al crecer el número de elementos.
 En la Figura \ref{fig:primera_version_arbol} se muestra cómo era esta Escena inicial.
+\textcolor{blue}{Esta imagen igual hay que forzarla a aparecer aquí, la verdad es que ahora mismo la renderiza lejisimos latex}
+\textcolor{olive}{veo si se puede. Tendría más sentido que todas las imágenes estuvieran dnd se mencionan en vd. Quitando la flag "p" pasan cosas.}
+También se dejan visibles dos botones relacionados con cargar y guardar.
 
-\begin{figure}[hp!]
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.75\textwidth]{imaxes/primera_version_arbol.png}
   \caption{Primera Escena de prueba del árbol. Arriba a la derecha hay dos botones que sirven para guardar y cargar un árbol ya creado. Abajo a la izquierda se ve una sencilla estructura con forma de árbol, con los nodos rojos con un texto de ejemplo conectados por líneas negras. Sobre uno de los nodos, se ve el menú que permite añadirle un hijo o eliminarlo.}
   \label{fig:primera_version_arbol}
 \end{figure}
 
-También se dejan visibles dos botones relacionados con cargar y guardar.
-En esta versión todavía no tienen una utilidad real.
-Su presencia sirve para reservar un espacio de la interfaz a una necesidad que ya se prevé: poder guardar un árbol entrenado y recuperarlo más adelante.
+%En esta versión todavía no tienen una utilidad real.
+%Su presencia sirve para reservar un espacio de la interfaz a una necesidad que ya se prevé: poder guardar un árbol entrenado y recuperarlo más adelante.
+%\textcolor{blue}{Es un mockup, pero se supone que ya existe cierto diseño, se entiende que haya botones que no funcionan y simplemente sean parte del front (al final back y front son desarrollos disjuntos). No hace falta que especifiques que no sirven para nada en este punto (y queda como raro) }
+%\textcolor{olive}{okey}
 
 
 \subsection{Exportación web con GitHub Pages}
 
-Una vez que la prueba interactiva funciona dentro de Godot, el siguiente paso lógico es llevarla al navegador.
-Esta comprobación es esencial, ya que la aplicación está pensada para ser consultada como una página web y también debe poder probarse fuera del editor de desarrollo.
+%\textcolor{blue}{Está subsección estaba increiblemente informal. Pongo una propuesta sin cambiar ninguna idea de las que escribiste}
+Una vez verificado el funcionamiento de la prueba interactiva en el entorno de desarrollo de Godot, se procedió a evaluar su despliegue en un navegador web.
+Esta fase resulta fundamental, ya que la aplicación está concebida para ser utilizada a través de una interfaz web y, por tanto, es necesario garantizar su correcta ejecución fuera del editor.
 
-La exportación se realiza correctamente con este proyecto inicial.
-El resultado se publica mediante GitHub Pages, usando la configuración del propio repositorio para indicar qué carpeta debe servir como página web.
-Con esto se confirma que el flujo completo es viable: desarrollar en Godot, exportar el proyecto y publicarlo en una dirección accesible desde el navegador.
+La exportación del proyecto al formato web se realizó utilizando las herramientas proporcionadas por Godot.
+Posteriormente, la aplicación generada se publicó mediante GitHub Pages, configurando el repositorio para servir los archivos exportados como una página web accesible públicamente.
 
-Esta prueba temprana reduce el riesgo del proyecto.
-Si la exportación web da problemas graves, hace falta replantear la tecnología antes de avanzar con los algoritmos.
-Al funcionar desde el inicio, el desarrollo puede continuar sobre una base más segura.
+La realización de esta prueba permitió validar la viabilidad del flujo de trabajo previsto para el proyecto, que comprende el desarrollo en Godot, la exportación al entorno web y su posterior publicación.
+Asimismo, la verificación temprana de este proceso contribuyó a reducir riesgos técnicos asociados al despliegue, permitiendo confirmar la adecuación de la tecnología seleccionada antes de abordar etapas posteriores del desarrollo.
+
+%Una vez que la prueba interactiva funciona dentro de Godot, el siguiente paso lógico es llevarla al navegador.
+%Esta comprobación es esencial, ya que la aplicación está pensada para ser consultada como una página web y también debe poder probarse fuera del editor de desarrollo.
+%
+%La exportación se realiza correctamente con este proyecto inicial.
+%El resultado se publica mediante GitHub Pages, usando la configuración del propio repositorio para indicar qué carpeta debe servir como página web.
+%Con esto se confirma que el flujo completo es viable: desarrollar en Godot, exportar el proyecto y publicarlo en una dirección accesible desde el navegador.
+%
+%Esta prueba temprana reduce el riesgo del proyecto.
+%Si la exportación web da problemas graves, hace falta replantear la tecnología antes de avanzar con los algoritmos.
+%Al funcionar desde el inicio, el desarrollo puede continuar sobre una base más segura.
 
 \textcolor{olive}{Añado aquí también algo de chicha sobre la exportación al ghpages?}
 
 
 \section{Árbol de decisión: versión 0.2}
 
-El proyecto deja de ser una prueba de interacción cuando comienza el desarrollo del primer algoritmo.
-A partir de esta versión, el objetivo pasa de dibujar elementos conectados a construir un árbol de decisión real, mostrar su evolución paso a paso y explicar las decisiones tomadas durante el entrenamiento.
+%El proyecto deja de ser una prueba de interacción cuando comienza el desarrollo del primer algoritmo.
+%\textcolor{blue}{Yo borraría estas lineas} \textcolor{olive}{okey}
+
+%A partir de esta versión, el objetivo pasa de dibujar elementos conectados a construir un árbol de decisión real, mostrar su evolución paso a paso y explicar las decisiones tomadas durante el entrenamiento.
+%\textcolor{blue}{A partir de esta iteración se incorporó el primer algoritmo de aprendizaje a la aplicación: un árbol de decisión basado en ID3. El objetivo consistió en representar gráficamente la construcción del árbol, visualizar su evolución paso a paso y mostrar las decisiones tomadas durante el proceso de entrenamiento.}
+A partir de esta iteración se incorporó el primer algoritmo de aprendizaje a la aplicación: un árbol de decisión basado en ID3. El objetivo consistió en representar gráficamente la construcción del árbol, visualizar su evolución paso a paso y mostrar las decisiones tomadas durante el proceso de entrenamiento.
 La dificultad principal está en coordinar tres niveles: el algoritmo que calcula la siguiente división, la estructura lógica del árbol y la escena que el usuario ve en pantalla.
 El funcionamiento formal de ID3 y del criterio de entropía se recoge en la Sección~\ref{sec:marco_arboles_id3}; en este capítulo se describe cómo se llevó ese algoritmo a la aplicación.
 
 
 \subsection{Primera arquitectura del árbol}
 
-El primer cambio consiste en sustituir la Escena de prueba por una vista preparada para un árbol construido por el algoritmo.
+%El primer cambio consiste en sustituir la Escena de prueba por una vista preparada para un árbol construido por el algoritmo.
+El primer cambio consiste en preparar una Escena que pueda albergar un árbol construido por el algoritmo sin importar su tamaño.
+\textcolor{blue}{No se si se entiende esta frase}
+\textcolor{olive}{okey, la cambio. Mejor?}
 La prueba inicial servía para validar que se podían añadir y borrar nodos manualmente, aunque su estructura resultaba insuficiente para un entrenamiento real.
 Un árbol de decisión puede crecer varios niveles y abrir muchas ramas en poco espacio, por lo que una pantalla fija deja de ser útil en cuanto el número de nodos aumenta.
 Por esta razón se incorpora una zona desplazable dentro de la interfaz, de manera que el usuario pueda moverse por el árbol cuando su tamaño supere el área visible.
+\textcolor{olive}{aquí no se si mencionar o no lo de que uso un Nodo Control de Godot de tipo ScrollContainer. Supongo que no, pero por si acaso.}
 
 También se revisa la distribución de los nodos en el árbol.
 En la versión manual bastaba con colocar cada hijo bajo su padre, ya que el objetivo era comprobar la interacción.
 Durante el entrenamiento algorítmico se necesita una disposición más estable: los hijos deben aparecer por debajo, el padre debe quedar centrado respecto a ellos y el árbol debe reorganizarse cada vez que se añade una rama.
 Para conseguirlo se introduce un cálculo de posiciones basado en la profundidad de cada nodo y en su orden dentro de la estructura.
-Así se evita que las ramas se acumulen en la misma zona y se mantiene una lectura jerárquica clara.
+Así se evita que las ramas se acumulen en la misma zona y se mantiene una lectura jerárquica clara como se aprecia en la Figura \ref{}.
+\textcolor{blue}{Yo aquí enseñaría el resultado}
+\textcolor{olive}{pero, cómo? Mostrando que antes se hacía mal y ahora bien?}
 
 Otra decisión importante es separar la información lógica del árbol de su representación visual.
 Cada nodo visible conserva un identificador, una referencia al padre, una lista de hijos, su profundidad y la información que representa, como el atributo de decisión o la etiqueta final.
@@ -110,12 +144,25 @@ Esta separación permite que los nodos se encarguen de mostrar decisiones o clas
 Más adelante, esta decisión facilita tanto la animación de las ramas como la evaluación visual de nuevos datos.
 
 \textcolor{olive}{Por ejemplo, en esta frase de aquí yo creo que el presente contínuo queda mal, y que habría que poner más bien "se añadió el modo automático"}
-Con la base visual preparada, se añade el modo automático, un estado interno de la Escena del árbol que activa diferentes Nodos y llama a diferente código que el modo manual implementado hasta el momento.
+\textcolor{blue}{estas seguro de que no se exige que el texto este escrito en impersonal?}
+\textcolor{olive}{... no lo he leido en ninguna parte}
+%Con la base visual preparada, se añade el modo automático, un estado interno de la Escena del árbol que activa diferentes Nodos y llama a diferente código que el modo manual implementado hasta el momento.
+Con la base visual preparada, se añade el modo automático.
+Este es un estado interno de la Escena del árbol diferenciado del modo manual implementado hasta ahora.
+Como se vió hasta ahora, en el modo manual el usuario interactuaba directamente con los nodos, pudiendo decidir si añadirlos o quitarlos y dónde hacero.
+Pero en el nuevo modo automático es el algoritmo ID3 en base a un dataset el que se encarga de marcar el crecimiento del árbol.
+\textcolor{blue}{lo de que llama a diferente código no se puede poner así. Di que hay dos versiones manual y automatica y como funcionan}
+textcolor{olive}{ready, a ver si mejor}
 En este modo, el usuario controla el avance del entrenamiento en lugar de añadir ramas manualmente.
-La primera versión de la interfaz es sencilla, con un botón para iniciar el proceso y otro para avanzar al siguiente paso, como se muestra en la Figura \ref{fig:dtree_view_start_next_english}.
-Los textos aparecen todavía en inglés porque pertenecen a una fase temprana de la aplicación.
+%La primera versión de la interfaz es sencilla
+%, con un botón para iniciar el proceso y otro para avanzar al siguiente paso, como se muestra en la Figura \ref{fig:dtree_view_start_next_english}.
+\textcolor{blue}{Yo no diría que es sencilla}
+\textcolor{olive}{okey}
+La primera versión de la interfaz cuenta con un botón para iniciar el proceso y con otro para avanzar al siguiente paso, como se muestra en la Figura \ref{fig:dtree_view_start_next_english}.
+%Los textos aparecen todavía en inglés porque pertenecen a una fase temprana de la aplicación.
+%\textcolor{blue}{Borrar}
 
-\begin{figure}[hp!]
+\begin{figure}[H]
   \centering
   \begin{minipage}[b]{0.48\textwidth}
     \centering
@@ -158,7 +205,7 @@ Al entrar en la vista del árbol se muestra primero un panel que permite escoger
 Cada opción activa controles distintos y evita mezclar acciones pensadas para usos diferentes.
 En la Figura \ref{fig:menu_manualmente_algoritmicamente} se muestra este panel inicial.
 
-\begin{figure}[hp!]
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.75\textwidth]{imaxes/menu_manualmente_algoritmicamente.png}
   \caption{Panel inicial de la escena del árbol para escoger entre creación manual y creación algorítmica.}
@@ -173,7 +220,7 @@ La interfaz se traduce al castellano en este mismo tramo.
 Los controles principales pasan a tener escrito el texto ``Empezar entrenamiento'' y ``Siguiente paso'' como se aprecia en la Figura \ref{fig:dtree_view_training_buttons_es}.
 El cambio ayuda a que la vista del árbol sea coherente con el idioma del resto de la aplicación y con el tono explicativo del trabajo.
 
-\begin{figure}[hp!]
+\begin{figure}[H]
   \centering
   \begin{minipage}[b]{0.48\textwidth}
     \centering
@@ -194,7 +241,7 @@ Hasta este punto, la escena permite ver qué se añade al árbol, aunque todaví
 La ventana nace para acompañar cada paso con una explicación escrita y sincronizada con el estado interno del algoritmo.
 Su primera versión contiene un mensaje inicial que invita a comenzar el entrenamiento, como se observa en la Figura \ref{fig:dtree_view_ventana_empezar_entrenamiento}.
 
-\begin{figure}[hp!]
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.85\textwidth]{imaxes/dtree_view_ventana_empezar_entrenamiento.png}
   \caption{Primera versión de la ventana informativa integrada en la vista del árbol, todavía con un mensaje inicial que indica al usuario que debe comenzar el entrenamiento.}
@@ -260,7 +307,7 @@ De esta manera, el usuario percibe que se está completando una parte del árbol
 En la Figura \ref{fig:dtree_nodos_pendientes} se puede ver el aspecto de estos nodos pendientes.
 % https://rawcdn.githack.com/HectorAldao/visualizing_machine_learning/55ac8e0508601cc7a456013159a7bfa8ba01f5d3/docs/index.html
 
-\begin{figure}[hp!]
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.85\textwidth]{imaxes/dtree_nodos_pendientes.png}
   \caption{Entrenamiento del árbol en el que se aprecian los nodos pendientes.}
@@ -284,7 +331,7 @@ La gráfica representa la métrica calculada para cada atributo, basada en la en
 Esta representación permite comparar de un vistazo qué atributo reduce mejor la incertidumbre de los datos y por qué se utiliza para abrir las ramas del nodo actual.
 % https://rawcdn.githack.com/HectorAldao/visualizing_machine_learning/fff2fdaf1b89c4140cd4c9496a34d7446c30f061/docs/index.html
 
-\begin{figure}[hp!]
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.85\textwidth]{imaxes/dtree_grafica_entropia.png}
   \caption{Ventana informativa en la que se dibuja la gráfica de la métrica basada en la entropía para cada atributo.}
@@ -330,7 +377,7 @@ Primero se elige una fuente de datos, después se valida la selección y finalme
 La primera opción permite usar un conjunto incluido en la aplicación, mientras que la segunda prepara la carga de archivos CSV.
 % https://rawcdn.githack.com/HectorAldao/visualizing_machine_learning/188dbce95d24c849a472f802326a333802c7c1a2/docs/index.html
 
-\begin{figure}[hp!]
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.85\textwidth]{imaxes/dtree_dataset_selection_panel.png}
   \caption{Menú que aparece tras seleccionar el modo algorítmico para escoger el conjunto de datos de entrenamiento.}
@@ -376,7 +423,7 @@ Para una herramienta educativa, poder retroceder es especialmente útil: permite
 Por eso se añade el botón ``Paso previo'', visible en la Figura \ref{fig:dtree_paso_previo}.
 % https://rawcdn.githack.com/HectorAldao/visualizing_machine_learning/0d3c78342180c5160c83de556e611674a0bf84e0/docs/index.html
 
-\begin{figure}[hp!]
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.85\textwidth]{imaxes/dtree_paso_previo.png}
   \caption{Vista del árbol con el botón para retroceder al paso anterior.}
@@ -418,7 +465,7 @@ El recorrido se calcula leyendo el atributo de cada nodo interno y buscando la r
 Cuando la pieza llega a una hoja, el recorrido termina y queda representada la clasificación obtenida.
 % https://rawcdn.githack.com/HectorAldao/visualizing_machine_learning/135fc3338e0bc7cfe3d4fb8dea5d09dbfad162e6/docs/index.html
 
-\begin{figure}[hp!]
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.85\textwidth]{imaxes/dtree_eval_data.png}
   \caption{Fase de evaluación en la que se ven dos datos ya clasificados y uno en proceso de clasificación.}
@@ -483,7 +530,7 @@ Más adelante pasan a representar también información del modelo, ya que su co
 Con ello, la Escena deja preparado el vínculo entre la arquitectura visible y los valores numéricos que el entrenamiento modificará.
 En la Figura \ref{fig:nn_primera_arquitectura_visual} se muestra esta primera representación visual.
 
-\begin{figure}[hp!]
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.85\textwidth]{imaxes/nn_primera_arquitectura_visual.png}
   \caption{Primera arquitectura visual de la red neuronal, formada por capas, neuronas y conexiones densas entre capas consecutivas.}
@@ -503,7 +550,7 @@ Para ello se crea un menú de construcción que controla el número de neuronas 
 Con este panel, la arquitectura puede editarse dentro de unos límites conocidos.
 La selección de funciones de activación dentro de este menú se aprecia en la Figura \ref{fig:nn_funciones_de_activacion}.
 
-\begin{figure}[hp!]
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.85\textwidth]{imaxes/nn_funciones_de_activacion.png}
   \caption{Menú de creación de la red neuronal con selectores para las funciones de activación de las capas.}
@@ -569,7 +616,7 @@ Esta decisión hace que la carga de datos sea más flexible que en las primeras 
 El resto de columnas se tratan como atributos de entrada.
 En la Figura \ref{fig:nn_columnas_objetivo} se ve este selector de columnas objetivo.
 
-\begin{figure}[hp!]
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.85\textwidth]{imaxes/nn_columnas_objetivo.png}
   \caption{Selección de columnas objetivo para la red neuronal a partir de un dataset cargado desde un archivo CSV.}
@@ -603,7 +650,7 @@ Con estos nombres, cada extremo del modelo representa información reconocible d
 Esto es muy relevante de cara a que el usuario relacione lo que se le muestra con lo que está sucediendo.
 Esta relación entre dataset y red visible se muestra en la Figura \ref{fig:nn_columnas_input_output_expected_texto_neuronas}, donde las neuronas aparecen etiquetadas con información del conjunto seleccionado.
 
-\begin{figure}[hp!]
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.85\textwidth]{imaxes/nn_columnas_de_input_output_expected_y_texto_en_neuronas.png}
   \caption{Red neuronal durante el entrenamiento, con nombres procedentes del dataset en las neuronas de entrada y salida, y con las columnas visuales de entrada, salida y valor esperado.}
@@ -645,7 +692,7 @@ Cada opción llama al mismo proceso interno, cambiando únicamente hasta dónde 
 Así se mantiene una única lógica de entrenamiento y se ofrecen varios niveles de detalle para observar el proceso.
 La Figura \ref{fig:nn_panel_de_entrenamiento} muestra este panel de control.
 
-\begin{figure}[hp!]
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.85\textwidth]{imaxes/nn_panel_de_entrenamiento.png}
   \caption{Panel de entrenamiento de la red neuronal con controles para avanzar con distintos niveles de granularidad.}
@@ -857,7 +904,7 @@ Sin esto, volver a intentar crear una red no la construía bien por interferenci
 El resultado final del menú principal se puede apreciar en la Figura \ref{fig:final_main_menu}
 
 
-\begin{figure}[hp!]
+\begin{figure}[H]
   \centering
   \begin{minipage}[b]{0.48\textwidth}
     \centering
@@ -1048,7 +1095,7 @@ Todo al mismo tiempo que se puede seguir haciendo click sobre los nodos del árb
 
 Se puede ver este proceso en la Figura \ref{fig:final_dtree_evaluacion}.
 
-\begin{figure}[hp!]
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.85\textwidth]{imaxes/final_dtree_evaluacion.png}
   \caption{Árbol de decisión en medio del proceso de evaluación del dataset de frutas.}
