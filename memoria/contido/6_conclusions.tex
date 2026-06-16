@@ -1,3 +1,30 @@
 \chapter{Conclusiones}
 \label{chap:conclusiones}
 
+El desarrollo realizado permite concluir que los objetivos planteados al inicio del trabajo se han cumplido.
+El resultado final es una aplicación educativa interactiva, accesible desde la web, que permite estudiar de forma visual el entrenamiento y la inferencia de un árbol de decisión y de una red neuronal multicapa.
+Para llegar a ese resultado se partió del estudio conceptual de ambos algoritmos y se trasladaron sus operaciones fundamentales a una implementación propia en Godot, manteniendo una correspondencia directa entre el cálculo interno, la representación gráfica y las explicaciones mostradas al usuario.
+
+El proceso seguido comenzó con la validación de Godot como entorno adecuado para construir una aplicación interactiva exportable a navegador.
+Esta primera fase permitió comprobar que era posible representar estructuras dinámicas, modificar elementos durante la ejecución y desplegar el proyecto mediante GitHub Pages.
+A partir de esa base se incorporó el árbol de decisión, pasando de una estructura editable manualmente a una construcción guiada por el algoritmo ID3.
+La aplicación permite observar cómo se crean los nodos, cómo se seleccionan los atributos mediante la métrica basada en entropía y cómo se forman las hojas.
+La ventana informativa, las gráficas y la navegación por pasos convierten ese proceso en una explicación progresiva, en la que cada decisión del algoritmo queda asociada a los datos que la provocan.
+
+El segundo bloque principal fue la red neuronal.
+Su desarrollo exigió representar una arquitectura formada por capas, neuronas y conexiones densas, y vincular esa representación con un modelo lógico que conserva pesos, sesgos, funciones de activación y parámetros de entrenamiento.
+La aplicación permite configurar la red según el conjunto de datos, ejecutar el forward pass paso a paso, mostrar el cálculo de cada neurona, comparar la salida con el valor esperado y representar el backward pass mediante la actualización visible de los parámetros.
+De esta forma, el entrenamiento deja de presentarse como una operación opaca y pasa a mostrarse como una secuencia de predicciones, errores y correcciones sobre el modelo.
+
+La fase final del desarrollo consolidó la aplicación como recurso educativo.
+Se revisó la navegación general, se adaptaron las vistas a distintos tamaños de pantalla, se mejoró la legibilidad visual de los algoritmos, se integró el renderizado de fórmulas matemáticas y se reforzaron las validaciones de datos.
+También se completaron los modos de evaluación tanto en el árbol, donde los datos recorren las ramas aprendidas hasta llegar a una hoja, como en la red, donde la inferencia reutiliza el forward pass sin modificar los parámetros entrenados.
+Estas funciones permiten observar no solo cómo se obtiene un modelo, sino también cómo se utiliza después para clasificar o predecir nuevos ejemplos.
+
+El trabajo ha permitido adquirir competencias directamente relacionadas con los objetivos propuestos.
+La implementación desde cero de los algoritmos obligó a comprender sus parámetros, sus estructuras internas y las condiciones que aparecen durante su ejecución.
+La construcción de la interfaz exigió organizar Escenas, Señales, paneles, animaciones y elementos informativos para que la interacción fuera comprensible.
+El despliegue web, junto con la carga y descarga de archivos en navegador, amplió el alcance técnico del proyecto y permitió que la aplicación pudiera consultarse como recurso público de aprendizaje.
+
+En conjunto, el proyecto cumple el propósito principal de ofrecer una herramienta que ayude a comprender paso a paso el funcionamiento interno de dos modelos básicos de aprendizaje automático.
+La aplicación final no se limita a mostrar el resultado de un entrenamiento, sino que hace visible el proceso que conduce a ese resultado, acompaña los cálculos con texto, fórmulas y gráficas, y permite experimentar con datos y configuraciones desde una interfaz accesible en web.
