@@ -1205,9 +1205,86 @@ Esta comprobación impide entrenar o ejecutar inferencia con un modelo que no pu
 
 El guardado de la red se realiza mediante un panel de exportación que permite generar una representación del modelo entrenado para usarla fuera de la aplicación.
 Esa representación está basada en el estándar ONNX.
-Y como los archivos de exportación son creados por la propia aplicación, sin herramientas externas consolidadas, se realizó una verificación con un script de Python para asegurar que el proceso de transformar una red a ONNX se realizaba correctamente.
-Para ello se revisan todos los parámetros de la red y se comprueba que los valores corresponden con los que se ven en la aplicación, como se ve en la Figura ¿?.
-Estas pruebas confirman que la exportación conserva los parámetros escritos en ONNX y que una red externa compatible puede reconstruirse dentro de la aplicación.
+Como los archivos de exportación son creados por la propia aplicación, se realiza una verificación con un script de Python para asegurar que el proceso de transformar una red a ONNX se hace correctamente.
+La prueba parte de una red entrenada dentro de la aplicación, mostrada en la Figura~\ref{fig:resultados_pesos_aplicacion_en_aplicacion}.
+En la neurona de salida se observan pesos cercanos a \(1.943\), \(1.929\) y \(-0.965\), junto con un sesgo cercano a \(0.994\).
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{imaxes/resultados_pesos_aplicacion_en_aplicacion.png}
+  \caption{Red neuronal entrenada dentro de la aplicación, con los pesos y el sesgo de la neurona de salida visibles en la interfaz.}
+  \label{fig:resultados_pesos_aplicacion_en_aplicacion}
+\end{figure}
+
+Después de exportar esa red a ONNX, el script externo carga el archivo generado y muestra los parámetros de salida.
+Como se ve en la Figura~\ref{fig:resultados_pesos_aplicacion_a_onnx}, los valores leídos desde el archivo son prácticamente los mismos que los mostrados por la aplicación.
+Las pequeñas diferencias se deben al redondeo visual y a la precisión numérica usada en cada entorno.
+Con esto se comprueba que la exportación conserva el orden y el valor de los parámetros aprendidos.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.75\textwidth]{imaxes/resultados_pesos_aplicacion_a_onnx.png}
+  \caption{Lectura externa del archivo ONNX exportado desde la aplicación, con los pesos y el sesgo de la red entrenada.}
+  \label{fig:resultados_pesos_aplicacion_a_onnx}
+\end{figure}
+
+También se comprueba el sentido inverso.
+Para ello se genera fuera de la aplicación una red sintética con pesos exactos \(2.0\), \(2.0\) y \(-1.0\), y con sesgo \(1.0\).
+La salida de terminal de la Figura~\ref{fig:resultados_pesos_onnx_sintetico} recoge esos valores antes de importar el modelo en Godot.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.55\textwidth]{imaxes/resultados_pesos_onnx_sintetico.png}
+  \caption{Red sintética exportada a ONNX desde un entorno externo, con pesos y sesgo conocidos.}
+  \label{fig:resultados_pesos_onnx_sintetico}
+\end{figure}
+
+Al importar ese archivo en la aplicación, la red reconstruida conserva los mismos parámetros, tal como se muestra en la Figura~\ref{fig:resultados_pesos_onnx_importado}.
+Esta prueba completa la comprobación de interoperabilidad: los modelos entrenados en la aplicación pueden salir hacia ONNX, y los modelos creados fuera pueden entrar en la aplicación con sus pesos y sesgos correctamente asignados.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{imaxes/resultados_pesos_onnx_importado.png}
+  \caption{Red sintética importada en la aplicación desde ONNX, con los pesos y el sesgo esperados visibles en la interfaz.}
+  \label{fig:resultados_pesos_onnx_importado}
+\end{figure}
+
+\subsection{Comprobación de resultados con bibliotecas externas}
+
+Además de revisar la persistencia de los modelos, se contrastan los resultados de los algoritmos con implementaciones de referencia fuera de Godot.
+El objetivo es verificar que la aplicación representa una ejecución didáctica y que los cálculos coinciden con los obtenidos mediante bibliotecas estándar: scikit-learn~\cite{ScikitLearn} para el árbol de decisión y PyTorch~\cite{PyTorch} para la red neuronal.
+
+En el caso del árbol de decisión, la comprobación se hace con un dataset categórico sintético.
+Primero se entrena una referencia externa con scikit-learn usando los mismos datos.
+La Figura~\ref{fig:resultados_dtree_sintetico} muestra la estructura obtenida desde el script de comprobación, impresa en la terminal.
+La captura recoge solo los primeros nodos del árbol completo por limitación de espacio, aunque esa parte permite identificar la raíz, las primeras ramas y varias hojas resultantes.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.72\textwidth]{imaxes/resultados_dtree_sintetico.png}
+  \caption{Primeros nodos de la estructura final de un árbol de decisión obtenido con scikit-learn a partir de un dataset sintético.}
+  \label{fig:resultados_dtree_sintetico}
+\end{figure}
+
+Al entrenar el árbol con ese mismo conjunto de datos desde la aplicación se obtiene la estructura de la Figura~\ref{fig:resultados_dtree_aplicacion}.
+La coincidencia entre ambas salidas se aprecia en la raíz, en las ramas principales y en las etiquetas finales asociadas a las hojas.
+Esta comparación confirma que la implementación del algoritmo en Godot toma las mismas decisiones de división que la referencia externa para este caso de prueba, y que la representación visual mantiene la información lógica necesaria para interpretar el modelo entrenado.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{imaxes/resultados_dtree_aplicacion.png}
+  \caption{Árbol de decisión generado por la aplicación con el mismo dataset sintético usado en la referencia externa.}
+  \label{fig:resultados_dtree_aplicacion}
+\end{figure}
+
+Para la red neuronal se usa un dataset sintético y una red equivalente implementada en PyTorch.
+La prueba fija la misma arquitectura y los mismos datos de entrada para comparar el forward pass, el error calculado y la actualización de los parámetros.
+Al ejecutar los mismos ejemplos, las salidas de la red de la aplicación coinciden con las de la red de PyTorch dentro de las diferencias esperables por precisión numérica.
+Esta comprobación ayuda a verificar que los pesos, los sesgos y las funciones de activación se aplican en el mismo orden que en una implementación estándar.
+
+En conjunto, estas pruebas refuerzan la correspondencia entre la interfaz y los modelos que calcula.
+En el árbol de decisión, la estructura visual coincide con una construcción externa equivalente.
+En la red neuronal, las salidas y las actualizaciones de parámetros coinciden con una red de referencia, y los valores entrenados se conservan al exportar e importar mediante ONNX.
 
 Con todas estas mejoras, la aplicación queda más cohesionada.
 El menú principal presenta mejor los algoritmos, las vistas se adaptan a distintos dispositivos, las fórmulas se renderizan dentro de Godot también en web, los datasets se seleccionan con más control, la evaluación del árbol se vuelve paso a paso, la red ofrece explicaciones a varias escalas, las funciones de activación se acompañan con gráficas y los modelos pueden cargarse, guardarse o contrastarse con herramientas externas.
