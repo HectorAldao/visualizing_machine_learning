@@ -5,12 +5,16 @@
 [ext_resource type="LabelSettings" uid="uid://udh2yi2uedtt" path="res://themes/main_menu_labels/main_menu_labels.tres" id="3_2o76q"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2o76q"]
-bg_color = Color(0.00566115, 0.005661152, 0.005661148, 0.9411765)
+bg_color = Color(0, 0, 0, 0.84313726)
 border_width_left = 5
 border_width_top = 5
 border_width_right = 5
 border_width_bottom = 5
 border_color = Color(0.003921569, 0.003921569, 0.003921569, 0.9411765)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
 
 [sub_resource type="Theme" id="Theme_6bivr"]
 PanelContainer/styles/panel = SubResource("StyleBoxFlat_2o76q")
