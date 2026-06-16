@@ -940,9 +940,24 @@ En pantallas verticales, los elementos se colocan en una estructura apilada, con
 Esto facilita el uso en navegador y hace que los paneles principales respondan de forma más coherente al tamaño disponible.
 
 Durante la creación de la red también se separa el espacio de edición del espacio de visualización.
-Antes, el panel de edición de la red estaba sobre la propia red mientras se editaba, como se aprecia en la Figura \ref{} ¿? \textcolor{olive}{igual tendría que poner más capturas. O quitar esta ref, claro}
-Ahora un contenedor agrupa el menú de creación y el panel de dataset, mientras que otro mantiene la red preliminar siempre visible.
+Antes, el panel de edición de la red estaba sobre la propia red mientras se editaba, como se aprecia en la Figura \ref{fig:nn_red_tras_menu} ¿? \textcolor{olive}{igual tendría que poner más capturas. O quitar esta ref, claro}
+Ahora un contenedor agrupa el menú de creación y el panel de dataset, mientras que otro mantiene la red preliminar siempre visible como se ve en la Figura \ref{fig:nn_red_al_lado_menu}.
 Cuando comienza el entrenamiento o la inferencia, los paneles de creación se ocultan para dar prioridad a los controles del algoritmo y a la ventana informativa.
+
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{imaxes/nn_red_tras_menu.png}
+  \caption{Creación de la red tras el menú traslúcido.}
+  \label{fig:nn_red_tras_menu}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{imaxes/nn_red_al_lado_menu.png}
+  \caption{Creación de la red al lado del menú de creación.}
+  \label{fig:nn_red_al_lado_menu}
+\end{figure}
 
 A mayores, el redibujado de conexiones se optimiza en esta fase: al cambiar la arquitectura se eliminan solo las conexiones obsoletas, se actualizan las que siguen siendo válidas y se crean únicamente las nuevas.
 Esto hace que la previsualización sea más estable y clara cuando se modifica el número de capas o neuronas.
@@ -985,9 +1000,18 @@ El objetivo es transmitir un estilo parecido al de un árbol real, haciendo que 
 Las hojas se mantienen verdes, como hasta ahora.
 
 En la red neuronal se revisa el color y grosor de las conexiones para representar mejor los pesos.
-Como se ve en la Figura \ref{} ¿? las conexiones hasta el momento se coloreaban con un gradiente en base al peso de la conexión.
-Esta decisión se cambia para añadir claridad: los pesos positivos se muestran en verde, los negativos en rojo y los valores cercanos a cero en negro.
-La magnitud se sigue comunicando mediante el grosor, con límites mínimos y máximos para evitar líneas invisibles o desproporcionadas.
+Como se ve en la Figura \ref{fig:nn_conexiones_multicolor} las conexiones hasta el momento se coloreaban con un gradiente en base al peso de la conexión.
+Las conexiones con peso positivo empezaban en un color cyan para valores bajos, que cambiaba a verde según el peso aumentaba.
+Mientras las conexiones con peso negativo empezaban en amarillo y cambiaban a rojo cuánto más negativo fuera el valor. 
+Esta decisión se cambia para añadir más claridad: los pesos positivos se muestran siempre en verde, los negativos en rojo y los valores cercanos a cero en negro.
+La magnitud se sigue comunicando mediante el grosor, aunque se añaden límites mínimos y máximos a este para evitar líneas inapreciables o desproporcionadamente grandes.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{imaxes/nn_conexiones_multicolor.png}
+  \caption{Imagen de la red en la que los colores de las conexiones son gradientes de avanzan desde el cyan hasta el verde para los valores positivos y del amarillo al rojo para los negativos.}
+  \label{fig:nn_conexiones_multicolor}
+\end{figure}
 
 Por último, durante el backpropagation de la red se añade un indicador visual más explícito para las actualizaciones de conexiones.
 Estas ya estaban animadas, pero si la magnitud del cambio no era muy grande, no era apreciable en muchos casos.
