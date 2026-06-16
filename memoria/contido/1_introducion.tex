@@ -1,70 +1,27 @@
 \chapter{Introdución}
 \label{chap:introducion}
 
-\lettrine{P}{rimer} capítulo da memoria, onde xeralmente se exporán as
-liñas mestras do traballo, os obxectivos, etc. Incluimos un par de
-exemplos de citas e de referencias
-%internas (sección \ref{sec:mostra}, páxina \pageref{sec:mostra}).
+\lettrine{L}{a} inteligencia artificial agrupa técnicas orientadas a construir sistemas capaces de resolver tareas que requieren predicción, razonamiento, reconocimiento de patrones o toma de decisiones. Dentro de este campo, el aprendizaje automático se centra en modelos que extraen regularidades a partir de datos para realizar predicciones sobre ejemplos nuevos. Una parte de estos modelos se basa en estructuras relativamente interpretables, como los árboles de decisión. El aprendizaje profundo (\textit{deep learning}) emplea redes neuronales con varias capas para aprender representaciones progresivamente más complejas. Estos conceptos tienen una presencia creciente en ámbitos técnicos y cotidianos, lo que hace necesario contar con recursos que faciliten su comprensión más allá de su formulación matemática.
 
-\lettrine{L}a inteligencia artificial ...?
+El estudio de estos algoritmos desde sus ecuaciones o desde una implementación convencional aporta rigor y permite conocer su funcionamiento formal. Al mismo tiempo, puede resultar difícil desarrollar una comprensión intuitiva del proceso completo cuando las operaciones se observan únicamente como código, fórmulas o resultados finales. En un árbol de decisión, la construcción del modelo depende de decisiones sucesivas sobre los atributos de entrada y sobre la incertidumbre de los datos. En una red neuronal, el entrenamiento implica el paso de información entre capas, el cálculo de errores, la propagación de gradientes y la actualización de pesos y sesgos. Estos procesos tienen una naturaleza dinámica, por lo que su comprensión mejora cuando pueden observarse paso a paso.
 
+Las aplicaciones educativas interactivas ofrecen un medio adecuado para abordar esta dificultad. La visualización, la manipulación de ejemplos y la navegación por estados intermedios permiten relacionar conceptos abstractos con efectos visibles dentro de la interfaz. Este enfoque favorece el aprendizaje activo, ya que el estudiante puede avanzar, retroceder, cambiar datos o parámetros y comprobar cómo esas decisiones modifican el comportamiento del algoritmo. En este contexto, una herramienta interactiva puede actuar como un entorno de experimentación guiada en el que cada operación del modelo se asocia a una explicación textual, visual o numérica.
 
-\section{Contexto y motivación}
-\label{sec:contexto_y_motivacion}
+Este trabajo propone el desarrollo de una aplicación educativa web, implementada en Godot, para visualizar de forma interactiva el entrenamiento y la inferencia de dos modelos básicos de aprendizaje automático: un árbol de decisión y una red neuronal multicapa. La elección de estos modelos permite cubrir dos formas distintas de aprendizaje supervisado. El árbol de decisión representa el conocimiento mediante una estructura jerárquica de preguntas y ramas. La red neuronal utiliza capas, neuronas, pesos y funciones de activación para transformar los datos de entrada. En ambos casos, la aplicación busca mostrar el proceso interno del algoritmo y acompañarlo con explicaciones integradas en la interfaz.
 
-Los algoritmos de aprendizaje máquina son técnicas matemáticas que escapan de las fronteras de lo que es entendible a simple vista por ¿?una persona cualquiera.¿?
-Desde sus raices más puramente matemáticas hasta su implementación tanto hardware como software. 
+Los objetivos concretos del trabajo son los siguientes: \textcolor{olive}{me tomé literal lo de copiapegar}
 
-Esto ya era cierto en los tiempos de los primeros algoritmos de aprendizaje ¿?por refuerzo, árboles o qué¿?,
-pero con el surgir de los modelos de aprendizaje profundo, esta realidad es más palpable que nunca.
+\begin{itemize}
+  \item Realizar un estudio conceptual de los algoritmos de inteligencia artificial seleccionados, entendiendo tanto el árbol de decisión como la red neuronal desde su funcionamiento a bajo nivel y desde sus parámetros de configuración.
+  \item Desarrollar una aplicación educativa que permita visualizar de forma interactiva el paso a paso del entrenamiento y la inferencia de los dos algoritmos propuestos, acompañando cada proceso con texto informativo sobre las operaciones que se están llevando a cabo.
+  \item Desplegar la aplicación en una web pública para facilitar su uso y su difusión como recurso de aprendizaje de los algoritmos propuestos.
+  \item Adquirir, a nivel formativo, conocimientos sobre desarrollo de interfaces gráficas, despliegue de aplicaciones web y funcionamiento interno de los algoritmos estudiados.
+\end{itemize}
 
-Bajo estas premisas es que se siente indispensable ¿? proporcionar a la gente los materiales y métodos para que puedan comprender lo mejor posible esta tecnología cada vez más omnipresente¿?.
-¿? Y a de más el aprendizaje es mejor si es interactivo ¿?
+El desarrollo de la aplicación se organiza alrededor de la relación entre algoritmo, representación visual e información explicativa. En el módulo del árbol de decisión se implementa una versión basada en ID3 con atributos categóricos. La aplicación permite observar la creación progresiva de nodos, la elección de atributos mediante una métrica basada en la entropía, la aparición de hojas y el recorrido posterior de ejemplos durante la evaluación. La ventana informativa acompaña cada paso con texto y gráficas para explicar por qué se toma una decisión determinada.
 
+En el módulo de la red neuronal se implementa un perceptrón multicapa configurable. La interfaz permite definir una arquitectura adaptada al conjunto de datos, visualizar capas, neuronas y conexiones, ejecutar el \textit{forward pass} paso a paso y mostrar cómo se calcula la salida de cada neurona. Durante el entrenamiento también se representa el cálculo del error, la retropropagación y la actualización de los parámetros. Después del entrenamiento, la aplicación permite evaluar nuevos ejemplos mediante la misma propagación hacia delante, con los pesos ya fijados.
 
+La memoria refleja este proceso de trabajo. El Capítulo~\ref{chap:estado_de_la_cuestion} revisa herramientas y recursos relacionados con la visualización educativa de modelos de aprendizaje automático. El Capítulo~\ref{chap:herramientas_y_tecnicas} describe las tecnologías empleadas, con especial atención a Godot, la organización mediante Escenas, Nodos y Señales, y el despliegue mediante GitHub Pages. El Capítulo~\ref{chap:marco_teorico} recoge la base formal de los árboles de decisión y de las redes neuronales multicapa. El Capítulo~\ref{chap:desarrollo} explica la evolución de la aplicación desde los primeros prototipos hasta la versión final, incluyendo la construcción de ambos módulos, la carga de datos, las animaciones, las explicaciones y las mejoras de interfaz. Por último, el Capítulo~\ref{chap:conclusiones} resume los resultados obtenidos y valora el cumplimiento de los objetivos planteados.
 
-\subsection{Definición del Problema}
-
-Hoy en día las principales formas de aprender cómo funcionan los modelos de inteligencia artificial (sobre todo los clásicos, pero también los modernos) es a traves de los siempre confiables libros y universidad, las más ancestrales fuentes de conocimiento.
-Entre los formatos más actuales también encontramos los vídeos divulgativos en plataformas online como Youtube,
-dónde la posibilidad de que todo el mundo comparta su contenido ha dado lugar a ¿? muchas oportunidades de ver las interpretaciones visuales de otras personas¿?.
-
-Sin embargo ¿? aún no existe ninguna herramienta pedagógica que mermita interactuar en tiempo real con los algorimos.¿?
-¿?Programándolos se pueden ver sus resultados, su evolución en una gráfica,
-pero no palpar los que está sucediendo en las entrañas de la bestia mientras mastica el equivalente a su comida: los datos,
-tanto en entrenamiento como en inferencia¿? ((.......))
-
-
-\subsection{Objetivos}
-
-((
-Crear la aplicación
-- paso 1, hacerla
-- paso 2, exportarla
-
-Publicarla para que todo el mundo la pueda disfrutar
-))
-
-((creo qe hay q se rmás concreto))
-
-Los objetivos que se pantean en este trabajo comienzan por plantearse qué algoritmos de IA son los más interesantes para ¿?explicar¿?.
-Esta es, en última instancia, una cuestión subjetiva,
-por lo que en este trabajo se abordó esta decisión mirando ¿?de cara¿? a dos de los mayores paradigmas de la IA: la simbólica y el deeplearning.
-((no se si decir de forma pragmática y decir que tenía en mente las redes neuronales, y que los árboles se parecían lo suficiente, o poner un poco de fantasía de "los árboles, uno los primeros amigos del hombre en cuánto a lo que hacer que una máquina aprenda a jugar al ajedrez..." (lo 
-
-De ambos se decidió que los mejores candidatos para protagonizar una explicacición que busque asentar los fundamentos eran las versiones más fundamentales de cada uno.
-Del lado de la IA simbólica está el árbol de decisión ((planteado por bla bla bla en blabal)), conocido por ser ... white box
-Y en el deeplearning, el ladrillo fundacional, la red neuronal ((lo mismo de histoia...))
-
-
-\subsection{Alcance y Limitaciones}
-
-
-
-
-\subsection{Metodología de Trabajo}
-
-
-
-\subsection{Estructura de la Memoria}
-
+El resultado final está publicado como aplicación web y puede consultarse desde un navegador en \href{https://hectoraldao.github.io/visualizing_machine_learning/}{\texttt{hectoraldao.github.io/visualizing\_machine\_learning}} \textcolor{olive}{Este texto está un poco feo, ns}. Esta publicación facilita que la herramienta pueda utilizarse como recurso de apoyo para estudiar el funcionamiento interno de los modelos implementados, experimentar con datos y configuraciones, y observar de forma guiada cómo un algoritmo de aprendizaje automático pasa de los datos de entrada a una predicción.
