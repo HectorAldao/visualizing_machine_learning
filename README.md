@@ -12,4 +12,4 @@ Y después ver la evaluación de los mismos.
 En el árbol, el proceso de decisión en base a las características (categóricas, no contínuas) de con qué etiqueta se clasifica cada dato.
 Y en la red, el proceso de forward pass.
 
-Gracias a que Godot permite exportar los proyectos a html5, este es desplegado en (GitHubPages en este mismo repositorio)[https://hectoraldao.github.io/visualizing_machine_learning/]
+Gracias a que Godot permite exportar los proyectos a html5, este es desplegado en [GitHubPages en este mismo repositorio](https://hectoraldao.github.io/visualizing_machine_learning/)
