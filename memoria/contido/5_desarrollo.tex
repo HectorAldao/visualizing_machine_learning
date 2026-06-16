@@ -940,7 +940,7 @@ En pantallas verticales, los elementos se colocan en una estructura apilada, con
 Esto facilita el uso en navegador y hace que los paneles principales respondan de forma más coherente al tamaño disponible.
 
 Durante la creación de la red también se separa el espacio de edición del espacio de visualización.
-Antes, el panel de edición de la red estaba sobre la propia red mientras se editaba, como se aprecia en la Figura \ref{fig:nn_red_tras_menu} ¿? \textcolor{olive}{igual tendría que poner más capturas. O quitar esta ref, claro}
+Antes, el panel de edición de la red estaba sobre la propia red mientras se editaba, como se aprecia en la Figura \ref{fig:nn_red_tras_menu} \textcolor{olive}{igual tendría que poner más capturas. O quitar esta ref, claro}
 Ahora un contenedor agrupa el menú de creación y el panel de dataset, mientras que otro mantiene la red preliminar siempre visible como se ve en la Figura \ref{fig:nn_red_al_lado_menu}.
 Cuando comienza el entrenamiento o la inferencia, los paneles de creación se ocultan para dar prioridad a los controles del algoritmo y a la ventana informativa.
 
@@ -1034,7 +1034,7 @@ Inicialmente se prueba una solución basada en MathJax y elementos HTML superpue
 Esa alternativa permite aprovechar el navegador, aunque la complejidad de mantener dos sistemas visuales coordinados hace preferible una solución integrada en Godot.
 
 La solución final se desarrolla como una extensión del motor propia programada en Rust.
-El renderizador convierte expresiones LaTeX en SVG usando la librería Ratex \ref{} ¿? y las presenta como texturas dentro de Godot.
+El renderizador convierte expresiones LaTeX en SVG usando la librería Ratex~\cite{Ratex} y las presenta como texturas dentro de Godot.
 El componente mantiene caché de fórmulas según texto, color, escala, tamaño de fuente y padding, y emite señales cuando el renderizado se completa o falla.
 También se prepara su compilación para web mediante WebAssembly, de manera que las fórmulas funcionen en la versión exportada a HTML5.
 
@@ -1196,7 +1196,8 @@ Si el archivo no contiene metadatos de atributos, la aplicación intenta inferir
 Esta recuperación hace que la carga sea más útil incluso con archivos generados en fases anteriores.
 
 En la red neuronal, la carga de modelos se sitúa en el menú de creación, ya que es ahí donde se define o se sustituye la arquitectura antes de entrenar o evaluar.
-La aplicación abre un cuadro para escoger el archivo y trabaja con ONNX como formato implementado para esta operación.
+La aplicación abre un cuadro para escoger el archivo y trabaja con ONNX~\cite{ONNX} como formato implementado para esta operación.
+ONNX, siglas de \textit{Open Neural Network Exchange}, es un formato abierto para representar modelos de aprendizaje automático y facilitar su intercambio entre herramientas compatibles.
 Los modelos importados se procesan en un Nodo dedicado, que convierte pesos, sesgos y funciones de activación a las estructuras internas de la aplicación.
 Si la carga falla, el menú muestra un mensaje de error; si se completa, la red visible se reconstruye con el modelo importado.
 
@@ -1206,8 +1207,8 @@ Cuando alguna dimensión no coincide, la interfaz informa de la diferencia entre
 Esta comprobación impide entrenar o ejecutar inferencia con un modelo que no puede recibir las columnas seleccionadas o que no produce las salidas esperadas.
 
 El guardado de la red se realiza mediante un panel de exportación que permite generar una representación del modelo entrenado para usarla fuera de la aplicación.
-Esa representación está basada en el estandart ONNX.
-Y como los archivos de export son creados por la propia aplicación, sin herramientas externas consolidadas, se realizó una verificación con un script de Python para asegurar que el proceso de transformar una red a ONNX se realizaba correctamente.
+Esa representación está basada en el estándar ONNX.
+Y como los archivos de exportación son creados por la propia aplicación, sin herramientas externas consolidadas, se realizó una verificación con un script de Python para asegurar que el proceso de transformar una red a ONNX se realizaba correctamente.
 Para ello se revisan todos los parámetros de la red y se comprueba que los valores corresponden con los que se ven en la aplicación, como se ve en la Figura ¿?.
 Estas pruebas confirman que la exportación conserva los parámetros escritos en ONNX y que una red externa compatible puede reconstruirse dentro de la aplicación.
 
