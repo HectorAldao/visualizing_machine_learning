@@ -881,43 +881,59 @@ El usuario escoge primero el algoritmo que quiere visualizar y, al hacerlo, la i
 El botón de comienzo se habilita solo cuando existe una selección válida.
 De esta forma el menú deja de ser una lista de botones aislados y pasa a actuar como punto de entrada explicativo al proyecto.
 
-A parte de explicaciones, también se añaden previsualizaciones de los algoritmos.
-La selección del árbol o de la red van acompañadas de una imagen representativa, lo que ayuda a anticipar el tipo de escena que se abrirá a continuación.
+Además de explicaciones, también se añaden previsualizaciones de los algoritmos.
+La selección del árbol o de la red va acompañada de una imagen representativa, lo que ayuda a anticipar el tipo de escena que se abrirá a continuación.
 Esta decisión mantiene la filosofía visual de la aplicación: siempre que sea posible, la interfaz combina texto con una referencia gráfica que facilite la orientación.
+
+Para planificar esta reorganización se preparó un boceto previo con Balsamiq Wireframes~\cite{Balsamiq}, una herramienta de creación de wireframes de baja fidelidad que permite definir la estructura de una interfaz antes de implementarla.
+El mockup de la Figura \ref{fig:balsamic_menu_vertical} sirvió como guía para ordenar la pantalla inicial alrededor de una selección de algoritmo, un panel descriptivo y una acción principal de comienzo.
+Durante la implementación final se ajustaron textos, tamaños e imágenes, por lo que la versión terminada que se muestra en las Figuras \ref{fig:final_main_menu_dtree} y \ref{fig:final_main_menu_nn} conserva la idea general del boceto con algunos cambios visuales.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.65\textwidth]{imaxes/balsamic_menu_vertical.png}
+  \caption{Mockup del menú principal realizado con Balsamiq antes de implementar la reorganización final de la entrada a la aplicación.}
+  \label{fig:balsamic_menu_vertical}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{imaxes/final_main_menu_dtree.png}
+  \caption{Versión final del menú principal, mostrando seleccionado el árbol de decisión.}
+  \label{fig:final_main_menu_dtree}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{imaxes/final_main_menu_nn.png}
+  \caption{Versión final del menú principal, mostrando seleccionada la red neuronal}
+  \label{fig:final_main_menu_nn}
+\end{figure}
 
 \textcolor{olive}{aquí sería donde se contaría lo de el menú de configuración, si se hace}
 
-La navegación interna se unifica mediante un menú común.
+La navegación interna se unifica mediante un menú común que se aprecia en la Figura \ref{fig:final_menu_navegacion}.
 Tanto el árbol como la red incorporan una opción para volver al menú principal y, cuando corresponde, botones asociados a cargar o guardar el algoritmo que se esté explorando.
 Este menú es una Escena a parte con toda la lógica autocontenida, de modo que las vistas no tienen que resolver por separado la navegación básica.
 En el árbol, los botones de carga y guardado se relacionan con la persistencia de la estructura entrenada.
 En la red, el guardado abre el panel de exportación del modelo.
-Esta mejora en la navegación tiene un efecto importante sobre la experiencia de uso, ya que ahora no hay que salir de la misma reiniciando la página web para continuar experimentando con ella.
-
 Al volver al menú principal también se limpia el estado compartido de la red neuronal.
 Sin esto, volver a intentar crear una red no la construía bien por interferencias con la red anterior.
 \textcolor{olive}{esto es una explicación de un bug, pero ns, no hay más q decir}
-%La vista de red guarda información global como la arquitectura lógica, la cola de entrenamiento, el decodificador de clases, los textos cacheados de las neuronas y la neurona seleccionada manualmente.
-%Antes de cambiar de Escena se emite una Señal de retorno al menú, y el estado global se reinicia a partir de ella.
-%Con esta limpieza, una red creada en una sesión anterior no interfiere en una nueva entrada a la vista de red.
-
-El resultado final del menú principal se puede apreciar en la Figura \ref{fig:final_main_menu}
+Esta mejora en la navegación tiene un efecto importante sobre la experiencia de uso, ya que ahora no hay que salir de la misma reiniciando la página web para continuar experimentando con ella.
 
 
 \begin{figure}[H]
   \centering
-  \begin{minipage}[b]{0.48\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{imaxes/final_main_menu_dtree.png}
-  \end{minipage}
-  \hfill
-  \begin{minipage}[b]{0.48\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{imaxes/final_main_menu_nn.png}
-  \end{minipage}
-  \caption{Versión final del menú principal, mostrando seleccionados el árbol de decisión y la red neuronal}
-  \label{fig:final_main_menu}
+  \includegraphics[width=0.65\textwidth]{imaxes/final_menu_navegacion.png}
+  \caption{Menu de navegacion que permite volver al menú principal y guardar y cargar estructuras de los algoritmos.}
+  \label{fig:final_menu_navegacion}
 \end{figure}
+
+%La vista de red guarda información global como la arquitectura lógica, la cola de entrenamiento, el decodificador de clases, los textos cacheados de las neuronas y la neurona seleccionada manualmente.
+%Antes de cambiar de Escena se emite una Señal de retorno al menú, y el estado global se reinicia a partir de ella.
+%Con esta limpieza, una red creada en una sesión anterior no interfiere en una nueva entrada a la vista de red.
+
 
 
 \subsection{Adaptación a web, móvil y pantallas de distinto tamaño}
@@ -926,16 +942,35 @@ Otra tarea central de esta fase es la adaptación de la interfaz a tamaños de p
 La aplicación se publica como página web, por lo que no puede asumir una única resolución de escritorio.
 El mismo contenido debe seguir siendo utilizable en una ventana amplia, en una pantalla vertical y en dispositivos con interacción táctil.
 
+Antes de llevar esta adaptación a Godot, se definieron con Balsamiq dos disposiciones base para las vistas de los algoritmos.
+Los bocetos de la Figura \ref{fig:balsamic_disposiciones_algoritmos} ayudan a fijar la diferencia entre la versión horizontal, pensada para colocar la visualización y la ventana informativa en paralelo, y la versión vertical, pensada para apilar los mismos elementos en pantallas estrechas.
+Esta planificación reduce la dependencia de posiciones absolutas y permite tratar la adaptación como una decisión de estructura desde el inicio, más allá de un ajuste de escala.
+
+\begin{figure}[H]
+  \centering
+  \begin{minipage}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{imaxes/balsamic_dispocicion_horizontal.png}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{imaxes/balsamic_disposicion_vertical.png}
+  \end{minipage}
+  \caption{Mockups de las disposiciones horizontal y vertical de las vistas de algoritmo realizados con Balsamiq.}
+  \label{fig:balsamic_disposiciones_algoritmos}
+\end{figure}
+
 %Bajo esta premisa el menú principal se reorganiza alrededor de Nodos \textit{Control} de Godot.
 Bajo esta premisa el menú principal se reorganiza alrededor de contenedores de interfaz de Godot.
 Se incorporan márgenes, zonas centradas, paneles con anchura máxima y contenedores desplazables.
 Con esta estructura, el contenido puede reducir su anchura y ganar desplazamiento vertical cuando la pantalla es pequeña de forma automática.
 Los tamaños de fuente, los márgenes y las dimensiones mínimas de los botones se ajustan para conservar legibilidad sin depender de posiciones absolutas.
 
-El árbol de decisión como la red neuronal también se adapta a esta lógica.
+Tanto el árbol de decisión como la red neuronal se adaptan a esta lógica.
 Ahora la vista se divide en variantes vertical y horizontal, y el menú principal decide cuál cargar según la proporción de la ventana.
 La ventana deja de comportarse como un elemento flotante y queda integrada y fija en la escena.
-En pantallas anchas, la visa del algoritmo y la ventana informativa pueden situarse en paralelo, aprovechando mejor el espacio horizontal.
+En pantallas anchas, la vista del algoritmo y la ventana informativa pueden situarse en paralelo, aprovechando mejor el espacio horizontal.
 En pantallas verticales, los elementos se colocan en una estructura apilada, con desplazamiento cuando el contenido excede el área visible.
 Esto facilita el uso en navegador y hace que los paneles principales respondan de forma más coherente al tamaño disponible.
 
