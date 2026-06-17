@@ -2,13 +2,15 @@
 
 \pagestyle{empty}
 \begin{abstract}
-  \blindtext % substitúe este comando polo resumo do teu TFG
-             % na lingua principal do documento (tipicamente: galego)
+  Este trabajo presenta el diseño y desarrollo de una aplicación web educativa, implementada en Godot, para visualizar de forma interactiva el funcionamiento interno de dos modelos básicos de aprendizaje automático supervisado: los árboles de decisión y las redes neuronales multicapa. La herramienta está orientada a facilitar la comprensión de procesos que, estudiados únicamente mediante fórmulas, código o resultados finales, pueden resultar difíciles de interpretar de forma intuitiva. Para ello, la aplicación muestra la evolución de los algoritmos paso a paso y acompaña cada estado con explicaciones textuales, representaciones gráficas y animaciones integradas en la interfaz.
+
+  En el módulo de árboles de decisión se implementa un algoritmo basado en ID3 para atributos categóricos. Durante el entrenamiento, el usuario puede observar cómo se seleccionan los atributos mediante una métrica basada en la entropía, cómo se crean los nodos y las ramas, y cómo se alcanzan las hojas finales. La fase de evaluación representa el recorrido de nuevos ejemplos por el árbol ya entrenado hasta obtener su clasificación. En el módulo de redes neuronales se implementa un perceptrón multicapa configurable, con selección de datos, definición de arquitectura, ejecución del \textit{forward pass}, cálculo del error, retropropagación y actualización visual de pesos y sesgos. La aplicación incorpora ventanas informativas con fórmulas, gráficas de activación, carga de conjuntos de datos, validaciones, persistencia de modelos y adaptación a distintos tamaños de pantalla. El resultado final se despliega como aplicación HTML5 mediante GitHub Pages, lo que permite acceder al recurso desde un navegador y utilizarlo como apoyo al aprendizaje de estos algoritmos.
 
   \vspace*{25pt}
   \begin{segundoresumo}
-    \blindtext % substitúe este comando polo resumo do teu TFG
-               % na lingua secundaria do documento (tipicamente: inglés)
+    This work presents the design and development of an educational web application, implemented in Godot, for the interactive visualization of the internal behavior of two basic supervised machine learning models: decision trees and multilayer neural networks. The tool aims to support the understanding of processes that can be difficult to interpret intuitively when they are studied only through formulas, code or final results. To this end, the application displays the evolution of the algorithms step by step and links each state with textual explanations, graphical representations and animations integrated into the interface.
+
+    The decision tree module implements an ID3-based algorithm for categorical attributes. During training, the user can observe how attributes are selected through an entropy-based metric, how nodes and branches are created, and how final leaves are reached. The evaluation stage represents the path followed by new examples through the trained tree until a classification is obtained. The neural network module implements a configurable multilayer perceptron, with dataset selection, architecture definition, \textit{forward pass} execution, error calculation, backpropagation and visual updates of weights and biases. The application includes informative panels with formulas, activation graphs, dataset loading, validation mechanisms, model persistence and adaptation to different screen sizes. The final result is deployed as an HTML5 application through GitHub Pages, allowing the resource to be accessed from a browser and used as support for learning these algorithms.
   \end{segundoresumo}
 \vspace*{25pt}
 \input{portada/palabras_chave}

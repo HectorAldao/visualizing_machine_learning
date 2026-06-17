@@ -1,2 +1,84 @@
 \chapter{Metodología y planificación}
 \label{chap:metodologia_y_planificacion}
+
+\lettrine{E}{l} desarrollo del proyecto se organizó mediante una metodología incremental basada en Scrum.
+Esta elección resulta adecuada para un trabajo en el que conviven investigación técnica, implementación de algoritmos, diseño de interfaz, validación visual y despliegue web, ya que permite avanzar mediante incrementos funcionales y revisar de forma periódica el avance logrado.
+La definición completa de la aplicación dependía de comprobar previamente la viabilidad de varios aspectos, como la visualización, la exportación a navegador, la carga de datos y la explicación paso a paso de cada algoritmo.
+Por ello, la planificación se planteó como una sucesión de versiones, cada una asociada a un objetivo concreto y a un resultado evaluable.
+
+\section{Metodología de trabajo}
+\label{sec:metodologia_trabajo}
+
+Scrum es un marco de trabajo ágil orientado al desarrollo de productos complejos mediante ciclos de duración acotada, llamados \textit{Sprints}, en los que se selecciona un conjunto de tareas procedentes del \textit{Product Backlog} y se obtiene un incremento revisable del producto~\cite{ScrumGuide}.
+El marco se apoya en la transparencia del estado del trabajo, la inspección frecuente de los resultados y la adaptación de la planificación a partir de lo aprendido durante el desarrollo.
+Estos principios encajan con un proyecto educativo interactivo, donde cada avance debe evaluarse tanto desde el punto de vista técnico como desde su capacidad para explicar correctamente el funcionamiento de los modelos.
+
+En este trabajo se aplicó Scrum de forma adaptada al contexto académico de un trabajo de fin de grado.
+El estudiante asumió las tareas de análisis, implementación, prueba y documentación, mientras que los tutores participaron en el seguimiento, la revisión técnica y la orientación del alcance.
+La pila de producto agrupó las funcionalidades, validaciones y mejoras pendientes, desde prototipos de interfaz y adaptación web, a implementación de los algoritmos.
+%La pila de producto agrupó las funcionalidades, validaciones y mejoras pendientes: prototipos de interfaz, implementación de los algoritmos, carga de conjuntos de datos, ventanas informativas, animaciones, adaptación a web, persistencia y comprobaciones externas.
+Todas las tareas se priorizaron según su dependencia con otras partes del sistema.
+%y según el riesgo técnico asociado.
+
+La planificación se estructuró en Sprints asociados a versiones funcionales del proyecto.
+Cada Sprint perseguía un incremento concreto de la aplicación, de forma que al finalizarlo existiese una versión utilizable y revisable.
+Los Sprints fueron: el prototipo inicial, el módulo del árbol de decisión, el módulo de la red neuronal y la fase de mejoras funcionales e interfaz.
+Las reuniones se realizaban semanalmente con los tutores y funcionaban como puntos de inspección y adaptación dentro de la versión activa.
+En ellas se revisaba el trabajo completado desde la reunión anterior, se analizaban las dificultades encontradas, se validaban las decisiones tomadas y se definían las tareas prioritarias para continuar.
+
+Estas reuniones cumplían una función cercana a la \textit{Sprint Review}, porque permitían inspeccionar el incremento parcial y contrastarlo con los objetivos del trabajo.
+También incorporaban elementos de planificación, ya que al final de cada sesión se concretaban las tareas que debían abordarse durante la siguiente semana dentro del Sprint en curso.
+Cuando una decisión técnica generaba problemas de mantenimiento, legibilidad o interacción, la reunión servía también como espacio de retrospectiva, revisando la forma de trabajo y ajustando el enfoque para las siguientes tareas.
+
+\section{Planificación por versiones}
+\label{sec:planificacion_versiones}
+
+La división por versiones permitió mantener una relación directa entre planificación y desarrollo.
+Cada versión incorporó un conjunto coherente de funcionalidades y dejó preparada la base para la siguiente.
+La Tabla~\ref{tab:planificacion_versiones} resume esta organización.
+
+\begin{table}[H]
+  \centering
+  \begin{tabular*}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.14\textwidth}@{\extracolsep{\fill}}>{\raggedright\arraybackslash}p{0.26\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+    \hline
+    \textbf{Sprint} & \textbf{Objetivo principal} & \textbf{Incremento obtenido} \\
+    \hline
+    Prototipo, versión 0.1 & Validar Godot como tecnología para una aplicación interactiva exportable a web. & Menú inicial, Escena de prueba con una estructura jerárquica editable, creación y eliminación de nodos, conexiones visuales y primera exportación mediante GitHub Pages. \\
+    \hline
+    Árbol de decisión, versión 0.2 & Implementar el primer algoritmo y representar su entrenamiento e inferencia de forma visual. & Árbol basado en ID3, construcción paso a paso, nodos internos y hojas, ramas etiquetadas, ventana informativa, gráficas de entropía, carga de datos, retroceso por pasos y evaluación visual. \\
+    \hline
+    Red neuronal, versión 0.3 & Incorporar una red multicapa configurable y mostrar su entrenamiento incremental. & Arquitectura visual por capas, selección de datos, restricciones de entrada y salida, forward pass, cálculo del error, backward pass, actualización visible de pesos, ventana informativa e inferencia. \\
+    \hline
+    Mejoras funcionales e interfaz & Consolidar la aplicación como herramienta web coherente y reutilizable. & Navegación común, adaptación a distintos tamaños de pantalla, identidad visual, renderizado de fórmulas, validaciones de datos, mejoras en evaluación, persistencia de modelos y comprobaciones con bibliotecas externas. \\
+    \hline
+  \end{tabular*}
+  \caption{Planificación del proyecto por versiones funcionales.}
+  \label{tab:planificacion_versiones}
+\end{table}
+
+El primer Sprint se centró en reducir la incertidumbre técnica inicial.
+Antes de implementar los modelos de aprendizaje automático, era necesario comprobar que Godot permitía construir una interfaz dinámica, actualizar estructuras visuales durante la ejecución y publicar el resultado en un navegador.
+El prototipo de la versión 0.1 sirvió como prueba de concepto y fijó la base de navegación, representación jerárquica y despliegue web que se reutilizaría en las siguientes fases.
+
+El segundo Sprint tuvo como objetivo convertir esa base visual en un módulo funcional de árbol de decisión.
+La planificación de esta versión se organizó alrededor de la construcción incremental del algoritmo: primero la representación lógica y visual del árbol, después el avance paso a paso, la explicación de las decisiones mediante texto y métricas, la carga de datos y, finalmente, la evaluación de ejemplos nuevos.
+Esta secuencia permitió validar de forma progresiva la correspondencia entre el estado interno del algoritmo y la Escena mostrada al usuario.
+
+El tercer Sprint incorporó el segundo modelo previsto, la red neuronal multicapa.
+Su planificación partió de la experiencia obtenida con el árbol, manteniendo la separación entre lógica del algoritmo, representación visual y ventana informativa.
+En esta versión el trabajo se orientó a construir una arquitectura configurable, adaptarla al conjunto de datos, ejecutar el forward pass y el backward pass de forma incremental y mostrar las actualizaciones de pesos y sesgos como parte del entrenamiento.
+
+El cuarto Sprint agrupó las mejoras necesarias para transformar los módulos ya funcionales en una aplicación más completa.
+En esta fase se revisó la navegación general, se adaptaron las vistas a pantallas de distinto tamaño, se mejoró la legibilidad visual, se integró el renderizado de fórmulas matemáticas, se ampliaron las validaciones de datos y se añadieron funciones de persistencia.
+También se comprobaron los resultados de los algoritmos mediante herramientas externas, reforzando la confianza en la correspondencia entre los cálculos internos y la información presentada por la interfaz.
+
+\section{Control y validación de los incrementos}
+\label{sec:control_validacion_incrementos}
+
+El control del avance se apoyó en incrementos ejecutables.
+Para considerar terminada una versión, el resultado debía poder probarse en el entorno de Godot y, cuando correspondía, también en la exportación web.
+En las versiones algorítmicas se exigía que el estado visual coincidiese con el estado lógico del modelo, que los pasos pudiesen reproducirse con conjuntos de datos controlados y que la ventana informativa recibiese los datos necesarios para justificar la operación mostrada.
+
+La revisión semanal con los tutores permitió detectar problemas antes de que se acumulasen en fases posteriores.
+Algunos ejemplos de estas decisiones fueron validar la exportación web en el prototipo, reorganizar la Escena del árbol al crecer el número de nodos, separar la lógica de la red neuronal de su representación visual, adaptar la interfaz a pantallas pequeñas y reforzar la carga de datos con validaciones explícitas.
+De esta forma, la metodología seguida mantuvo un equilibrio entre planificación inicial y adaptación continua, conservando siempre una versión funcional como referencia del avance del proyecto.
