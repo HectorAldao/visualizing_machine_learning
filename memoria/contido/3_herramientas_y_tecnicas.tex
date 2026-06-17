@@ -37,9 +37,10 @@ el \textit{Node} una clase vacía, la raíz del resto de Nodos, que solo cuenta 
 el \textit{Node2D} característico por contar con atributos referentes a la posición en un espacio bidimensional;
 el \textit{Node3D} similar al anterior pero en un espacio tridimensional;
 y el \textit{Control} pensado para los elementos de interfaz de usuario.
+Por encima de estas, el desarrollador siempre puede definir sus propias clases ampliando las ya existentes.
+
 En este proyecto, los Nodos \textit{Control} son los más importantes.
 Esto se debe a que como ningún elemento a representar necesita habitar un espacio ni estar sujeto a físicas para poder ser representado, no hace falta que sean \textit{Node2D} ni \textit{Node3D}, al timepo que los \textit{Control} ofrecen grandes ventajas a la hora de usarlos para interactuar con el usuario.
-Por encima de estas, el desarrollador siempre puede definir sus propias clases ampliando las ya existentes.
 
 Los Nodos por sí solos son clases abstractas que no existen en el programa ejecutable final por sí mismos.
 Para instanciarlos están las Escenas.
