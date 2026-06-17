@@ -37,6 +37,8 @@ el \textit{Node} una clase vacía, la raíz del resto de Nodos, que solo cuenta 
 el \textit{Node2D} característico por contar con atributos referentes a la posición en un espacio bidimensional;
 el \textit{Node3D} similar al anterior pero en un espacio tridimensional;
 y el \textit{Control} pensado para los elementos de interfaz de usuario.
+En este proyecto, los Nodos \textit{Control} son los más importantes.
+Esto se debe a que como ningún elemento a representar necesita habitar un espacio ni estar sujeto a físicas para poder ser representado, no hace falta que sean \textit{Node2D} ni \textit{Node3D}, al timepo que los \textit{Control} ofrecen grandes ventajas a la hora de usarlos para interactuar con el usuario.
 Por encima de estas, el desarrollador siempre puede definir sus propias clases ampliando las ya existentes.
 
 Los Nodos por sí solos son clases abstractas que no existen en el programa ejecutable final por sí mismos.
@@ -58,7 +60,7 @@ De este Nodo raíz pueden colgar Nodos hijo, que a su vez pueden contar con sus 
 Finalmente, las Escenas, como en última instancia son árboles de Nodos, pueden ser instanciadas dentro de otras Escenas.
 Esto habilita una modularidad total, puesto que toda estructura de Nodos que sea susceptible de ser reutilizada, puede guardarse como una Escena para no tener que ser recreada. 
 
-Además, los Nodos pueden tener asociado un Script.
+Además, los Nodos instanciados pueden tener asociado un Script.
 Estos son código desde el que se puede interactuar, principalmente, con los atributos y métodos del Nodo al que están asociados, así como con sus hijos.
 Pero no están limitados a estos elementos.
 Siempre se puede acceder al Nodo raíz y, desde este, modificar cualquier propiedad global o acceder a cualquier Nodo en la Escena.

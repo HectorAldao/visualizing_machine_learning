@@ -30,6 +30,9 @@ Estas reuniones cumplían una función cercana a la \textit{Sprint Review}, porq
 También incorporaban elementos de planificación, ya que al final de cada sesión se concretaban las tareas que debían abordarse durante la siguiente semana dentro del Sprint en curso.
 Cuando una decisión técnica generaba problemas de mantenimiento, legibilidad o interacción, la reunión servía también como espacio de retrospectiva, revisando la forma de trabajo y ajustando el enfoque para las siguientes tareas.
 
+La revisión semanal con los tutores permitió detectar problemas antes de que se acumulasen en fases posteriores.
+De esta forma, la metodología seguida mantuvo un equilibrio entre planificación inicial y adaptación continua, conservando siempre una versión funcional como referencia del avance del proyecto.
+
 \section{Planificación por versiones}
 \label{sec:planificacion_versiones}
 
@@ -49,7 +52,7 @@ La Tabla~\ref{tab:planificacion_versiones} resume esta organización.
     \hline
     Red neuronal, versión 0.3 & Incorporar una red multicapa configurable y mostrar su entrenamiento incremental. & Arquitectura visual por capas, selección de datos, restricciones de entrada y salida, forward pass, cálculo del error, backward pass, actualización visible de pesos, ventana informativa e inferencia. \\
     \hline
-    Mejoras funcionales e interfaz & Consolidar la aplicación como herramienta web coherente y reutilizable. & Navegación común, adaptación a distintos tamaños de pantalla, identidad visual, renderizado de fórmulas, validaciones de datos, mejoras en evaluación, persistencia de modelos y comprobaciones con bibliotecas externas. \\
+    Mejoras funcionales e interfaz, versión ¿? & Consolidar la aplicación como herramienta web coherente y reutilizable. & Navegación común, adaptación a distintos tamaños de pantalla, identidad visual, renderizado de fórmulas, validaciones de datos, mejoras en evaluación, persistencia de modelos y comprobaciones con bibliotecas externas. \\
     \hline
   \end{tabular*}
   \caption{Planificación del proyecto por versiones funcionales.}
@@ -72,13 +75,9 @@ El cuarto Sprint agrupó las mejoras necesarias para transformar los módulos ya
 En esta fase se revisó la navegación general, se adaptaron las vistas a pantallas de distinto tamaño, se mejoró la legibilidad visual, se integró el renderizado de fórmulas matemáticas, se ampliaron las validaciones de datos y se añadieron funciones de persistencia.
 También se comprobaron los resultados de los algoritmos mediante herramientas externas, reforzando la confianza en la correspondencia entre los cálculos internos y la información presentada por la interfaz.
 
-\section{Control y validación de los incrementos}
-\label{sec:control_validacion_incrementos}
+%\section{Control y validación de los incrementos}
+%\label{sec:control_validacion_incrementos}
 
-El control del avance se apoyó en incrementos ejecutables.
-Para considerar terminada una versión, el resultado debía poder probarse en el entorno de Godot y, cuando correspondía, también en la exportación web.
-En las versiones algorítmicas se exigía que el estado visual coincidiese con el estado lógico del modelo, que los pasos pudiesen reproducirse con conjuntos de datos controlados y que la ventana informativa recibiese los datos necesarios para justificar la operación mostrada.
-
-La revisión semanal con los tutores permitió detectar problemas antes de que se acumulasen en fases posteriores.
-Algunos ejemplos de estas decisiones fueron validar la exportación web en el prototipo, reorganizar la Escena del árbol al crecer el número de nodos, separar la lógica de la red neuronal de su representación visual, adaptar la interfaz a pantallas pequeñas y reforzar la carga de datos con validaciones explícitas.
-De esta forma, la metodología seguida mantuvo un equilibrio entre planificación inicial y adaptación continua, conservando siempre una versión funcional como referencia del avance del proyecto.
+%El control del avance se apoyó en incrementos ejecutables.
+%Para considerar terminada una versión, el resultado debía poder probarse en el entorno de Godot y, cuando correspondía, también en la exportación web.
+%En las versiones algorítmicas se exigía que el estado visual coincidiese con el estado lógico del modelo, que los pasos pudiesen reproducirse con conjuntos de datos controlados y que la ventana informativa recibiese los datos necesarios para justificar la operación mostrada.
