@@ -12,7 +12,7 @@ const scene_uid: String = Constants.SCENES.conection
 @export var line_color: Color = Color.BLACK
 @export var positive_update_indicator_color: Color = Color.GREEN
 @export var negative_update_indicator_color: Color = Color.RED
-@export var neutral_update_indicator_color: Color = Color.BLACK
+@export var neutral_update_indicator_color: Color = Color.WHITE
 
 var _label: Label
 

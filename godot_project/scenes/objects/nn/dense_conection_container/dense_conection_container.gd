@@ -224,7 +224,7 @@ func _get_connection_width(weight: float) -> float:
 
 func _get_connection_color(weight: float) -> Color:
 	if weight == 0:
-		return Color.BLACK
+		return Color.WHITE
 
 	if weight > 0:
 		return Color.GREEN
