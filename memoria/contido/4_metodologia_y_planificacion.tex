@@ -44,7 +44,7 @@ La Tabla~\ref{tab:planificacion_versiones} resume esta organización.
   \centering
   \begin{tabular*}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.14\textwidth}@{\extracolsep{\fill}}>{\raggedright\arraybackslash}p{0.26\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
     \hline
-    \textbf{Sprint} & \textbf{Objetivo principal} & \textbf{Incremento obtenido} \\
+    \textbf{Sprint} & \textbf{Objetivo principal} & \textbf{Incremento alcanzado} \\
     \hline
     Prototipo, versión 0.1 & Validar Godot como tecnología para una aplicación interactiva exportable a web. & Menú inicial, \gls{Escena} de prueba con una estructura jerárquica editable, creación y eliminación de \gls{nodo}s, conexiones visuales y primera exportación mediante GitHub Pages. \\
     \hline
@@ -61,17 +61,20 @@ La Tabla~\ref{tab:planificacion_versiones} resume esta organización.
 
 El primer Sprint se centró en reducir la incertidumbre técnica inicial.
 Antes de implementar los modelos de aprendizaje automático, era necesario comprobar que Godot permitía construir una interfaz dinámica, actualizar estructuras visuales durante la ejecución y publicar el resultado en un navegador.
-El prototipo de la versión 0.1 sirvió como prueba de concepto y fijó la base de navegación, representación jerárquica y despliegue web que se reutilizaría en las siguientes fases.
+El prototipo de la versión 0.1 sirvió como prueba de concepto y asentó las bases para la organización y el despliegue web que se reutilizaría en las siguientes fases.
 
 El segundo Sprint tuvo como objetivo convertir esa base visual en un módulo funcional de árbol de decisión.
-La planificación de esta versión se organizó alrededor de la construcción incremental del algoritmo: primero la representación lógica y visual del árbol, después el avance paso a paso, la explicación de las decisiones mediante texto y métricas, la carga de datos y, finalmente, la evaluación de ejemplos nuevos.
-Esta secuencia permitió validar de forma progresiva la correspondencia entre el estado interno del algoritmo y la \gls{Escena} mostrada al usuario.
+La planificación de esta versión se organizó alrededor de la construcción incremental del algoritmo.
+Primero, la representación lógica y visual del árbol.
+Después el avance paso a paso junto a la explicación de las decisiones mediante texto y métricas.
+Y por último la carga de datos y la evaluación de ejemplos nuevos.
+Esta secuencia permitió validar de forma progresiva la correspondencia entre el estado interno del algoritmo y la \gls{escena} mostrada al usuario.
 
 El tercer Sprint incorporó el segundo modelo previsto, la red neuronal multicapa.
 Su planificación partió de la experiencia obtenida con el árbol, manteniendo la separación entre lógica del algoritmo, representación visual y ventana informativa.
 En esta versión el trabajo se orientó a construir una arquitectura configurable, adaptarla al conjunto de datos, ejecutar el forward pass y el backward pass de forma incremental y mostrar las actualizaciones de pesos y sesgos como parte del entrenamiento.
 
-El cuarto Sprint agrupó las mejoras necesarias para transformar los módulos ya funcionales en una aplicación más completa.
+El cuarto y último Sprint agrupó las mejoras necesarias para transformar los módulos ya funcionales en una aplicación más completa.
 En esta fase se revisó la navegación general, se adaptaron las vistas a pantallas de distinto tamaño, se mejoró la legibilidad visual, se integró el renderizado de fórmulas matemáticas, se ampliaron las validaciones de datos y se añadieron funciones de persistencia.
 También se comprobaron los resultados de los algoritmos mediante herramientas externas, reforzando la confianza en la correspondencia entre los cálculos internos y la información presentada por la interfaz.
 

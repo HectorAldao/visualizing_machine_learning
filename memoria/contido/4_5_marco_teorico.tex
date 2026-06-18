@@ -13,10 +13,10 @@ Después se describe el funcionamiento de una red neuronal multicapa sencilla, f
 Los árboles de decisión son modelos supervisados que organizan una clasificación como una secuencia de preguntas sobre los atributos de entrada.
 Cada nodo interno representa una pregunta, cada rama representa una posible respuesta y cada hoja contiene la etiqueta predicha.
 El algoritmo ID3 fue presentado por Quinlan como un procedimiento para inducir árboles de decisión a partir de ejemplos etiquetados~\cite{QuinlanID3}.
-La versión considerada en este trabajo usa atributos categóricos y selecciona las divisiones mediante entropía y ganancia de información.
+La versión considerada en este trabajo usa atributos categóricos y selecciona las divisiones mediante el cálculo de la ganancia de información basada en la entropía.
 
 Sea \(D\) un conjunto de ejemplos de entrenamiento y sea \(C\) el conjunto de clases posibles.
-Para una clase \(c \in C\), se define
+Para una clase \(c \in C\), se define su probabilidad como:
 \[
 p(c) = \frac{|\{x \in D : y(x)=c\}|}{|D|},
 \]
@@ -59,7 +59,7 @@ Si se agotan los atributos antes de conseguir subconjuntos puros, se crea una ho
 \]
 
 La formulación anterior corresponde a la versión básica de ID3 usada en la aplicación.
-Existen extensiones y variantes que modifican varios puntos del proceso: se pueden tratar atributos continuos mediante umbrales, utilizar otras métricas como el índice de Gini o la razón de ganancia, aplicar técnicas de poda para reducir sobreajuste o permitir árboles con restricciones distintas sobre su profundidad.
+Existen extensiones y variantes que modifican varios puntos del proceso, como tratar atributos continuos mediante umbrales, utilizar otras métricas como el índice de Gini o la razón de ganancia, aplicar técnicas de poda para reducir sobreajuste o permitir árboles con restricciones distintas sobre su profundidad.
 En este trabajo se fija el caso categórico con entropía porque permite mostrar de forma directa cómo una métrica numérica justifica cada partición del conjunto de datos.
 
 
@@ -77,11 +77,11 @@ a^{(0)} = x.
 \]
 Para cada capa posterior \(l \in \{1, \dots, L\}\), el modelo dispone de una matriz de pesos \(W^{(l)}\), un vector de sesgos \(b^{(l)}\) y una función de activación \(f_l\).
 El cálculo de la capa se divide en dos pasos.
-Primero se obtiene la combinación lineal:
+Primero se obtiene la combinación lineal de las entrada de la capa por sus pesos más el sesgo:
 \[
 z^{(l)} = W^{(l)}a^{(l-1)} + b^{(l)}.
 \]
-Después se aplica la función de activación:
+Y después se aplica la función de activación:
 \[
 a^{(l)} = f_l\left(z^{(l)}\right).
 \]
@@ -133,7 +133,7 @@ Para otras combinaciones de pérdida y activación, el delta de salida se obtien
 \]
 donde \(\odot\) indica producto elemento a elemento.
 
-En una capa oculta, el error se obtiene a partir de los deltas de la capa siguiente:
+En las capas ocultas, el error se obtiene a partir de los deltas de la capa siguiente:
 \[
 \delta^{(l)} = \left(W^{(l+1)}\right)^T\delta^{(l+1)} \odot f'_l\left(z^{(l)}\right).
 \]
@@ -153,7 +153,7 @@ W^{(l)} \leftarrow W^{(l)} - \eta \frac{\partial L}{\partial W^{(l)}},
 \[
 b^{(l)} \leftarrow b^{(l)} - \eta \frac{\partial L}{\partial b^{(l)}}.
 \]
-Este ciclo se repite sobre las muestras de entrenamiento.
+Este ciclo se repite sobre todas las muestras de entrenamiento.
 Cada muestra produce una propagación hacia delante, una pérdida, una retropropagación de deltas y una actualización de parámetros.
 
 Durante la inferencia se utiliza únicamente la propagación hacia delante.
