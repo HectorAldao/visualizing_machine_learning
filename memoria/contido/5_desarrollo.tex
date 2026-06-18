@@ -50,6 +50,7 @@ La interfaz incluye también dos controles reservados para operaciones de carga 
 
 
 \subsection{Exportación web con GitHub Pages}
+\label{sec:exportacion_web_con_github_pages}
 
 Una vez verificado el funcionamiento de la prueba interactiva en el entorno de desarrollo de Godot, se evalúa su despliegue en un navegador web.
 Esta comprobación es necesaria porque la aplicación está concebida para utilizarse a través de una interfaz web y debe ejecutarse correctamente fuera del editor.
@@ -619,7 +620,7 @@ Esta relación entre conjunto de datos y red visible se muestra en la Figura \re
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.85\textwidth]{imaxes/nn_columnas_de_input_output_expected_y_texto_en_neuronas.png}
-  \caption{Red neuronal durante el entrenamiento, con nombres procedentes del conjunto de datos en las neuronas de entrada y salida, y con las columnas visuales de entrada, salida y valor esperado.}
+  \caption{Red neuronal durante el entrenamiento, con nombres procedentes del conjunto de datos en las neuronas de entrada y salida.}
   \label{fig:nn_columnas_input_output_expected_texto_neuronas}
 \end{figure}
 
@@ -631,10 +632,10 @@ Una vez fijadas estas condiciones, la red queda preparada para conectarse con el
 
 \subsection{Algoritmo de entrenamiento incremental}
 
-Una vez que la arquitectura y los datos están definidos, la red necesita una pieza encargada de ejecutar el entrenamiento.
-Esta responsabilidad se concentra en un \gls{Nodo} de algoritmo, separado de la vista.
-Su papel es equivalente al que cumplía el algoritmo del árbol: calcula el siguiente avance, actualiza el estado interno y emite Señales para que la \gls{Escena} represente el cambio correspondiente.
-La vista, por tanto, puede centrarse en representar el avance recibido mediante Señales.
+Una vez que la arquitectura y los datos están definidos, hay que entrenar la red.
+Esta responsabilidad se concentra en un \gls{Nodo} dedicado a procesar el algoritmo, separado de la vista.
+Su papel consiste en calcular el siguiente avance, actualizar el estado interno y emitir Señales para que la \gls{Escena} represente el cambio correspondiente.
+La misma estructura que el algoritmo del árbol.
 
 Al comenzar el entrenamiento, la \gls{Escena} configura el algoritmo con toda la información necesaria.
 Le entrega las filas del conjunto de datos, los atributos de entrada, las columnas objetivo y toda la información de la arquitectura de la red.
@@ -673,7 +674,7 @@ Esta decisión reduce la complejidad visual del procedimiento y concentra la exp
 
 El algoritmo también coordina los elementos visuales que acompañan al entrenamiento.
 Al cargar una muestra, emite Señales para preparar los valores de entrada y los valores esperados.
-Durante el forward pass y el backward pass, emite Señales de neurona y de capa para resaltar la parte de la red que se está procesando.
+Durante el \textit{forward pass} y el \textit{backward pass}, emiten Señales para resaltar la parte de la red que se está procesando.
 Cuando un peso cambia, emite la actualización correspondiente para que la conexión visual modifique su grosor o color según el nuevo valor.
 
 Al finalizar el entrenamiento, la interfaz cambia de estado.
@@ -683,7 +684,7 @@ Este cierre evita que el usuario continúe modificando una ejecución ya termina
 
 \subsection{Forward pass y visualización de datos}
 
-El forward pass es la fase en la que una muestra atraviesa la red desde la capa de entrada hasta la capa de salida.
+El \textit{forward pass} es la fase en la que una muestra atraviesa la red desde la capa de entrada hasta la capa de salida.
 En la aplicación se ejecuta capa a capa y, dentro de cada capa, neurona a neurona.
 Esta granularidad permite observar qué parte de la red participa en cada instante del cálculo.
 
@@ -700,13 +701,20 @@ La activación softmax requiere un tratamiento específico dentro de la implemen
 Como sus salidas dependen del vector completo de la capa, primero se calculan todos los valores previos a la activación y después se aplica la función al conjunto completo.
 La explicación de la ventana informativa refleja este comportamiento para presentar softmax como una operación de capa.
 
-Durante el forward pass se guardan dos tipos de valores por capa: las sumas ponderadas previas a la activación y las salidas activadas.
-Esta caché permite que la explicación, el cálculo del error y el backward pass usen exactamente los mismos resultados que se obtuvieron al propagar la muestra hacia delante.
+Durante el \textit{forward pass} se guardan dos tipos de valores por capa: las sumas ponderadas previas a la activación y las salidas activadas.
+Esta caché permite que la explicación, el cálculo del error y el \textit{backward pass} usen exactamente los mismos resultados que se obtuvieron al propagar la muestra hacia delante.
 
 La salida de la red también se representa visualmente.
 Junto a la capa final aparece una columna de valores producidos por la red, y junto a ella aparece otra columna con el valor esperado.
 Cuando se calcula una neurona de salida, su valor se añade a la columna de salida mientras los valores anteriores de la misma muestra se mantienen visibles.
-De esta manera, la predicción se completa gradualmente y queda alineada con las clases o variables objetivo que se habían mostrado en la arquitectura, como se veía en la Figura \ref{fig:nn_columnas_input_output_expected_texto_neuronas}.
+De esta manera, la predicción se completa gradualmente y queda alineada con las clases o variables objetivo que se habían mostrado en la arquitectura, como se ve en la Figura \ref{fig:nn_columnas_input_output_expected_texto_neuronas_2}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{imaxes/nn_columnas_de_input_output_expected_y_texto_en_neuronas_2.png}
+  \caption{Red neuronal durante el entrenamiento, con la información del dato de entrada, su salida y su valor esperado.}
+  \label{fig:nn_columnas_input_output_expected_texto_neuronas_2}
+\end{figure}
 
 El resaltado de neuronas y capas acompaña todo el proceso.
 Cada vez que se evalúa una neurona, esta cambia de estado visual y la ventana informativa recibe los datos necesarios para explicar el cálculo.
@@ -743,7 +751,7 @@ Una vez calculado el delta de una neurona, se actualizan sus pesos y su sesgo me
 Cada peso se corrige en función del delta de la neurona, del valor que llega desde la capa anterior y de la tasa de aprendizaje configurada.
 El sesgo se actualiza con el propio delta, de forma coherente con la formulación de la Sección~\ref{sec:marco_redes_neuronales}.
 La inclusión del sesgo permite que la red aprenda desplazamientos y relaciones que no pasan necesariamente por el origen.
-Este comportamiento se comprobó mediante scripts externos de Python y una red equivalente en PyTorch sobre conjuntos sintéticos sencillos.
+%Este comportamiento se comprobó mediante scripts externos de Python y una red equivalente en PyTorch sobre conjuntos sintéticos sencillos.
 
 Cada actualización se sincroniza con la representación lógica de la red.
 Los pesos y sesgos modificados se copian de vuelta al modelo compartido, y cada peso emite una Señal de actualización.
@@ -767,19 +775,33 @@ El algoritmo emite Señales con la información del paso actual, y la ventana de
 Esta organización permite que el cálculo siga estando en la clase de entrenamiento, que la red visible se centre en resaltar neuronas y conexiones, y que la explicación textual evolucione sin mezclar responsabilidades.
 
 Una primera utilidad implementada de la ventana aparece al pulsar una neurona.
-Al hacerlo se muestran los pesos que llegan a esa neurona y su sesgo asociado.
+Al hacerlo se muestran los pesos que llegan a esa neurona y su sesgo asociado como se ve en la Figura \ref{fig:nn_ventana_pesos}.
 Esta consulta manual permite inspeccionar el estado del modelo durante el entrenamiento, revisando los valores de las conexiones representadas.
 Si el usuario deselecciona la neurona, la ventana recupera la explicación anterior para no perder el contexto del paso que se estaba visualizando.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.65\textwidth]{imaxes/nn_ventana_pesos.png}
+  \caption{Entrenamiento de la red en la que se ve en la ventana los pesos y bias de la neurona resaltada.}
+  \label{fig:nn_ventana_pesos}
+\end{figure}
 
 Durante el forward pass, la ventana explica el cálculo de la neurona resaltada.
 Muestra las entradas recibidas, los pesos utilizados, el sesgo, la suma ponderada y la salida tras aplicar la función de activación.
 La explicación sigue la misma estructura matemática que usa el algoritmo y remite a la formulación general de la Sección~\ref{sec:marco_redes_neuronales}.
-En el caso de una neurona concreta, la ventana desarrolla esa operación con los valores de entrada y pesos correspondientes.
+En el caso de una neurona concreta, la ventana desarrolla esa operación con los valores de entrada y pesos correspondientes como se ve en la Figura \ref{fig:nn_ventana}.
 
-La ventana también puede explicar una capa completa.
-Cuando el avance se realiza por capas, la explicación pasa de una operación escalar a una operación matricial.
-Esta explicación relaciona el cálculo neurona a neurona con la formulación habitual de una red neuronal, donde todas las salidas de una capa pueden obtenerse a partir de un vector de entrada, una matriz de pesos y un vector de sesgos.
-Si la activación es softmax, el texto aclara que la función se aplica al vector completo de la capa.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{imaxes/nn_ventana.png}
+  \caption{Entrenamiento de la red en la que se ve en la ventana una explicación en texto plano de la operación que se está calculando en la neurona resaltada.}
+  \label{fig:nn_ventana}
+\end{figure}
+
+%%La ventana también puede explicar una capa completa.
+%%Cuando el avance se realiza por capas, la explicación pasa de una operación escalar a una operación matricial.
+%%Esta explicación relaciona el cálculo neurona a neurona con la formulación habitual de una red neuronal, donde todas las salidas de una capa pueden obtenerse a partir de un vector de entrada, una matriz de pesos y un vector de sesgos.
+%%Si la activación es softmax, el texto aclara que la función se aplica al vector completo de la capa.
 
 En la fase de error, la ventana muestra la comparación entre salida y objetivo esperado.
 Indica el tipo de pérdida usado, el valor de la pérdida y los deltas que iniciarán la retropropagación.
@@ -790,14 +812,34 @@ En la salida puede mostrar la simplificación de softmax con entropía cruzada, 
 En las capas ocultas explica el gradiente entrante como la suma de contribuciones procedentes de la capa siguiente.
 Después muestra cómo ese delta genera gradientes de pesos y cómo esos gradientes modifican los parámetros.
 
-La granularidad de la explicación cambia con el modo de avance elegido por el usuario.
-Si se avanza neurona a neurona, la ventana se centra en una operación pequeña.
-Si se avanza por capas, resume el cálculo de toda la capa.
-Si se avanza una muestra completa, la ventana puede resumir el dato procesado, su salida, el error y la actualización realizada.
-Así, la misma infraestructura permite observar el entrenamiento con distintos niveles de detalle.
+%%La granularidad de la explicación cambia con el modo de avance elegido por el usuario.
+%%Si se avanza neurona a neurona, la ventana se centra en una operación pequeña.
+%%Si se avanza por capas, resume el cálculo de toda la capa.
+%%Si se avanza una muestra completa, la ventana puede resumir el dato procesado, su salida, el error y la actualización realizada.
+%%Así, la misma infraestructura permite observar el entrenamiento con distintos niveles de detalle.
 
-Las fórmulas pueden mostrarse como texto plano o con un renderizado matemático más elaborado.
-Ese soporte se desarrolla con mayor detalle en las mejoras de interfaz posteriores; en esta fase, su función consiste en acompañar cada paso con una representación simbólica del cálculo.
+%%Las fórmulas pueden mostrarse como texto plano o con un renderizado matemático más elaborado.
+Las fórmulas pueden mostrarse como texto plano o con un renderizado matemático basado en una petición https. % como se aprecia en las Figuras \ref{fig:nn_ventana} y \ref{fig:nn_ventana_latex}.
+Esta configuración era una opción booleana que se establecía desde código.
+El objetivo es mostrar con mejor calidad operaciones complicadas de representar en texto plano como las derivadas.
+En las Figuras \ref{fig:nn_ventana_latex_derivada} y \ref{fig:nn_ventana_texto_derivada} se ve la diferencia entre el texto plano y la fórmula renderizada. 
+
+\begin{figure}[hp]
+  \centering
+  \includegraphics[width=0.75\textwidth]{imaxes/nn_ventana_latex_derivada.png}
+  \caption{Fórmula de derivada renderizada en la ventana.}
+  \label{fig:nn_ventana_latex_derivada}
+\end{figure}
+\begin{figure}[hp]
+  \centering
+  \includegraphics[width=0.75\textwidth]{imaxes/nn_ventana_texto_derivada.png}
+  \caption{Fórmula de derivada en texto plano en la ventana}
+  \label{fig:nn_ventana_texto_derivada}
+\end{figure}
+
+%%Las fórmulas pueden mostrarse como texto plano o con un renderizado matemático más elaborado.
+
+%Ese soporte se desarrolla con mayor detalle en las mejoras de interfaz posteriores; en esta fase, su función consiste en acompañar cada paso con una representación simbólica del cálculo.
 Con la ventana informativa, la red combina la animación de valores con el razonamiento matemático que justifica cada cambio del modelo.
 
 
@@ -813,9 +855,16 @@ La diferencia principal está en que el algoritmo se configura con tasa de apren
 Cuando se completa la capa de salida, la muestra se da por finalizada: no se calcula retorno del error ni se actualizan pesos o sesgos.
 
 Antes de ejecutar la inferencia, la aplicación valida el conjunto de datos elegido para evaluar.
-Debe tener los mismos atributos de entrada que el conjunto de datos usado en entrenamiento, las mismas salidas esperadas y el mismo orden de columnas.
+Debe tener los mismos atributos de entrada que el conjunto de datos usado en entrenamiento, las mismas salidas esperadas y el mismo orden de columnas. En la Figura \ref{fig:nn_mal_dataset_inferencia} se puede ver como el panel de selección de dataset no permite avanzar a la inferencia con un dataset incompatible.
 Esta comprobación evita alimentar la red con vectores que tengan una estructura distinta a la que aprendió.
 Sin esa validación, una neurona de entrada podría recibir un atributo diferente al que representa su peso entrenado.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.65\textwidth]{imaxes/nn_mal_dataset_inferencia.png}
+  \caption{Panel de selección de dataset de inferencia en el que se ha intentado seleccionar el dataset \textit{EnemyAI} para una red entrenada con \textit{Cultivos}.}
+  \label{fig:nn_mal_dataset_inferencia}
+\end{figure}
 
 La visualización de datos se aprovecha también en este modo.
 Los valores de entrada vuelven a situarse junto a sus neuronas, se animan hacia la red y la columna de salida se completa a medida que avanza el cálculo.
@@ -827,10 +876,10 @@ Las mejoras posteriores se centran en pulir la interfaz general, adaptar la vist
 
 
 
-\section{Mejoras de funcionalidades e interfaz de usuario: versión ¿?}
+\section{Mejoras de funcionalidades e interfaz de usuario: versión 0.4}
 
-Una vez completados los núcleos funcionales del árbol de decisión y la red neuronal, el desarrollo cambia de enfoque.
-Los dos algoritmos principales ya están presentes en la aplicación: el árbol de decisión puede construirse, explicarse y evaluarse, y la red neuronal puede configurarse, entrenarse e inspeccionarse paso a paso.
+%El árbol de decisión puede construirse, explicarse y evaluarse, y la red neuronal puede configurarse, entrenarse e inspeccionarse paso a paso.
+Una vez completados los núcleos funcionales de los algoritmos el desarrollo cambia de enfoque.
 A partir de este punto, el trabajo se concentra en convertir ese conjunto de \gls{Escena}s funcionales en una herramienta más coherente, preparada para la versión web y adecuada para una interacción continuada.
 
 Esta fase se plantea como una revisión de tareas transversales que afectan a la experiencia completa, una vez terminada la incorporación de los algoritmos principales.
@@ -840,22 +889,24 @@ En conjunto, estas tareas permiten pasar de una demostración técnica de los mo
 
 
 \subsection{Entrada principal y navegación común}
+\label{sec:entrada_principal_y_navegacion_comun}
 
 Una de las primeras tareas de pulido consiste en revisar el menú principal.
 Hasta ese momento, la pantalla inicial funcionaba solo como una forma rápida de entrar en cada algoritmo.
-Con la aplicación más avanzada, el menú necesitaba presentar el contenido disponible y contextualizar cada opción antes de abrir una vista de algoritmo.
-Para ello se sustituyen los accesos directos por un flujo de selección.
+%Con la aplicación más avanzada, el menú necesitaba presentar el contenido disponible y contextualizar cada opción antes de abrir una vista de algoritmo.
+%Para ello se sustituyen los accesos directos por un flujo de selección.
+Esto se cambió por por un flujo de selección.
 El usuario escoge primero el algoritmo que quiere visualizar y, al hacerlo, la interfaz actualiza un panel descriptivo con información sobre esa opción.
-El botón de comienzo se habilita solo cuando existe una selección válida.
-De esta forma, el menú deja de actuar como una lista de botones aislados y pasa a funcionar como punto de entrada explicativo al proyecto.
+El botón de comienzo se habilita solo cuando existe una selección.
+De esta forma, el menú deja de actuar como una lista de botones y pasa a funcionar como punto de entrada explicativo al proyecto.
 
 El panel descriptivo se acompaña de previsualizaciones de los algoritmos.
-La selección del árbol o de la red muestra una imagen representativa que anticipa el tipo de \gls{Escena} que se abrirá a continuación.
+Estas muestran una imagen representativa del algoritmo seleccionado.
 Esta decisión mantiene el criterio visual de la aplicación: siempre que es posible, la interfaz combina texto con una referencia gráfica relacionada con el contenido que se va a explorar.
 
 Para planificar esta reorganización se preparó un boceto previo con Balsamiq Wireframes~\cite{Balsamiq}, una herramienta de creación de wireframes de baja fidelidad que permite definir la estructura de una interfaz antes de implementarla.
 El mockup de la Figura \ref{fig:balsamic_menu_vertical} sirvió como guía para ordenar la pantalla inicial alrededor de una selección de algoritmo, un panel descriptivo y una acción principal de comienzo.
-Durante la implementación final se ajustaron textos, tamaños e imágenes.
+Durante la implementación final se ajustaron tamaños e imágenes.
 La versión terminada, mostrada en las Figuras \ref{fig:final_main_menu_dtree} y \ref{fig:final_main_menu_nn}, conserva la organización general del boceto con cambios visuales derivados de su integración en Godot.
 
 \begin{figure}[H]
@@ -884,8 +935,8 @@ La versión terminada, mostrada en las Figuras \ref{fig:final_main_menu_dtree} y
 La navegación interna se unifica mediante un menú común que se aprecia en la Figura \ref{fig:final_menu_navegacion}.
 Tanto el árbol como la red incorporan una opción para volver al menú principal y, cuando corresponde, botones asociados a cargar o guardar el algoritmo que se esté explorando.
 Este menú se implementa como una \gls{Escena} aparte con lógica autocontenida, de modo que las vistas no tienen que resolver por separado la navegación básica.
-En el árbol, los botones de carga y guardado se relacionan con la persistencia de la estructura entrenada.
-En la red, el guardado abre el panel de exportación del modelo.
+En el árbol, los botones de carga y guardado abren el explorador de archivos local para cargar en la aplicación o guardar en el ordenador respectivamente la estructura entrenada.
+En la red, el de guardado abre el panel de exportación del modelo. Para la red la carga se hacer desde el menú de edición de la arquitectura.
 Al volver al menú principal también se limpia el estado compartido de la red neuronal.
 Esta limpieza evita que una arquitectura creada en una sesión anterior interfiera en la construcción de una nueva red.
 %\textcolor{olive}{esto es una explicación de un bug, pero ns, no hay más q decir}
@@ -905,7 +956,7 @@ Con esta mejora, la aplicación puede reutilizarse dentro de la misma sesión we
 
 
 
-\subsection{Adaptación a web, móvil y pantallas de distinto tamaño}
+\subsection{Adaptación a pantallas de distintos tamaños y orientaciónes}
 
 Otra tarea central de esta fase es la adaptación de la interfaz a tamaños de pantalla distintos.
 La aplicación se publica como página web, por lo que no puede asumir una única resolución de escritorio.
@@ -935,6 +986,15 @@ Bajo esta premisa el menú principal se reorganiza alrededor de contenedores de 
 Se incorporan márgenes, zonas centradas, paneles con anchura máxima y contenedores desplazables.
 Con esta estructura, el contenido puede reducir su anchura y activar desplazamiento vertical de forma automática cuando la pantalla es pequeña.
 Los tamaños de fuente, los márgenes y las dimensiones mínimas de los botones se ajustan para conservar legibilidad sin depender de posiciones absolutas.
+Los resultados ya se mostraron en la Sección \ref{sec:entrada_principal_y_navegacion_comun}.
+También se puede ver el resultado en movil en la Figura \ref{fig:final_menu_movil}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth]{imaxes/final_menu_movil.png}
+  \caption{Vista del menu principal en un movil.}
+  \label{fig:final_menu_movil}
+\end{figure}
 
 Tanto el árbol de decisión como la red neuronal se adaptan a esta lógica.
 A partir de esta revisión, la vista se divide en variantes vertical y horizontal, y el menú principal decide cuál cargar según la proporción de la ventana.
@@ -964,19 +1024,15 @@ Cuando comienza el entrenamiento o la inferencia, los paneles de creación se oc
   \label{fig:nn_red_al_lado_menu}
 \end{figure}
 
-En esta misma fase se optimiza el redibujado de conexiones.
-Al cambiar la arquitectura se eliminan solo las conexiones obsoletas, se actualizan las que siguen siendo válidas y se crean únicamente las nuevas.
-Con ello, la previsualización mantiene mayor estabilidad cuando se modifica el número de capas o neuronas.
-
 Para las zonas grandes, como el árbol entrenado o la red con varias capas, se mejora el desplazamiento y el zoom.
 El contenedor desplazable incorpora control con rueda, combinaciones de teclado y gestos táctiles.
 Con un dedo se puede arrastrar la vista, y con dos dedos se puede aplicar zoom mediante pinza.
 Estas interacciones se aplican al árbol, donde algunas ramas pueden alejarse del centro, y a la red, donde varias capas densas pueden ocupar una superficie amplia.
 
-El desplazamiento se revisa también para disposiciones con contenedores anidados.
-Si un panel interno llega a su límite de desplazamiento, el evento puede propagarse a un contenedor superior.
-Así se evita que la rueda del ratón o el arrastre táctil queden atrapados en una zona que ya no puede desplazarse más.
-El zoom se implementa como un zoom global, que modifica el factor de escala de la raíz de la ventana dentro de unos límites definidos.
+%El desplazamiento se revisa también para disposiciones con contenedores anidados.
+%Si un panel interno llega a su límite de desplazamiento, el evento puede propagarse a un contenedor superior.
+%Así se evita que la rueda del ratón o el arrastre táctil queden atrapados en una zona que ya no puede desplazarse más.
+%El zoom se implementa como un zoom global, que modifica el factor de escala de la raíz de la ventana dentro de unos límites definidos.
 
 %El cálculo del tamaño mínimo de las \gls{escena}s también se revisa.
 %El árbol amplía su lienzo cuando aparecen \gls{nodo}s o datos de evaluación fuera del área inicial.
@@ -984,62 +1040,91 @@ El zoom se implementa como un zoom global, que modifica el factor de escala de l
 %Así se evita que elementos importantes queden fuera del scroll o se pierdan por no estar incluidos en el tamaño lógico de la vista.
 
 Los últimos cambios de adaptación a pantalla consisten en reducir márgenes y separaciones entre los contenidos.
-En pantallas pequeñas, esos espacios pueden ocupar una parte significativa del área útil.
+En pantallas pequeñas, esos espacios ocupan una parte significativa del área útil.
 Por ello se recortan de forma parcial, manteniendo la organización de los paneles y aumentando el espacio disponible para el contenido interactivo.
 
 
 \subsection{Identidad visual y legibilidad de la interfaz}
 
-También se revisa la estética general de la aplicación.
+Se revisa para este punto la estética general de la aplicación.
 El objetivo es unificar la identidad visual y hacer que los elementos principales se distingan con claridad.
 Se actualizan colores de fondo, estilos de botones, bordes, textos y temas de paneles.
 El fondo pasa a usar una textura inspirada en una placa base.
 
 %El uso de una \gls{Escena} de fondo común permite mantener ese recurso entre vistas sin duplicar lógica en cada una.
 
-Se revisan también los iconos y controles pequeños.
-El botón de menú deja de depender de un carácter textual y pasa a usar iconos gráficos.
-Esto evita diferencias entre fuentes o navegadores y ofrece un aspecto más estable en la exportación web.
+%Se revisan también los iconos y controles pequeños.
+%El botón de menú deja de depender de un carácter textual y pasa a usar iconos gráficos.
+%Esto evita diferencias entre fuentes o navegadores y ofrece un aspecto más estable en la exportación web.
+
+También se actualiza el redibujado de conexiones.
+Al cambiar la arquitectura de la red se ejecutaban la animación de aparición de todas las conexiones.
+Ahora solo las conexiones nuevas se animan.
+Con ello, la previsualización mantiene mayor estabilidad cuando se modifica el número de capas o neuronas.
 
 En el árbol de decisión se ajusta el grosor de las conexiones y el contraste de las etiquetas de rama.
-Las conexiones y los \gls{nodo}s de decisión adoptan colores cercanos al marrón, mientras que las hojas mantienen el verde utilizado para señalar clasificaciones finales.
+Las conexiones y los \gls{nodo}s de decisión adoptan colores cercanos al marrón, mientras que las hojas mantienen el verde, inspirando los colores de una planta.
 
 En la red neuronal se revisa el color y grosor de las conexiones para representar mejor los pesos.
 Como se muestra en la Figura \ref{fig:nn_conexiones_multicolor}, las conexiones se coloreaban inicialmente con un gradiente basado en el peso de la conexión.
 Las conexiones con peso positivo partían de un color cian para valores bajos y cambiaban a verde según aumentaba el peso.
 Las conexiones con peso negativo partían de amarillo y cambiaban a rojo cuanto más negativo era el valor.
-Esta codificación se sustituye por una representación más directa: los pesos positivos se muestran en verde, los negativos en rojo y los valores cercanos a cero en negro.
+Esta codificación se sustituye por una representación más directa: los pesos positivos se muestran en verde, los negativos en rojo y los valores cercanos a cero en blanco.
 La magnitud se sigue comunicando mediante el grosor, con límites mínimos y máximos para evitar líneas inapreciables o desproporcionadamente grandes.
+En la Figura \ref{fig:final_nn_conexiones_multicolor} se puede ver la representación final.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.85\textwidth]{imaxes/nn_conexiones_multicolor.png}
-  \caption{Red neuronal con conexiones coloreadas mediante gradientes desde el cian hasta el verde para valores positivos y desde el amarillo hasta el rojo para valores negativos.}
+  \caption{Red neuronal con conexiones sin limite de grosor coloreadas mediante gradientes desde el cian hasta el verde para valores positivos y desde el amarillo hasta el rojo para valores negativos.}
   \label{fig:nn_conexiones_multicolor}
 \end{figure}
 
-Durante la retropropagación de la red se añade un indicador visual más explícito para las actualizaciones de conexiones.
-Las conexiones ya contaban con animación.
-Los cambios de baja magnitud podían pasar desapercibidos.
-La solución consiste en añadir un círculo que retrocede por la conexión actualizada y cuyo color indica el signo de la actualización.
-De esta forma se representa que las conexiones se modifican durante el backward pass, incluso cuando la variación del grosor es pequeña.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{imaxes/final_nn_conexiones_multicolor.png}
+  \caption{Red neuronal con conexiones con límite de grosor coloreadas en verde para valores positivos, en rojo para valores negativos, y en blanco los más cercanos a 0.}
+  \label{fig:final_nn_conexiones_multicolor}
+\end{figure}
 
+Y tanto durante la propagación como la retropropagación de la red se añade un indicador visual más explícito para las actualizaciones de conexiones.
+Las conexiones ya contaban con animación, pero los cambios de baja magnitud podían pasar desapercibidos.
+La solución consiste en añadir una figura que retrocede por la conexión actualizada y cuyo color indica el signo de la actualización.
+De esta forma se representa que las conexiones se modifican durante el backward pass, incluso cuando la variación del grosor es pequeña.
+En la Figura \ref{fig:final_actualizacion} se puede apreciar esta visualización en estático.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{imaxes/final_actualizacion_1.png}
+  \caption{Red en medio de la animación de \textit{forward pass}.}
+  \label{fig:final_actualizacion}
+\end{figure}
 
 
 \subsection{Renderizado de fórmulas matemáticas}
+\label{sec:renderizado_de_formulas_matematicas}
 
 La ventana informativa de la red y la del árbol necesitan mostrar expresiones matemáticas para completar las explicaciones.
 En las primeras versiones, las fórmulas podían representarse como texto plano.
-Esa solución resultaba limitada para explicar operaciones como la derivada de los pesos.
+Esa solución resultaba limitada para explicar operaciones como la derivada de los pesos, o expresiones matriciales.
+También se probó a renderizar las fórmulas por medio de una petición https a un servidor que se encargaba de generar la imágen ??.
+Pero esto introducía una latencia de segundos entre que aparecía la explicación y se mostraba la fórmula 
 Por ello se dedica una tarea específica a integrar un sistema de renderizado LaTeX dentro de la aplicación.
 
-La primera decisión consiste en tratar la fórmula como un nuevo tipo de \gls{Nodo} personalizado que hereda del tipo Control.
-Al pertenecer a esta clase, se puede colocar dentro de paneles, zonas desplazables y estructuras verticales junto al texto explicativo.
-Esta integración evita posicionar manualmente las fórmulas como si fueran sprites de la \gls{Escena}.
+%La primera decisión consiste en tratar la fórmula como un nuevo tipo de \gls{Nodo} personalizado que hereda del tipo Control.
+%Al pertenecer a esta clase, se puede colocar dentro de paneles, zonas desplazables y estructuras verticales junto al texto explicativo.
+%Esta integración evita posicionar manualmente las fórmulas como si fueran sprites de la \gls{Escena}.
 
-Inicialmente se prueba una solución basada en MathJax y elementos HTML superpuestos al lienzo de Godot.
-Esa alternativa permite aprovechar el navegador.
-La complejidad de mantener dos sistemas visuales coordinados hace preferible una solución integrada en Godot.
+Inicialmente se probó una solución basada en MathJax y elementos HTML superpuestos al lienzo de Godot.
+Sin embargo el resultado siempre acababa con el texto de latex en crudo ocupando toda la pantalla como se ve en la Figura \ref{fig:mathjax}.
+Esto ocurre porque, como se trató en la Sección \ref{sec:exportacion_web_con_github_pages}, el sistema de exportación de Godot se fundamenta en un elemento \textit{canvas}, en el cual MathJax no puede renderizar de forma nativa.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{imaxes/mathjax.png}
+  \caption{Error en el que MathJax no se renderiza adecuadamente en el \textit{canvas} de Godot}
+  \label{fig:mathjax}
+\end{figure}
 
 La solución final se desarrolla como una extensión propia del motor, programada en Rust.
 El renderizador convierte expresiones LaTeX en SVG usando la librería Ratex~\cite{Ratex} y las presenta como texturas dentro de Godot.
@@ -1056,6 +1141,73 @@ Cuando la ventana muestra otros contenidos, como selección de \gls{nodo}s o eva
 El ajuste de escalado requirió varias iteraciones.
 Se revisaron tamaños de fuente, padding, modo de estirado, tamaño mínimo lógico y normalización de SVG para que la fórmula tenga una dimensión natural dentro del panel.
 Este trabajo afecta especialmente a la versión web, donde un escalado incorrecto puede producir texturas borrosas o demasiado grandes.
+
+
+\subsection{Explicaciones de mayor nivel en la red neuronal}
+
+La red neuronal ya explicaba cálculos neurona a neurona, pero esta fase amplía la granularidad de las explicaciones aprovechando la posibilidad de renderizar formulas de la Sección \ref{sec:renderizado_de_formulas_matematicas}.
+El panel de entrenamiento permite avanzar por neurona, por capa, por muestra o completar el entrenamiento.
+La ventana informativa debe adaptarse a esos niveles para que cada modo de avance tenga una explicación adecuada.
+
+Para el forward pass se añaden explicaciones de capa completa.
+El algoritmo guarda la información del último avance de capa y la ventana puede mostrar la operación agregada como se muestra en la Figura \ref{fig:final_matriz_foward}. % con vectores, matrices de pesos, sesgos, valores previos a la activación y salidas activadas.
+Esto conecta la visualización detallada de neuronas individuales con la formulación matricial habitual de las redes densas.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.75\textwidth]{imaxes/final_matriz_foward_peligro.png}
+  \caption{Texto y fórmulas de la propagación de la red por capas.}
+  \label{fig:final_matriz_foward}
+\end{figure}
+
+El backward pass recibe un tratamiento similar.
+En la capa de salida se muestra la pérdida usada y el delta inicial.
+En capas ocultas se explica cómo llega el gradiente desde la capa siguiente y cómo se transforma en deltas propios.
+En la Figura \ref{fig:final_matriz_backward} se puede ver el texto explicativo.
+%Al completar una capa hacia atrás, la explicación incluye gradientes de pesos y actualización de parámetros.
+%La ventana incorpora plantillas para la carga de datos, el cálculo de error, el inicio del retorno del error y la actualización de una capa.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.75\textwidth]{imaxes/final_matriz_backward_peligro.png}
+  \caption{Texto y fórmulas de la retropropagación de la red por capas.}
+  \label{fig:final_matriz_backward}
+\end{figure}
+
+También se añade una explicación al pasar todo el proceso para una muestra.
+Cuando el usuario avanza un dato entero, la ventana resume las entradas utilizadas, la salida producida, el objetivo esperado y el valor de pérdida como se ve en la Figura \ref{fig:final_dato_entero}.
+Este modo resulta útil para observar el efecto global de una muestra sin detenerse en cada neurona.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.75\textwidth]{imaxes/final_dato_entero.png}
+  \caption{Texto y fórmulas al entrenar con dato en un paso.}
+  \label{fig:final_dato_entero}
+\end{figure}
+
+Este cambio refuerza la idea de que el entrenamiento puede mirarse con distintos niveles de detalle.
+Un usuario puede estudiar una neurona concreta, revisar una capa como operación matricial o seguir una muestra completa como unidad de aprendizaje.
+
+
+\subsection[Gráficas de activación e inspección de neuronas y nodos]{Gráficas de activación e inspección de neuronas y \protect\gls{nodo}s}
+
+Se incorpora una interacción común para consultar neuronas de la red y \gls{nodo}s del árbol.
+Al pulsar uno de estos elementos, la ventana explicativa cambia su contenido y el elemento seleccionado queda resaltado para indicar a qué parte de la estructura se refiere la información.
+Una nueva pulsación restaura la explicación anterior.
+El avance del algoritmo puede continuar después de la consulta, y también es posible inspeccionar otros \gls{nodo}s o neuronas sin reiniciar el proceso activo.
+
+La explicación de las funciones de activación se refuerza con gráficas.
+Se generan imágenes para funciones como ReLU, sigmoide e identidad.
+Las gráficas se preparan con fondo transparente, ejes claros y cuadrícula tenue para integrarse en la estética oscura de la aplicación.
+Después se incorporan como texturas a la ventana informativa de la red.
+Durante el forward pass, la ventana puede mostrar la gráfica asociada a la función de activación de la capa que se está calculando.
+Cuando la explicación pasa a otro tipo de contenido, como la carga de datos, la retropropagación o el fin del entrenamiento, la gráfica se limpia junto con la fórmula anterior.
+Esta limpieza mantiene la ventana centrada en el paso actual y evita que una representación matemática permanezca visible fuera de contexto.
+
+El último paso consiste en marcar sobre la gráfica el punto evaluado por la neurona.
+La ventana toma la entrada ponderada, la salida activada y la función correspondiente, y transforma esos valores en una posición dentro del área útil de la imagen.
+Sobre ella se dibuja un marcador rojo que indica qué punto de la curva se está usando en ese cálculo concreto.
+Así se conectan el valor numérico de entrada, la fórmula aplicada y la forma de la función de activación dentro de la ventana explicativa.
 
 
 \subsection{Selección de conjuntos de datos y validaciones de inferencia}
@@ -1133,52 +1285,6 @@ Este proceso se muestra en la Figura \ref{fig:final_dtree_evaluacion}.
   \caption{Árbol de decisión durante el proceso de evaluación del conjunto de frutas.}
   \label{fig:final_dtree_evaluacion}
 \end{figure}
-
-%\subsection{Explicaciones de mayor nivel en la red neuronal}
-%
-%La red neuronal ya explicaba cálculos neurona a neurona, pero esta fase amplía la granularidad de las explicaciones.
-%El panel de entrenamiento permite avanzar por neurona, por capa, por muestra o completar el entrenamiento.
-%La ventana informativa debe adaptarse a esos niveles para que cada modo de avance tenga una explicación adecuada.
-%
-%Para el forward pass se añaden explicaciones de capa completa.
-%El algoritmo guarda la información del último avance de capa y la ventana puede mostrar la operación agregada con vectores, matrices de pesos, sesgos, valores previos a la activación y salidas activadas.
-%Esto conecta la visualización detallada de neuronas individuales con la formulación matricial habitual de las redes densas.
-%
-%También se añade una explicación de muestra completa.
-%Cuando el usuario avanza un dato entero, la ventana resume las entradas utilizadas, la salida producida, el objetivo esperado y el valor de pérdida.
-%Este modo resulta útil para observar el efecto global de una muestra sin detenerse en cada neurona.
-%
-%El backward pass recibe un tratamiento similar.
-%La ventana incorpora plantillas para la carga de datos, el cálculo de error, el inicio del retorno del error y la actualización de una capa.
-%En la capa de salida puede explicar la pérdida usada, el delta inicial y la relación entre salida y objetivo.
-%En capas ocultas puede mostrar cómo llega el gradiente desde la capa siguiente y cómo se transforma en deltas propios.
-%Al completar una capa hacia atrás, la explicación incluye gradientes de pesos y actualización de parámetros.
-%
-%Este cambio refuerza una idea importante de la aplicación: el entrenamiento puede mirarse con distintos niveles de detalle.
-%Un usuario puede estudiar una neurona concreta, revisar una capa como operación matricial o seguir una muestra completa como unidad de aprendizaje.
-%La misma ejecución interna alimenta todas esas explicaciones, lo que mantiene la coherencia entre cálculo, animación y texto.
-
-
-\subsection[Gráficas de activación e inspección de neuronas y nodos]{Gráficas de activación e inspección de neuronas y \protect\gls{nodo}s}
-
-Se incorpora una interacción común para consultar neuronas de la red y \gls{nodo}s del árbol.
-Al pulsar uno de estos elementos, la ventana explicativa cambia su contenido y el elemento seleccionado queda resaltado para indicar a qué parte de la estructura se refiere la información.
-Una nueva pulsación restaura la explicación anterior.
-El avance del algoritmo puede continuar después de la consulta, y también es posible inspeccionar otros \gls{nodo}s o neuronas sin reiniciar el proceso activo.
-
-La explicación de las funciones de activación se refuerza con gráficas.
-Se generan imágenes para funciones como ReLU, sigmoide e identidad.
-Las gráficas se preparan con fondo transparente, ejes claros y cuadrícula tenue para integrarse en la estética oscura de la aplicación.
-Después se incorporan como texturas a la ventana informativa de la red.
-Durante el forward pass, la ventana puede mostrar la gráfica asociada a la función de activación de la capa que se está calculando.
-Cuando la explicación pasa a otro tipo de contenido, como la carga de datos, la retropropagación o el fin del entrenamiento, la gráfica se limpia junto con la fórmula anterior.
-Esta limpieza mantiene la ventana centrada en el paso actual y evita que una representación matemática permanezca visible fuera de contexto.
-
-El último paso consiste en marcar sobre la gráfica el punto evaluado por la neurona.
-La ventana toma la entrada ponderada, la salida activada y la función correspondiente, y transforma esos valores en una posición dentro del área útil de la imagen.
-Sobre ella se dibuja un marcador rojo que indica qué punto de la curva se está usando en ese cálculo concreto.
-Así se conectan el valor numérico de entrada, la fórmula aplicada y la forma de la función de activación dentro de la ventana explicativa.
-
 
 \subsection{Persistencia, carga y validación de modelos}
 
