@@ -1189,32 +1189,76 @@ Este cambio refuerza la idea de que el entrenamiento puede mirarse con distintos
 Un usuario puede estudiar una neurona concreta, revisar una capa como operación matricial o seguir una muestra completa como unidad de aprendizaje.
 
 
-\subsection[Gráficas de activación e inspección de neuronas y nodos]{Gráficas de activación e inspección de neuronas y \protect\gls{nodo}s}
+\subsection[Gráficas de funciones de activación e inspección de neuronas y nodos]{Gráficas de funciones de activación e inspección de neuronas y \protect\gls{nodo}s}
 
-Se incorpora una interacción común para consultar neuronas de la red y \gls{nodo}s del árbol.
-Al pulsar uno de estos elementos, la ventana explicativa cambia su contenido y el elemento seleccionado queda resaltado para indicar a qué parte de la estructura se refiere la información.
+Se incorpora el poder consultar la información interna de las neuronas de la red y \gls{nodo}s del árbol.
+Antes, la información de la pureza de un nodo del árbol se mostraba al arrastrar el ratón por encima como un número, sin acompañar de ninguna explicación.
+Ahora, al pulsar uno de ellos, la ventana explicativa cambia su contenido para mostrar con más contexto la misma información como se aprecia en la Figura \ref{fig:final_nodo_resaltado}.
+Lo mismo sucede en las neuronas.
+A mayores, el elemento seleccionado queda resaltado para indicar a qué parte de la estructura se refiere la información.
 Una nueva pulsación restaura la explicación anterior.
 El avance del algoritmo puede continuar después de la consulta, y también es posible inspeccionar otros \gls{nodo}s o neuronas sin reiniciar el proceso activo.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.75\textwidth]{imaxes/final_nodo_resaltado.png}
+  \caption{Ejemplo de un nodo resaltado durante el entrenamiento de un árbol de decisión.}
+  \label{fig:final_nodo_resaltado}
+\end{figure}
 
 La explicación de las funciones de activación se refuerza con gráficas.
 Se generan imágenes para funciones como ReLU, sigmoide e identidad.
 Las gráficas se preparan con fondo transparente, ejes claros y cuadrícula tenue para integrarse en la estética oscura de la aplicación.
 Después se incorporan como texturas a la ventana informativa de la red.
-Durante el forward pass, la ventana puede mostrar la gráfica asociada a la función de activación de la capa que se está calculando.
+Durante el forward pass, la ventana puede mostrar la gráfica asociada a la función de activación de la capa que se está calculando como se ve en la Figura \ref{fig:funcion_activacion}.
 Cuando la explicación pasa a otro tipo de contenido, como la carga de datos, la retropropagación o el fin del entrenamiento, la gráfica se limpia junto con la fórmula anterior.
 Esta limpieza mantiene la ventana centrada en el paso actual y evita que una representación matemática permanezca visible fuera de contexto.
 
 El último paso consiste en marcar sobre la gráfica el punto evaluado por la neurona.
 La ventana toma la entrada ponderada, la salida activada y la función correspondiente, y transforma esos valores en una posición dentro del área útil de la imagen.
-Sobre ella se dibuja un marcador rojo que indica qué punto de la curva se está usando en ese cálculo concreto.
+Sobre ella se dibuja un marcador rojo que indica qué punto de la curva se está usando en ese cálculo concreto, como también se aprecia en la Figura \ref{fig:funcion_activacion}.
 Así se conectan el valor numérico de entrada, la fórmula aplicada y la forma de la función de activación dentro de la ventana explicativa.
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.75\textwidth]{imaxes/final_funcion_activacion.png}
+  \caption{Etapa del \textit{forward pass} en la que se ve en la ventana la función de activación dibujada junto con el punto que marca la salida de la función.}
+  \label{fig:funcion_activacion}
+\end{figure}
 
-\subsection{Selección de conjuntos de datos y validaciones de inferencia}
+\subsection{Selección de conjuntos de datos}
+\label{sec:seleccoin_de_conjuntos_de_datos}
 
 La carga de datos ya existía en fases anteriores.
-En esta etapa se revisa para hacerla más flexible y segura.
-El árbol y la red tienen necesidades distintas, y ambos requieren un panel de selección más claro junto con validaciones previas al entrenamiento o la evaluación.
+En esta etapa se mejora la usabilidad del panel de carga al mejorarlo a nivel estético y de funcionalidades.
+Visualmente se aprecia en la Figura \ref{fig:final_dsp} mejoras en la legibilidad gracias a la nueva distribución de la información en el panel.
+Y en cuando a funcionlidades, se implementó, para su uso desde el navegador, un puente de JavaScript que permite leer archivos desde la aplicación exportada al navegador.
+Este se usa cuándo la aplicación detecta que el entorno de ejecución es web.
+Se encarga de llamar al recurso del navegador que permite el acceso a archivos en local, para que después el motor de Godot se encarge de procesar lo seleccionado.
+Hasta que se implementó este cambio, en la versión web se habría un menú nativo de Godot sin acceso al ordenador del usuario.
+Las pruebas de carga se podían seguir realizando, pero desde el editor.
+Con esta funcionalidad implementada se puede también cargar con nomalidad un csv también desde la aplicación desplegada.
+Esto sería usado tambíen para la carga y cuardado de modelos, como se detalla en la Sección \ref{sec:persistencia_carga_y_validacion_de_modelos}.
+
+\begin{figure}[H]
+  \centering
+  \begin{minipage}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{imaxes/final_dsp_1.png}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{imaxes/final_dsp_2.png}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{imaxes/final_dsp_3.png}
+  \end{minipage}
+  \caption{Diferentes estados de la carga de un dataset desde un csv.}
+  \label{fig:final_dsp}
+\end{figure}
 
 En el árbol de decisión se amplían los conjuntos de datos internos.
 El conjunto de frutas incorpora más instancias, clases con características compartidas y casos que pueden generar hojas impuras.
@@ -1223,18 +1267,18 @@ Estos conjuntos permiten observar estructuras más variadas que las usadas en la
 También se incorpora al árbol la selección explícita de la variable objetivo, una función que ya estaba presente en el selector de datos de la red.
 
 En la red neuronal se revisan también los conjuntos internos.
-El conjunto de prueba inicial se sustituye por Iris, un ejemplo clásico de clasificación multiclase con cuatro entradas numéricas y salida \textit{softmax}.
+El conjunto de prueba inicial se sustituye por Iris, un ejemplo clásico de clasificación multiclase con cuatro entradas numéricas y salida \textit{softmax}, y se aumentan las entradas de \textit{Cultivos}, un dataset de regresión sintético.
 
 También se añaden validaciones básicas de estructura.
 La aplicación informa si el archivo no puede abrirse, si no contiene suficientes columnas, si no hay filas válidas o si todavía no se ha escogido una variable objetivo.
 El botón de selección permanece desactivado hasta que la configuración es suficiente para continuar.
 Así se evita iniciar el algoritmo con datos incompletos.
 
-La carga de conjuntos de datos para inferencia requiere validaciones propias.
-Cuando el usuario evalúa un árbol o una red entrenada, el nuevo conjunto debe ser compatible con el usado durante el entrenamiento.
-En el árbol se comprueba que estén los atributos requeridos y la variable objetivo esperada.
-En la red se comprueba que las entradas y salidas tengan la misma estructura que el modelo aprendió.
-Estas comprobaciones impiden evaluar con columnas ausentes, extra o en un orden incompatible.
+%La carga de conjuntos de datos para inferencia añade validaciones propias.
+%Cuando el usuario evalúa un árbol o una red entrenada, el nuevo conjunto debe ser compatible con el usado durante el entrenamiento.
+%En el árbol se comprueba que estén los atributos requeridos y la variable objetivo esperada.
+%En la red se comprueba que las entradas y salidas tengan la misma estructura que el modelo aprendió.
+%Estas comprobaciones impiden evaluar con columnas ausentes, extra o en un orden incompatible.
 
 Por último se traducen todos los conjuntos de datos al castellano.
 Los nombres de atributos y valores pasan a estar alineados con el idioma de la interfaz y de la memoria.
@@ -1261,7 +1305,7 @@ Si la pila queda fuera del área inicial del árbol, el lienzo se amplía para q
 
 Otra mejora introducida es el avance \gls{nodo} a \gls{nodo}.
 En lugar de mover un dato desde la raíz hasta la hoja en una única animación, la aplicación mantiene un dato activo y un \gls{nodo} activo.
-Cada pulsación avanza una decisión: el dato entra por la raíz, después se escoge la rama correspondiente al valor del atributo y finalmente llega a una hoja.
+Cada pulsación avanza una decisión, empezando cuando el dato entra por la raíz, después cuando se escoge la rama correspondiente al valor del atributo, y así sucesivamente hasta que llega a una hoja.
 Este cambio aplica a la evaluación la misma lógica de avance incremental utilizada durante la construcción del árbol.
 
 Para dar robustez a las animaciones, cada dato mantiene su propia cola de movimientos.
@@ -1277,7 +1321,7 @@ Si no coinciden, distingue entre una hoja pura y una hoja impura: en el primer c
 Si se pulsa uno de los datos en evaluación, la ventana muestra su información interna, formada por sus atributos y su etiqueta.
 La inspección del árbol ya construido se mantiene disponible durante la evaluación, de forma que los \gls{nodo}s del árbol pueden seguir seleccionándose para consultar su información.
 
-Este proceso se muestra en la Figura \ref{fig:final_dtree_evaluacion}.
+En la Figura \ref{fig:final_dtree_evaluacion} se puede ver el resultado.
 
 \begin{figure}[H]
   \centering
@@ -1287,44 +1331,40 @@ Este proceso se muestra en la Figura \ref{fig:final_dtree_evaluacion}.
 \end{figure}
 
 \subsection{Persistencia, carga y validación de modelos}
+\label{sec:persistencia_carga_y_validacion_de_modelos}
 
-La última tarea transversal se centra en conservar resultados, recuperarlos desde archivo y contrastar los cálculos que muestra la aplicación.
+La última tarea se centra en conservar resultados, recuperarlos desde archivo y contrastar los cálculos que muestra la aplicación.
 Esta necesidad aparece en los dos modelos y se resuelve con formatos distintos.
 En el árbol de decisión se guarda una estructura visual y lógica propia de la aplicación.
-En la red neuronal se guardan los parámetros de un modelo entrenado en un formato que pueda usarse también fuera de Godot.
+En la red neuronal se guardan los parámetros de un modelo entrenado en un formato que pueda usarse también fuera de la aplicación.
 
 En la versión web, tanto la carga como el guardado de archivos necesitan una integración específica con el navegador.
-Para ello se utiliza un puente de JavaScript que permite abrir selectores HTML, leer archivos elegidos por el usuario y generar descargas desde la aplicación exportada.
-Esta capa tiene un papel transversal: se usa para los modelos del árbol, para los modelos de la red y para cualquier operación de persistencia que deba atravesar las restricciones del navegador.
-Después de esta comunicación con JavaScript, Godot puede tratar el archivo cargado o preparar el contenido que se descargará.
+Para ello se utiliza un puente de JavaScript que permite leer archivos elegidos por el usuario y generar descargas desde la aplicación exportada.
+Esta capa tiene un papel transversal, ya que se usa tanto para guardar y cargar ambos tipos de modelos, como para cargar csvs como se cuenta en la Sección \ref{sec:persistencia_carga_y_validacion_de_modelos}
+%Después de esta comunicación con JavaScript, Godot puede tratar el archivo cargado o preparar el contenido que se descargará.
 
 En el árbol de decisión se implementa guardado y carga en formato JSON.
 El guardado conserva la estructura del árbol, la información visible de sus \gls{nodo}s y ramas, y los metadatos del conjunto de datos cuando están disponibles.
 Esto permite recuperar un árbol con su forma visual y con la información necesaria para seguir inspeccionándolo o evaluándolo.
+Para la carga, primero se valida la estructura, después se vacía el árbol que esté en la aplicación en ese momento y vuelve por último vuelve a crear los \gls{nodo}s en base a lo que indique el archivo.
+Tras una carga válida, el controlador configura el árbol como una estructura ya entrenada, preparando la \gls{Escena} para ello.
+%Si el archivo no contiene metadatos de atributos, la aplicación intenta inferirlos a partir de la raíz o de los atributos usados por los \gls{nodo}s.
+%Esta recuperación amplía la compatibilidad con archivos generados en fases anteriores.
 
-La carga reconstruye el árbol a partir del archivo guardado.
-Primero valida la estructura, limpia el árbol actual y vuelve a crear los \gls{nodo}s.
-Después restaura la raíz, reorganiza la vista y actualiza el tamaño del lienzo.
-Tras una carga válida, el controlador configura el árbol como una estructura ya entrenada.
-Para ello oculta los controles de entrenamiento, muestra la opción de evaluación y prepara el estado interno para que el árbol cargado pueda clasificarse directamente.
-Si el archivo no contiene metadatos de atributos, la aplicación intenta inferirlos a partir de la raíz o de los atributos usados por los \gls{nodo}s.
-Esta recuperación amplía la compatibilidad con archivos generados en fases anteriores.
-
-En la red neuronal, la carga de modelos se sitúa en el menú de creación, ya que ese menú define o sustituye la arquitectura antes de entrenar o evaluar.
-La aplicación abre un cuadro para escoger el archivo y trabaja con ONNX~\cite{ONNX} como formato implementado para esta operación.
+En la red neuronal, el guardado de la red se sitúa en el menú de navegación, como el árbol.
+Mientras, la carga de modelos se sitúa en el menú de creación, ya que ese menú define o sustituye la arquitectura antes de entrenar o evaluar.
+La aplicación trabaja con ONNX~\cite{ONNX} como formato implementado para esta operación.
 ONNX, siglas de \textit{Open Neural Network Exchange}, es un formato abierto para representar modelos de aprendizaje automático y facilitar su intercambio entre herramientas compatibles.
-Los modelos importados se procesan en un \gls{Nodo} dedicado, que convierte pesos, sesgos y funciones de activación a las estructuras internas de la aplicación.
-Si la carga falla, el menú muestra un mensaje de error; si se completa, la red visible se reconstruye con el modelo importado.
+Tanto los modelos importados como exportados se procesan en un \gls{Nodo} dedicado, que convierte el archivo a las estructuras internas de la aplicación o viceversa.
+Si la carga falla, el menú muestra un mensaje de error, si se completa, la red visible se reconstruye con el modelo importado.
 
-Antes de confirmar que la red cargada puede usarse, la aplicación valida su compatibilidad con el conjunto de datos seleccionado.
+Antes de confirmar que una red cargada puede usarse, la aplicación valida su compatibilidad con el conjunto de datos seleccionado.
 El modelo debe tener el número esperado de neuronas de entrada y de salida.
 Cuando alguna dimensión no coincide, la interfaz informa de la diferencia entre la arquitectura cargada y la requerida por los datos actuales.
 Esta comprobación impide entrenar o ejecutar inferencia con un modelo que no puede recibir las columnas seleccionadas o que no produce las salidas esperadas.
 
-El guardado de la red se realiza mediante un panel de exportación que permite generar una representación del modelo entrenado para usarla fuera de la aplicación.
-Esa representación está basada en el estándar ONNX.
-Como los archivos de exportación son creados por la propia aplicación, se realiza una verificación con un script de Python para comprobar que la transformación de una red a ONNX conserva sus parámetros.
-La prueba parte de una red entrenada dentro de la aplicación, mostrada en la Figura~\ref{fig:resultados_pesos_aplicacion_en_aplicacion}.
+La implementación de esta exportación fué validada con un script de Python.
+En este se verificaba que la red de la Figura~\ref{fig:resultados_pesos_aplicacion_en_aplicacion}, extraida de la aplicación, era reconocida por la librería de ONNX y que sus parámetros coincidían.
 En la neurona de salida se observan pesos cercanos a \(1.943\), \(1.929\) y \(-0.965\), junto con un sesgo cercano a \(0.994\).
 
 \begin{figure}[H]
@@ -1334,9 +1374,7 @@ En la neurona de salida se observan pesos cercanos a \(1.943\), \(1.929\) y \(-0
   \label{fig:resultados_pesos_aplicacion_en_aplicacion}
 \end{figure}
 
-Después de exportar esa red a ONNX, el script externo carga el archivo generado y muestra los parámetros de salida.
-Como se muestra en la Figura~\ref{fig:resultados_pesos_aplicacion_a_onnx}, los valores leídos desde el archivo coinciden con los mostrados por la aplicación salvo por pequeñas variaciones numéricas.
-Las pequeñas diferencias se deben al redondeo visual y a la precisión numérica usada en cada entorno.
+Como se muestra en la Figura~\ref{fig:resultados_pesos_aplicacion_a_onnx}, los valores leídos desde el archivo coinciden con los mostrados por la aplicación salvo por el redondeo hecho por la interfaz del editor de Godot.
 Con esta comparación se comprueba que la exportación conserva el orden y el valor de los parámetros aprendidos.
 
 \begin{figure}[H]
@@ -1346,8 +1384,8 @@ Con esta comparación se comprueba que la exportación conserva el orden y el va
   \label{fig:resultados_pesos_aplicacion_a_onnx}
 \end{figure}
 
-También se comprueba el sentido inverso.
-Para ello se genera fuera de la aplicación una red sintética con pesos exactos \(2.0\), \(2.0\) y \(-1.0\), y con sesgo \(1.0\).
+También se comprobó el sentido inverso.
+Para ello se generó fuera de la aplicación una red sintética con pesos exactos \(2.0\), \(2.0\) y \(-1.0\), y con sesgo \(1.0\).
 La salida de terminal de la Figura~\ref{fig:resultados_pesos_onnx_sintetico} recoge esos valores antes de importar el modelo en Godot.
 
 \begin{figure}[H]
@@ -1358,7 +1396,8 @@ La salida de terminal de la Figura~\ref{fig:resultados_pesos_onnx_sintetico} rec
 \end{figure}
 
 Al importar ese archivo en la aplicación, la red reconstruida conserva los mismos parámetros, tal como se muestra en la Figura~\ref{fig:resultados_pesos_onnx_importado}.
-Esta prueba completa la comprobación de interoperabilidad: los modelos entrenados en la aplicación pueden exportarse a ONNX y los modelos creados fuera pueden importarse con sus pesos y sesgos correctamente asignados.
+Esta prueba completa la comprobación de interoperabilidad.
+Los modelos entrenados en la aplicación pueden exportarse a ONNX y los modelos creados fuera pueden importarse con sus pesos y sesgos correctamente asignados.
 
 \begin{figure}[H]
   \centering
@@ -1369,14 +1408,19 @@ Esta prueba completa la comprobación de interoperabilidad: los modelos entrenad
 
 \subsection{Comprobación de resultados con bibliotecas externas}
 
-Junto con la persistencia de los modelos, se contrastan los resultados de los algoritmos con implementaciones de referencia fuera de Godot.
-El objetivo es verificar que la aplicación representa una ejecución didáctica cuyos cálculos coinciden con los obtenidos mediante bibliotecas estándar: scikit-learn~\cite{ScikitLearn} para el árbol de decisión y PyTorch~\cite{PyTorch} para la red neuronal.
+Junto con la persistencia de los modelos, se contrastaron los resultados de los algoritmos implementados con librerías de referencia.
+El objetivo es verificar que la aplicación representa una ejecución didáctica cuyos cálculos coinciden con los obtenidos mediante bibliotecas estándar.
+Concretamente scikit-learn~\cite{ScikitLearn} para el árbol de decisión y PyTorch~\cite{PyTorch} para la red neuronal.
 
-En el caso del árbol de decisión, la comprobación se realiza con un conjunto categórico sintético.
-Primero se entrena una referencia externa con scikit-learn usando los mismos datos.
+En el caso del árbol de decisión, la comprobación se realizó con un conjunto categórico sintético.
+Primero se entrenó una referencia externa con scikit-learn usando los mismos datos.
 La Figura~\ref{fig:resultados_dtree_sintetico} muestra la estructura obtenida desde el script de comprobación, impresa en la terminal.
 La captura recoge solo los primeros \gls{nodo}s del árbol completo por limitación de espacio.
 Esa parte permite identificar la raíz, las primeras ramas y varias hojas resultantes.
+
+Al entrenar el árbol con ese mismo conjunto de datos desde la aplicación se obtiene la estructura de la Figura~\ref{fig:resultados_dtree_aplicacion}.
+La coincidencia entre ambas salidas se aprecia en la raíz, en las ramas principales y en las etiquetas finales asociadas a las hojas.
+Esta comparación confirma que la implementación del algoritmo en Godot toma las mismas decisiones de división que la referencia externa para este caso de prueba, y que la representación visual mantiene la información lógica necesaria para interpretar el modelo entrenado.
 
 \begin{figure}[H]
   \centering
@@ -1384,10 +1428,6 @@ Esa parte permite identificar la raíz, las primeras ramas y varias hojas result
   \caption{Primeros \protect\gls{nodo}s de la estructura final de un árbol de decisión obtenido con scikit-learn a partir de un conjunto sintético.}
   \label{fig:resultados_dtree_sintetico}
 \end{figure}
-
-Al entrenar el árbol con ese mismo conjunto de datos desde la aplicación se obtiene la estructura de la Figura~\ref{fig:resultados_dtree_aplicacion}.
-La coincidencia entre ambas salidas se aprecia en la raíz, en las ramas principales y en las etiquetas finales asociadas a las hojas.
-Esta comparación confirma que la implementación del algoritmo en Godot toma las mismas decisiones de división que la referencia externa para este caso de prueba, y que la representación visual mantiene la información lógica necesaria para interpretar el modelo entrenado.
 
 \begin{figure}[H]
   \centering
