@@ -157,7 +157,7 @@ El algoritmo calcula qué tipo de \gls{nodo} debe crearse en cada momento y emit
 El controlador recibe esa información (Controller) y la traduce a cambios en la \gls{Escena} (View), creando o actualizando los \gls{nodo}s visibles.
 Con esta división, la lógica de aprendizaje queda aislada de los elementos gráficos de Godot, y la vista representa el resultado de cada decisión.
 La Figura \ref{fig:diagrama_mvc_arbol} resume esta relación entre el algoritmo, el controlador y las partes visibles de la \gls{Escena}.
-Este esquema general es la base de la implementación de la red neuronal, detallada en Sección \ref{}.
+Este esquema general es la base de la implementación de la red neuronal, detallada en la Sección~\ref{sec:red_neuronal_version_03}.
 
 \begin{figure}[H]
   \centering
@@ -192,7 +192,8 @@ Este esquema general es la base de la implementación de la red neuronal, detall
     \node[model, right=1cm of controller] (model) {\textbf{Model}\\\texttt{AlgorithmDTree}\\\texttt{AlgorithmNn}\\\footnotesize Calcula los pasos del algoritmo y conserva valores parciales};
     \node[external, above=1.35cm of view] (user) {Usuario\\\footnotesize Avanza el entrenamiento};
 
-    \draw[signal] (user) to[bend left=30] node[right=3pt, flowlabel]{pulsa\\controles} (controller);
+    %\draw[signal] (user) to[bend left=30] node[right=3pt, flowlabel]{pulsa\\controles} (controller);
+    \draw[signal] (user) to[bend left=30] node[right=3pt, flowlabel]{pulsa\\controles} (view);
     \draw[signal] (view) -- node[above=3pt, flowlabel]{Señales} (controller);
     \draw[signal] (controller) -- node[above=3pt, flowlabel]{solicita\\paso} (model);
     \draw[feedback] (model) to[bend left=40] node[below=7pt, flowlabel]{resultado del paso\\y detalles} (controller);
@@ -503,11 +504,75 @@ Esta prueba establece la base del modo de evaluación: representar visualmente c
 
 Con este conjunto de cambios queda completada la primera versión significativa del árbol de decisión.
 El módulo permite entrenar un árbol categórico paso a paso, mantener una estructura lógica sincronizada con la \gls{Escena}, mostrar ramas con valores, distinguir \gls{nodo}s internos, hojas y \gls{nodo}s pendientes, animar los cambios, explicar las decisiones con texto y gráficas, cargar datos sencillos, retroceder por la construcción y evaluar ejemplos nuevos de forma visual.
+
+La arquitectura concreta que queda al final de esta fase se resume en la Figura \ref{fig:arquitectura_modulo_arbol}.
+El módulo se reparte entre los paneles de entrada, el controlador, el algoritmo, la estructura lógica y los elementos de explicación.
+El controlador coordina las acciones del usuario, solicita pasos a \texttt{AlgorithmDTree} y aplica cada resultado sobre \texttt{DTree}.
+El algoritmo mantiene los contextos pendientes y ejecutados mediante \texttt{call\_stack} y \texttt{called\_stack}, y devuelve el diccionario \texttt{details} junto con el resultado del paso.
+La estructura lógica conserva identificadores, relaciones y posiciones, a partir de los cuales se actualizan los \gls{nodo}s visibles, las conexiones y la copia usada durante la evaluación.
+
+\begin{figure}[H]
+  \centering
+  \resizebox{\textwidth}{!}{%
+  \begin{tikzpicture}[
+    font=\scriptsize,
+    >=Latex,
+    block/.style={
+      draw,
+      rounded corners=3pt,
+      line width=0.5pt,
+      align=center,
+      minimum height=1cm,
+      text width=2.9cm,
+      inner sep=4pt
+    },
+    panel/.style={block, fill=gray!10, draw=gray!60!black, text width=3.05cm},
+    controller/.style={block, fill=orange!12, draw=orange!65!black, text width=3.05cm},
+    model/.style={block, fill=blue!8, draw=blue!60!black, text width=3.05cm},
+    view/.style={block, fill=green!10, draw=green!45!black},
+    info/.style={block, fill=purple!8, draw=purple!55!black},
+    flow/.style={-{Latex[length=2.2mm]}, line width=0.55pt},
+    flowlabel/.style={font=\tiny, align=center, fill=white, inner sep=1.2pt}
+  ]
+    \node[panel] (dataset) at (-2.5,0) {{\ttfamily PanelDataset\allowbreak{}Selection}\\\tiny Selección del dataset};
+    \node[panel] (algpanel) at (2.5,0) {{\ttfamily PanelAlgorithm\allowbreak{}DTree}\\\tiny Avanzar, retroceder y evaluar};
+
+    \node[info] (window) at (-4.25,-2.9) {\texttt{Window}\\\tiny Mostrar texto, gráficas y fórmulas};
+    \node[info] (eval) at (4.25,-2.9) {{\ttfamily EvalData}\\\tiny Recorrer el árbol};
+    \node[view] (logical) at (0,-4.35) {\texttt{DTree}\\\tiny Identificadores,\\relaciones\\y posiciones};
+    \node[view] (dnode) at (-4.25,-5.8) {\texttt{DNode}\\\tiny Nodo de decisión,\\hoja o pendiente};
+    \node[view] (connections) at (4.25,-5.8) {{\ttfamily Conection}\\\tiny Ramas y sus etiquetas};
+
+    \node[controller] (controller) at (0,-8.7) {{\ttfamily Controller\allowbreak{}DTree}\\\tiny Coordina acciones y escena};
+    \node[model] (algorithm) at (0,-11.7) {\texttt{AlgorithmDTree}\\\tiny Ejecuta ID3 paso a paso};
+
+    \draw[flow] (dataset.west) -- ++(-3.45,0) |- node[pos=0.78, left, flowlabel]{dataset seleccionado} ([yshift=2.5mm]controller.west);
+    \draw[flow] (algpanel.east) -- ++(3.45,0) |- node[pos=0.78, right, flowlabel]{acciones del usuario} ([yshift=2.5mm]controller.east);
+
+    \draw[flow] (controller.north) -- node[right, flowlabel]{crea y actualiza\\el árbol visible} (logical.south);
+    \draw[flow] (controller.west) -- ++(-5.0,0) |- node[pos=0.7, left, flowlabel]{actualiza\\explicación} (window.west);
+    \draw[flow] (controller.east) -- ++(5.0,0) |- node[pos=0.7, right, flowlabel]{activa\\evaluación} (eval.east);
+
+    \draw[flow] (logical.west) -- node[above, flowlabel]{organiza\\nodos} (dnode.east);
+    \draw[flow] (logical.east) -- node[above, flowlabel]{actualiza\\ramas} (connections.west);
+    \draw[flow] (logical.east) -- node[above, flowlabel]{posiciones de\\los nodos} (eval.south |- logical.east) -- (eval.south);
+    \draw[flow] (eval.west) -- node[above, flowlabel]{dato activo\\y resultado} (window.east);
+
+    \draw[flow] ([xshift=-4mm]controller.south) -- node[left, flowlabel]{solicita paso\\o retroceso} ([xshift=-4mm]algorithm.north);
+    \draw[flow] ([xshift=4mm]algorithm.north) -- node[right, flowlabel]{resultado del paso\\y \texttt{details}} ([xshift=4mm]controller.south);
+    \draw[flow] ([yshift=1.5mm]algorithm.east) to[out=15,in=-15,looseness=6] node[right, flowlabel]{\texttt{call\_stack}: pendientes\\\texttt{called\_stack}: ejecutados} ([yshift=-1.5mm]algorithm.east);
+  \end{tikzpicture}%
+  }
+  \caption{Arquitectura específica del módulo del árbol de decisión durante el entrenamiento, el retroceso y la evaluación.}
+  \label{fig:arquitectura_modulo_arbol}
+\end{figure}
+
 A partir de aquí, el desarrollo continúa con el segundo algoritmo de la aplicación: la red neuronal.
 
 
 
 \section{Red neuronal: versión 0.3}
+\label{sec:red_neuronal_version_03}
 
 Una vez completada la primera versión funcional del árbol de decisión, el proyecto incorpora la red neuronal multicapa, el segundo modelo previsto.
 El cambio de algoritmo implica también un cambio en el tipo de visualización necesaria.
@@ -519,7 +584,7 @@ Por esta razón, el desarrollo de la red empieza por resolver un problema distin
 Antes de mostrar el forward pass o el backward pass, la aplicación debe representar una arquitectura formada por capas, neuronas y conexiones densas, con una correspondencia clara con el modelo lógico que se va a entrenar.
 La red visible funciona como soporte para los cálculos posteriores, en los que cada neurona debe poder resaltarse, y cada conexión debe poder actualizarse.
 
-La \gls{Escena} de red neuronal sigue el mismo patrón de diseño Model-View-Controller utilizado en el árbol de decisión.
+La \gls{Escena} de red neuronal sigue el mismo patrón de diseño Model-View-Controller utilizado en el árbol de decisión, mostrado en la Figura \ref{fig:diagrama_mvc_arbol}.
 La lógica matemática, la representación visual y los elementos informativos se separan en componentes distintos, comunicados mediante Señales.
 Esta separación permite que el algoritmo avance paso a paso y que la \gls{Escena} represente el estado correspondiente en cada momento.
 El resultado de esta versión es el núcleo funcional de la red, que cuenta con una arquitectura configurable, adaptada al conjunto de datos, entrenable de forma incremental y capaz de mostrar tanto el flujo de datos hacia delante como el retorno del error.
