@@ -152,7 +152,7 @@ En la primera versión de la interfaz se incluye un botón para iniciar el proce
   \label{fig:dtree_view_start_next_english}
 \end{figure}
 
-La construcción paso a paso se apoya en una separación de responsabilidades basada en el patrón Model-View-Controller.
+La construcción paso a paso se apoya en una separación de responsabilidades basada en el patrón Model-View-Controller~\cite{KrasnerPopeMVC}.
 El algoritmo calcula qué tipo de \gls{nodo} debe crearse en cada momento y emite la información necesaria para hacerlo (Model).%, incluyendo el padre, el valor de la rama, el atributo elegido, la etiqueta si se trata de una hoja y los datos explicativos del paso.
 El controlador recibe esa información (Controller) y la traduce a cambios en la \gls{Escena} (View), creando o actualizando los \gls{nodo}s visibles.
 Con esta división, la lógica de aprendizaje queda aislada de los elementos gráficos de Godot, y la vista representa el resultado de cada decisión.
@@ -819,7 +819,7 @@ Después muestra cómo ese delta genera gradientes de pesos y cómo esos gradien
 %%Así, la misma infraestructura permite observar el entrenamiento con distintos niveles de detalle.
 
 %%Las fórmulas pueden mostrarse como texto plano o con un renderizado matemático más elaborado.
-Las fórmulas pueden mostrarse como texto plano o con un renderizado matemático basado en una petición https. % como se aprecia en las Figuras \ref{fig:nn_ventana} y \ref{fig:nn_ventana_latex}.
+Las fórmulas pueden mostrarse como texto plano o con un renderizado matemático basado en una petición https a Math API~\cite{MathAPI}. % como se aprecia en las Figuras \ref{fig:nn_ventana} y \ref{fig:nn_ventana_latex}.
 Esta configuración era una opción booleana que se establecía desde código.
 El objetivo es mostrar con mejor calidad operaciones complicadas de representar en texto plano como las derivadas.
 En las Figuras \ref{fig:nn_ventana_latex_derivada} y \ref{fig:nn_ventana_texto_derivada} se ve la diferencia entre el texto plano y la fórmula renderizada. 
@@ -1107,7 +1107,7 @@ En la Figura \ref{fig:final_actualizacion} se puede apreciar esta visualización
 La ventana informativa de la red y la del árbol necesitan mostrar expresiones matemáticas para completar las explicaciones.
 En las primeras versiones, las fórmulas podían representarse como texto plano.
 Esa solución resultaba limitada para explicar operaciones como la derivada de los pesos, o expresiones matriciales.
-También se probó a renderizar las fórmulas por medio de una petición https a un servidor que se encargaba de generar la imágen ??.
+También se probó a renderizar las fórmulas por medio de una petición https a Math API, un servicio que generaba la imagen a partir de una expresión LaTeX.
 Pero esto introducía una latencia de segundos entre que aparecía la explicación y se mostraba la fórmula 
 Por ello se dedica una tarea específica a integrar un sistema de renderizado LaTeX dentro de la aplicación.
 
@@ -1232,8 +1232,8 @@ Así se conectan el valor numérico de entrada, la fórmula aplicada y la forma 
 La carga de datos ya existía en fases anteriores.
 En esta etapa se mejora la usabilidad del panel de carga al mejorarlo a nivel estético y de funcionalidades.
 Visualmente se aprecia en la Figura \ref{fig:final_dsp} mejoras en la legibilidad gracias a la nueva distribución de la información en el panel.
-Y en cuando a funcionlidades, se implementó, para su uso desde el navegador, un puente de JavaScript que permite leer archivos desde la aplicación exportada al navegador.
-Este se usa cuándo la aplicación detecta que el entorno de ejecución es web.
+Y en cuando a funcionlidades, se implementó, para su uso desde el navegador, una conexión con JavaScript que permite leer archivos desde la aplicación exportada al navegador.
+Esta se usa cuándo la aplicación detecta que el entorno de ejecución es web.
 Se encarga de llamar al recurso del navegador que permite el acceso a archivos en local, para que después el motor de Godot se encarge de procesar lo seleccionado.
 Hasta que se implementó este cambio, en la versión web se habría un menú nativo de Godot sin acceso al ordenador del usuario.
 Las pruebas de carga se podían seguir realizando, pero desde el editor.
@@ -1267,7 +1267,7 @@ Estos conjuntos permiten observar estructuras más variadas que las usadas en la
 También se incorpora al árbol la selección explícita de la variable objetivo, una función que ya estaba presente en el selector de datos de la red.
 
 En la red neuronal se revisan también los conjuntos internos.
-El conjunto de prueba inicial se sustituye por Iris, un ejemplo clásico de clasificación multiclase con cuatro entradas numéricas y salida \textit{softmax}, y se aumentan las entradas de \textit{Cultivos}, un dataset de regresión sintético.
+El conjunto de prueba inicial se sustituye por \textit{Iris}~\cite{Iris}, un ejemplo clásico de clasificación multiclase con cuatro entradas numéricas y salida \textit{softmax}, y se aumentan las entradas de \textit{Cultivos}, un dataset de regresión sintético.
 
 También se añaden validaciones básicas de estructura.
 La aplicación informa si el archivo no puede abrirse, si no contiene suficientes columnas, si no hay filas válidas o si todavía no se ha escogido una variable objetivo.
@@ -1339,8 +1339,8 @@ En el árbol de decisión se guarda una estructura visual y lógica propia de la
 En la red neuronal se guardan los parámetros de un modelo entrenado en un formato que pueda usarse también fuera de la aplicación.
 
 En la versión web, tanto la carga como el guardado de archivos necesitan una integración específica con el navegador.
-Para ello se utiliza un puente de JavaScript que permite leer archivos elegidos por el usuario y generar descargas desde la aplicación exportada.
-Esta capa tiene un papel transversal, ya que se usa tanto para guardar y cargar ambos tipos de modelos, como para cargar csvs como se cuenta en la Sección \ref{sec:persistencia_carga_y_validacion_de_modelos}
+Para ello se utiliza una conexión con JavaScript que permite leer archivos elegidos por el usuario y generar descargas desde la aplicación exportada.
+Esta conexión tiene un papel transversal, ya que se usa tanto para guardar y cargar ambos tipos de modelos, como para cargar csvs como se cuenta en la Sección \ref{sec:persistencia_carga_y_validacion_de_modelos}
 %Después de esta comunicación con JavaScript, Godot puede tratar el archivo cargado o preparar el contenido que se descargará.
 
 En el árbol de decisión se implementa guardado y carga en formato JSON.
