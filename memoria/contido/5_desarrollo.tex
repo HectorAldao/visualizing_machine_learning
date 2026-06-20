@@ -1441,10 +1441,10 @@ La prueba fija la misma arquitectura y los mismos datos de entrada para comparar
 Al ejecutar los mismos ejemplos, las salidas de la red de la aplicación coinciden con las de la red de PyTorch dentro de las diferencias esperables por precisión numérica.
 Esta comprobación permite verificar que los pesos, los sesgos y las funciones de activación se aplican en el mismo orden que en una implementación estándar.
 
-En conjunto, estas pruebas comprueban la correspondencia entre la interfaz y los modelos que calcula.
-En el árbol de decisión, la estructura visual coincide con una construcción externa equivalente.
-En la red neuronal, las salidas y las actualizaciones de parámetros coinciden con una red de referencia, y los valores entrenados se conservan al exportar e importar mediante ONNX.
+%En conjunto, estas pruebas comprueban la correspondencia entre la interfaz y los modelos que calcula.
+%En el árbol de decisión, la estructura visual coincide con una construcción externa equivalente.
+%En la red neuronal, las salidas y las actualizaciones de parámetros coinciden con una red de referencia, y los valores entrenados se conservan al exportar e importar mediante ONNX.
 
 Con todas estas mejoras, la aplicación queda organizada en torno a un flujo de uso que integra navegación, adaptación visual, explicación matemática, evaluación y persistencia.
-El menú principal contextualiza los algoritmos, las vistas se adaptan a distintos dispositivos, las fórmulas se renderizan dentro de Godot también en web, los conjuntos de datos se seleccionan con más control, la evaluación del árbol avanza paso a paso, la red ofrece explicaciones a varias escalas, las funciones de activación se acompañan con gráficas y los modelos pueden cargarse, guardarse o contrastarse con herramientas externas.
-El proyecto termina así con una correspondencia más precisa entre los cálculos internos, su representación visual y su explicación textual.
+El menú principal contextualiza los algoritmos, las vistas se adaptan a distintos dispositivos, las fórmulas se renderizan desde el motor también en web, los conjuntos de datos se seleccionan con más control, la evaluación del árbol avanza paso a paso, la red ofrece explicaciones a varias escalas, las funciones de activación se acompañan con gráficas y los modelos pueden cargarse, guardarse o contrastarse con herramientas externas.
+El proyecto termina así con una correspondencia más precisa y probada entre los cálculos internos, su representación visual y su explicación textual.
