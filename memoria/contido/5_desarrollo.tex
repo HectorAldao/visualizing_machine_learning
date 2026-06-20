@@ -156,6 +156,51 @@ La construcción paso a paso se apoya en una separación de responsabilidades ba
 El algoritmo calcula qué tipo de \gls{nodo} debe crearse en cada momento y emite la información necesaria para hacerlo (Model).%, incluyendo el padre, el valor de la rama, el atributo elegido, la etiqueta si se trata de una hoja y los datos explicativos del paso.
 El controlador recibe esa información (Controller) y la traduce a cambios en la \gls{Escena} (View), creando o actualizando los \gls{nodo}s visibles.
 Con esta división, la lógica de aprendizaje queda aislada de los elementos gráficos de Godot, y la vista representa el resultado de cada decisión.
+La Figura \ref{fig:diagrama_mvc_arbol} resume esta relación entre el algoritmo, el controlador y las partes visibles de la \gls{Escena}.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[
+    font=\small,
+    >=Latex,
+    component/.style={
+      draw,
+      rounded corners=3pt,
+      line width=0.55pt,
+      align=center,
+      minimum height=1.75cm,
+      text width=3.65cm,
+      inner sep=6pt
+    },
+    external/.style={
+      component,
+      fill=gray!10,
+      draw=gray!60!black,
+      text width=2.8cm,
+      minimum height=1.05cm
+    },
+    model/.style={component, fill=blue!8, draw=blue!55!black},
+    controller/.style={component, fill=orange!12, draw=orange!60!black},
+    view/.style={component, fill=green!10, draw=green!45!black},
+    signal/.style={-{Latex[length=2.4mm]}, line width=0.65pt},
+    feedback/.style={signal, dashed},
+    flowlabel/.style={font=\scriptsize, align=center, fill=white, inner sep=1.6pt}
+  ]
+    \node[view] (view) {\textbf{View}\\\texttt{dtree\_view}, \texttt{DNode} y ventana informativa\\\footnotesize Dibuja, anima y recibe eventos};
+    \node[controller, right=0.95cm of view] (controller) {\textbf{Controller}\\\texttt{ControllerDTree}\\\footnotesize Coordina botones, Señales y cambios en la Escena};
+    \node[model, right=0.95cm of controller] (model) {\textbf{Model}\\\texttt{AlgorithmDTree}\\\footnotesize Calcula ID3, conserva contextos y prepara detalles};
+    \node[external, above=1.35cm of view] (user) {Usuario\\\footnotesize Avanza el entrenamiento};
+
+    \draw[signal] (user) -- node[right=3pt, flowlabel]{pulsa\\controles} (view);
+    \draw[signal] (view) -- node[above=3pt, flowlabel]{Señales} (controller);
+    \draw[signal] (controller) -- node[above=3pt, flowlabel]{solicita\\paso} (model);
+    \draw[feedback] (model) to[bend left=30] node[below=7pt, flowlabel]{resultado del paso\\y detalles} (controller);
+    \draw[feedback] (controller) to[bend left=30] node[below=7pt, flowlabel]{nodos, ramas,\\animaciones y texto} (view);
+    \draw[feedback] (view) to[bend left=30] node[left=3pt, flowlabel]{árbol y\\explicación} (user);
+  \end{tikzpicture}
+  \caption{Separación de responsabilidades aplicada al árbol de decisión mediante el patrón Model-View-Controller.}
+  \label{fig:diagrama_mvc_arbol}
+\end{figure}
 
 El algoritmo no construye todo el árbol en una sola ejecución.
 El trabajo pendiente se almacena como una serie de contextos, cada uno con los datos necesarios para el cálculo de los cambios en el árbol y la creación de los siguientes contextos. %que llegan a una rama, los atributos disponibles, el padre visual y la profundidad correspondiente.
