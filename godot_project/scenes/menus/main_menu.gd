@@ -89,7 +89,7 @@ func _update_text(algorithm: int) -> void:
 		1: ["Árbol de decisión",
 			"El árbol de decisión es un modelo que clasifica los datos en base a sus características.
 
-Durante el entranamiento, en los nodos del árbol se decide qué característica de los datos usar para dividirlos de la forma que más se separen.
+Durante el entrenamiento, en los nodos del árbol se decide qué característica de los datos usar para dividirlos de la forma que más se separen.
 Este criterio de división es conocido como 'ganancia de información', y se puede calcular con fórmulas como la entropía.
 El particionamiento continúa en cada rama del árbol hasta que todos los ejemplos del nodo pertenecen a la misma clase o se han agotado las características a evaluar.
 
@@ -100,7 +100,7 @@ Durante el test, los datos descienden por las ramas que indican sus característ
 
 			Está formada por capas, que se conectan una detrás de otra. Estas capas contienen neuronas, que reciben como entrada las salidas de todas las neuronas de la capa anterior y devuelven un valor. Y cada neurona tiene unos números llamados 'pesos', y tiene tantos como neuronas haya en la capa anterior.
 
-El entrenamiento de una red cuenta con dos fases. La primera es la de propagación hacia adelante. El dato de entranamiento pasa por la red. La salida de la capa final es la predicción de la red para ese dato. La segunda es la retropropagación. En base a cuánto falló la red se calcula cuánto modificar los pesos para que la proxima vez falle menos."
+El entrenamiento de una red cuenta con dos fases. La primera es la de propagación hacia adelante. El dato de entrenamiento pasa por la red. La salida de la capa final es la predicción de la red para ese dato. La segunda es la retropropagación. En base a cuánto falló la red se calcula cuánto modificar los pesos para que la próxima vez falle menos."
 #La primera fase es la de propagación hacia adelante. Cada neurona calcula la multiplicación de sus entradas por los sus pesos, después los suma junto con un número (llamado bias), y al resultado lo pasa por una función (llamada función de activación).
 #La segunda fase es la retropropagación. De la última capa sale un número por cada neurona en esa capa. Esos números son la predicción de la red. Esta predicción se compara con el valor real que tendría que dar una red neuronal perfecta. Esta comparación se hace con una función de error, que devuelve un número diciendo cuánto ha fallado la red. Con respecto a este error se pueden calcular las derivadas parciales de los pesos de las neuronas. Y con estas derivadas se puede calcular cuánto cambiar los pesos para que la red falle menos.
 			]

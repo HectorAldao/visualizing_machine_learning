@@ -230,7 +230,7 @@ En la Figura \ref{fig:menu_manualmente_algoritmicamente} se muestra este panel i
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.75\textwidth]{imaxes/menu_manualmente_algoritmicamente.png}
+  \includegraphics[width=0.65\textwidth]{imaxes/menu_manualmente_algoritmicamente.png}
   \caption{Panel inicial de la \protect\gls{escena} del árbol para escoger entre creación manual y creación algorítmica.}
   \label{fig:menu_manualmente_algoritmicamente}
 \end{figure}
@@ -264,16 +264,16 @@ Hasta este punto, la \gls{escena} muestra qué elemento se añade al árbol en c
 La ventana se introduce para acompañar cada avance con un texto sincronizado con el estado interno del algoritmo.
 Su primera versión contiene un mensaje inicial que indica el inicio del entrenamiento, como se observa en la Figura \ref{fig:dtree_view_ventana_empezar_entrenamiento}.
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.85\textwidth]{imaxes/dtree_view_ventana_empezar_entrenamiento.png}
-  \caption{Primera versión de la ventana informativa integrada en la vista del árbol, todavía con un mensaje inicial que indica al usuario que debe comenzar el entrenamiento.}
-  \label{fig:dtree_view_ventana_empezar_entrenamiento}
-\end{figure}
-
 La ventana se implementa como un componente separado de la vista principal.
 Esta separación permite actualizar su contenido cada vez que el algoritmo procesa un contexto, sin mezclar la redacción de explicaciones con la creación de \gls{nodo}s en pantalla.
 El algoritmo prepara la información explicativa del paso actual y la ventana la recibe y transforma en texto integrado en la interfaz.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.75\textwidth]{imaxes/dtree_view_ventana_empezar_entrenamiento.png}
+  \caption{Primera versión de la ventana informativa integrada en la vista del árbol, todavía con un mensaje inicial que indica al usuario que debe comenzar el entrenamiento.}
+  \label{fig:dtree_view_ventana_empezar_entrenamiento}
+\end{figure}
 
 Los primeros textos explican la selección de un atributo en un \gls{nodo} interno, la creación de hojas puras cuando todos los ejemplos de una rama comparten etiqueta y la creación de hojas por mayoría cuando ya no quedan atributos útiles para continuar dividiendo.
 Durante las pruebas se comprueba que la información interna del algoritmo necesita una preparación previa antes de mostrarse.
@@ -326,18 +326,18 @@ De esta manera, la vista representa la sustitución de una posibilidad abierta p
 El aspecto de estos \gls{nodo}s pendientes se muestra en la Figura \ref{fig:dtree_nodos_pendientes}.
 % https://rawcdn.githack.com/HectorAldao/visualizing_machine_learning/55ac8e0508601cc7a456013159a7bfa8ba01f5d3/docs/index.html
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.85\textwidth]{imaxes/dtree_nodos_pendientes.png}
-  \caption{Entrenamiento del árbol en el que se aprecian los \protect\gls{nodo}s pendientes.}
-  \label{fig:dtree_nodos_pendientes}
-\end{figure}
-
 También se prueba una forma de consultar información asociada a \gls{nodo}s ya procesados.
 Al pasar por determinados \gls{nodo}s, el texto podía cambiar para mostrar un valor numérico vinculado a la decisión correspondiente.
 La solución permitía consultar información sin recargar visualmente todo el árbol.
 %Fuera de contexto, el número aislado tenía poca capacidad explicativa.
 %Esta prueba confirma que la explicación principal debía concentrarse en la ventana informativa, donde los valores pueden acompañarse de texto y comparaciones visuales.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.65\textwidth]{imaxes/dtree_nodos_pendientes.png}
+  \caption{Entrenamiento del árbol en el que se aprecian los \protect\gls{nodo}s pendientes.}
+  \label{fig:dtree_nodos_pendientes}
+\end{figure}
 
 
 \subsection{Gráficas y casos explicativos en la ventana}
@@ -354,7 +354,7 @@ La representación visual permite comparar qué atributo reduce en mayor medida 
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.85\textwidth]{imaxes/dtree_grafica_entropia.png}
+  \includegraphics[width=0.65\textwidth]{imaxes/dtree_grafica_entropia.png}
   \caption{Ventana informativa en la que se dibuja la gráfica de la métrica basada en la entropía para cada atributo.}
   \label{fig:dtree_grafica_entropia}
 \end{figure}
@@ -445,7 +445,7 @@ Por ello se añade el botón ``Paso previo'', visible en la Figura \ref{fig:dtre
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.85\textwidth]{imaxes/dtree_paso_previo.png}
+  \includegraphics[width=0.65\textwidth]{imaxes/dtree_paso_previo.png}
   \caption{Vista del árbol con el botón para retroceder al paso anterior.}
   \label{fig:dtree_paso_previo}
 \end{figure}
@@ -487,7 +487,7 @@ Cuando la pieza llega a una hoja, el recorrido termina y queda representada la c
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.85\textwidth]{imaxes/dtree_eval_data.png}
+  \includegraphics[width=0.65\textwidth]{imaxes/dtree_eval_data.png}
   \caption{Fase de evaluación en la que se ven dos datos ya clasificados y uno en proceso de clasificación.}
   \label{fig:dtree_eval_data}
 \end{figure}
@@ -511,61 +511,61 @@ El controlador coordina las acciones del usuario, solicita pasos a \texttt{Algor
 El algoritmo mantiene los contextos pendientes y ejecutados mediante \texttt{call\_stack} y \texttt{called\_stack}, y devuelve el diccionario \texttt{details} junto con el resultado del paso.
 La estructura lógica conserva identificadores, relaciones y posiciones, a partir de los cuales se actualizan los \gls{nodo}s visibles, las conexiones y la copia usada durante la evaluación.
 
-\begin{figure}[H]
-  \centering
-  \resizebox{\textwidth}{!}{%
-  \begin{tikzpicture}[
-    font=\scriptsize,
-    >=Latex,
-    block/.style={
-      draw,
-      rounded corners=3pt,
-      line width=0.5pt,
-      align=center,
-      minimum height=1cm,
-      text width=2.9cm,
-      inner sep=4pt
-    },
-    panel/.style={block, fill=gray!10, draw=gray!60!black, text width=3.05cm},
-    controller/.style={block, fill=orange!12, draw=orange!65!black, text width=3.05cm},
-    model/.style={block, fill=blue!8, draw=blue!60!black, text width=3.05cm},
-    view/.style={block, fill=green!10, draw=green!45!black},
-    info/.style={block, fill=purple!8, draw=purple!55!black},
-    flow/.style={-{Latex[length=2.2mm]}, line width=0.55pt},
-    flowlabel/.style={font=\tiny, align=center, fill=white, inner sep=1.2pt}
-  ]
-    \node[panel] (dataset) at (-2.5,0) {{\ttfamily PanelDataset\allowbreak{}Selection}\\\tiny Selección del dataset};
-    \node[panel] (algpanel) at (2.5,0) {{\ttfamily PanelAlgorithm\allowbreak{}DTree}\\\tiny Avanzar, retroceder y evaluar};
-
-    \node[info] (window) at (-4.25,-2.9) {\texttt{Window}\\\tiny Mostrar texto, gráficas y fórmulas};
-    \node[info] (eval) at (4.25,-2.9) {{\ttfamily EvalData}\\\tiny Recorrer el árbol};
-    \node[view] (logical) at (0,-4.35) {\texttt{DTree}\\\tiny Identificadores,\\relaciones\\y posiciones};
-    \node[view] (dnode) at (-4.25,-5.8) {\texttt{DNode}\\\tiny Nodo de decisión,\\hoja o pendiente};
-    \node[view] (connections) at (4.25,-5.8) {{\ttfamily Conection}\\\tiny Ramas y sus etiquetas};
-
-    \node[controller] (controller) at (0,-8.7) {{\ttfamily Controller\allowbreak{}DTree}\\\tiny Coordina acciones y escena};
-    \node[model] (algorithm) at (0,-11.7) {\texttt{AlgorithmDTree}\\\tiny Ejecuta ID3 paso a paso};
-
-    \draw[flow] (dataset.west) -- ++(-3.45,0) |- node[pos=0.78, left, flowlabel]{dataset seleccionado} ([yshift=2.5mm]controller.west);
-    \draw[flow] (algpanel.east) -- ++(3.45,0) |- node[pos=0.78, right, flowlabel]{acciones del usuario} ([yshift=2.5mm]controller.east);
-
-    \draw[flow] (controller.north) -- node[right, flowlabel]{crea y actualiza\\el árbol visible} (logical.south);
-    \draw[flow] (controller.west) -- ++(-5.0,0) |- node[pos=0.7, left, flowlabel]{actualiza\\explicación} (window.west);
-    \draw[flow] (controller.east) -- ++(5.0,0) |- node[pos=0.7, right, flowlabel]{activa\\evaluación} (eval.east);
-
-    \draw[flow] (logical.west) -- node[above, flowlabel]{organiza\\nodos} (dnode.east);
-    \draw[flow] (logical.east) -- node[above, flowlabel]{actualiza\\ramas} (connections.west);
-    \draw[flow] (logical.east) -- node[above, flowlabel]{posiciones de\\los nodos} (eval.south |- logical.east) -- (eval.south);
-    \draw[flow] (eval.west) -- node[above, flowlabel]{dato activo\\y resultado} (window.east);
-
-    \draw[flow] ([xshift=-4mm]controller.south) -- node[left, flowlabel]{solicita paso\\o retroceso} ([xshift=-4mm]algorithm.north);
-    \draw[flow] ([xshift=4mm]algorithm.north) -- node[right, flowlabel]{resultado del paso\\y \texttt{details}} ([xshift=4mm]controller.south);
-    \draw[flow] ([yshift=1.5mm]algorithm.east) to[out=15,in=-15,looseness=6] node[right, flowlabel]{\texttt{call\_stack}: pendientes\\\texttt{called\_stack}: ejecutados} ([yshift=-1.5mm]algorithm.east);
-  \end{tikzpicture}%
-  }
-  \caption{Arquitectura específica del módulo del árbol de decisión durante el entrenamiento, el retroceso y la evaluación.}
-  \label{fig:arquitectura_modulo_arbol}
-\end{figure}
+%\begin{figure}[H]
+%  \centering
+%  \resizebox{\textwidth}{!}{%
+%  \begin{tikzpicture}[
+%    font=\scriptsize,
+%    >=Latex,
+%    block/.style={
+%      draw,
+%      rounded corners=3pt,
+%      line width=0.5pt,
+%      align=center,
+%      minimum height=1cm,
+%      text width=2.9cm,
+%      inner sep=4pt
+%    },
+%    panel/.style={block, fill=gray!10, draw=gray!60!black, text width=3.05cm},
+%    controller/.style={block, fill=orange!12, draw=orange!65!black, text width=3.05cm},
+%    model/.style={block, fill=blue!8, draw=blue!60!black, text width=3.05cm},
+%    view/.style={block, fill=green!10, draw=green!45!black},
+%    info/.style={block, fill=purple!8, draw=purple!55!black},
+%    flow/.style={-{Latex[length=2.2mm]}, line width=0.55pt},
+%    flowlabel/.style={font=\tiny, align=center, fill=white, inner sep=1.2pt}
+%  ]
+%    \node[panel] (dataset) at (-2.5,0) {{\ttfamily PanelDataset\allowbreak{}Selection}\\\tiny Selección del dataset};
+%    \node[panel] (algpanel) at (2.5,0) {{\ttfamily PanelAlgorithm\allowbreak{}DTree}\\\tiny Avanzar, retroceder y evaluar};
+%
+%    \node[info] (window) at (-4.25,-2.9) {\texttt{Window}\\\tiny Mostrar texto, gráficas y fórmulas};
+%    \node[info] (eval) at (4.25,-2.9) {{\ttfamily EvalData}\\\tiny Recorrer el árbol};
+%    \node[view] (logical) at (0,-4.35) {\texttt{DTree}\\\tiny Identificadores,\\relaciones\\y posiciones};
+%    \node[view] (dnode) at (-4.25,-5.8) {\texttt{DNode}\\\tiny Nodo de decisión,\\hoja o pendiente};
+%    \node[view] (connections) at (4.25,-5.8) {{\ttfamily Conection}\\\tiny Ramas y sus etiquetas};
+%
+%    \node[controller] (controller) at (0,-8.7) {{\ttfamily Controller\allowbreak{}DTree}\\\tiny Coordina acciones y escena};
+%    \node[model] (algorithm) at (0,-11.7) {\texttt{AlgorithmDTree}\\\tiny Ejecuta ID3 paso a paso};
+%
+%    \draw[flow] (dataset.west) -- ++(-3.45,0) |- node[pos=0.78, left, flowlabel]{dataset seleccionado} ([yshift=2.5mm]controller.west);
+%    \draw[flow] (algpanel.east) -- ++(3.45,0) |- node[pos=0.78, right, flowlabel]{acciones del usuario} ([yshift=2.5mm]controller.east);
+%
+%    \draw[flow] (controller.north) -- node[right, flowlabel]{crea y actualiza\\el árbol visible} (logical.south);
+%    \draw[flow] (controller.west) -- ++(-5.0,0) |- node[pos=0.7, left, flowlabel]{actualiza\\explicación} (window.west);
+%    \draw[flow] (controller.east) -- ++(5.0,0) |- node[pos=0.7, right, flowlabel]{activa\\evaluación} (eval.east);
+%
+%    \draw[flow] (logical.west) -- node[above, flowlabel]{organiza\\nodos} (dnode.east);
+%    \draw[flow] (logical.east) -- node[above, flowlabel]{actualiza\\ramas} (connections.west);
+%    \draw[flow] (logical.east) -- node[above, flowlabel]{posiciones de\\los nodos} (eval.south |- logical.east) -- (eval.south);
+%    \draw[flow] (eval.west) -- node[above, flowlabel]{dato activo\\y resultado} (window.east);
+%
+%    \draw[flow] ([xshift=-4mm]controller.south) -- node[left, flowlabel]{solicita paso\\o retroceso} ([xshift=-4mm]algorithm.north);
+%    \draw[flow] ([xshift=4mm]algorithm.north) -- node[right, flowlabel]{resultado del paso\\y \texttt{details}} ([xshift=4mm]controller.south);
+%    \draw[flow] ([yshift=1.5mm]algorithm.east) to[out=15,in=-15,looseness=6] node[right, flowlabel]{\texttt{call\_stack}: pendientes\\\texttt{called\_stack}: ejecutados} ([yshift=-1.5mm]algorithm.east);
+%  \end{tikzpicture}%
+%  }
+%  \caption{Arquitectura específica del módulo del árbol de decisión durante el entrenamiento, el retroceso y la evaluación.}
+%  \label{fig:arquitectura_modulo_arbol}
+%\end{figure}
 
 A partir de aquí, el desarrollo continúa con el segundo algoritmo de la aplicación: la red neuronal.
 
@@ -985,6 +985,88 @@ Con esta fase queda completo el núcleo funcional de la red neuronal dentro de l
 La herramienta permite escoger datos, crear una arquitectura coherente con ellos, entrenarla paso a paso, mostrar el forward pass, calcular y explicar el backward pass, actualizar los pesos de forma visible y evaluar la red entrenada mediante inferencia.
 Las mejoras posteriores se centran en pulir la interfaz general, adaptar la vista a distintos tamaños y mejorar la presentación visual, partiendo ya de un árbol y de una red funcionales y explicables.
 
+La Figura \ref{fig:flujo_incremental_red_neuronal} resume el flujo completo que queda implementado en la red neuronal.
+El esquema se organiza en tres columnas dedicadas a la preparación, la máquina de estados y los elementos actualizados mediante Señales.
+Las flechas continuas representan el orden de ejecución y las discontinuas muestran las actualizaciones visuales o explicativas emitidas durante cada fase.
+
+%\begin{figure}[H]
+%  \centering
+%  \resizebox{\textwidth}{!}{%
+%  \begin{tikzpicture}[
+%    font=\footnotesize,
+%    >=Latex,
+%    y=1.08cm,
+%    block/.style={
+%      draw,
+%      rounded corners=3pt,
+%      line width=0.5pt,
+%      align=center,
+%      minimum height=1.2cm,
+%      text width=3.75cm,
+%      inner sep=5pt
+%    },
+%    setup/.style={block, fill=gray!10, draw=gray!60!black},
+%    state/.style={block, fill=blue!8, draw=blue!60!black},
+%    transition/.style={block, fill=purple!8, draw=purple!55!black},
+%    endstate/.style={block, fill=green!10, draw=green!45!black},
+%    component/.style={block, fill=orange!11, draw=orange!65!black},
+%    model/.style={block, fill=cyan!8, draw=cyan!55!black},
+%    flow/.style={-{Latex[length=2.1mm]}, line width=0.55pt},
+%    signal/.style={flow, dashed},
+%    header/.style={font=\bfseries\small, align=center},
+%    flowlabel/.style={font=\scriptsize, align=center, fill=white, inner sep=1.5pt}
+%  ]
+%    \node[header] at (-5.4,0.8) {Preparación};
+%    \node[header] at (0,0.8) {Máquina de estados};
+%    \node[header] at (5.4,0.8) {Elementos actualizados};
+%
+%    \node[setup] (dataset) at (-5.4,-0.8) {\textbf{Selección de dataset}\\Entradas, salidas\\y tipo de problema};
+%    \node[setup] (config) at (-5.4,-2.8) {\textbf{Configuración de red}\\Capas ocultas, neuronas\\y activaciones};
+%    \node[model] (vars) at (-5.4,-4.8) {\texttt{Variables.nn}\\Pesos, sesgos\\y activaciones};
+%    \node[setup] (control) at (-5.4,-6.8) {\textbf{Panel de control}\\Avance por neurona,\\capa, muestra o total};
+%
+%    \node[model] (algorithm) at (0,-0.8) {\texttt{AlgorithmNn}\\Máquina de estados\\observable};
+%    \node[state] (sample) at (0,-2.8) {\textbf{Cargar muestra}\\Entradas en la capa inicial\\y valor esperado};
+%    \node[state] (forward) at (0,-4.8) {\textit{Forward pass}\\Cálculo capa a capa\\y neurona a neurona};
+%    \node[state] (compare) at (0,-6.8) {\textbf{Comparar salida}\\Pérdida y deltas\\iniciales};
+%    \node[transition] (returnerror) at (0,-8.8) {\textbf{Retorno visual del error}\\La predicción pasa\\a corrección};
+%    \node[state] (backward) at (0,-10.8) {\textit{Backward pass}\\Deltas, gradientes\\y actualización};
+%    \node[state] (next) at (0,-12.8) {\textbf{Siguiente muestra}\\Usa los pesos\\actualizados};
+%    \node[endstate] (finish) at (0,-14.8) {\textbf{Fin del entrenamiento}\\Bloquea avance\\y habilita evaluación};
+%    \node[endstate] (infer) at (0,-16.8) {\textbf{Inferencia}\\Reutiliza el forward pass\\sin actualizar parámetros};
+%
+%    \node[component] (view) at (5.4,-4.8) {\texttt{NeuralNetwork}\\\texttt{Layer} y \texttt{Neuron}\\Arquitectura visible\\y resaltados};
+%    \node[component] (data) at (5.4,-6.8) {\texttt{NnEvalData}\\\texttt{Container}\\Entrada, salida, esperado\\y error};
+%    \node[component] (window) at (5.4,-8.8) {\texttt{WindowNN}\\Texto, fórmulas\\y gráficas};
+%    \node[component] (connections) at (5.4,-10.8) {\texttt{Dense}\\\texttt{Conection}\\\texttt{Container}\\Color, grosor\\e indicador de cambio};
+%
+%    \draw[flow] (dataset) -- (config);
+%    \draw[flow] (config) -- (vars);
+%    \draw[flow] (config.east) -- ++(0.8,0) |- ([yshift=2mm]algorithm.west);
+%    \draw[flow] (control.east) -- ++(1.2,0) |- ([yshift=-2mm]algorithm.west);
+%
+%    \draw[flow] (algorithm) -- (sample);
+%    \draw[flow] (sample) -- (forward);
+%    \draw[flow] (forward) -- (compare);
+%    \draw[flow] (compare) -- (returnerror);
+%    \draw[flow] (returnerror) -- (backward);
+%    \draw[flow] (backward) -- (next);
+%    \draw[flow] (next.west) -- ++(-0.9,0) |- (sample.west);
+%    \draw[flow] (next) -- (finish);
+%    \draw[flow] (finish) -- (infer);
+%    \draw[signal] (infer.east) -- ++(1.0,0) |- (forward.east);
+%
+%    \draw[signal] (forward.east) -- (view.west);
+%    \draw[signal] (compare.east) -- (data.west);
+%    \draw[signal] (returnerror.east) -- (window.west);
+%    \draw[signal] (backward.east) -- (connections.west);
+%    \draw[signal] (backward.west) -- ++(-1.7,0) |- (vars.south);
+%  \end{tikzpicture}%
+%  }
+%  \caption{Flujo de ejecución incremental de la red neuronal durante entrenamiento e inferencia.}
+%  \label{fig:flujo_incremental_red_neuronal}
+%\end{figure}
+
 
 
 \section{Mejoras de funcionalidades e interfaz de usuario: versión 1.0}
@@ -1123,14 +1205,14 @@ Cuando comienza el entrenamiento o la inferencia, los paneles de creación se oc
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.85\textwidth]{imaxes/nn_red_tras_menu.png}
+  \includegraphics[width=0.75\textwidth]{imaxes/nn_red_tras_menu.png}
   \caption{Creación de la red con el menú traslúcido situado sobre la visualización.}
   \label{fig:nn_red_tras_menu}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.85\textwidth]{imaxes/nn_red_al_lado_menu.png}
+  \includegraphics[width=0.75\textwidth]{imaxes/nn_red_al_lado_menu.png}
   \caption{Creación de la red con el menú de creación situado al lado de la visualización.}
   \label{fig:nn_red_al_lado_menu}
 \end{figure}

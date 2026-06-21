@@ -18,7 +18,7 @@ var current_chart_title: String = ""
 var current_chart_data: Dictionary[String, float] = {}
 
 
-const ENTROPY_FORMULA: String = "\\begin{aligned}&H(S) : \\text{entropía del atributo } S\\\\&c : \\text{numero de etiquetas distintas}\\\\&p_i : \\text{proporcion de datos con la etiqueta } i\\\\&H(S) = -\\sum_{i=1}^{c} p_i\\log_2(p_i)\\end{aligned}"
+const ENTROPY_FORMULA: String = "\\begin{aligned}&H(S) : \\text{entropía del atributo } S\\\\&c : \\text{número de etiquetas distintas}\\\\&p_i : \\text{proporción de datos con la etiqueta } i\\\\&H(S) = -\\sum_{i=1}^{c} p_i\\log_2(p_i)\\end{aligned}"
 
 const ZERO_ENTROPY_EXPLANATION: String = "\n\n{texto_atributos} {verbo_entropia} entropía 0 porque, con los datos que llegan a este nodo, dividir por {texto_referencia} no reduce la incertidumbre sobre la etiqueta: las proporciones de etiquetas quedan igual o no aportan una separación útil. Por eso su valor es 0 y no ayuda a decidir mejor la clasificación."
 const TRAINING_FINISHED_TEXT: String = "Entrenamiento finalizado, continúe con la evaluación pulsando 'Evaluar'."
@@ -30,7 +30,7 @@ const template_texts: Dictionary[String, Array] = {
 ["Han bajado {numero_de_datos} datos por esta rama.
 Estos {numero_de_datos} datos tenían las etiquetas {lista_etiquetas}.
 La entropía se calcula como:
-Los datos tienen los atributos {lista_atributos}, por lo que hay que calcular {metrica_de_ganancia_de_info_1} para decidir cuál sirve para dividir los mejor.",
+Los datos tienen los atributos {lista_atributos}, por lo que hay que calcular {metrica_de_ganancia_de_info_1} para decidir cuál sirve para dividirlos mejor.",
 #{lista_ganancias}
 "El que tiene mejor {metrica_de_ganancia_de_info_2} es '{mejor_atributo}' con {valor_metrica_mejor_atributo}.
 Las ramas que se crean a partir de '{mejor_atributo}' son:
@@ -40,7 +40,7 @@ Las ramas que se crean a partir de '{mejor_atributo}' son:
 ["Han bajado {numero_de_datos} datos por esta rama.
 Estos {numero_de_datos} datos tenían las etiquetas {lista_etiquetas}.
 La entropía se calcula como:
-Los datos tienen los atributos {lista_atributos}, por lo que hay que calcular {metrica_de_ganancia_de_info_1} para decidir cuál sirve para dividir los mejor.",
+Los datos tienen los atributos {lista_atributos}, por lo que hay que calcular {metrica_de_ganancia_de_info_1} para decidir cuál sirve para dividirlos mejor.",
 #{lista_ganancias}
 "Hay {n_atributos_con_ganancia_maxima} atributos con mejor {metrica_de_ganancia_de_info_2}, con un valor de {valor_metrica_mejor_atributo}.
 Por lo tanto se selecciona uno aleatoriamente y se prosigue, en este caso \"{mejor_atributo}\".
@@ -49,14 +49,14 @@ Las ramas que se crean a partir de '{mejor_atributo}' son:
 
 	"leaf":
 ["Ha bajado {numero_de_datos} datos por esta rama con la misma etiqueta.
-Por lo tanto, para este conjunto de datos solo podemos asumir que los futuros datos que lleugen a esta rama tendrán la misma etiqueta: {lista_etiquetas}"],
+Por lo tanto, para este conjunto de datos solo podemos asumir que los futuros datos que lleguen a esta rama tendrán la misma etiqueta: {lista_etiquetas}"],
 
 	"leaf_mayority":
 	["Han bajado {numero_de_datos} datos por esta rama.
 Pero no quedan atributos sin recorrer para estos datos, es decir, todos los atributos han sido valorados para clasificar los datos.
 Por lo que solo queda ver qué etiquetas tienen los datos resultantes.",
 "Si todos tienen la misma etiqueta, perfecto, había datos repetidos o muy similares entre los datos, pero todos estos los clasificamos igual.
-Si hay varias etiquetas, pues los atributos escogidos no sirven para diferenciar a la perfección todos los casos de nuestro conjunto de datos. Pero hay que seleccioniar una etiqueta para este nodo hoja, por lo que se escoje la etiqueta mayoritaria.
+Si hay varias etiquetas, pues los atributos escogidos no sirven para diferenciar a la perfección todos los casos de nuestro conjunto de datos. Pero hay que seleccionar una etiqueta para este nodo hoja, por lo que se escoge la etiqueta mayoritaria.
 En este caso '{etiqueta_mayoritaria}'."],
 
 	"leaf_majority":
@@ -64,7 +64,7 @@ En este caso '{etiqueta_mayoritaria}'."],
 Pero no quedan atributos sin recorrer para estos datos, es decir, todos los atributos han sido valorados para clasificar los datos.
 Por lo que solo queda ver qué etiquetas tienen los datos resultantes.",
 "Si todos tienen la misma etiqueta, perfecto, había datos repetidos o muy similares entre los datos, pero todos estos los clasificamos igual.
-Si hay varias etiquetas, pues los atributos escogidos no sirven para diferenciar a la perfección todos los casos de nuestro conjunto de datos. Pero hay que seleccioniar una etiqueta para este nodo hoja, por lo que se escoje la etiqueta mayoritaria.
+Si hay varias etiquetas, pues los atributos escogidos no sirven para diferenciar a la perfección todos los casos de nuestro conjunto de datos. Pero hay que seleccionar una etiqueta para este nodo hoja, por lo que se escoge la etiqueta mayoritaria.
 En este caso '{etiqueta_mayoritaria}'."],
 
 	"node_partition":
