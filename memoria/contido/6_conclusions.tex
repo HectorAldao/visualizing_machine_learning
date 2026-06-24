@@ -23,8 +23,23 @@ Estas funciones permiten observar no solo cómo se obtiene un modelo, sino tambi
 
 El trabajo ha permitido adquirir competencias directamente relacionadas con los objetivos propuestos.
 La implementación desde cero de los algoritmos obligó a comprender sus parámetros, sus estructuras internas y las condiciones que aparecen durante su ejecución.
-La construcción de la interfaz exigió organizar Escenas, Señales, paneles, animaciones y elementos informativos para que la interacción fuera comprensible.
+La construcción de la interfaz exigió organizar Escenas, Señales, paneles, animaciones y elementos informativos para que la interacción fuera comprensible, un proceso de diseño de software ageno a los contenidos del Grado en Inteligencia Artificial.
 El despliegue web, junto con la carga y descarga de archivos en navegador, amplió el alcance técnico del proyecto y permitió que la aplicación pudiera consultarse como recurso público de aprendizaje.
 
 En conjunto, el proyecto cumple el propósito principal de ofrecer una herramienta que ayude a comprender paso a paso el funcionamiento interno de dos modelos básicos de aprendizaje automático.
 La aplicación final no se limita a mostrar el resultado de un entrenamiento, sino que hace visible el proceso que conduce a ese resultado, acompaña los cálculos con texto, fórmulas y gráficas, y permite experimentar con datos y configuraciones desde una interfaz accesible en web.
+
+\section{Trabajo futuro}
+\label{sec:trabajo_futuro}
+
+El desarrollo realizado deja una base sobre la que pueden plantearse varias ampliaciones.
+La aplicación actual se centra en dos modelos concretos, árboles de decisión y redes neuronales multicapa, y los presenta de forma incremental para que el usuario pueda seguir tanto el entrenamiento como la evaluación.
+A partir de esa base, el trabajo futuro puede organizarse en tres líneas principales: ampliar el catálogo de algoritmos, profundizar en las opciones de los modelos ya implementados e integrar el aprendizaje con simulaciones interactivas creadas en el propio motor.
+
+\begin{itemize}
+    \item \textbf{Ampliación del catálogo de modelos}: una primera línea de evolución consiste en incorporar nuevos algoritmos de aprendizaje automático. La estructura modular desarrollada facilita que la aplicación pueda crecer con nuevos modelos, siempre que cada uno se acompañe de una visualización adaptada a su forma de aprender. %Esta ampliación también permitiría comparar cómo distintos algoritmos resuelven un mismo conjunto de datos, qué información utiliza cada uno y qué tipo de explicación resulta más adecuada en cada caso.
+    \item \textbf{Profundización en los modelos existentes}: una segunda línea de trabajo consiste en enriquecer los algoritmos que ya forman parte de la aplicación. En el árbol de decisión, sería interesante permitir distintos criterios de división, ampliar el tipo de datos aceptados para manejar atributos numéricos continuos e incorporar técnicas de poda o mecanismos de control de crecimiento. En la red neuronal, el trabajo futuro puede avanzar hacia una configuración más flexible del entrenamiento, con distintos optimizadores, número de épocas, tamaño de batch, tasa de aprendizaje modificable, regularización, etc. %También podría permitirse el uso de topologías no densas o definidas por el usuario, manteniendo la relación entre arquitectura visible y modelo lógico.
+    \item \textbf{Integración con simulaciones interactivas}: la tercera línea de trabajo es la más vinculada con la elección de Godot como herramienta de desarrollo. Una evolución especialmente interesante sería conectar los algoritmos con una simulación o un videojuego ejecutándose en la propia aplicación. En ese escenario, el entorno interactivo generaría datos durante la ejecución, y el modelo aprendería a partir de lo que sucede en la escena. Esto permitiría pasar de datasets estáticos a explorar problemas cercanos al aprendizaje por refuerzo y mostrar al mismo tiempo la evolución del entorno y la evolución del algoritmo que aprende a partir de él.
+\end{itemize}
+
+Estas líneas deberían mantener la prioridad de la versión actual, de forma que cada avance del algoritmo pueda observarse, cada decisión esté acompañada por una explicación y la visualización ayude a entender el funcionamiento interno del modelo. También sería de gran interés probar la aplicación con usuarios reales para detectar qué partes resultan más y menos claras, y qué cambios podrían mejorar su utilidad didáctica.
