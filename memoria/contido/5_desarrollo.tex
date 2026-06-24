@@ -61,7 +61,7 @@ Estos archivos forman una versión distinta del proyecto editable y contienen el
 
 Tras generar la exportación, se publica el prototipo mediante GitHub Pages.
 Para ello se configura el repositorio de forma que los archivos exportados queden disponibles desde una dirección pública.
-El objetivo de realizar esta prueba tan pronto en el desarrollo es no retrasar la solución de problemas que puedan surgir a raíz de la transoformación del proyecto a HTML5 o de su compatibilidad con GitHub Pages.
+El objetivo de realizar esta prueba tan pronto en el desarrollo es no retrasar la solución de problemas que puedan surgir a raíz de la transformación del proyecto a HTML5 o de su compatibilidad con GitHub Pages.
 
 La prueba valida el flujo de trabajo previsto, basado en desarrollar en Godot, exportar la versión HTML5 y publicar el resultado como una aplicación accesible desde un enlace.
 Esta validación temprana tiene un peso importante en el desarrollo, porque confirma que la herramienta puede llegar al usuario sin instalación local ni infraestructura de servidor propia.
@@ -417,7 +417,7 @@ En esta etapa también se flexibiliza la carga de CSV para que la columna objeti
 %En las primeras pruebas, el algoritmo asumía ese nombre fijo para la etiqueta de salida, lo que limitaba el uso de conjuntos con cabeceras diferentes.
 %La solución adoptada consiste en tratar como atributos las columnas indicadas por el panel y deducir la etiqueta como la columna restante.
 %En la carga de archivos CSV también se amplía la lista de nombres reconocidos automáticamente como columna objetivo.
-al amplíar la lista de nombres reconocidos automáticamente como columna objetivo.
+al ampliar la lista de nombres reconocidos automáticamente como columna objetivo.
 %\textcolor{olive}{aquí he metido este anglicismo para no repetir columna objtivo}
 De esta forma, el árbol puede entrenarse con conjuntos que usen nombres como \textit{class} o \textit{label}, siempre que el conjunto tenga una única columna objetivo.
 
@@ -746,7 +746,7 @@ Una vez fijadas estas condiciones, la red queda preparada para conectarse con el
 Una vez que la arquitectura y los datos están definidos, hay que entrenar la red.
 Esta responsabilidad se concentra en un \gls{Nodo} dedicado a procesar el algoritmo, separado de la vista.
 Su papel consiste en calcular el siguiente avance, actualizar el estado interno y emitir Señales para que la \gls{Escena} represente el cambio correspondiente.
-La misma estructura que el algoritmo del árbol.
+Sigue la misma estructura que el algoritmo del árbol.
 
 Al comenzar el entrenamiento, la \gls{Escena} configura el algoritmo con toda la información necesaria.
 Le entrega las filas del conjunto de datos, los atributos de entrada, las columnas objetivo y toda la información de la arquitectura de la red.
@@ -785,7 +785,7 @@ Esta decisión reduce la complejidad visual del procedimiento y concentra la exp
 
 El algoritmo también coordina los elementos visuales que acompañan al entrenamiento.
 Al cargar una muestra, emite Señales para preparar los valores de entrada y los valores esperados.
-Durante el \textit{forward pass} y el \textit{backward pass}, emiten Señales para resaltar la parte de la red que se está procesando.
+Durante el \textit{forward pass} y el \textit{backward pass}, emite Señales para resaltar la parte de la red que se está procesando.
 Cuando un peso cambia, emite la actualización correspondiente para que la conexión visual modifique su grosor o color según el nuevo valor.
 
 Al finalizar el entrenamiento, la interfaz cambia de estado.
@@ -1088,7 +1088,7 @@ Una de las primeras tareas de pulido consiste en revisar el menú principal.
 Hasta ese momento, la pantalla inicial funcionaba solo como una forma rápida de entrar en cada algoritmo.
 %Con la aplicación más avanzada, el menú necesitaba presentar el contenido disponible y contextualizar cada opción antes de abrir una vista de algoritmo.
 %Para ello se sustituyen los accesos directos por un flujo de selección.
-Esto se cambió por por un flujo de selección.
+Esto se cambió por un flujo de selección.
 El usuario escoge primero el algoritmo que quiere visualizar y, al hacerlo, la interfaz actualiza un panel descriptivo con información sobre esa opción.
 El botón de comienzo se habilita solo cuando existe una selección.
 De esta forma, el menú deja de actuar como una lista de botones y pasa a funcionar como punto de entrada explicativo al proyecto.
@@ -1129,7 +1129,7 @@ La navegación interna se unifica mediante un menú común que se aprecia en la 
 Tanto el árbol como la red incorporan una opción para volver al menú principal y, cuando corresponde, botones asociados a cargar o guardar el algoritmo que se esté explorando.
 Este menú se implementa como una \gls{Escena} aparte con lógica autocontenida, de modo que las vistas no tienen que resolver por separado la navegación básica.
 En el árbol, los botones de carga y guardado abren el explorador de archivos local para cargar en la aplicación o guardar en el ordenador respectivamente la estructura entrenada.
-En la red, el de guardado abre el panel de exportación del modelo. Para la red la carga se hacer desde el menú de edición de la arquitectura.
+En la red, el de guardado abre el panel de exportación del modelo. Para la red la carga se hace desde el menú de edición de la arquitectura.
 Al volver al menú principal también se limpia el estado compartido de la red neuronal.
 Esta limpieza evita que una arquitectura creada en una sesión anterior interfiera en la construcción de una nueva red.
 %\textcolor{olive}{esto es una explicación de un bug, pero ns, no hay más q decir}
@@ -1149,7 +1149,7 @@ Con esta mejora, la aplicación puede reutilizarse dentro de la misma sesión we
 
 
 
-\subsection{Adaptación a pantallas de distintos tamaños y orientaciónes}
+\subsection{Adaptación a pantallas de distintos tamaños y orientaciones}
 
 Otra tarea central de esta fase es la adaptación de la interfaz a tamaños de pantalla distintos.
 La aplicación se publica como página web, por lo que no puede asumir una única resolución de escritorio.
@@ -1163,7 +1163,7 @@ Esta planificación reduce la dependencia de posiciones absolutas y permite trat
   \centering
   \begin{minipage}[b]{0.48\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{imaxes/balsamic_dispocicion_horizontal.png}
+    \includegraphics[width=\textwidth]{imaxes/balsamic_disposicion_horizontal.png}
   \end{minipage}
   \hfill
   \begin{minipage}[b]{0.48\textwidth}
@@ -1180,12 +1180,12 @@ Se incorporan márgenes, zonas centradas, paneles con anchura máxima y contened
 Con esta estructura, el contenido puede reducir su anchura y activar desplazamiento vertical de forma automática cuando la pantalla es pequeña.
 Los tamaños de fuente, los márgenes y las dimensiones mínimas de los botones se ajustan para conservar legibilidad sin depender de posiciones absolutas.
 Los resultados ya se mostraron en la Sección \ref{sec:entrada_principal_y_navegacion_comun}.
-También se puede ver el resultado en movil en la Figura \ref{fig:final_menu_movil}.
+También se puede ver el resultado en móvil en la Figura \ref{fig:final_menu_movil}.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.3\textwidth]{imaxes/final_menu_movil.png}
-  \caption{Vista del menu principal en un movil.}
+  \caption{Vista del menú principal en un móvil.}
   \label{fig:final_menu_movil}
 \end{figure}
 
@@ -1269,7 +1269,7 @@ En la Figura \ref{fig:final_nn_conexiones_multicolor} se puede ver la representa
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.85\textwidth]{imaxes/nn_conexiones_multicolor.png}
-  \caption{Red neuronal con conexiones sin limite de grosor coloreadas mediante gradientes desde el cian hasta el verde para valores positivos y desde el amarillo hasta el rojo para valores negativos.}
+  \caption{Red neuronal con conexiones sin límite de grosor coloreadas mediante gradientes desde el cian hasta el verde para valores positivos y desde el amarillo hasta el rojo para valores negativos.}
   \label{fig:nn_conexiones_multicolor}
 \end{figure}
 
@@ -1309,7 +1309,7 @@ Por ello se dedica una tarea específica a integrar un sistema de renderizado La
 %Esta integración evita posicionar manualmente las fórmulas como si fueran sprites de la \gls{Escena}.
 
 Inicialmente se probó una solución basada en MathJax y elementos HTML superpuestos al lienzo de Godot.
-Sin embargo el resultado siempre acababa con el texto de latex en crudo ocupando toda la pantalla como se ve en la Figura \ref{fig:mathjax}.
+Sin embargo el resultado siempre acababa con el texto de LaTeX en crudo ocupando toda la pantalla como se ve en la Figura \ref{fig:mathjax}.
 Esto ocurre porque, como se trató en la Sección \ref{sec:exportacion_web_con_github_pages}, el sistema de exportación de Godot se fundamenta en un elemento \textit{canvas}, en el cual MathJax no puede renderizar de forma nativa.
 
 \begin{figure}[H]
@@ -1338,19 +1338,19 @@ Este trabajo afecta especialmente a la versión web, donde un escalado incorrect
 
 \subsection{Explicaciones de mayor nivel en la red neuronal}
 
-La red neuronal ya explicaba cálculos neurona a neurona, pero esta fase amplía la granularidad de las explicaciones aprovechando la posibilidad de renderizar formulas de la Sección \ref{sec:renderizado_de_formulas_matematicas}.
+La red neuronal ya explicaba cálculos neurona a neurona, pero esta fase amplía la granularidad de las explicaciones aprovechando la posibilidad de renderizar fórmulas de la Sección \ref{sec:renderizado_de_formulas_matematicas}.
 El panel de entrenamiento permite avanzar por neurona, por capa, por muestra o completar el entrenamiento.
 La ventana informativa debe adaptarse a esos niveles para que cada modo de avance tenga una explicación adecuada.
 
 Para el forward pass se añaden explicaciones de capa completa.
-El algoritmo guarda la información del último avance de capa y la ventana puede mostrar la operación agregada como se muestra en la Figura \ref{fig:final_matriz_foward}. % con vectores, matrices de pesos, sesgos, valores previos a la activación y salidas activadas.
+El algoritmo guarda la información del último avance de capa y la ventana puede mostrar la operación agregada como se muestra en la Figura \ref{fig:final_matriz_forward}. % con vectores, matrices de pesos, sesgos, valores previos a la activación y salidas activadas.
 Esto conecta la visualización detallada de neuronas individuales con la formulación matricial habitual de las redes densas.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.75\textwidth]{imaxes/final_matriz_foward_peligro.png}
+  \includegraphics[width=0.75\textwidth]{imaxes/final_matriz_forward_peligro.png}
   \caption{Texto y fórmulas de la propagación de la red por capas.}
-  \label{fig:final_matriz_foward}
+  \label{fig:final_matriz_forward}
 \end{figure}
 
 El backward pass recibe un tratamiento similar.
@@ -1420,18 +1420,18 @@ Así se conectan el valor numérico de entrada, la fórmula aplicada y la forma 
 \end{figure}
 
 \subsection{Selección de conjuntos de datos}
-\label{sec:seleccoin_de_conjuntos_de_datos}
+\label{sec:seleccion_de_conjuntos_de_datos}
 
 La carga de datos ya existía en fases anteriores.
 En esta etapa se mejora la usabilidad del panel de carga al mejorarlo a nivel estético y de funcionalidades.
 Visualmente se aprecia en la Figura \ref{fig:final_dsp} mejoras en la legibilidad gracias a la nueva distribución de la información en el panel.
-Y en cuando a funcionlidades, se implementó, para su uso desde el navegador, una conexión con JavaScript que permite leer archivos desde la aplicación exportada al navegador.
-Esta se usa cuándo la aplicación detecta que el entorno de ejecución es web.
-Se encarga de llamar al recurso del navegador que permite el acceso a archivos en local, para que después el motor de Godot se encarge de procesar lo seleccionado.
-Hasta que se implementó este cambio, en la versión web se habría un menú nativo de Godot sin acceso al ordenador del usuario.
+Y en cuanto a funcionalidades, se implementó, para su uso desde el navegador, una conexión con JavaScript que permite leer archivos desde la aplicación exportada al navegador.
+Esta se usa cuando la aplicación detecta que el entorno de ejecución es web.
+Se encarga de llamar al recurso del navegador que permite el acceso a archivos en local, para que después el motor de Godot se encargue de procesar lo seleccionado.
+Hasta que se implementó este cambio, en la versión web se abría un menú nativo de Godot sin acceso al ordenador del usuario.
 Las pruebas de carga se podían seguir realizando, pero desde el editor.
-Con esta funcionalidad implementada se puede también cargar con nomalidad un csv también desde la aplicación desplegada.
-Esto sería usado tambíen para la carga y cuardado de modelos, como se detalla en la Sección \ref{sec:persistencia_carga_y_validacion_de_modelos}.
+Con esta funcionalidad implementada se puede también cargar con normalidad un csv también desde la aplicación desplegada.
+Esto sería usado también para la carga y guardado de modelos, como se detalla en la Sección \ref{sec:persistencia_carga_y_validacion_de_modelos}.
 
 \begin{figure}[H]
   \centering
@@ -1539,7 +1539,7 @@ Esta conexión tiene un papel transversal, ya que se usa tanto para guardar y ca
 En el árbol de decisión se implementa guardado y carga en formato JSON.
 El guardado conserva la estructura del árbol, la información visible de sus \gls{nodo}s y ramas, y los metadatos del conjunto de datos cuando están disponibles.
 Esto permite recuperar un árbol con su forma visual y con la información necesaria para seguir inspeccionándolo o evaluándolo.
-Para la carga, primero se valida la estructura, después se vacía el árbol que esté en la aplicación en ese momento y vuelve por último vuelve a crear los \gls{nodo}s en base a lo que indique el archivo.
+Para la carga, primero se valida la estructura, después se vacía el árbol que esté en la aplicación en ese momento y por último vuelve a crear los \gls{nodo}s en base a lo que indique el archivo.
 Tras una carga válida, el controlador configura el árbol como una estructura ya entrenada, preparando la \gls{Escena} para ello.
 %Si el archivo no contiene metadatos de atributos, la aplicación intenta inferirlos a partir de la raíz o de los atributos usados por los \gls{nodo}s.
 %Esta recuperación amplía la compatibilidad con archivos generados en fases anteriores.
@@ -1556,8 +1556,8 @@ El modelo debe tener el número esperado de neuronas de entrada y de salida.
 Cuando alguna dimensión no coincide, la interfaz informa de la diferencia entre la arquitectura cargada y la requerida por los datos actuales.
 Esta comprobación impide entrenar o ejecutar inferencia con un modelo que no puede recibir las columnas seleccionadas o que no produce las salidas esperadas.
 
-La implementación de esta exportación fué validada con un script de Python.
-En este se verificaba que la red de la Figura~\ref{fig:resultados_pesos_aplicacion_en_aplicacion}, extraida de la aplicación, era reconocida por la librería de ONNX y que sus parámetros coincidían.
+La implementación de esta exportación fue validada con un script de Python.
+En este se verificaba que la red de la Figura~\ref{fig:resultados_pesos_aplicacion_en_aplicacion}, extraída de la aplicación, era reconocida por la librería de ONNX y que sus parámetros coincidían.
 En la neurona de salida se observan pesos cercanos a \(1.943\), \(1.929\) y \(-0.965\), junto con un sesgo cercano a \(0.994\).
 
 \begin{figure}[H]
