@@ -75,18 +75,23 @@ func _download_file_from_browser(file_path: String, download_name: String) -> vo
 		push_error("No se pudo preparar la descarga del archivo exportado.")
 		return
 
-	var content := file.get_as_text()
+	var content_base64 := Marshalls.raw_to_base64(file.get_buffer(file.get_length()))
 	file.close()
 
 	var js_bridge = Engine.get_singleton("JavaScriptBridge")
-	js_bridge.get_interface("window").godotNnExportContent = content
+	js_bridge.get_interface("window").godotNnExportContentBase64 = content_base64
 	js_bridge.get_interface("window").godotNnExportFileName = download_name
 	js_bridge.eval(
 		"""
 		(function () {
-			const content = window.godotNnExportContent || "";
+			const contentBase64 = window.godotNnExportContentBase64 || "";
 			const fileName = window.godotNnExportFileName || "network";
-			const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+			const binary = atob(contentBase64);
+			const bytes = new Uint8Array(binary.length);
+			for (let i = 0; i < binary.length; i += 1) {
+				bytes[i] = binary.charCodeAt(i);
+			}
+			const blob = new Blob([bytes], { type: "application/octet-stream" });
 			const url = URL.createObjectURL(blob);
 			const link = document.createElement("a");
 			link.href = url;

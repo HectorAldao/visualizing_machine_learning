@@ -148,12 +148,8 @@ func _build_node_step(context: Dictionary) -> void:
 		return
 	
 	# Calculate information gain for all attributes
-	#details["ganancias_info"] = {}
 	var gains: Dictionary[String, float] = _information_gains_for_all_atributes(attributes, data)
 	
-	#var concatenation: String = ""
-	#for key in gains:
-		#concatenation += str(key) + " = " + str(gains[key]) + "\n"
 	details["lista_ganancias"] = gains
 	
 	

@@ -120,14 +120,20 @@ func _load_network_from_browser() -> void:
 				}
 				const reader = new FileReader();
 				reader.onload = function (event) {
-					window.godotNnUploadCallback(event.target.result, file.name);
+					const bytes = new Uint8Array(event.target.result);
+					let binary = "";
+					const chunkSize = 0x8000;
+					for (let i = 0; i < bytes.length; i += chunkSize) {
+						binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
+					}
+					window.godotNnUploadCallback(btoa(binary), file.name);
 					input.remove();
 				};
 				reader.onerror = function () {
 					window.godotNnUploadCallback("", file.name, "No se pudo leer el archivo.");
 					input.remove();
 				};
-				reader.readAsText(file);
+				reader.readAsArrayBuffer(file);
 			});
 			document.body.appendChild(input);
 			input.click();
@@ -154,7 +160,7 @@ func _on_web_network_loaded(args: Array) -> void:
 		_show_network_load_error("Error preparando la red: %d" % FileAccess.get_open_error())
 		return
 
-	file.store_string(str(args[0]))
+	file.store_buffer(Marshalls.base64_to_raw(str(args[0])))
 	file.close()
 	_import_network(temp_path, display_name)
 
