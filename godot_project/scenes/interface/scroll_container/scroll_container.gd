@@ -7,7 +7,6 @@ class_name ScrollContainerV2 extends ScrollContainer
 @export var max_zoom: float = 3.
 @export var min_zoom: float = 0.1
 @export var touch_drag_deadzone: float = 5.0
-@export var pinch_zoom_pixels_per_step: float = 100.0
 @export var fallback_scroll_container: ScrollContainerV2
 
 var is_middle_mouse_dragging: bool = false
@@ -16,7 +15,6 @@ var touch_positions: Dictionary = {}
 var is_touch_dragging: bool = false
 var touch_drag_start_position: Vector2 = Vector2.ZERO
 var last_touch_position: Vector2 = Vector2.ZERO
-var last_pinch_distance: float = 0.0
 
 
 # Called when the node enters the scene tree for the first time.
@@ -102,17 +100,10 @@ func _handle_screen_touch(event: InputEventScreenTouch) -> void:
 			touch_drag_start_position = event.position
 			last_touch_position = event.position
 
-		# Two fingers
-		elif touch_positions.size() == 2:
-			is_touch_dragging = false
-			last_pinch_distance = _get_pinch_distance()
-			accept_event()
-
 		return
 
 	var was_touch_gesture = is_touch_dragging or touch_positions.size() >= 2
 	touch_positions.erase(event.index)
-	last_pinch_distance = 0.0
 	is_touch_dragging = false
 
 	if touch_positions.size() == 1:
@@ -146,17 +137,6 @@ func _handle_screen_drag(event: InputEventScreenDrag) -> void:
 		if did_scroll:
 			accept_event()
 		return
-
-	if touch_positions.size() == 2:
-		var current_pinch_distance = _get_pinch_distance()
-
-		if last_pinch_distance > 0.0 and pinch_zoom_pixels_per_step > 0.0:
-			var delta = ((current_pinch_distance - last_pinch_distance) / pinch_zoom_pixels_per_step) * zoom_speed
-			_apply_zoom_delta(delta)
-
-		last_pinch_distance = current_pinch_distance
-		accept_event()
-
 
 func try_drag_scroll(delta_position: Vector2) -> bool:
 	return _try_drag_scroll(delta_position, [])
@@ -237,13 +217,6 @@ func _apply_zoom_delta(delta: float) -> void:
 		min_zoom,
 		max_zoom
 	)
-
-
-func _get_pinch_distance() -> float:
-	var touch_indices = touch_positions.keys()
-	var first_position: Vector2 = touch_positions[touch_indices[0]]
-	var second_position: Vector2 = touch_positions[touch_indices[1]]
-	return first_position.distance_to(second_position)
 
 
 func _get_single_touch_position() -> Vector2:
